@@ -1527,20 +1527,15 @@ tr[id]{scroll-margin-top:110px;}
   letter-spacing:.12em;
   text-transform:uppercase;
 }
-.component-media-right,
-.lore-side-art,
-.wall-side-images{
+/* v25: component media block must not override existing v23 artwork layouts on wall/order pages */
+.component-media-right{
   width:min(34vw,320px);
   margin:6px 0 22px 28px;
   float:right;
   clear:right;
 }
-.component-media-right figure,
-.lore-side-art figure,
-.wall-side-images figure{margin:0 0 18px 0;}
-.component-media-right img,
-.lore-side-art img,
-.wall-side-images img{
+.component-media-right figure{margin:0 0 18px 0;}
+.component-media-right img{
   display:block;
   width:100%;
   max-width:320px;
@@ -1551,9 +1546,7 @@ tr[id]{scroll-margin-top:110px;}
   box-shadow:0 18px 42px rgba(0,0,0,.36),0 0 0 1px rgba(255,255,255,.025);
 }
 .component-caption,
-.component-media-right figcaption,
-.lore-side-art figcaption,
-.wall-side-images figcaption{
+.component-media-right figcaption{
   margin-top:7px;
   padding:0 2px;
   font-family:'Cinzel',serif;
@@ -1594,13 +1587,13 @@ tr[id]{scroll-margin-top:110px;}
 .component-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);gap:22px;align-items:start;}
 .component-split__media img{width:100%;max-width:320px;height:auto;object-fit:contain;border-radius:18px;border:1px solid rgba(201,169,97,.22);box-shadow:0 18px 42px rgba(0,0,0,.36);}
 @media (max-width:900px){
-  .component-media-right,.lore-side-art,.wall-side-images{float:none;width:min(100%,340px);margin:18px auto 24px;}
-  .component-media-right img,.lore-side-art img,.wall-side-images img{max-width:340px;max-height:280px;}
+  .component-media-right{float:none;width:min(100%,340px);margin:18px auto 24px;}
+  .component-media-right img{max-width:340px;max-height:280px;}
   .component-split{grid-template-columns:1fr;}
   .component-split__media{order:-1;max-width:340px;margin:0 auto;}
 }
 @media (max-width:520px){
   .component-card,.recipe-card,.creature-card,.anomaly-card{border-radius:18px;}
   .creature-card,.statblock.creature-card{padding:18px 15px;}
-  .component-media-right img,.lore-side-art img,.wall-side-images img{max-width:100%;max-height:240px;}
+  .component-media-right img{max-width:100%;max-height:240px;}
 }
