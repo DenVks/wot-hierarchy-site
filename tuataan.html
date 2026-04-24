@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Туата’ан · Колесо Времени · 270 ПБ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="pattern-bg"></div>
+  <div class="thread-layer"><svg viewBox="0 0 1800 1200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="thread1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c9a961" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#c9a961" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#c9a961" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="thread2" x1="0" y1="0" x2="1" y2="0.3">
+      <stop offset="0" stop-color="#c084fc" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#c084fc" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#c084fc" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="thread3" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#fb923c" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#fb923c" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#fb923c" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path d="M-50,180 Q400,60 850,240 Q1200,380 1850,180" stroke="url(#thread1)" stroke-width="1" fill="none"/>
+  <path d="M-50,520 Q500,440 950,600 Q1400,720 1850,540" stroke="url(#thread1)" stroke-width=".7" fill="none" opacity=".7"/>
+  <path d="M-50,820 Q350,680 750,850 Q1150,1000 1850,780" stroke="url(#thread2)" stroke-width=".6" fill="none" opacity=".8"/>
+  <path d="M-50,1050 Q450,950 900,1080 Q1350,1180 1850,1020" stroke="url(#thread3)" stroke-width=".5" fill="none" opacity=".65"/>
+</svg></div>
+
+<nav class="sitenav"><div class="inner"><a href="index.html" class="nav-brand"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="wg" cx="50%" cy="50%"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/></radialGradient></defs><g stroke="url(#wg)" fill="none" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"/><circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/><circle cx="40" cy="40" r="18" stroke-width=".5" opacity=".55"/><circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/><g stroke-width=".55" opacity=".7"><line x1="40" y1="4" x2="40" y2="76"/><line x1="4" y1="40" x2="76" y2="40"/><line x1="14.8" y1="14.8" x2="65.2" y2="65.2"/><line x1="65.2" y1="14.8" x2="14.8" y2="65.2"/><line x1="40" y1="4" x2="52" y2="76"/><line x1="40" y1="4" x2="28" y2="76"/><line x1="4" y1="40" x2="76" y2="52"/></g><circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="epoch.html">Эпоха</a><a href="hierarchies.html">Три Иерархии</a><a href="unity.html">Единство</a><a href="throne.html">Трон</a><a href="madding.html">Хранители</a><a href="hierarchy-wall.html">Иерархия Стены</a><a href="order.html">Орден</a><a href="wall.html">Стена</a><a href="chronicles.html">Хроника</a><a href="anomalies.html">Аномалии</a><a href="aiel.html">Айил</a><a href="tuataan.html">Туата’ан</a><a href="freefolk.html">Вольные</a><a href="rituals.html">Ритуалы</a><a href="ingredients.html">Ингредиенты</a><a href="tsitadel.html">Цитадель</a><a href="monsters.html">Монстры</a></div></div></nav>
+<div class="page-body">
+<style>
+.stream-wrap{max-width:900px;margin:40px auto;display:grid;grid-template-columns:1fr;gap:24px}
+.stream-card{background:linear-gradient(180deg,var(--bg-card) 0%,var(--bg-deep) 100%);border:1px solid var(--border);border-left:3px solid var(--stream-color,var(--c-order));padding:30px 32px}
+.stream-card.s1{--stream-color:#a78bfa}
+.stream-card.s2{--stream-color:#06b6d4}
+.stream-card.s3{--stream-color:#f59e0b}
+.stream-card h3{font-family:'Cinzel',serif;font-size:22px;color:var(--ink);margin-bottom:6px;font-weight:500}
+.stream-card .sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--stream-color);margin-bottom:16px}
+.stream-card p{font-size:15px;color:var(--ink-soft);line-height:1.8;margin-bottom:12px}
+.stream-card p strong{color:var(--ink)}
+.stream-card p em{color:var(--stream-color);font-style:italic}
+</style>
+<header class="page-header">
+  <div class="page-header-flourish left" style="color:var(--gold)"><svg viewBox="0 0 60 160" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="currentColor" fill="none" stroke-width="0.6" stroke-linecap="round">
+    <path d="M30 10 L30 150"/>
+    <path d="M30 30 Q15 40 20 55 Q25 65 40 55 Q50 48 45 35 Q42 25 30 30"/>
+    <path d="M30 80 Q10 88 18 100 Q28 112 45 102 Q55 93 48 80 Q40 70 30 80"/>
+    <path d="M30 130 Q18 137 22 148 Q30 155 40 148 Q46 142 42 133 Q38 127 30 130"/>
+    <circle cx="30" cy="10" r="1.5" fill="currentColor"/>
+    <circle cx="30" cy="150" r="1.5" fill="currentColor"/>
+  </g>
+</svg></div>
+  <div class="page-header-flourish right" style="color:var(--gold);transform:translateY(-50%) rotate(12deg) scaleX(-1)"><svg viewBox="0 0 60 160" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="currentColor" fill="none" stroke-width="0.6" stroke-linecap="round">
+    <path d="M30 10 L30 150"/>
+    <path d="M30 30 Q15 40 20 55 Q25 65 40 55 Q50 48 45 35 Q42 25 30 30"/>
+    <path d="M30 80 Q10 88 18 100 Q28 112 45 102 Q55 93 48 80 Q40 70 30 80"/>
+    <path d="M30 130 Q18 137 22 148 Q30 155 40 148 Q46 142 42 133 Q38 127 30 130"/>
+    <circle cx="30" cy="10" r="1.5" fill="currentColor"/>
+    <circle cx="30" cy="150" r="1.5" fill="currentColor"/>
+  </g>
+</svg></div>
+  <div class="eyebrow">Раздел VII · Пути</div>
+  <h1>Туата'ан</h1>
+  <p class="lead">Странствующий Народ. Те, кто ищет песню, утерянную в начале времён. Три течения к 270 ПБ</p>
+</header>
+
+<section class="chapter narrow">
+  <div class="chapter-head">
+    <div class="chapter-roman">VII.I · СОВРЕМЕННОСТЬ</div>
+    <h2 class="chapter-title">Три течения</h2>
+    <p class="chapter-desc">Туата'ан не раскололись в один момент, как айил. Они разошлись медленно — втечение поколений, без ссор</p>
+  </div>
+
+  <div class="stream-wrap reveal-target">
+    <div class="stream-card s1">
+      <h3>Поющие Ясно</h3>
+      <div class="sub">Ортодоксальные хранители Пути Листа</div>
+      <p>Классические Туата'ан, такими, какими их описывали хроники Третьей Эпохи. Путешествуют в крытых повозках, продолжают искать Песню, принимают бездомных — особенно детей, особенно тех, что <em>видели что-то, что им не полагалось видеть</em>. Отказ от насилия абсолютный, даже когда это означает смерть каравана.</p>
+      <p>К 270 ПБ таких караванов осталось мало — от силы двадцать по всему миру. Они идут по путям, которых уже нет на картах. Иерархии их не трогают: <strong>есть старый запрет</strong>, неформальный, но соблюдаемый.</p>
+    </div>
+
+    <div class="stream-card s2">
+      <h3>Караваны Свидетелей</h3>
+      <div class="sub">Новое течение, возникшее после Реформы Узла</div>
+      <p>После того как Стражи Узора начали работать с аномалиями, часть Туата'ан обнаружила в своей культуре готовую роль: <strong>переносчики памяти</strong>. Они не направляющие — они не закрывают разрывы. Они <em>запоминают</em> то, что случилось рядом с разрывом, и несут эту память дальше, чтобы она не была потеряна, когда выжившие начнут забывать.</p>
+      <p>Караваны Свидетелей <strong>не отказываются от насилия полностью</strong>, но применяют его только для самозащиты. Орден Стражей Узора оплачивает им часть расходов — продовольствие, лошадей. Это единственный случай, когда Туата'ан принимают деньги от Иерархии.</p>
+    </div>
+
+    <div class="stream-card s3">
+      <h3>Последние Поющие</h3>
+      <div class="sub">Те, кто перестал искать Песню</div>
+      <p>Самое тревожное течение. Туата'ан, которые пришли к выводу, что <strong>Песня утеряна безвозвратно</strong>, а продолжение поиска — это <em>отказ принять правду</em>. Они не стали оседлыми — они продолжают странствовать, но уже не ищут. Они <strong>свидетельствуют</strong>: путешествуют к местам разрушенным, к сгоревшим деревням, к семьям, потерявшим всех.</p>
+      <p>Приходят, живут неделю, помогают чем могут, уходят. Нигде не задерживаются. Некоторые Мастера Стены считают их <em>ближе всех к пониманию того, что происходит</em>. Последние Поющие не направляют, не обучают, не принимают учеников. Каждый сам находит своё решение перестать искать.</p>
+    </div>
+  </div>
+</section>
+
+<section class="chapter narrow">
+  <div class="chapter-head">
+    <div class="chapter-roman">VII.II · ИМЯ</div>
+    <h2 class="chapter-title">«Имя должно звучать»</h2>
+    <p class="chapter-desc">Главное отличие Туата'ан от всех других народов 270 ПБ</p>
+  </div>
+
+  <div class="prose reveal-target" style="max-width:780px;margin:0 auto">
+    <p>В Единстве имена фиксируются в реестрах Конклава. В Хрустальном Троне имя раба не имеет значения, а имя благородного — часть его титула. В Фар Мэддинге каждое имя привязано к кристаллу. У Стражей Узора есть правило: <em>имя теряет значение после Ранга III</em> — тебя называют по функции.</p>
+    <p>У Туата'ан — наоборот. <strong>Каждое имя должно звучать</strong>. Это практика: имена у них произносятся полностью, с отчествами, с прозвищами, даже когда это неудобно, даже когда дольше. Теория такая: <em>пока имя звучит, человек — есть.</em> Когда имя перестают произносить — человек начинает исчезать, даже если продолжает дышать.</p>
+    <p>Эта практика кажется простой, пока не сталкиваешься с Ореолом. Ореол <strong>стирает имена из памяти</strong> в первую очередь. Туата'ан, идущие через Ореол с Караваном Свидетелей, проговаривают имена спутников <em>вслух, вслух, вслух</em> — каждые несколько минут. Это выглядит странно. Это работает лучше, чем любой известный амулет Ордена.</p>
+  </div>
+
+  <p class="pullquote reveal-target">Пока имя звучит — человек есть. Когда имя перестают произносить — человек начинает исчезать.</p>
+</section>
+</div>
+<footer>
+  <svg class="mini-wheel-ft" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="wg" cx="50%" cy="50%">
+      <stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/>
+    </radialGradient>
+  </defs>
+  <g stroke="url(#wg)" fill="none" stroke-linecap="round">
+    <circle cx="40" cy="40" r="36" stroke-width="1"/>
+    <circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/>
+    <circle cx="40" cy="40" r="18" stroke-width=".5" opacity=".55"/>
+    <circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/>
+    <g stroke-width=".55" opacity=".7">
+      <line x1="40" y1="4" x2="40" y2="76"/>
+      <line x1="4" y1="40" x2="76" y2="40"/>
+      <line x1="14.8" y1="14.8" x2="65.2" y2="65.2"/>
+      <line x1="65.2" y1="14.8" x2="14.8" y2="65.2"/>
+      <line x1="40" y1="4" x2="52" y2="76"/>
+      <line x1="40" y1="4" x2="28" y2="76"/>
+      <line x1="4" y1="40" x2="76" y2="52"/>
+    </g>
+    <circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/>
+  </g>
+</svg>
+  <div class="ft-quote">❖&nbsp;&nbsp;И нет ни начала, ни конца вращению Колеса Времени&nbsp;&nbsp;❖</div>
+  <p>Четвёртая Эпоха · 270 лет после Последней Битвы</p>
+  <p style="margin-top:10px;font-size:14px;opacity:.55">Полевые материалы кампании · Колесо Времени</p>
+</footer>
+<script src="assets/shared.js"></script>
+</body>
+</html>

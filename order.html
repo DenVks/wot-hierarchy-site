@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Орден Стражей Узора · Колесо Времени · 270 ПБ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="pattern-bg"></div>
+  <div class="thread-layer"><svg viewBox="0 0 1800 1200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="thread1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c9a961" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#c9a961" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#c9a961" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="thread2" x1="0" y1="0" x2="1" y2="0.3">
+      <stop offset="0" stop-color="#c084fc" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#c084fc" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#c084fc" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="thread3" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#fb923c" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#fb923c" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#fb923c" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path d="M-50,180 Q400,60 850,240 Q1200,380 1850,180" stroke="url(#thread1)" stroke-width="1" fill="none"/>
+  <path d="M-50,520 Q500,440 950,600 Q1400,720 1850,540" stroke="url(#thread1)" stroke-width=".7" fill="none" opacity=".7"/>
+  <path d="M-50,820 Q350,680 750,850 Q1150,1000 1850,780" stroke="url(#thread2)" stroke-width=".6" fill="none" opacity=".8"/>
+  <path d="M-50,1050 Q450,950 900,1080 Q1350,1180 1850,1020" stroke="url(#thread3)" stroke-width=".5" fill="none" opacity=".65"/>
+</svg></div>
+
+<nav class="sitenav"><div class="inner"><a href="index.html" class="nav-brand"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="wg" cx="50%" cy="50%"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/></radialGradient></defs><g stroke="url(#wg)" fill="none" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"/><circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/><circle cx="40" cy="40" r="18" stroke-width=".5" opacity=".55"/><circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/><g stroke-width=".55" opacity=".7"><line x1="40" y1="4" x2="40" y2="76"/><line x1="4" y1="40" x2="76" y2="40"/><line x1="14.8" y1="14.8" x2="65.2" y2="65.2"/><line x1="65.2" y1="14.8" x2="14.8" y2="65.2"/><line x1="40" y1="4" x2="52" y2="76"/><line x1="40" y1="4" x2="28" y2="76"/><line x1="4" y1="40" x2="76" y2="52"/></g><circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="epoch.html">Эпоха</a><a href="hierarchies.html">Три Иерархии</a><a href="unity.html">Единство</a><a href="throne.html">Трон</a><a href="madding.html">Хранители</a><a href="hierarchy-wall.html">Иерархия Стены</a><a href="order.html">Орден</a><a href="wall.html">Стена</a><a href="chronicles.html">Хроника</a><a href="anomalies.html">Аномалии</a><a href="aiel.html">Айил</a><a href="tuataan.html">Туата’ан</a><a href="freefolk.html">Вольные</a><a href="rituals.html">Ритуалы</a><a href="ingredients.html">Ингредиенты</a><a href="tsitadel.html">Цитадель</a><a href="monsters.html">Монстры</a></div></div></nav>
+<div class="page-body">
+<style>
+.ability-list{margin-top:20px}
+.ability-item{padding:18px 0;border-bottom:1px dashed var(--border)}
+.ability-item:last-child{border-bottom:none}
+.ability-item .ab-name{font-family:'Cinzel',serif;font-size:15px;color:var(--c-order);margin-bottom:6px;font-weight:500}
+.ability-item .ab-rank{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.25em;color:var(--ink-muted);text-transform:uppercase}
+.ability-item .ab-rule{font-size:14px;color:var(--ink-soft);line-height:1.75;margin-top:8px}
+.memo-box{margin:50px 0;padding:40px;background:linear-gradient(180deg,rgba(167,139,250,.04) 0%,rgba(13,13,25,.6) 100%);border:1px solid rgba(167,139,250,.2);border-left:3px solid var(--c-order);position:relative}
+.memo-box::before{content:'';position:absolute;top:14px;right:14px;width:40px;height:40px;border:1px solid rgba(167,139,250,.3);border-radius:50%}
+.memo-box::after{content:'';position:absolute;top:24px;right:14px;width:40px;height:40px;border:1px solid rgba(167,139,250,.3);border-radius:50%}
+.memo-box h4{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.3em;color:var(--c-order);text-transform:uppercase;margin-bottom:20px;padding-right:80px}
+.memo-box p{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--ink-soft);font-size:17px;line-height:1.75;margin-bottom:14px}
+.memo-box p strong{color:var(--ink);font-weight:500}
+</style>
+<header class="page-header">
+  <div class="page-header-flourish left" style="color:var(--gold)"><svg viewBox="0 0 60 160" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="currentColor" fill="none" stroke-width="0.6" stroke-linecap="round">
+    <path d="M30 10 L30 150"/>
+    <path d="M30 30 Q15 40 20 55 Q25 65 40 55 Q50 48 45 35 Q42 25 30 30"/>
+    <path d="M30 80 Q10 88 18 100 Q28 112 45 102 Q55 93 48 80 Q40 70 30 80"/>
+    <path d="M30 130 Q18 137 22 148 Q30 155 40 148 Q46 142 42 133 Q38 127 30 130"/>
+    <circle cx="30" cy="10" r="1.5" fill="currentColor"/>
+    <circle cx="30" cy="150" r="1.5" fill="currentColor"/>
+  </g>
+</svg></div>
+  <div class="page-header-flourish right" style="color:var(--gold);transform:translateY(-50%) rotate(12deg) scaleX(-1)"><svg viewBox="0 0 60 160" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="currentColor" fill="none" stroke-width="0.6" stroke-linecap="round">
+    <path d="M30 10 L30 150"/>
+    <path d="M30 30 Q15 40 20 55 Q25 65 40 55 Q50 48 45 35 Q42 25 30 30"/>
+    <path d="M30 80 Q10 88 18 100 Q28 112 45 102 Q55 93 48 80 Q40 70 30 80"/>
+    <path d="M30 130 Q18 137 22 148 Q30 155 40 148 Q46 142 42 133 Q38 127 30 130"/>
+    <circle cx="30" cy="10" r="1.5" fill="currentColor"/>
+    <circle cx="30" cy="150" r="1.5" fill="currentColor"/>
+  </g>
+</svg></div>
+  <div class="eyebrow">Раздел II · Малая иерархия</div>
+  <h1>Орден Стражей Узора</h1>
+  <p class="lead">Две пересекающиеся окружности. Шесть рангов. Один принцип: Узор держится — пока держим его мы.</p>
+</header>
+
+<section class="chapter">
+  <div class="detail-panel order reveal-target">
+    <div class="detail-head">
+      <div class="symbol"><svg viewBox="0 0 64 64"><circle cx="26" cy="32" r="16" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="38" cy="32" r="16" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div>
+      <div>
+        <h3>Орден Стражей Узора</h3>
+        <div class="sub">Иерархия стабилизации аномалий · Цитадель в Тел'аран'риоде</div>
+      </div>
+    </div>
+
+    <h4>Предыстория</h4>
+    <p>После Последней Битвы Колесо не остановилось, но Узор утратил прежнюю цельность. В первые десятилетия Четвёртой Эпохи начали возникать <strong>локальные разрывы</strong> — временные аномалии, выбрасывающие чуждую энергию и сущностей, не принадлежащих этому миру. Ни Айз Седай, ни Аша'маны поодиночке не могли им противостоять: аномалии требовали не всплеска силы, а <em>устойчивого удержания</em>.</p>
+    <p>Первый век был жестоким: ранние практики «коллективного усиления» приводили к трагедиям. <strong>Реформа Узла</strong> зафиксировала современный принцип: никаких жертвоприношений, никакого выжигания Источника, никакой эксплуатации мирного населения. Орден строит работу на открытии: аномалии можно не только закрывать — их можно <em>извлекать</em>, превращая угрозу в ресурс.</p>
+
+    <h4>Цели Ордена</h4>
+    <ul>
+      <li>Обнаружение, классификация и локализация временных аномалий.</li>
+      <li>Стабилизация разрывов через извлечение энергии и «латание» края Узора.</li>
+      <li>Накопление общего резерва для операций против редких перманентных очагов.</li>
+      <li>Защита населения без вовлечения внешних масс в энергетическую пирамиду.</li>
+    </ul>
+
+    <h4>Девизы</h4>
+    <p><strong>Официальный:</strong> <em>«Узор держится — пока держим его мы.»</em></p>
+    <p><strong>Внутренний:</strong> <em>«Сила — не право. Сила — ответственность за жизнь Узора.»</em></p>
+
+    <h4>Базовый принцип</h4>
+    <p><strong>Орден не берёт энергию снаружи.</strong> Мирные жители не приносят клятв, не участвуют в передаче энергии, не рассматриваются как ресурс. Членство добровольное, но после клятвы воспринимается как долг пожизненного масштаба.</p>
+
+    <h4>Прогрессия по рангам</h4>
+    <p>У Стражей Узора рост <em>намеренно слабее</em>, чем в великих иерархиях: общий резерв ограничен числом членов и добычей из аномалий, Орден избегает «культа сверхлюдей», ставка на стабильность и живучесть в аномальной среде.</p>
+    <div class="rank-table-wrap"><table class="rank-table">
+<thead><tr><th>Ранг</th><th>Титул</th><th>Характеристики</th><th>Скорость</th><th>Инициатива</th><th>Спасброски</th><th>Для направляющих</th></tr></thead>
+<tbody>
+<tr><td class="rnk">I</td><td class="ttl">Страж-Послушник</td><td>—</td><td>30 фт</td><td>−1</td><td>—</td><td>нет</td></tr>
+<tr><td class="rnk">II</td><td class="ttl">Страж Узла</td><td>+1 к двум; +1 атака/урон</td><td>+5 фт</td><td>+1</td><td>+1 ко всем</td><td>+1 DC; +1 уровень силы; +1 доп. использование</td></tr>
+<tr><td class="rnk">III</td><td class="ttl">Ткач Потока</td><td>ещё +1 (суммарно +2); +1 КД</td><td>—</td><td>+2</td><td>+2 ко всем</td><td>+2 DC; +3 уровень силы; +2 доп. использования</td></tr>
+<tr><td class="rnk">IV</td><td class="ttl">Старший Ткач</td><td>ещё +1 (суммарно +3); +20 HP; +1 атака/урон</td><td>—</td><td>+3</td><td>+3 ко всем</td><td>+3 DC; +5 уровень силы; +3 доп. использования</td></tr>
+<tr><td class="rnk">V</td><td class="ttl">Чемпион Узора</td><td>ещё +1 (суммарно +4); +40 HP; +1 КД</td><td>+10 фт</td><td>+4</td><td>+4 ко всем</td><td>+4 DC; +8 уровень силы; +4 доп. использования</td></tr>
+<tr><td class="rnk">VI</td><td class="ttl">Архистраж</td><td>ещё +1 (суммарно +5), предел до 24; +60 HP; +1 атака/урон</td><td>—</td><td>+5</td><td>+5 ко всем</td><td>+5 DC; +12 уровень силы; +5 доп. использований</td></tr>
+</tbody></table></div>
+
+    <h4>Уникальные способности</h4>
+    <div class="ability-list"><div class="ability-item"><div class="ab-rank">Ранг I</div><div class="ab-name">Осознание</div><div class="ab-rule">Чутьё аномалии: ощущение её наличия в радиусе полумили. Осознание силы: на 100 футах оценка типа — спасбросок основной характеристики СЛ 8 + уровень аномалии.</div></div><div class="ability-item"><div class="ab-rank">Ранг II</div><div class="ab-name">Печать Узла</div><div class="ab-rule">Чутьё разрыва: направление к ближайшей активной аномалии в радиусе 1 мили. Боевой импульс Узора: 1/долгий отдых, бонусным действием — временные HP = 2× уровень, до начала следующего хода сопротивление урону от эффектов аномалии.</div></div><div class="ability-item"><div class="ab-rank">Ранг III</div><div class="ab-name">Ключ Цитадели</div><div class="ab-rule">Вход в Цитадель без проводника (и выводить 1 согласное существо). Сдвиг Нити: 1/короткий отдых, реакция — уменьшить полученный урон на 2d6 + ранг; если источник из аномалии, дополнительно сдвинуться на 10 фт без провокации атак.</div></div><div class="ability-item"><div class="ab-rank">Ранг IV</div><div class="ab-name">Протокол Извлечения</div><div class="ab-rule">Страховка техники: 1/операцию переброс спасброска для извлечения энергии пирамидкой. Клин Узора: 1/короткий отдых, бонусным действием на 1 минуту — атаки/плетения +1d6 урона всем, +2d6 существам из аномалии или Тел'аран'риода; регенерация 3 HP/минуту.</div></div><div class="ability-item"><div class="ab-rank">Ранг V</div><div class="ab-name">Чемпионская Нить</div><div class="ab-rule">Право принимать клятвы в поле (активация новых членов). Стойкий: снижение урона на 3 HP от любой немагической атаки и сопротивление одному типу немагического урона (на выбор). Сверхскорость: вторая реакция. Выдача из Резерва: 1/долгий отдых на 10 минут — Бастион (+2 КД, преимущество на Телосложение), Напор (+2 к атаке и урону оружием) или Ясность Узора (+2 DC плетений, преимущество на концентрацию).</div></div><div class="ability-item"><div class="ab-rank">Ранг VI</div><div class="ab-name">Рука Резерва</div><div class="ab-rule">Полный контроль допусков к Сфере Узора. Перенаправление Потока: 1/короткий отдых, бонусным действием на 1 минуту — сопротивление любому немагическому дробящему/колющему/рубящему урону, регенерация 5 в начале хода. Укрепление Нити: только Архистражи инициируют повышение или снятие печати Иерархии. Многорукий: дополнительная атака оружием или плетением.</div></div></div>
+  </div>
+
+  <div class="memo-box reveal-target">
+    <h4>До знакомства · что говорят о Стражах</h4>
+    <p>Ты слышал о них раньше — краем уха, в разговорах тех, кто любит говорить о странном, но никогда не видел собственными глазами. О таких вещах не докладывают по цепочке. О таких вещах шепчут у костра, когда командиры уже спят.</p>
+    <p>Говорят, в мире есть люди, которые приходят <strong>туда, где мир перестаёт быть миром</strong>. Их не называют по званиям. Их называют по функции: <em>Стражи</em>, <em>Ткачи</em>, иногда — <em>Узловики</em>. А тех, кто появляется в самый плохой момент, называют просто: <strong>Чемпион</strong>. Не как титул, а как факт.</p>
+    <p>Они появляются рядом с аномалиями — разрывами, где воздух дрожит, земля становится чужой, а из пустоты выходят твари. Они не собирают людей в доноры, не требуют «платы», не строят пирамид из жителей. Они используют странные знаки — <strong>две пересекающиеся окружности</strong>, иногда выгравированные на металле, иногда вышитые на ткани, иногда словно отпечатанные на коже.</p>
+    <p>Они умеют «гасить» разрыв — это выглядит так, будто они держат ткань мира руками, пока она не сомкнётся сама.</p>
+    <p>Иногда после них <em>память у людей меняется</em>: они помнят, что было событие… но не помнят, <strong>как</strong> оно было. Иногда после их вмешательства в округе несколько дней «не ощущается давление» — будто что-то привычное исчезло. Иногда они забирают с собой тех, кто выжил у разрыва. Не силой. Просто задают вопрос — и человек исчезает вместе с ними.</p>
+    <p>Самое неприятное — другое. Говорят, они знают способы <strong>разорвать старую клятву</strong>. Не вернуть «милость» сверху — а снять след, будто его никогда не было. Те, кто рассказывают это, обычно понижают голос и оглядываются, как будто сам факт произнесённого может привлечь внимание.</p>
+  </div>
+</section>
+</div>
+<footer>
+  <svg class="mini-wheel-ft" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="wg" cx="50%" cy="50%">
+      <stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/>
+    </radialGradient>
+  </defs>
+  <g stroke="url(#wg)" fill="none" stroke-linecap="round">
+    <circle cx="40" cy="40" r="36" stroke-width="1"/>
+    <circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/>
+    <circle cx="40" cy="40" r="18" stroke-width=".5" opacity=".55"/>
+    <circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/>
+    <g stroke-width=".55" opacity=".7">
+      <line x1="40" y1="4" x2="40" y2="76"/>
+      <line x1="4" y1="40" x2="76" y2="40"/>
+      <line x1="14.8" y1="14.8" x2="65.2" y2="65.2"/>
+      <line x1="65.2" y1="14.8" x2="14.8" y2="65.2"/>
+      <line x1="40" y1="4" x2="52" y2="76"/>
+      <line x1="40" y1="4" x2="28" y2="76"/>
+      <line x1="4" y1="40" x2="76" y2="52"/>
+    </g>
+    <circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/>
+  </g>
+</svg>
+  <div class="ft-quote">❖&nbsp;&nbsp;И нет ни начала, ни конца вращению Колеса Времени&nbsp;&nbsp;❖</div>
+  <p>Четвёртая Эпоха · 270 лет после Последней Битвы</p>
+  <p style="margin-top:10px;font-size:14px;opacity:.55">Полевые материалы кампании · Колесо Времени</p>
+</footer>
+<script src="assets/shared.js"></script>
+</body>
+</html>
