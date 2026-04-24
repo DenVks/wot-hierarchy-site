@@ -148,6 +148,15 @@
     ],
     'hierarchies.html': [
       ['#edinstvo','Единство'], ['#tron','Хрустальный Трон'], ['#farmadding','Фар Мэддинг'], ['#comparison','Сравнение'], ['#wall-hierarchy','Иерархия Стены']
+    ],
+    'tsitadel.html': [
+      ['#citadel-device','Цитадель как устройство'],
+      ['#threshold-node','Порог Узла'],
+      ['#gallery-threads','Галерея Нитей'],
+      ['#pyramid-workshops','Мастерские Пирамид'],
+      ['#access-hall','Зал Допусков'],
+      ['#pattern-sphere-hall','Сердце Цитадели'],
+      ['#silent-gardens','Сады Тишины']
     ]
   };
   function slugify(text){
