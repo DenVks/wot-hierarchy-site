@@ -1605,3 +1605,54 @@ tr[id]{scroll-margin-top:110px;}
 .result-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
 .result-grid div{border:1px solid rgba(201,169,97,.16);border-radius:12px;padding:10px;background:rgba(0,0,0,.16)}
 .result-grid b{display:block;color:var(--gold);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-family:Cinzel,serif}.result-grid span{display:block;margin-top:4px;color:#eadfc4}.compact-note{margin-top:16px}.temporal-monster-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.temporal-pack{border-left:3px solid rgba(201,169,97,.55)}.temporal-pack .subtitle{font-size:14px;color:#c9c0ac;margin-top:-6px;margin-bottom:12px}.monster-chip-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.monster-chip{border:1px solid rgba(201,169,97,.24);border-radius:999px;padding:6px 10px;background:rgba(0,0,0,.18);font-size:14px;color:#eadfc4}.monster-chip strong{color:var(--gold-pale)}@media(max-width:980px){.temporal-monster-grid{grid-template-columns:1fr 1fr}.result-grid{grid-template-columns:1fr 1fr}}@media(max-width:640px){.temporal-monster-grid{grid-template-columns:1fr}.result-grid{grid-template-columns:1fr}.generated-card h3{font-size:24px}}
+
+
+/* v28: styled GM access modal */
+html.auth-lock body > *:not(.auth-overlay){filter:blur(5px);pointer-events:none;user-select:none;}
+.auth-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(circle at 50% 30%,rgba(201,169,97,.16),transparent 32%),rgba(5,4,7,.86);backdrop-filter:blur(10px);}
+.auth-modal{width:min(92vw,460px);border:1px solid rgba(201,169,97,.34);border-radius:26px;padding:30px 28px 28px;background:linear-gradient(145deg,rgba(28,23,26,.98),rgba(10,9,14,.98));box-shadow:0 28px 90px rgba(0,0,0,.68),inset 0 1px 0 rgba(255,255,255,.05);text-align:center;color:#eadfc4;position:relative;overflow:hidden;}
+.auth-modal::before{content:"";position:absolute;inset:-2px;background:radial-gradient(circle at 50% 0%,rgba(201,169,97,.22),transparent 34%);pointer-events:none;}
+.auth-sigil{width:70px;height:70px;margin:0 auto 16px;border:1px solid rgba(201,169,97,.38);border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(201,169,97,.16),rgba(0,0,0,.18));box-shadow:0 0 34px rgba(201,169,97,.12);}
+.auth-sigil span{width:34px;height:34px;border:2px solid rgba(237,213,150,.84);transform:rotate(45deg);display:block;box-shadow:0 0 22px rgba(201,169,97,.28);}
+.auth-kicker{font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.22em;font-size:11px;color:var(--gold);margin:0 0 8px;}
+.auth-modal h1{font-family:Marcellus,serif;font-size:34px;line-height:1.05;margin:0 0 10px;color:var(--gold-bright);}
+.auth-text{font-size:16px;line-height:1.55;color:#cfc3aa;margin:0 auto 22px;max-width:36ch;}
+.auth-form{display:grid;gap:10px;text-align:left;}
+.auth-form label{font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:#c9a961;}
+.auth-form input{width:100%;box-sizing:border-box;border:1px solid rgba(201,169,97,.28);border-radius:14px;background:rgba(0,0,0,.28);color:#f0e6ce;padding:13px 14px;font:16px Marcellus,serif;outline:none;transition:border-color .2s,box-shadow .2s;}
+.auth-form input:focus{border-color:rgba(237,213,150,.75);box-shadow:0 0 0 3px rgba(201,169,97,.12);}
+.auth-form input.auth-input-error{border-color:rgba(190,61,48,.85);box-shadow:0 0 0 3px rgba(190,61,48,.14);}
+.auth-error{min-height:18px;margin:0;color:#e7a39a;font-size:13px;}
+.auth-form button{border:1px solid rgba(201,169,97,.42);border-radius:14px;padding:13px 18px;background:linear-gradient(135deg,rgba(201,169,97,.28),rgba(105,70,36,.38));color:#fff4d7;font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.14em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform .18s,box-shadow .18s,border-color .18s;}
+.auth-form button:hover{transform:translateY(-1px);border-color:rgba(237,213,150,.7);box-shadow:0 14px 34px rgba(0,0,0,.36);}
+
+/* v28: recipe rarity coding and rank badges */
+.recipe-card.uncommon{--recipe-accent:#d69b4b;--recipe-accent-soft:rgba(214,155,75,.16);}
+.recipe-card.rare{--recipe-accent:#b9c7d5;--recipe-accent-soft:rgba(185,199,213,.14);}
+.recipe-card.very-rare{--recipe-accent:#f2d778;--recipe-accent-soft:rgba(242,215,120,.18);}
+.recipe-card{border-color:color-mix(in srgb,var(--recipe-accent,var(--gold)) 42%,rgba(201,169,97,.18));box-shadow:0 18px 52px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.035);}
+.recipe-card::before{background:radial-gradient(circle at 82% 20%,var(--recipe-accent-soft,rgba(201,169,97,.14)),transparent 34%);}
+.recipe-card .rarity{border:1px solid color-mix(in srgb,var(--recipe-accent,var(--gold)) 55%,transparent);background:linear-gradient(135deg,var(--recipe-accent-soft,rgba(201,169,97,.13)),rgba(0,0,0,.18));color:var(--recipe-accent,var(--gold-bright));border-radius:999px;padding:5px 10px;font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.13em;font-size:11px;}
+.recipe-card.uncommon .rarity::before{content:"Uncommon · ";opacity:.72;}
+.recipe-card.rare .rarity::before{content:"Rare · ";opacity:.72;}
+.recipe-card.very-rare .rarity::before{content:"Very Rare · ";opacity:.72;}
+.recipe-card .rarity{font-size:0;}
+.recipe-card .rarity::before{font-size:11px;}
+.recipe-card .brew{border-radius:999px;padding:5px 10px;background:rgba(0,0,0,.22);border:1px solid rgba(201,169,97,.16);color:#d8cdae;font-size:12px;}
+.rank-badge{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:24px;margin-left:5px;padding:0 7px;border-radius:999px;border:1px solid rgba(201,169,97,.30);background:linear-gradient(135deg,rgba(201,169,97,.14),rgba(0,0,0,.22));color:#f0dfae;font-family:Cinzel,serif;font-size:11px;font-weight:700;letter-spacing:.04em;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);}
+.rank-r1,.rank-r2,.rank-r3{--rank-color:#c9a961;}
+.rank-r4,.rank-r5,.rank-r6{--rank-color:#d09a55;}
+.rank-r7,.rank-r8{--rank-color:#b9c7d5;}
+.rank-r9,.rank-r10{--rank-color:#f2d778;}
+.rank-badge{border-color:color-mix(in srgb,var(--rank-color,#c9a961) 62%,transparent);color:var(--rank-color,#f0dfae);background:linear-gradient(135deg,color-mix(in srgb,var(--rank-color,#c9a961) 18%,transparent),rgba(0,0,0,.22));}
+.recipe-meta p{line-height:1.8;}
+@supports not (color:color-mix(in srgb, red 10%, white)){
+  .recipe-card{border-color:rgba(201,169,97,.28);}
+  .recipe-card .rarity{border-color:rgba(201,169,97,.38);}
+  .rank-badge{border-color:rgba(201,169,97,.38);}
+}
+@media(max-width:640px){
+  .auth-modal{padding:26px 20px 22px;border-radius:22px;}
+  .auth-modal h1{font-size:29px;}
+  .auth-text{font-size:15px;}
+}
