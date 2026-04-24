@@ -1169,3 +1169,80 @@ nav.sitenav .inner{position:relative}
     border-radius:15px;
   }
 }
+
+/* ==== v21 compact side artwork for lore pages ==== */
+.lore-art-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(220px,330px);
+  gap:28px;
+  align-items:start;
+}
+.lore-side-art{
+  display:grid;
+  gap:14px;
+  position:sticky;
+  top:96px;
+}
+.lore-side-art figure{
+  margin:0;
+  padding:0;
+}
+.lore-side-art img{
+  width:100%;
+  max-height:240px;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+  border-radius:18px;
+  border:1px solid rgba(201,169,97,.20);
+  box-shadow:0 18px 44px rgba(0,0,0,.34), inset 0 0 0 1px rgba(255,255,255,.025);
+  filter:saturate(.92) contrast(1.03) brightness(.88);
+}
+.lore-side-art figcaption,
+.wall-side-images figcaption{
+  margin:7px 4px 0;
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  line-height:1.35;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  color:rgba(232,200,120,.48);
+}
+.lore-side-art--single img{max-height:330px;}
+.cit-hero .lore-art-grid{align-items:center;}
+.cit-hero .lore-side-art{position:static;}
+.cit-hero .lore-side-art img{max-height:330px;}
+@media (max-width:980px){
+  .lore-art-grid{grid-template-columns:1fr;gap:20px;}
+  .lore-side-art{position:static;grid-template-columns:1fr 1fr;}
+  .lore-side-art--single{grid-template-columns:1fr;max-width:420px;margin:0 auto;}
+  .lore-side-art img,.lore-side-art--single img{max-height:230px;}
+}
+@media (max-width:620px){
+  .lore-side-art{grid-template-columns:1fr;}
+  .lore-side-art img,.lore-side-art--single img{max-height:210px;border-radius:15px;}
+  .lore-side-art figcaption,.wall-side-images figcaption{font-size:9px;opacity:.72;}
+}
+
+/* v21: keep captions below wall images, never overlaying artwork */
+.wall-side-images figure{margin:0;padding:0;}
+.wall-side-images figcaption{padding-left:2px;}
+.wall-image-caption{
+  position:static;
+  margin:8px 10px 0;
+  padding:8px 10px 7px;
+  border-radius:12px;
+  background:rgba(9,8,12,.30);
+  border-color:rgba(201,169,97,.12);
+  backdrop-filter:none;
+  box-shadow:none;
+  opacity:.72;
+}
+.wall-image-card::before{background:radial-gradient(circle at 50% 20%,rgba(201,169,97,.08),transparent 48%);}
+.wall-image-caption span{font-size:8px;letter-spacing:.16em;margin-bottom:3px;color:rgba(232,200,120,.58);}
+.wall-image-caption strong{font-size:16px;margin-bottom:3px;color:rgba(243,223,176,.72);}
+.wall-image-caption p{font-size:12px;line-height:1.32;color:rgba(238,228,210,.58);}
+.wall-side-images figure:first-child img{max-height:185px;}
+.wall-side-images figure:last-child img{max-height:230px;}
+@media (max-width:980px){.wall-side-images figure:first-child img,.wall-side-images figure:last-child img{max-height:210px;}}
+@media (max-width:620px){.wall-side-images figure:first-child img,.wall-side-images figure:last-child img{max-height:190px;}}
