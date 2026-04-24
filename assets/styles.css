@@ -972,3 +972,22 @@ nav.sitenav .inner{position:relative}
   .theme-unity-page .toc,.theme-throne-page .toc,.theme-keepers-page .toc,.theme-chronicle-page .toc{padding:0 18px}
   .chronicle-item{grid-template-columns:1fr}
 }
+
+/* ==== Loot generator page ==== */
+.theme-generator-page{--page-accent:#c9a961;--page-accent-soft:rgba(201,169,97,.18);--page-accent-deep:#6f5630}
+.generator-grid{display:grid;grid-template-columns:minmax(260px,360px) minmax(0,1fr);gap:22px;align-items:start}
+.generator-panel{display:grid;gap:10px;padding:22px}
+.generator-panel label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-soft);margin-top:6px}
+.generator-panel select,.generator-panel input{width:100%;background:rgba(5,7,12,.72);border:1px solid rgba(201,169,97,.22);color:var(--ink-bright);padding:11px 12px;font-family:'Crimson Pro',serif;font-size:18px;outline:none}
+.generator-panel select:focus,.generator-panel input:focus{border-color:rgba(201,169,97,.62);box-shadow:0 0 0 2px rgba(201,169,97,.08)}
+.generator-btn{margin-top:12px;border:1px solid rgba(201,169,97,.55);background:linear-gradient(180deg,rgba(201,169,97,.18),rgba(201,169,97,.07));color:var(--ink-bright);font-family:'Cinzel',serif;letter-spacing:.18em;text-transform:uppercase;padding:13px 16px;cursor:pointer}
+.generator-btn:hover{border-color:var(--gold);background:linear-gradient(180deg,rgba(201,169,97,.28),rgba(201,169,97,.1))}
+.result-panel h3{font-family:'Marcellus',serif;color:var(--gold);font-size:28px;margin-bottom:12px}
+.loot-output{font-size:18px;line-height:1.55;color:var(--ink-soft)}
+.loot-output ul{margin:8px 0 0 20px;padding:0}.loot-output li{margin:7px 0}.loot-output strong{color:var(--ink-bright)}
+.roll-head{font-family:'Cinzel',serif;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-size:12px;margin-bottom:14px}
+.roll-block{border-top:1px solid rgba(201,169,97,.14);padding:14px 0}.roll-block:first-child{border-top:none}
+.roll-block h4{font-family:'Marcellus',serif;color:var(--ink-bright);font-size:23px;margin:0 0 6px}
+.roll-note{font-size:15px;color:rgba(230,224,213,.62)}.failed{color:#ff9b9b}.danger{margin-top:9px;padding:8px 10px;border:1px solid rgba(201,169,97,.14);background:rgba(255,255,255,.025)}
+.compact-table td,.compact-table th{font-size:16px}
+@media (max-width:900px){.generator-grid{grid-template-columns:1fr}.generator-panel{padding:18px}}

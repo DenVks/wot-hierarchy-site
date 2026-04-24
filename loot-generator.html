@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Генератор ингредиентов · Аномалии и Стена</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="theme-generator-page">
+  <div class="pattern-bg"></div>
+  <div class="thread-layer"><svg viewBox="0 0 1800 1200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="thread1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c9a961" stop-opacity="0"/><stop offset="0.5" stop-color="#c9a961" stop-opacity=".55"/><stop offset="1" stop-color="#c9a961" stop-opacity="0"/></linearGradient><linearGradient id="thread2" x1="0" y1="0" x2="1" y2="0.3"><stop offset="0" stop-color="#c084fc" stop-opacity="0"/><stop offset="0.5" stop-color="#c084fc" stop-opacity=".35"/><stop offset="1" stop-color="#c084fc" stop-opacity="0"/></linearGradient></defs><path d="M-50,180 Q400,60 850,240 Q1200,380 1850,180" stroke="url(#thread1)" stroke-width="1" fill="none"/><path d="M-50,820 Q350,680 750,850 Q1150,1000 1850,780" stroke="url(#thread2)" stroke-width=".6" fill="none" opacity=".8"/></svg></div>
+  <nav class="sitenav"><div class="inner"><a href="index.html" class="nav-brand"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="wg" cx="50%" cy="50%"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/></radialGradient></defs><g stroke="url(#wg)" fill="none" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"/><circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/><circle cx="40" cy="40" r="18" stroke-width=".5" opacity=".55"/><circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/><g stroke-width=".55" opacity=".7"><line x1="40" y1="4" x2="40" y2="76"/><line x1="4" y1="40" x2="76" y2="40"/><line x1="14.8" y1="14.8" x2="65.2" y2="65.2"/><line x1="65.2" y1="14.8" x2="14.8" y2="65.2"/><line x1="40" y1="4" x2="52" y2="76"/><line x1="40" y1="4" x2="28" y2="76"/><line x1="4" y1="40" x2="76" y2="52"/></g><circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="epoch.html">Эпоха</a><a href="hierarchies.html">Три Иерархии</a><a href="unity.html">Единство</a><a href="throne.html">Трон</a><a href="madding.html">Хранители</a><a href="hierarchy-wall.html">Иерархия Стены</a><a href="order.html">Орден</a><a href="wall.html">Стена</a><a href="chronicles.html">Хроника</a><a href="anomalies.html">Аномалии</a><a href="aiel.html">Айил</a><a href="tuataan.html">Туата’ан</a><a href="freefolk.html">Вольные</a><a href="rituals.html">Ритуалы</a><a href="ingredients.html">Ингредиенты</a><a href="loot-generator.html">Генератор</a><a href="tsitadel.html">Цитадель</a><a href="monsters.html">Монстры</a></div></div></nav>
+  <div class="page-body">
+    <header class="page-header">
+      <div class="eyebrow">Полевой инструмент Ордена</div>
+      <h1>Генератор ингредиентов</h1>
+      <p class="lead">Сбор аномальных компонентов во временных аномалиях и слоях Аномальной Стены: Внешняя Тень, Внутренняя Тень, Гребень и Ядро.</p>
+    </header>
+    <div class="chapter-nav"><a href="#temporal">Временные аномалии</a><a href="#wallgen">Аномальная Стена</a><a href="#reference">Справочник</a></div>
+
+    <section class="chapter narrow" id="temporal">
+      <div class="chapter-head"><div class="chapter-roman">I</div><h2 class="chapter-title">Временная аномалия</h2><p class="chapter-desc">Броски по рейтингу аномалии. Таблица определяет шанс обнаружить хотя бы одну дозу компонента выбранного ранга.</p></div>
+      <div class="generator-grid">
+        <div class="panel generator-panel">
+          <label>Рейтинг аномалии</label><select id="temporalRating"></select>
+          <label>Количество часов / попыток</label><input id="temporalAttempts" type="number" min="1" max="12" value="1">
+          <label>Фильтр склонности</label><select id="temporalType"><option value="all">Любая</option><option>Энергия</option><option>Тел’аран’риод</option><option>Иные измерения</option></select>
+          <label>Бонус к проверке Природы/Выживания</label><input id="temporalBonus" type="number" min="-5" max="25" value="0">
+          <button class="generator-btn" id="rollTemporal">Сгенерировать сбор</button>
+        </div>
+        <div class="panel result-panel"><h3>Результат</h3><div id="temporalResult" class="loot-output muted">Выберите параметры и нажмите кнопку.</div></div>
+      </div>
+    </section>
+
+    <section class="chapter narrow" id="wallgen">
+      <div class="chapter-head"><div class="chapter-roman">II</div><h2 class="chapter-title">Аномальная Стена</h2><p class="chapter-desc">Один час перехода — одна попытка поиска. В одной местности можно найти только один ингредиент; после находки зона исчерпана минимум на 24 часа.</p></div>
+      <div class="generator-grid">
+        <div class="panel generator-panel">
+          <label>Слой Стены</label><select id="wallZone"><option value="outer">Внешняя Тень</option><option value="inner">Внутренняя Тень</option><option value="crest">Гребень</option><option value="core">Ядро</option></select>
+          <label>Искомый ранг</label><select id="wallRank"><option value="any">Любой доступный</option></select>
+          <label>Тип поиска</label><select id="wallSearchMode"><option value="none">Обычный поиск</option><option value="type">Целенаправленно по склонности (+2)</option><option value="name">Целенаправленно по названию (+4)</option></select>
+          <label>Склонность / название</label><select id="wallTarget"><option value="all">Любая</option></select>
+          <label>Бонус Природы/Выживания</label><input id="wallBonus" type="number" min="-5" max="25" value="0">
+          <label>Количество часов / попыток</label><input id="wallAttempts" type="number" min="1" max="12" value="1">
+          <button class="generator-btn" id="rollWall">Сгенерировать поиск</button>
+        </div>
+        <div class="panel result-panel"><h3>Результат</h3><div id="wallResult" class="loot-output muted">Ядро использует расширенное правило: доступ R1–R10, но каждый успешный или проваленный сбор сопровождается проверкой опасности.</div></div>
+      </div>
+    </section>
+
+    <section class="chapter narrow" id="reference">
+      <div class="chapter-head"><div class="chapter-roman">III</div><h2 class="chapter-title">Справочные таблицы</h2><p class="chapter-desc">Краткий перечень компонентов и отдельное правило Ядра.</p></div>
+      <div class="panel prose">
+        <h3>Правило Ядра</h3>
+        <p><strong>Ядро</strong> — не просто глубинный слой Стены, а место, где маршрут уже почти не принадлежит реальности. В нём доступны ингредиенты всех рангов R1–R10. СЛ поиска ниже, чем в Гребне для редких компонентов, потому что энергия обнажена, но после каждой попытки выполняется бросок опасности Ядра.</p>
+        <ul>
+          <li><strong>Опасность Ядра:</strong> d20 + бонус Мудрости/Выживания против СЛ 15. Провал — аномальный откат: 1 уровень истощения или встреча с существом Ядра, на выбор МИ.</li>
+          <li><strong>Провал на 5+:</strong> дополнительно теряется 1 час маршрута или STAB −1, если используется маршрутная стабильность.</li>
+          <li><strong>Критический успех поиска:</strong> 2 дозы вместо 1 или дополнительная попытка в той же локации.</li>
+        </ul>
+      </div>
+      <table class="data-table compact-table" id="ingredientTable"><thead><tr><th>Ранг</th><th>Ингредиенты</th><th>Склонность</th></tr></thead><tbody></tbody></table>
+    </section>
+  </div>
+  <footer><svg class="mini-wheel-ft" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="wg2" cx="50%" cy="50%"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/></radialGradient></defs><g stroke="url(#wg2)" fill="none" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"/><circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/><circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/><circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/></g></svg><div class="ft-quote">❖  Каждая доза стоит часа пути. Иногда — части души.  ❖</div><p>Четвёртая Эпоха · 270 лет после Последней Битвы</p></footer>
+  <script src="assets/shared.js"></script>
+  <script src="assets/loot-generator.js"></script>
+</body>
+</html>
