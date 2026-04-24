@@ -142,10 +142,28 @@
     return true;
   }).slice(0,14);
   const tocList = sidebar.querySelector('.sidebar-toc-list');
+  const staticPageAnchors = {
+    'wall.html': [
+      ['#w1','Феномен'], ['#w2','Зоны'], ['#wall-visual','Схема'], ['#w3','Пересечение'], ['#w4','Механика'], ['#w5','Карта']
+    ],
+    'hierarchies.html': [
+      ['#edinstvo','Единство'], ['#tron','Хрустальный Трон'], ['#farmadding','Фар Мэддинг'], ['#comparison','Сравнение'], ['#wall-hierarchy','Иерархия Стены']
+    ]
+  };
   function slugify(text){
     return text.toLowerCase().replace(/[«»“”"'’]/g,'').replace(/[^a-zа-яё0-9]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,64) || 'section';
   }
-  if(headings.length){
+  const staticAnchors = staticPageAnchors[path] || null;
+  if(staticAnchors){
+    staticAnchors.forEach(([href, label]) => {
+      const a = document.createElement('a');
+      a.className = 'sidebar-toc-link primary';
+      a.href = href;
+      a.textContent = label;
+      a.addEventListener('click', () => { if(!isDesktop()) setOpen(false); });
+      tocList.appendChild(a);
+    });
+  } else if(headings.length){
     headings.forEach((h, idx) => {
       if(!h.id){
         let base = slugify(h.textContent.trim()), id = base, n = 2;
