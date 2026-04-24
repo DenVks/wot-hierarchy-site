@@ -1481,3 +1481,126 @@ nav.sitenav .inner{position:relative}
   background:rgba(232,200,120,.045);
 }
 tr[id]{scroll-margin-top:110px;}
+
+/* v24: unified reusable components
+   Canonical component layer for recipe cards, creature/stat cards, anomaly cards,
+   and right-side media blocks. Existing page-specific classes are kept as aliases. */
+:root{
+  --component-radius:22px;
+  --component-radius-sm:16px;
+  --component-border:rgba(201,169,97,.22);
+  --component-border-strong:rgba(201,169,97,.36);
+  --component-bg:linear-gradient(135deg,rgba(16,15,17,.94),rgba(38,28,24,.78));
+  --component-bg-soft:linear-gradient(180deg,rgba(255,255,255,.032),rgba(255,255,255,.014));
+  --component-shadow:0 18px 60px rgba(0,0,0,.34),inset 0 0 0 1px rgba(255,255,255,.025);
+}
+.component-card,
+.recipe-card,
+.creature-card,
+.anomaly-card{
+  position:relative;
+  border:1px solid var(--component-border);
+  border-radius:var(--component-radius);
+  background:var(--component-bg);
+  box-shadow:var(--component-shadow);
+  overflow:hidden;
+}
+.component-card::before,
+.recipe-card::before,
+.creature-card::before,
+.anomaly-card::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  pointer-events:none;
+  background:radial-gradient(circle at 82% 28%,rgba(201,169,97,.14),transparent 35%),radial-gradient(circle at 8% 100%,rgba(120,74,32,.10),transparent 42%);
+}
+.component-card__body,
+.recipe-body,
+.creature-card__body,
+.anomaly-card__body{position:relative;z-index:1;}
+.component-kicker,
+.recipe-topline,
+.creature-card .subtitle,
+.anomaly-card .rank-badge{
+  font-family:'Cinzel',serif;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.component-media-right,
+.lore-side-art,
+.wall-side-images{
+  width:min(34vw,320px);
+  margin:6px 0 22px 28px;
+  float:right;
+  clear:right;
+}
+.component-media-right figure,
+.lore-side-art figure,
+.wall-side-images figure{margin:0 0 18px 0;}
+.component-media-right img,
+.lore-side-art img,
+.wall-side-images img{
+  display:block;
+  width:100%;
+  max-width:320px;
+  height:auto;
+  object-fit:contain;
+  border-radius:18px;
+  border:1px solid rgba(201,169,97,.22);
+  box-shadow:0 18px 42px rgba(0,0,0,.36),0 0 0 1px rgba(255,255,255,.025);
+}
+.component-caption,
+.component-media-right figcaption,
+.lore-side-art figcaption,
+.wall-side-images figcaption{
+  margin-top:7px;
+  padding:0 2px;
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  line-height:1.45;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  color:rgba(238,228,210,.56);
+  opacity:.78;
+}
+.creature-card,
+.statblock.creature-card{
+  padding:24px;
+  margin:22px 0;
+  background:linear-gradient(180deg,rgba(17,15,18,.95),rgba(28,21,21,.86));
+  border-left:3px solid rgba(201,169,97,.72);
+}
+.creature-card h3,
+.statblock.creature-card h3{font-family:'Cinzel',serif;color:#f3dfb0;}
+.creature-card .meta,
+.statblock.creature-card .meta,
+.creature-card .abilities,
+.statblock.creature-card .abilities{position:relative;z-index:1;}
+.anomaly-card,
+.anom-card.anomaly-card{
+  border-radius:20px;
+  background:linear-gradient(180deg,rgba(18,16,19,.92),rgba(30,22,22,.82));
+  border-color:rgba(201,169,97,.18);
+  border-left:3px solid var(--anom-color,var(--gold));
+  box-shadow:0 14px 42px rgba(0,0,0,.26),inset 0 0 0 1px rgba(255,255,255,.018);
+}
+.anomaly-card::before,
+.anom-card.anomaly-card::before{background:radial-gradient(circle at 88% 22%,color-mix(in srgb,var(--anom-color,var(--gold)) 24%,transparent),transparent 34%);}
+@supports not (background:color-mix(in srgb, red 10%, transparent)){
+  .anomaly-card::before,.anom-card.anomaly-card::before{background:radial-gradient(circle at 88% 22%,rgba(201,169,97,.14),transparent 34%);}
+}
+.component-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin:28px 0;}
+.component-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);gap:22px;align-items:start;}
+.component-split__media img{width:100%;max-width:320px;height:auto;object-fit:contain;border-radius:18px;border:1px solid rgba(201,169,97,.22);box-shadow:0 18px 42px rgba(0,0,0,.36);}
+@media (max-width:900px){
+  .component-media-right,.lore-side-art,.wall-side-images{float:none;width:min(100%,340px);margin:18px auto 24px;}
+  .component-media-right img,.lore-side-art img,.wall-side-images img{max-width:340px;max-height:280px;}
+  .component-split{grid-template-columns:1fr;}
+  .component-split__media{order:-1;max-width:340px;margin:0 auto;}
+}
+@media (max-width:520px){
+  .component-card,.recipe-card,.creature-card,.anomaly-card{border-radius:18px;}
+  .creature-card,.statblock.creature-card{padding:18px 15px;}
+  .component-media-right img,.lore-side-art img,.wall-side-images img{max-width:100%;max-height:240px;}
+}
