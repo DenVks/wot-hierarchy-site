@@ -51,7 +51,7 @@
     {title:'Мир', items:['index.html','epoch.html','chronicles.html']},
     {title:'Иерархии', items:['hierarchies.html','unity.html','throne.html','madding.html','hierarchy-wall.html']},
     {title:'Орден и аномалии', items:['order.html','wall.html','anomalies.html','tsitadel.html']},
-    {title:'Игровые инструменты', items:['ingredients.html','loot-generator.html','rituals.html','monsters.html']},
+    {title:'Игровые инструменты', items:['ingredients.html','loot-generator.html','encounter-generator.html','rituals.html','monsters.html']},
     {title:'Народы', items:['aiel.html','tuataan.html','freefolk.html']}
   ];
   const byHref = new Map(navLinks.map(a => [a.getAttribute('href'), a.textContent.trim()]));

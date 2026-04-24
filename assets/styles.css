@@ -1597,3 +1597,11 @@ tr[id]{scroll-margin-top:110px;}
   .creature-card,.statblock.creature-card{padding:18px 15px;}
   .component-media-right img{max-width:100%;max-height:240px;}
 }
+
+/* v26: encounter generator + temporal anomaly bestiary */
+.generated-card{border:1px solid rgba(201,169,97,.22);border-radius:18px;padding:18px;background:linear-gradient(135deg,rgba(18,16,24,.96),rgba(35,26,23,.82));box-shadow:0 16px 50px rgba(0,0,0,.28)}
+.generated-card h3{margin:0 0 8px;color:var(--gold-bright);font-family:Marcellus,serif;font-size:28px}
+.generated-card h4{margin:16px 0 8px;color:var(--gold-pale);font-family:Cinzel,serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+.result-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
+.result-grid div{border:1px solid rgba(201,169,97,.16);border-radius:12px;padding:10px;background:rgba(0,0,0,.16)}
+.result-grid b{display:block;color:var(--gold);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-family:Cinzel,serif}.result-grid span{display:block;margin-top:4px;color:#eadfc4}.compact-note{margin-top:16px}.temporal-monster-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.temporal-pack{border-left:3px solid rgba(201,169,97,.55)}.temporal-pack .subtitle{font-size:14px;color:#c9c0ac;margin-top:-6px;margin-bottom:12px}.monster-chip-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.monster-chip{border:1px solid rgba(201,169,97,.24);border-radius:999px;padding:6px 10px;background:rgba(0,0,0,.18);font-size:14px;color:#eadfc4}.monster-chip strong{color:var(--gold-pale)}@media(max-width:980px){.temporal-monster-grid{grid-template-columns:1fr 1fr}.result-grid{grid-template-columns:1fr 1fr}}@media(max-width:640px){.temporal-monster-grid{grid-template-columns:1fr}.result-grid{grid-template-columns:1fr}.generated-card h3{font-size:24px}}
