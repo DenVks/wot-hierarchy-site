@@ -2241,3 +2241,26 @@ body .weaves-page .weave-filter-panel button:hover{
   border-color: rgba(232,200,120,.50) !important;
   box-shadow: 0 0 0 2px rgba(201,169,97,.12) !important;
 }
+
+
+/* v33: Far Madding keeper abilities unified layout */
+.keeper-abilities-section .keeper-ability-table td:nth-child(1),
+.keeper-abilities-section .keeper-field-table td:nth-child(1){font-family:Cinzel,serif;color:var(--gold-bright);font-weight:600;white-space:nowrap;}
+.keeper-abilities-section .keeper-ability-table td:nth-child(2){color:var(--gold-pale);min-width:170px;}
+.keeper-field-card{margin:28px 0;padding:24px;border:1px solid rgba(163,244,224,.22);border-radius:24px;background:radial-gradient(circle at 92% 16%,rgba(163,244,224,.10),transparent 34%),linear-gradient(135deg,rgba(14,22,25,.92),rgba(8,8,13,.78));box-shadow:0 22px 58px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.035);}
+.keeper-field-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:16px;}
+.keeper-kicker{font-family:Cinzel,serif;font-size:10px;letter-spacing:.20em;text-transform:uppercase;color:rgba(163,244,224,.62);margin-bottom:6px;}
+.keeper-field-head h4{margin:0;font-family:Marcellus,serif;font-size:30px;line-height:1.1;color:#c8fff1;}
+.keeper-field-badge{border:1px solid rgba(163,244,224,.28);border-radius:999px;padding:6px 11px;background:rgba(0,0,0,.20);font-family:Cinzel,serif;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#c8fff1;}
+.keeper-rule-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px;}
+.keeper-rule-grid div{border:1px solid rgba(201,169,97,.13);border-radius:16px;padding:14px 15px;background:rgba(0,0,0,.18);}
+.keeper-rule-grid strong{display:block;color:var(--gold-pale);font-family:Cinzel,serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;}
+.keeper-rule-grid p{margin:0;color:#d9cfb8;line-height:1.48;}
+.ability-card-grid.keeper-ability-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:26px 0;}
+.keeper-card{position:relative;border:1px solid rgba(201,169,97,.17);border-radius:22px;padding:18px 18px 17px;background:radial-gradient(circle at 86% 14%,rgba(163,244,224,.08),transparent 34%),linear-gradient(135deg,rgba(17,16,24,.92),rgba(8,8,13,.76));box-shadow:0 18px 48px rgba(0,0,0,.24);overflow:hidden;}
+.keeper-card span{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;margin-bottom:10px;border:1px solid rgba(163,244,224,.28);border-radius:999px;background:rgba(0,0,0,.20);font-family:Cinzel,serif;color:#c8fff1;font-size:12px;}
+.keeper-card h4{margin:0 0 8px;font-family:Marcellus,serif;font-size:23px;color:var(--gold-bright);}
+.keeper-card p{margin:0;color:#d8cfb9;line-height:1.52;}
+.keeper-note{border-color:rgba(163,244,224,.18);background:linear-gradient(135deg,rgba(11,18,20,.62),rgba(8,8,13,.46));}
+@media(max-width:980px){.ability-card-grid.keeper-ability-cards{grid-template-columns:repeat(2,minmax(0,1fr));}.keeper-rule-grid{grid-template-columns:1fr;}}
+@media(max-width:620px){.ability-card-grid.keeper-ability-cards{grid-template-columns:1fr;}.keeper-field-head{display:block}.keeper-field-badge{display:inline-flex;margin-top:10px}.keeper-field-card{padding:19px 16px}.keeper-field-head h4{font-size:25px;}}
