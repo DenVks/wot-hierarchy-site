@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Плетения · Колесо Времени · 270 ПБ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+  <div class="pattern-bg"></div>
+  <div class="thread-layer"><svg viewBox="0 0 1800 1200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="thread1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c9a961" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#c9a961" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#c9a961" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="thread2" x1="0" y1="0" x2="1" y2="0.3">
+      <stop offset="0" stop-color="#c084fc" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#c084fc" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#c084fc" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="thread3" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#fb923c" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#fb923c" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#fb923c" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path d="M-50,180 Q400,60 850,240 Q1200,380 1850,180" stroke="url(#thread1)" stroke-width="1" fill="none"/>
+  <path d="M-50,520 Q500,440 950,600 Q1400,720 1850,540" stroke="url(#thread1)" stroke-width=".7" fill="none" opacity=".7"/>
+  <path d="M-50,820 Q350,680 750,850 Q1150,1000 1850,780" stroke="url(#thread2)" stroke-width=".6" fill="none" opacity=".8"/>
+  <path d="M-50,1050 Q450,950 900,1080 Q1350,1180 1850,1020" stroke="url(#thread3)" stroke-width=".5" fill="none" opacity=".65"/>
+</svg></div>
+
+<nav class="sitenav"><div class="inner"><a href="index.html" class="nav-brand"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="wg" cx="50%" cy="50%"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/></radialGradient></defs><g stroke="url(#wg)" fill="none" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"/><circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/><circle cx="40" cy="40" r="18" stroke-width=".5" opacity=".55"/><circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/><g stroke-width=".55" opacity=".7"><line x1="40" y1="4" x2="40" y2="76"/><line x1="4" y1="40" x2="76" y2="40"/><line x1="14.8" y1="14.8" x2="65.2" y2="65.2"/><line x1="65.2" y1="14.8" x2="14.8" y2="65.2"/><line x1="40" y1="4" x2="52" y2="76"/><line x1="40" y1="4" x2="28" y2="76"/><line x1="4" y1="40" x2="76" y2="52"/></g><circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="epoch.html">Эпоха</a><a href="hierarchies.html">Три Иерархии</a><a href="unity.html">Единство</a><a href="throne.html">Трон</a><a href="madding.html">Хранители</a><a href="hierarchy-wall.html">Иерархия Стены</a><a href="order.html">Орден</a><a href="wall.html">Стена</a><a href="chronicles.html">Хроника</a><a href="anomalies.html">Аномалии</a><a href="aiel.html">Айил</a><a href="tuataan.html">Туата’ан</a><a href="freefolk.html">Вольные</a><a href="rituals.html">Ритуалы</a><a href="weaves.html">Плетения</a><a href="ingredients.html">Ингредиенты</a><a href="loot-generator.html">Генератор</a><a href="encounter-generator.html">Энкаунтеры</a><a href="tsitadel.html">Цитадель</a><a href="monsters.html">Монстры</a></div></div></nav>
+
+<div class="page-body">
+<header class="page-header weave-page-header">
+  <div class="eyebrow">Единая Сила · каталог плетений</div>
+  <h1>Плетения</h1>
+  <p>Сводный открытый раздел по плетениям Единой Силы: уровень, талант, стихии, редкость, базовая механика и усиление на более высоких уровнях.</p>
+</header>
+
+<main class="weaves-page">
+  <section class="chapter narrow">
+    <div class="chapter-head">
+      <div class="chapter-roman">I · КАТАЛОГ</div>
+      <h2 class="chapter-title">Плетения Единой Силы</h2>
+      <p class="chapter-desc">Карточки отсортированы по уровню: от кантрипов до плетений 9-го уровня.</p>
+    </div>
+
+    <div class="weave-filter-panel reveal-target">
+      <label>Поиск<input id="weave-search" type="search" placeholder="Название или текст плетения…"></label>
+      <label>Уровень<select id="weave-level-filter"><option value="all">Все уровни</option><option value="0">Кантрип</option><option value="1">1-й уровень</option><option value="2">2-й уровень</option><option value="3">3-й уровень</option><option value="4">4-й уровень</option><option value="5">5-й уровень</option><option value="6">6-й уровень</option><option value="7">7-й уровень</option><option value="8">8-й уровень</option><option value="9">9-й уровень</option></select></label>
+      <label>Талант / школа<select id="weave-school-filter"><option value="all">Все таланты/школы</option><option value="Иллюзия">Иллюзия</option><option value="Исцеление">Исцеление</option><option value="Охранные плетения">Охранные плетения</option><option value="Пение Земли">Пение Земли</option><option value="Погибельный Огонь">Погибельный Огонь</option><option value="Путешествия">Путешествия</option><option value="Соединение">Соединение</option><option value="Танец Облаков">Танец Облаков</option><option value="Элементализм">Элементализм</option></select></label>
+      <label>Тип<select id="weave-rarity-filter"><option value="all">Все типы</option><option value="Обычное">Обычное</option><option value="Редкое">Редкое</option><option value="Утрачено">Утрачено</option></select></label>
+      <label>Стихия<select id="weave-power-filter"><option value="all">Все стихии</option><option value="Воздух">Воздух</option><option value="Земля">Земля</option><option value="Огонь">Огонь</option><option value="Дух">Дух</option><option value="Вода">Вода</option></select></label>
+      <button id="weave-reset" type="button">Сбросить</button>
+    </div>
+
+    <div class="weave-summary reveal-target">
+      <span id="weave-count">60</span> плетений в каталоге
+    </div>
+
+    <div class="mini-anchor-row reveal-target weave-level-nav">
+      <a href="#weave-level-0">Кантрип</a><a href="#weave-level-1">1-й уровень</a><a href="#weave-level-2">2-й уровень</a><a href="#weave-level-3">3-й уровень</a><a href="#weave-level-4">4-й уровень</a><a href="#weave-level-5">5-й уровень</a><a href="#weave-level-6">6-й уровень</a><a href="#weave-level-7">7-й уровень</a><a href="#weave-level-8">8-й уровень</a><a href="#weave-level-9">9-й уровень</a>
+    </div>
+
+    
+<section class="weave-level-section anchor-nav" id="weave-level-0" data-level-group="0">
+  <div class="weave-level-head">
+    <span>Кантрип</span>
+    <small>11 плет.</small>
+  </div>
+  <div class="weave-grid">
+<article class="weave-card rarity-common level-0" data-level="0" data-school="Иллюзия" data-rarity="Обычное" data-powers="Воздух Огонь">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">Кантрип · Иллюзия</div>
+      <h3>Голос Силы</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Длительность</span><p>Концентрация</p></div><div><span>Спасбросок</span><p>Мудрость, нейтрализует</p></div></div>
+  <div class="weave-text"><p>Вы касаетесь одного существа, и его голос становится настолько громким, что:</p><p>Он легко перекрикивает толпу.</p><p>Может отдавать приказы на шумном поле битвы.</p><p>Его крики слышны до четырёх миль.</p><p>Пока плетение активно, цель получает преимущество на проверки Харизмы (Запугивание).</p></div>
+  
+</article>
+
+<article class="weave-card rarity-rare level-0" data-level="0" data-school="Исцеление" data-rarity="Редкое" data-powers="Воздух Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">Кантрип · Исцеление</div>
+      <h3>Разорвать плоть</h3>
+    </div>
+    <span class="weave-rarity">Редкое</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Длительность</span><p>Мгновенно</p></div><div><span>Спасбросок</span><p>Телосложение половину</p></div></div>
+  <div class="weave-text"><p>Вы направляете Единую Силу, чтобы разорвать плоть, выворачивая кости из суставов и оставляя глубокие рваные раны.</p><p>Цель должна совершить спасбросок Телосложения.</p><p>При провале она получает 1d10 рубящего урона, а при успехе — половину этого урона.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 1-го уровня или выше, урон увеличивается на 1d10 за каждый уровень слота выше 0.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-0" data-level="0" data-school="Пение Земли" data-rarity="Обычное" data-powers="Земля Огонь">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">Кантрип · Пение Земли</div>
+      <h3>Граната</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Цель</span><p>Один камень</p></div><div><span>Длительность</span><p>Мгновенная</p></div><div><span>Спасбросок</span><p>Ловкость, половина урона</p></div></div>
+  <div class="weave-text"><p>Вы наделяете маленький камень взрывной силой. Если камень ударяется о твёрдую поверхность, он взрывается, нанося 1d4 дробящего + 1d4 огненного урона существу или объекту, в который он попал (половина при успешном спасброске Ловкости). Если цель воспламеняема и провалила спасбросок, она загорается, получая в конце своего хода 1d6 урона огнём, пока кто-нибудь не затушит огонь действием.</p><p>Вы можете бросить камень вручную или использовать его как снаряд для подходящего оружия (например, пращи или катапульты). Чтобы попасть брошенным камнем, совершается дальнобойная атака, а не атака плетением.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку плетений 1-го уровня или выше, вы можете целиться в камни большего размера. Такой камень наносит дополнительно +1d4 дробящего и +1d4 огненного урона и взрывается с радиусом 5 футов за каждый уровень слота выше 0.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-0" data-level="0" data-school="Пение Земли" data-rarity="Обычное" data-powers="Земля">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">Кантрип · Пение Земли</div>
+      <h3>Полировка</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-earth" title="Земля">Земля</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Цель</span><p>Один металлический предмет</p></div><div><span>Длительность</span><p>Мгновенно</p></div></div>
+  <div class="weave-text"><p>Вы очищаете металлический предмет от тусклого налёта, ржавчины и коррозии, оставляя гладкую и сияющую поверхность.</p><p>Сильная ржавчина превращается обратно в металл.</p><p>Повреждённое оружие восстанавливает свою форму.</p><p>Засорённые ржавчиной петли снова начинают работать плавно.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-0" data-level="0" data-school="Соединение" data-rarity="Обычное" data-powers="Воздух Земля Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">Кантрип · Соединение</div>
+      <h3>Ложный след</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>Собственная</p></div><div><span>Длительность</span><p>Мгновенная</p></div><div><span>Спасбросок</span><p>Мудрость отменяет</p></div></div>
+  <div class="weave-text"><p>Вы указываете направление, и в радиусе 25 футов от вас остаётся след из запаха и отпечатков, уводящий в эту сторону. Если вы идёте в другом направлении, вы не оставляете запах или следы на 25 футов от места сотворения плетения. Вы можете создать ложный след для числа существ, равного вашему модификатору способности к направлению.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 1-го уровня или выше, вы можете удвоить количество существ, для которых создаётся ложный след, а длина следа увеличивается на 500 футов за каждый уровень ячейки выше 0.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-0" data-level="0" data-school="Танец Облаков" data-rarity="Обычное" data-powers="Воздух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">Кантрип · Танец Облаков</div>
+      <h3>Обуздать Ветер</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>300 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы создаёте порыв ветра радиусом 5 футов, достаточный, чтобы затушить свечи, разметать листья или сдуть листы бумаги.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы создаёте это плетение, используя ячейку 1-го уровня или выше, радиус и дальность увеличиваются на 100 футов.</p><p>При плетении 3-го уровня вы способны двигать корабли на хорошей скорости.</p><p>При 5-м уровне каждое существо в области должно совершить спасбросок Ловкости или упасть.</p><p>При 7-м уровне ветер способен вырывать деревья и разрушать лёгкие постройки.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-0" data-level="0" data-school="Танец Облаков" data-rarity="Обычное" data-powers="Воздух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">Кантрип · Танец Облаков</div>
+      <h3>Предсказание Погоды</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 минута</p></div><div><span>Дальность</span><p>Собственная</p></div><div><span>Длительность</span><p>Мгновенная</p></div></div>
+  <div class="weave-text"><p>Вы способны ощутить будущие изменения погоды в области вокруг вас на ближайшие 24 часа. Вы не можете почувствовать изменения, вызванные неестественными причинами (например, плетением «Обуздание ветра»).</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. При использовании ячейки плетений 1-го уровня или выше вы можете предвидеть изменения погоды на одну неделю за каждый уровень слота выше 0. Чем дальше во времени, тем менее точные сведения вы получаете.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-0" data-level="0" data-school="Танец Облаков" data-rarity="Обычное" data-powers="Воздух Огонь">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">Кантрип · Танец Облаков</div>
+      <h3>Тепло</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Область</span><p>Радиус 15 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы изменяете температуру в радиусе 15 футов, делая её комфортной на время действия плетения.</p><p>Если плетение сотворено в замкнутом пространстве (например, в комнате или палатке), оно принимает форму этого пространства, если оно не превышает область действия.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-0" data-level="0" data-school="Элементализм" data-rarity="Обычное" data-powers="Воздух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">Кантрип · Элементализм</div>
+      <h3>Инструмент Воздуха</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>Бонусное действие</p></div><div><span>Дальность</span><p>60 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы создаёте маленький инструмент или оружие из воздуха, например, нож, молот, клин или зажим.</p><p>Предмет парит рядом с вами.</p><p>Вы можете использовать бонусное действие, чтобы переместить предмет на 20 футов и нанести одну атаку плетением.</p><p>Урон зависит от формы предмета:</p><p>Дробящий (молот, зажим)</p><p>Колющее (нож, клин)</p><p>Режущее (лезвие, топор)</p><p>Базовый урон 1d4.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>Когда вы создаёте это плетение, используя ячейку 1-го уровня или выше, размер и урон оружия увеличивается в соответствии со следующей таблицей:</p><p>Оружие можно использовать для атак на расстоянии или ближнего боя, в зависимости от формы.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-0" data-level="0" data-school="Элементализм" data-rarity="Обычное" data-powers="Воздух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">Кантрип · Элементализм</div>
+      <h3>Ледяные кристаллы</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Цель</span><p>Одно существо или объект</p></div><div><span>Длительность</span><p>Мгновенная</p></div><div><span>Спасбросок</span><p>Нет. Бросок атаки</p></div></div>
+  <div class="weave-text"><p>Воздух перед вами кристаллизуется от холода и устремляется в лицо врага, заставляя того отступить назад на 5 футов и нанеся урон 1к10.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 1-го уровня или выше, урон увеличивает на 1к10 за каждый уровень ячейки выше.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-0" data-level="0" data-school="Элементализм" data-rarity="Обычное" data-powers="Воздух Огонь">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">Кантрип · Элементализм</div>
+      <h3>Свет</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>Собственная</p></div><div><span>Длительность</span><p>Концентрация</p></div><div><span>Спасбросок</span><p>Ловкость отменяет</p></div></div>
+  <div class="weave-text"><p>Вы создаёте шар яркого света, парящий в нескольких футах над землёй рядом с вами. Шар освещает область ярким светом в радиусе 30 футов и тусклым ещё на 30 футов.</p><p>Вы можете использовать бонусное действие, чтобы переместить шар на 20 футов в любом направлении. Если вы расположите шар перед лицом существа, оно должно совершить спасбросок Ловкости или быть ослеплённым до конца своего следующего хода.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. При использовании ячейки 1-го уровня или выше радиус света увеличивается на 30 футов за каждый уровень слота сверх 0, а существо получает помеху на спасбросок.</p></div>
+</article></div>
+</section>
+<section class="weave-level-section anchor-nav" id="weave-level-1" data-level-group="1">
+  <div class="weave-level-head">
+    <span>1-й уровень</span>
+    <small>15 плет.</small>
+  </div>
+  <div class="weave-grid">
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Иллюзия" data-rarity="Обычное" data-powers="Воздух Огонь Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Иллюзия</div>
+      <h3>Зеркало Туманов</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>Собственная</p></div><div><span>Длительность</span><p>Концентрация</p></div><div><span>Спасбросок</span><p>Мудрость отменяет</p></div></div>
+  <div class="weave-text"><p>Вы создаёте иллюзию, которая заставляет вас казаться выше, окружает мерцающей вуалью света, а ваш голос становится глубже и насыщеннее.</p><p>Вы получаете преимущество на все проверки Харизмы (Запугивание).</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 2-го уровня, все враждебные существа в радиусе 30 футов, которые видят или слышат вас, должны совершить спасбросок Мудрости или будут ошеломлены (stunned) до конца вашего следующего хода.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Иллюзия" data-rarity="Обычное" data-powers="Воздух Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Иллюзия</div>
+      <h3>Подслушивание</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы создаёте щупальце Единой Силы в пределах дистанции. Оно может пролезать через узкие отверстия (не менее ¼ дюйма).</p><p>Вы можете бонусным действием слушать через это щупальце, как будто оно — ваши уши. Пока вы так делаете, вы лишь смутно воспринимаете звуки вокруг. Вы получаете помеху на проверки Мудрости (Восприятие), зависящие от слуха.</p><p>Вы можете своим действием переместить щупальце до 30 футов в любом направлении, но оно не может удаляться более чем на 300 футов от вас. Если вы завязываете плетение, вы не можете двигать щупальце, однако всё ещё можете слушать через него.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Исцеление" data-rarity="Обычное" data-powers="Земля Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Исцеление</div>
+      <h3>Восстановление</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 минута</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Длительность</span><p>Мгновенно</p></div></div>
+  <div class="weave-text"><p>Вы касаетесь цели и медленно восстанавливаете её физическое и ментальное состояние.</p><p>В конце плетения цель получает +1d4 к одной выбранной характеристике.</p><p>Вы должны поддерживать прикосновение к цели в течение всего времени плетения.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 2-го уровня или выше, вы можете восстановить дополнительно 1d4 к той же или другой характеристике за каждый уровень слота выше 1-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Исцеление" data-rarity="Обычное" data-powers="Воздух Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Исцеление</div>
+      <h3>Исцеление</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Цель</span><p>Прикоснувшееся существо</p></div><div><span>Длительность</span><p>Мгновенная</p></div><div><span>Спасбросок</span><p>Мудрость отменяет</p></div></div>
+  <div class="weave-text"><p>Вы прикасаетесь к живому существу и используете энергию его собственного тела, восстанавливая количество хитов, равное 1d8 + ваш модификатор способности направлять.</p><p>Поскольку плетение использует силу самого тела, лечение серьёзных ран требует больше времени и может вызвать истощение.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы создаёте это плетение, используя ячейку 2-го уровня или выше, вы восстанавливаете дополнительные 1d8 хитов за каждый уровень ячейки сверх 1-го. Время плетения (в раундах) и уровень(и) истощения равны одной трети уровня ячейки (округляется вниз).</p></div>
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Исцеление" data-rarity="Обычное" data-powers="Воздух Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Исцеление</div>
+      <h3>Исцеление Разума</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 минута</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Цель</span><p>Прикоснувшееся существо</p></div><div><span>Длительность</span><p>Мгновенная</p></div><div><span>Спасбросок</span><p>Мудрость отменяет</p></div></div>
+  <div class="weave-text"><p>Вы кладёте руки на голову другого человека, временно облегчая симптомы безумия. Во время сотворения плетения цель может совершить спасбросок Мудрости, чтобы прекратить приступ безумия.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку плетений 2-го уровня или выше, цель может немедленно совершить спасбросок Мудрости, и вы уменьшаете её рейтинг безумия на 1d6 на 24 часа за каждый уровень ячейки сверх 1-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Исцеление" data-rarity="Обычное" data-powers="Воздух Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Исцеление</div>
+      <h3>Обновление</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Цель</span><p>Существо, к которому прикасаются</p></div><div><span>Длительность</span><p>1 час</p></div><div><span>Спасбросок</span><p>Мудрость отменяет</p></div></div>
+  <div class="weave-text"><p>Вы временно снимаете эффекты истощения с существа, позволяя ему чувствовать себя бодрым и способным продолжать физическую активность, будь то работа, путешествие или бой.</p><p>Истощение не исчезает, но временное влияние его последствий прекращается.</p><p>По окончании действия плетения существо получает один дополнительный уровень истощения.</p><p>Например, если у существа 3 уровня истощения, а плетение было соткано на 2-м уровне, оно не будет страдать от истощения в течение 2 часов. Но по окончании этого времени оно получит 4-й уровень истощения.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 2-го уровня или выше, длительность увеличивается на 1 час за каждый уровень слота выше 1-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Охранные плетения" data-rarity="Обычное" data-powers="Воздух Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Охранные плетения</div>
+      <h3>Консервация</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Длительность</span><p>См. текст</p></div><div><span>Спасбросок</span><p>Нет</p></div></div>
+  <div class="weave-text"><p>Вы сохраняете в пригодном виде количество пищи, достаточное для прокорма 5 человек на неделю, предотвращая её порчу.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 2-го уровня или выше, вы можете сохранить ещё 5 рационов на неделю или продлить сохранность 5 рационов ещё на неделю за каждый уровень слота сверх 1-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Охранные плетения" data-rarity="Обычное" data-powers="Воздух Огонь Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Охранные плетения</div>
+      <h3>Охрана От Порождений Тени</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Область</span><p>Купол радиусом 5 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы создаёте купол радиусом 5 футов, который не позволяет Порождениям Тени войти в него.</p><p>Во время сотворения плетения в области не должно быть Порождений Тени.</p><p>Купол является невидимой барьерной стеной только для Порождений Тени.</p><p>Обычные существа, предметы и направляющие могут свободно проходить сквозь него.</p><p>Вы можете изменить форму купола, но его радиус определяется уровнем плетения.
+Если плетение сотворено в замкнутом пространстве (например, в комнате или пещере), оно принимает форму этого пространства.</p><p>Зона плетения не может перекрываться, содержать или быть заключённой внутри другого охранного плетения.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>При сотворении с ячейкой 2-го уровня или выше радиус купола увеличивается на 10 футов за каждый уровень ячейки выше 1-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Пение Земли" data-rarity="Обычное" data-powers="Земля">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Пение Земли</div>
+      <h3>Выровнять Землю</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-earth" title="Земля">Земля</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>60 футов</p></div><div><span>Область</span><p>Квадрат 10 футов</p></div><div><span>Длительность</span><p>Мгновенная</p></div><div><span>Спасбросок</span><p>Ловкость отменяет</p></div></div>
+  <div class="weave-text"><p>Вы используете нити Земли, чтобы выровнять или нарушить участок земли 10 на 10 футов, тем самым убирая или создавая труднопроходимую местность. Существа в зоне должны совершить спасбросок Ловкости или упасть.</p><p>Это плетение не устраняет другие объекты (растения, обломки и т.п.), которые могут причинять неудобства.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. При использовании ячейки 2-го уровня или выше область увеличивается на ещё один 10-футовый квадрат за уровень слота выше 1-го, при условии, что новые квадраты соприкасаются с ранее затронутыми.</p></div>
+</article>
+
+<article class="weave-card rarity-rare level-1" data-level="1" data-school="Соединение" data-rarity="Редкое" data-powers="Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Соединение</div>
+      <h3>Контроль Насекомых</h3>
+    </div>
+    <span class="weave-rarity">Редкое</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Область</span><p>Квадрат 5 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы привлекаете или отпугиваете рой насекомых в пределах квадрата 5 футов в указанной зоне. Вы не контролируете насекомых напрямую — не можете заставить их жалить, кусать или забираться на существ или объекты в зоне.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Используя ячейку 2-го уровня или выше, вы можете увеличить область на ещё один квадрат 5 футов за каждый уровень слота сверх 1-го, при условии, что новые квадраты примыкают друг к другу.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Танец Облаков" data-rarity="Обычное" data-powers="Воздух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Танец Облаков</div>
+      <h3>Поднять Туман</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>120 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы создаёте густой туман радиусом 20 футов вокруг выбранной точки в пределах досягаемости.</p><p>Туман поднимается на 5 футов в высоту каждый раунд.</p><p>Вы можете использовать бонусное действие, чтобы переместить центр тумана.</p><p>Туман заполняет углы и создаёт сильное затемнение в своей области.</p><p>Туман рассеивается при ветре от 10 миль в час или сильнее.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 2-го уровня или выше, радиус тумана увеличивается на 20 футов за каждый уровень слота выше 1-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Танец Облаков" data-rarity="Обычное" data-powers="Воздух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Танец Облаков</div>
+      <h3>Смерч</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Цель</span><p>Одно существо</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы создаёте вихрь воздуха вокруг существа, защищая его от снарядов.</p><p>Снаряды (стрелы, болты, мелкие камни) отклоняются ветром.</p><p>Любой снаряд, попавший в вихрь, с вероятностью 75% падает на землю, не достигая цели.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Элементализм" data-rarity="Обычное" data-powers="Воздух Земля">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Элементализм</div>
+      <h3>Ложная Стена</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>100 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы создаёте иллюзорную стену 5 на 5 футов, окрашенную под цвет скалы. Любой, кто попытается пройти сквозь неё, должен совершить проверку Силы (Атлетика) против СЛ спасброска вашего плетения. При успехе существо может протолкнуться сквозь стену.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 2-го уровня или выше, размер стены увеличивается на одну дополнительную секцию 5×5 футов за каждый уровень ячейки выше 1-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Элементализм" data-rarity="Обычное" data-powers="Земля Огонь">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Элементализм</div>
+      <h3>Огненный Жезл</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>Бонусное действие</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы наполняете оружие, жезл, ветку или другой предмет, который можно использовать как импровизированное оружие, энергией огня.</p><p>Объект не кажется горящим, но наносит дополнительно 1d6 урона огнём при успешной атаке в ближнем бою. Вы не получаете урона при касании объекта. Однако, если другой персонаж возьмёт предмет, он получит урон огнём в начале своего хода.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-1" data-level="1" data-school="Элементализм" data-rarity="Обычное" data-powers="Воздух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">1-й уровень · Элементализм</div>
+      <h3>Уплотнить Воздух</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>60 футов</p></div><div><span>Область</span><p>См. текст</p></div><div><span>Длительность</span><p>Концентрация</p></div><div><span>Спасбросок</span><p>Ловкость отменяет</p></div></div>
+  <div class="weave-text"><p>Вы уплотняете воздух вокруг выбранного существа или объекта в пределах дистанции. Существо совершает спасбросок Ловкости. При провале оно сковано (restrained).</p><p>Плетение можно использовать, чтобы поймать падающие объекты или существ; в этом случае они могут добровольно провалить спасбросок. Также можно блокировать объекты, формируя барьер, щит или даже мост из затвердевшего воздуха.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. При использовании ячейки 2-го уровня или выше вы можете выбрать одно дополнительное существо или объект за каждый уровень слота выше 1-го. Максимальная дистанция между любыми двумя целями не должна превышать 20 футов.</p></div>
+</article></div>
+</section>
+<section class="weave-level-section anchor-nav" id="weave-level-2" data-level-group="2">
+  <div class="weave-level-head">
+    <span>2-й уровень</span>
+    <small>7 плет.</small>
+  </div>
+  <div class="weave-grid">
+<article class="weave-card rarity-rare level-2" data-level="2" data-school="Иллюзия" data-rarity="Редкое" data-powers="Воздух Огонь">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">2-й уровень · Иллюзия</div>
+      <h3>Небесные Огни</h3>
+    </div>
+    <span class="weave-rarity">Редкое</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>300 футов</p></div><div><span>Область</span><p>Куб 20 футов</p></div><div><span>Длительность</span><p>Мгновенно</p></div><div><span>Спасбросок</span><p>Телосложение предотвращает (см. ниже)</p></div></div>
+  <div class="weave-text"><p>Вы создаёте ослепляющий визуальный эффект, напоминающий фейерверки Иллюминаторов, в указанной области.</p><p>Все существа в зоне должны совершить спасбросок Телосложения. При провале существо ослеплено до конца своего следующего хода.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>Если вы используете ячейку 3-го уровня или выше, размер куба увеличивается на 5 футов за каждый уровень слота выше 2-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-2" data-level="2" data-school="Иллюзия" data-rarity="Обычное" data-powers="Воздух Огонь">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">2-й уровень · Иллюзия</div>
+      <h3>Свернутый Свет</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы создаёте экран шириной 10 футов и высотой 10 футов, чтобы спрятать за ним конкретное существо, объект или группу существ/объектов. Вы выбираете направление, с которого экран обеспечивает прикрытие, и определяете цель, которую нужно скрыть.</p><p>Существа за экраном невидимы для тех, кто находится с противоположной стороны, пока они не двигаются. Движение за экраном вызывает незначительный размытый эффект. Наблюдатели могут заметить это при успешной проверке Мудрости (Восприятие) со СЛ 20. Экран не блокирует звуки или запахи.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-2" data-level="2" data-school="Охранные плетения" data-rarity="Обычное" data-powers="Воздух Огонь Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">2-й уровень · Охранные плетения</div>
+      <h3>Охрана От Людей</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Область</span><p>Купол радиусом 5 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы создаёте купол радиусом 5 футов, через который могут проходить только вы и те, кто находился в области плетения во время его сотворения.</p><p>Для всех остальных людей купол является невидимой барьерной стеной, через которую они не могут пройти.</p><p>Вы можете изменить форму купола, но его радиус определяется уровнем плетения.
+Если плетение сотворено в замкнутом пространстве (например, в комнате или пещере), оно принимает форму этого пространства.</p><p>Зона плетения не может перекрываться, содержать или быть заключённой внутри другого охранного плетения.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>При сотворении с ячейкой 3-го уровня или выше радиус купола увеличивается на 10 футов за каждый уровень ячейки выше 2-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-2" data-level="2" data-school="Охранные плетения" data-rarity="Обычное" data-powers="Воздух Огонь Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">2-й уровень · Охранные плетения</div>
+      <h3>Охрана от Направляющих</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Область</span><p>Купол радиусом 5 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы создаёте купол радиусом 5 футов, через который направляющие вашего пола не могут пройти.</p><p>Находящиеся снаружи направляющие не могут войти в область купола.</p><p>Находящиеся внутри направляющие не могут выйти.</p><p>Направляющие противоположного пола, обычные существа и предметы могут свободно проходить сквозь купол, не влияя на плетение.</p><p>Вы можете изменить форму купола, но его радиус определяется уровнем плетения.</p><p>Если плетение сотворено в замкнутом пространстве (например, в комнате или пещере), оно принимает форму этого пространства.</p><p>Зона плетения не может перекрываться, содержать или быть заключённой внутри другого охранного плетения.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>При сотворении с ячейкой 3-го уровня или выше радиус купола увеличивается на 10 футов за каждый уровень ячейки выше 2-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-2" data-level="2" data-school="Танец Облаков" data-rarity="Обычное" data-powers="Воздух Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">2-й уровень · Танец Облаков</div>
+      <h3>Громовой Удар</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>150 футов</p></div><div><span>Область</span><p>Сфера радиусом 30 футов</p></div><div><span>Длительность</span><p>Мгновенно</p></div><div><span>Спасбросок</span><p>Телосложение нейтрализует</p></div></div>
+  <div class="weave-text"><p>Вы создаёте оглушительный раскат грома в воздухе, вызывая глухоту у всех существ в радиусе 30 футов от точки фокуса плетения, если только они не преуспеют в спасброске Телосложения.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-2" data-level="2" data-school="Элементализм" data-rarity="Обычное" data-powers="Воздух Огонь Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">2-й уровень · Элементализм</div>
+      <h3>Огненный Меч</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 бонусное действие</p></div><div><span>Дальность</span><p>Собственная</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>В вашей руке возникает оружие из красного пламени любой желаемой формы (применяются обычные правила владения оружием). Это оружие можно использовать как обычное, нанося 1d10 урона огнём при попадании в ближнем бою.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 3-го уровня или выше, клинок наносит дополнительно +1d10 урона огнём за каждый уровень ячейки выше 2-го, максимум до 3d10.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-2" data-level="2" data-school="Элементализм" data-rarity="Обычное" data-powers="Воздух Огонь">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">2-й уровень · Элементализм</div>
+      <h3>Огненный шар</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>150 футов</p></div><div><span>Область</span><p>Сфера радиусом 10 футов</p></div><div><span>Длительность</span><p>Мгновенно</p></div><div><span>Спасбросок</span><p>Ловкость, половина урона</p></div></div>
+  <div class="weave-text"><p>С небольшой горошины красного цвета, вылетающей от вас, формируется шар огня радиусом 10 футов с громогласным рёвом. Все существа и объекты внутри радиуса возгорания совершают спасбросок Ловкости или получают 4d6 урона огнём и загораются, при успехе получая половину урона.</p><p>Вы можете выбрать точку в пределах дистанции, где шар огня взорвётся. Он срабатывает при столкновении с материальным объектом или твёрдой поверхностью либо при достижении выбранной точки. Горошина может пролететь сквозь хрупкие преграды (стекло или тонкие листы дерева).</p><p>Если вы пытаетесь направить горошину сквозь узкий проход, вы должны совершить дальнюю атаку плетением; при неудаче она сталкивается со стенами, взрываясь преждевременно.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. При использовании этого плетения со слотами выше 2-го уровня радиус взрыва увеличивается на 10 футов, а урон возрастает на +1d6 за каждый уровень слота выше 2-го.</p></div>
+</article></div>
+</section>
+<section class="weave-level-section anchor-nav" id="weave-level-3" data-level-group="3">
+  <div class="weave-level-head">
+    <span>3-й уровень</span>
+    <small>8 плет.</small>
+  </div>
+  <div class="weave-grid">
+<article class="weave-card rarity-rare level-3" data-level="3" data-school="Охранные плетения" data-rarity="Редкое" data-powers="Воздух Земля Огонь">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">3-й уровень · Охранные плетения</div>
+      <h3>Защитный кокон</h3>
+    </div>
+    <span class="weave-rarity">Редкое</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 реакция, которую вы используете, когда становитесь целью плетения</p></div><div><span>Дальность</span><p>Собственная</p></div><div><span>Длительность</span><p>Мгновенно</p></div></div>
+  <div class="weave-text"><p>Вы создаёте защитный кокон, который блокирует вредные эффекты плетений Единой Силы.</p><p>Кокон окружает вас и воздух вокруг, предоставляя сопротивление урону от плетений других направляющих до конца вашего следующего хода.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-3" data-level="3" data-school="Охранные плетения" data-rarity="Обычное" data-powers="Воздух Огонь Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">3-й уровень · Охранные плетения</div>
+      <h3>Огненная Ловушка</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Цель</span><p>Один объект</p></div><div><span>Длительность</span><p>Концентрация</p></div><div><span>Спасбросок</span><p>Ловкость половина</p></div></div>
+  <div class="weave-text"><p>Вы создаёте охранное плетение вокруг объекта, пола или стены. Если кто-либо, кроме вас, коснётся защищённого места, происходит взрыв огня радиусом 5 футов. Все существа в области взрыва совершают спасбросок Ловкости, получая 4d6 урона огнём или половину при успешном спасброске. Взрыв поджигает горючие материалы в зоне.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Используя ячейку 4-го уровня или выше, радиус взрыва увеличивается на 5 футов, а урон огнём на +1d6 за каждый уровень ячейки выше 3-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-3" data-level="3" data-school="Охранные плетения" data-rarity="Обычное" data-powers="Воздух Земля Огонь Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">3-й уровень · Охранные плетения</div>
+      <h3>Охрана От Единой Силы</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Область</span><p>Купол радиусом 5 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы создаёте купол радиусом 5 футов, через который плетения Единой Силы не могут пройти.</p><p>Направляющие снаружи купола не могут плести сквозь него или воздействовать на находящихся внутри с помощью Единой Силы.</p><p>Направляющие внутри купола не могут плести сквозь него или воздействовать на тех, кто находится снаружи, с помощью Единой Силы.</p><p>Обычные существа и предметы могут свободно проходить через купол.</p><p>Вы можете изменить форму купола, но его радиус определяется уровнем плетения.
+Если плетение сотворено в замкнутом пространстве (например, в комнате или пещере), оно принимает форму этого пространства.</p><p>Зона плетения не может перекрываться, содержать или быть заключённой внутри другого охранного плетения.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>При сотворении с ячейкой 4-го уровня или выше радиус купола увеличивается на 10 футов за каждый уровень ячейки выше 3-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-3" data-level="3" data-school="Охранные плетения" data-rarity="Обычное" data-powers="Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">3-й уровень · Охранные плетения</div>
+      <h3>Щит</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Цель</span><p>Один направляющий</p></div><div><span>Длительность</span><p>Концентрация</p></div><div><span>Спасбросок</span><p>Способность направлять, предотвращает</p></div></div>
+  <div class="weave-text"><p>Вы пытаетесь отрезать направляющего от Истинного Источника, не давая ему направлять и немедленно разрывая все его поддерживаемые плетения.</p><p>Направляющий все еще ощущает Единую Силу, но не может ею управлять.</p><p>Вы совершаете проверку способности направлять.</p><p>Если цель не держит Единую Силу, вы получаете преимущество.</p><p>Если держит, вы получаете помеху.</p><p>Результат вашей проверки становится сложностью для спасброска цели, чтобы разорвать Щит.</p><p>Цель может повторять спасбросок в конце каждого своего хода.</p><p>При успехе она разрушает щит и освобождается.</p><p>Дополнительные эффекты:</p><p>Если щит наложен Кругом направляющих, сложность спасброска увеличивается на +1 за каждого направляющего в круге.</p><p>Если щит закреплен, цель получает преимущество на спасбросок.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 4-го уровня или выше, сложность разорвать Щит увеличивается на +1 за каждый уровень слота выше 3-го.</p></div>
+</article>
+
+<article class="weave-card rarity-rare level-3" data-level="3" data-school="Соединение" data-rarity="Редкое" data-powers="Воздух Земля Огонь Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">3-й уровень · Соединение</div>
+      <h3>Влияние</h3>
+    </div>
+    <span class="weave-rarity">Редкое</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Длительность</span><p>1 час</p></div><div><span>Спасбросок</span><p>Мудрость отменяет</p></div></div>
+  <div class="weave-text"><p>«Влияние» — это более слабая форма принуждения (compulsion), позволяющая сделать цель более восприимчивой к внушениям, лжи, иллюзиям и подобным эффектам. Плетение вызывает сильные головные боли, близкие к мигреням. Пока существо под действием плетения, оно получает помеху на все спасброски Мудрости, направленные на сопротивление убеждению, использование Проницательности, опознание иллюзий, обнаружение принуждения и прочие эффекты очарования (например, песню Драгкара).</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-3" data-level="3" data-school="Соединение" data-rarity="Обычное" data-powers="Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">3-й уровень · Соединение</div>
+      <h3>Искатель</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Длительность</span><p>См. текст</p></div></div>
+  <div class="weave-text"><p>Вы накладываете «следящее» плетение на предмет. Аналогично, но проще, чем Трассировка (Trace Weave), «Искатель» создаёт связь между человеком и предметом. Пока этот человек держит предмет, вы (как создатель плетения) можете чувствовать направление и расстояние до него. Если человек перестаёт держать предмет, вы больше не ощущаете его. Только направляющий, сотворивший «Искатель», способен чувствовать эту связь.</p><p>Плетение длится:</p><p>1 год для предметов из кожи или ткани,</p><p>бессрочно для металлических предметов.</p><p>Чем ближе вы находитесь к предмету, тем точнее чувствуете, где он.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-3" data-level="3" data-school="Элементализм" data-rarity="Обычное" data-powers="Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">3-й уровень · Элементализм</div>
+      <h3>Водоворот</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>100 футов</p></div><div><span>Цель</span><p>Водоём в пределах дальности</p></div><div><span>Длительность</span><p>Концентрация</p></div><div><span>Спасбросок</span><p>Сила, урон пополам</p></div></div>
+  <div class="weave-text"><p>Вы создаёте водоворот радиусом 25 футов в достаточно крупном водоёме, который затягивает плавающих существ, корабли и прочие объекты, мешая им выбраться.</p><p>Водоворот имеет воронку шириной 5 футов в основании, 50 футов в вершине и глубину 25 футов.</p><p>Любое существо или объект в воде и в пределах 25 футов от воронки притягивается на 10 футов ближе.</p><p>Существо может попытаться выплыть, совершая проверку Силы (Атлетика).</p><p>Эффекты:</p><p>Если существо входит в водоворот впервые за ход или начинает ход в нём, оно совершает спасбросок Силы:</p><p>При провале получает 2к8 дробящего урона и остаётся в водовороте.</p><p>При успехе получает половину урона и не задерживается в воронке.</p><p>Существо, попавшее в водоворот, может использовать своё действие, чтобы выплыть (с помехой на проверку).</p><p>Если провал спасброска превышает 10 или более, существо затягивается под воду и начинает тонуть.</p><p>Каждый объект, попавший в водоворот, получает 2к8 дробящего урона каждый раунд, пока остаётся внутри.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>При сотворении с ячейкой 4-го уровня или выше:</p><p>Радиус водоворота увеличивается на 10 футов. Урон увеличивается на 1к8 за каждый уровень ячейки выше 3-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-3" data-level="3" data-school="Элементализм" data-rarity="Обычное" data-powers="Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">3-й уровень · Элементализм</div>
+      <h3>Перемещение Воды</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div><div><span>Спасбросок</span><p>Ловкость отменяет</p></div></div>
+  <div class="weave-text"><p>Вы перемещаете до 50 галлонов воды. Вы можете использовать бонусное действие, чтобы поднять воду в воздух на 20 футов или заставить её течь по поверхности, даже вверх по склону.</p><p>Если вы переместите воду в клетку существа и оставите её там, существо должно совершить спасбросок Ловкости или начнёт тонуть.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 4-го уровня или выше, вы можете перемещать дополнительно 50 галлонов воды за каждый уровень слота выше 3-го. Вода занимает 1 клетку на каждые 100 галлонов.</p></div>
+</article></div>
+</section>
+<section class="weave-level-section anchor-nav" id="weave-level-4" data-level-group="4">
+  <div class="weave-level-head">
+    <span>4-й уровень</span>
+    <small>6 плет.</small>
+  </div>
+  <div class="weave-grid">
+<article class="weave-card rarity-lost level-4" data-level="4" data-school="Охранные плетения" data-rarity="Утрачено" data-powers="Воздух Земля Огонь Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">4-й уровень · Охранные плетения</div>
+      <h3>Дыра в Охране</h3>
+    </div>
+    <span class="weave-rarity">Утрачено</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>60 футов</p></div><div><span>Цель</span><p>Охранное плетение</p></div><div><span>Длительность</span><p>Мгновенно</p></div></div>
+  <div class="weave-text"><p>Вы создаёте зонд из пяти Сил, который позволяет вам изучить структуру обнаруженного Охранного плетения, выясняя, от чего оно защищает.</p><p>Вы можете совершить проверку Видения Плетений (Сл 20 + уровень плетения + модификатор способности направлять создателя плетения) чтобы создать разрыв в защите.</p><p>При успехе вы разрываете охранное плетение, создавая отверстие размером не более 10×10 футов.</p><p>При провале ваше плетение теряется, но вы можете попытаться снова.</p><p>Если провал превышает 10 или более, и плетение не завязано, его создатель чувствует попытку воздействия и узнаёт его местоположение, но не личность нарушителя.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-4" data-level="4" data-school="Охранные плетения" data-rarity="Обычное" data-powers="Воздух Земля Огонь Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">4-й уровень · Охранные плетения</div>
+      <h3>Защитный купол</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Область</span><p>См. текст</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы создаёте купол радиусом 5 футов, через который не могут проходить физические объекты или Единая Силы.</p><p>Ни одно существо, включая направляющего, не может пересечь купол.</p><p>Воздух не проходит через барьер, и находящиеся внутри могут задохнуться.</p><p>Направляющие снаружи не могут вплетать плетения внутрь купола или воздействовать на тех, кто внутри.</p><p>Направляющие внутри не могут вплетать плетения наружу или влиять на цели снаружи.</p><p>Купол почти прозрачен, но слегка затемнён или имеет лёгкий оттенок.</p><p>Звуки приглушаются, проходя через него.</p><p>Вы можете изменить форму купола, но его радиус зависит от уровня плетения.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 5-го уровня или выше, радиус купола увеличивается на 10 футов за каждый уровень слота сверх 4-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-4" data-level="4" data-school="Пение Земли" data-rarity="Обычное" data-powers="Земля Огонь">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">4-й уровень · Пение Земли</div>
+      <h3>Расколотая Земля</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>100 футов</p></div><div><span>Область</span><p>Куб 10 × 10 футов</p></div><div><span>Длительность</span><p>Мгновенно</p></div><div><span>Спасбросок</span><p>Ловкость наполовину</p></div></div>
+  <div class="weave-text"><p>Вы заставляете землю в указанной области взорваться, разбрасывая землю и потоки огня.</p><p>Существа в области должны совершить спасбросок Ловкости.</p><p>При провале они сбиваются с ног и получают 3d6 дробящего + 3d6 огненного урона.</p><p>При успехе они получают половину урона.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 5-го уровня или выше, урон увеличивается на 1d6 дробящего и 1d6 огненного за каждый уровень слота выше 4-го, а размер куба увеличивается на 5 футов.</p></div>
+</article>
+
+<article class="weave-card rarity-rare level-4" data-level="4" data-school="Путешествия" data-rarity="Редкое" data-powers="Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">4-й уровень · Путешествия</div>
+      <h3>Использование Портального Камня</h3>
+    </div>
+    <span class="weave-rarity">Редкое</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Длительность</span><p>Мгновенно</p></div></div>
+  <div class="weave-text"><p>Это плетение позволяет активировать Портальный Камень для мгновенного перемещения на большие расстояния.</p><p>Для этого необходимо коснуться одного из символов на Камне Портала, который представляет другой Камень Портала в другом месте.</p><p>Затем вы направляете Единую Силу в символ, перенося себя и до 5 существ в радиусе 10 футов в место, с которым связан этот символ.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>При использовании плетения 5-го уровня или выше:</p><p>Вы можете взять ещё 5 существ в радиусе 20 футов.</p><p>Для путешествия в зеркальный мир требуется плетение 8-го уровня или выше</p></div>
+</article>
+
+<article class="weave-card rarity-rare level-4" data-level="4" data-school="Соединение" data-rarity="Редкое" data-powers="Воздух Земля Огонь Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">4-й уровень · Соединение</div>
+      <h3>Предложение</h3>
+    </div>
+    <span class="weave-rarity">Редкое</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Цель</span><p>1 существо</p></div><div><span>Длительность</span><p>Мгновенно</p></div><div><span>Спасбросок</span><p>Мудрость, отменяет эффект</p></div></div>
+  <div class="weave-text"><p>Предложение — это более слабая версия Принуждения.</p><p>Вы внушаете цели определённый курс действий, но должны предложить рациональную мотивацию.</p><p>Если вы наносили урон цели или её союзникам в течение последнего дня, или если предложение идёт против интересов цели, она совершает спасбросок с преимуществом.</p><p>При провале цель вынуждена следовать вашему предложению наилучшим возможным образом в разумные сроки.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-4" data-level="4" data-school="Элементализм" data-rarity="Обычное" data-powers="Огонь Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">4-й уровень · Элементализм</div>
+      <h3>Приносить в жертву</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>60 футов</p></div><div><span>Цель</span><p>Одно существо или объект</p></div><div><span>Длительность</span><p>Мгновенная</p></div><div><span>Спасбросок</span><p>Телосложение, половина урона</p></div></div>
+  <div class="weave-text"><p>Вы заставляете существо или объект воспламениться изнутри. Цель получает 4d8 урона огнём, или половину при успешном спасброске Телосложения.</p><p>Если существо носит воспламеняемые предметы или сам объект воспламеняем, он загорается. Горящее существо получает 1d8 урона огнём в начале каждого своего хода, пока кто-нибудь не затратит действие, чтобы потушить огонь.</p><p>Если цель большая или больше, урон уменьшается на 1d8 за каждую категорию размера выше среднего.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. При использовании ячейки 5-го уровня или выше урон увеличивается на +1d8 за каждый уровень слота выше 4-го.</p></div>
+</article></div>
+</section>
+<section class="weave-level-section anchor-nav" id="weave-level-5" data-level-group="5">
+  <div class="weave-level-head">
+    <span>5-й уровень</span>
+    <small>3 плет.</small>
+  </div>
+  <div class="weave-grid">
+<article class="weave-card rarity-lost level-5" data-level="5" data-school="Исцеление" data-rarity="Утрачено" data-powers="Земля Огонь Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">5-й уровень · Исцеление</div>
+      <h3>Прикосновение Смерти</h3>
+    </div>
+    <span class="weave-rarity">Утрачено</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>60 футов</p></div><div><span>Длительность</span><p>Концентрация</p></div><div><span>Спасбросок</span><p>Телосложение половина</p></div></div>
+  <div class="weave-text"><p>Вы посылаете щупальца Единой Силы внутрь тела живого существа, манипулируя его органами и тканями, вызывая сильнейшие повреждения без внешних ран.</p><p>В конце каждого вашего хода цель должна совершать спасбросок Телосложения. При провале цель получает 8d8 урона дробящего типа. При успехе цель получает половину урона.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>При создании этого плетения с ячейкой 6-го уровня или выше, урон увеличивается на 1d8 за каждый уровень ячейки выше 5-го.</p></div>
+</article>
+
+<article class="weave-card rarity-common level-5" data-level="5" data-school="Танец Облаков" data-rarity="Обычное" data-powers="Воздух Огонь">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">5-й уровень · Танец Облаков</div>
+      <h3>Молния</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>300 футов</p></div><div><span>Область</span><p>Куб 15 футов</p></div><div><span>Длительность</span><p>Мгновенная</p></div><div><span>Спасбросок</span><p>Ловкость (половина урона), см. текст</p></div></div>
+  <div class="weave-text"><p>Вы призываете молнию с неба, направляя её в точку в пределах досягаемости. Если в зоне действия нет открытого неба, плетение пропадает, и ячейка расходуется впустую.</p><p>Существо, находящееся в точке удара, должно совершить спасбросок Ловкости. При провале оно получает 8d6 урона молнией.</p><p>Все существа в радиусе 5 футов от точки удара получают 2d6 урона молнией.</p><p>Все поражённые существа также должны совершить спасбросок Телосложения, иначе они оглушены на 1 минуту.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Если вы используете ячейку 6-го уровня или выше, радиус поражения увеличивается на 5 футов, а урон молнией возрастает на 1d6 за каждый уровень слота выше 5-го.</p></div>
+</article>
+
+<article class="weave-card rarity-lost level-5" data-level="5" data-school="Элементализм" data-rarity="Утрачено" data-powers="Воздух Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">5-й уровень · Элементализм</div>
+      <h3>Полет</h3>
+    </div>
+    <span class="weave-rarity">Утрачено</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Цель</span><p>Одно существо</p></div><div><span>Длительность</span><p>Концентрация</p></div><div><span>Спасбросок</span><p>Мудрость отменяет</p></div></div>
+  <div class="weave-text"><p>Цель получает скорость полёта 60 футов (60 футов, если носит любые доспехи). Существо может подниматься со скоростью вдвое меньше и опускаться вдвое быстрее.</p><p>Если действие плетения заканчивается в тот момент, когда существо всё ещё находится в воздухе, эффект плавно рассеивается. Оно опускается на 60 футов за раунд в течение 1d6 раундов. Если за это время оно достигает земли, приземляется безопасно. В противном случае падает остаток дистанции.</p></div>
+  
+</article></div>
+</section>
+<section class="weave-level-section anchor-nav" id="weave-level-6" data-level-group="6">
+  <div class="weave-level-head">
+    <span>6-й уровень</span>
+    <small>5 плет.</small>
+  </div>
+  <div class="weave-grid">
+<article class="weave-card rarity-lost level-6" data-level="6" data-school="Исцеление" data-rarity="Утрачено" data-powers="Воздух Земля Огонь Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">6-й уровень · Исцеление</div>
+      <h3>Восстановление Силы</h3>
+    </div>
+    <span class="weave-rarity">Утрачено</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 минута</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Цель</span><p>Существо, к которому прикасаются</p></div><div><span>Длительность</span><p>Мгновенно</p></div><div><span>Спасбросок</span><p>Мудрость отменяет</p></div></div>
+  <div class="weave-text"><p>Это плетение исцеляет разорванную связь с Единой Силой (то есть исцеляет остановку или усмирение).</p><p>Если направляющий противоположного пола, цель полностью восстанавливает связь без последствий.</p><p>Если направляющий того же пола, цель считается имеющей только половину своего уровня направляющего при определении количества доступных плетений в день.</p><p>Повторное исцеление не поможет восстановить полный уровень, так как он уже зафиксирован.</p><p>Если цель снова утратит связь и будет исцелена ещё раз, она вернётся к тому же урезанному уровню, а не к исходному.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-6" data-level="6" data-school="Исцеление" data-rarity="Обычное" data-powers="Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">6-й уровень · Исцеление</div>
+      <h3>Отсечение от Источника</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>10 минут</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Цель</span><p>Один экранированный Щитом направляющий</p></div><div><span>Длительность</span><p>Мгновенно</p></div><div><span>Спасбросок</span><p>Способность направлять, предотвращает</p></div></div>
+  <div class="weave-text"><p>Вы целеустремленно разрываете связь с Истинным Источником у направляющего, находящегося под действием плетения Щит или пребывающего в бессознательном состоянии.</p><p>Цель должна совершить спасбросок, используя свою способность направлять, при этом она имеет преимущество.</p><p>При провале она отсечена и больше не может направлять Единую Силу или даже ощущать Истинный Источник.</p><p>Этот процесс называется &quot;Укрощение&quot; (Gentling) у мужчин и &quot;Усмирение&quot; (Stilling) у женщин, хотя в Эпоху Легенд термин &quot;Отсечение&quot; использовался для обоих полов.</p><p>Долгое время считалось, что отсечение необратимо, однако утраченное плетение &quot;Восстановление Силы&quot; может отменить его эффект.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-6" data-level="6" data-school="Пение Земли" data-rarity="Обычное" data-powers="Воздух Земля">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">6-й уровень · Пение Земли</div>
+      <h3>Каменный Вихрь</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>150 футов</p></div><div><span>Область</span><p>Куб 30 футов</p></div><div><span>Длительность</span><p>Концентрация, Мгновенно</p></div><div><span>Спасбросок</span><p>Сила</p></div></div>
+  <div class="weave-text"><p>Земля разрывается на мелкие кусочки вокруг врагов и начинает вращаться вокруг них, превращаясь в вихрь из камней нанося 8к8 дробящего урона и притягивая врагов к центру куба на 10 футов. Успешный Спасбросок на Силу позволяет избежать удерживание.</p><p>Удерживаемые существа могут каждый раунд сделать Спасбросок на Силу, чтобы избавиться от Удерживания. Все, кто остаются в данной зоне, получают каждый раунд 2к8 дробящего урона. В случае успешного Спасброска на Ловкость урон уменьшается пополам.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях. Ширина куба возрастает на 5 футов каждый последующий уровень, а урон увеличивается на 1к8.</p></div>
+</article>
+
+<article class="weave-card rarity-lost level-6" data-level="6" data-school="Путешествия" data-rarity="Утрачено" data-powers="Воздух Земля Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">6-й уровень · Путешествия</div>
+      <h3>Скольжение</h3>
+    </div>
+    <span class="weave-rarity">Утрачено</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Длительность</span><p>До конца вашего следующего хода</p></div></div>
+  <div class="weave-text"><p>Вы открываете врата в пустоту за пределами мира, создавая платформу размером 10×10 футов, на которой можно стоять.</p><p>Врата остаются открытыми до конца вашего следующего хода. Чтобы использовать Скольжение, вам достаточно пробыть в окружении около получаса. Совершите проверку способности направлять (Сл 10). Примените следующие модификаторы к кубику:</p><p>Механика Скольжения:</p><p>Продолжительность путешествия не зависит от реального расстояния между точками.</p><p>Невозможно заранее рассчитать, сколько оно займет – это может быть от нескольких секунд до нескольких минут.</p><p>Точность выхода в пункт назначения зависит от результата вашей проверки способности направлять.</p><p>Платформа:</p><p>Внешний вид платформы индивидуален для каждого направляющего.</p><p>Можно изменить её облик, если успешно совершить проверку Мудрости (Сл 15).</p><p>Движение в пустоте ощущается, как плавное скольжение платформы или движение пространства вокруг неё.</p><p>По достижении цели открываются вторые врата, позволяющие выйти.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>На более высоких уровнях:
+Если вы используете ячейку 7-го уровня или выше, то:</p><p>Ширина и высота врат увеличиваются на 5 футов.</p><p>Размер платформы увеличивается на 5 футов.</p><p>Врата остаются открытыми ещё на 1 ход за каждый уровень слота выше 6-го.</p></div>
+</article>
+
+<article class="weave-card rarity-lost level-6" data-level="6" data-school="Путешествия" data-rarity="Утрачено" data-powers="Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">6-й уровень · Путешествия</div>
+      <h3>Удержать Врата</h3>
+    </div>
+    <span class="weave-rarity">Утрачено</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 действие</p></div><div><span>Дальность</span><p>100 футов</p></div><div><span>Цель</span><p>Одни Врата (Gateway), созданные другим направляющим</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Вы вплетаете нити Духа, чтобы удерживать Врата, открытые другим направляющим. Вы не можете менять размер Врат — только продлеваете время, в течение которого они остаются открытыми.</p></div>
+  
+</article></div>
+</section>
+<section class="weave-level-section anchor-nav" id="weave-level-7" data-level-group="7">
+  <div class="weave-level-head">
+    <span>7-й уровень</span>
+    <small>2 плет.</small>
+  </div>
+  <div class="weave-grid">
+<article class="weave-card rarity-rare level-7" data-level="7" data-school="Соединение" data-rarity="Редкое" data-powers="Воздух Земля Огонь Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">7-й уровень · Соединение</div>
+      <h3>Обращение</h3>
+    </div>
+    <span class="weave-rarity">Редкое</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>См. текст</p></div><div><span>Дальность</span><p>30 футов</p></div><div><span>Цель</span><p>Один направляющий</p></div><div><span>Длительность</span><p>Мгновенно</p></div><div><span>Спасбросок</span><p>Мудрость</p></div></div>
+  <div class="weave-text"><p>Обращение — это метод принудительного обращения направляющих к Тени против их воли. Это чрезвычайно сложное плетение, требующее круга из 13 направляющих, которые накладывают его через 13 Мирддраал.</p><p>Жертва может сопротивляться, совершая спасбросок Мудрости против Сл сложности защиты круга, но каждый раунд, пока продолжается попытка обращения, жертве приходится совершать новый спасбросок.</p><p>Чем дольше жертва находится под воздействием плетения, тем сложнее сопротивляться.</p><p>Каждую минуту сложность спасброска увеличивается на 1.</p><p>Некоторые условия делают сопротивление сложнее:</p><p>Последствия:</p><p>Даже успешный спасбросок может иметь тяжелые последствия:</p><p>Сломленный дух или рассудок.</p><p>Суицидальные мысли или мрачные размышления о жизни.</p><p>Глубокая депрессия или безразличие.</p><p>Обращение не меняет черты личности жертвы.</p><p>Чем преданнее Свету был направляющий, тем более преданным Тени он становится после обращения.</p><p>Не влияет на психические расстройства, такие как безумие от таинства Саидина.</p><p>Как узнать Обращенного?</p><p>Люди, подвергшиеся Обращению, описываются как имеющие черную, бездушную пустоту за глазами.</p><p>Те, кто сталкивался с такими людьми, часто считают, что их души были отняты.</p><p>Ограничения:</p><p>Направляющие, которые были лишены способности направлять (Укрощены или Усмирены), а также находящиеся под влиянием веществ, подавляющих способность направлять (например, форкрут) — НЕ МОГУТ быть обращены.</p><p>Однако находящиеся под Щитом направляющие все еще способны ощущать и теоретически касаться Единой Силы и, следовательно, могут быть обращены.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-common level-7" data-level="7" data-school="Соединение" data-rarity="Обычное" data-powers="Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">7-й уровень · Соединение</div>
+      <h3>Передача Уз</h3>
+    </div>
+    <span class="weave-rarity">Обычное</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>10 минут</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Длительность</span><p>Мгновенно</p></div><div><span>Спасбросок</span><p>Харизма отменяет</p></div></div>
+  <div class="weave-text"><p>Вы касаетесь другого направляющего, который становится будущим носителем уза, созданного вами ранее с помощью плетения &quot;Узы Стража&quot;.</p><p>Когда вы умираете, ваш Страж автоматически привязывается к цели.</p><p>Страж не получает психического урона от разрыва уза, но всё ещё испытывает потребность в саморазрушении, хотя и в меньшей степени, чем при обычном разрыве.</p><p>Если у вас несколько Стражей, вы должны использовать плетение отдельно для каждого из них.</p></div>
+  
+</article></div>
+</section>
+<section class="weave-level-section anchor-nav" id="weave-level-8" data-level-group="8">
+  <div class="weave-level-head">
+    <span>8-й уровень</span>
+    <small>1 плет.</small>
+  </div>
+  <div class="weave-grid">
+<article class="weave-card rarity-rare level-8" data-level="8" data-school="Охранные плетения" data-rarity="Редкое" data-powers="Воздух Огонь Дух">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">8-й уровень · Охранные плетения</div>
+      <h3>Удар Смерти</h3>
+    </div>
+    <span class="weave-rarity">Редкое</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>На себя</p></div><div><span>Область</span><p>Куб 25 футов, центрированный на вас</p></div><div><span>Длительность</span><p>Концентрация</p></div><div><span>Спасбросок</span><p>Ловкость, см. текст</p></div></div>
+  <div class="weave-text"><p>Вы выбираете один тип отродий Тени (например, Троллоков или Тёмных гончих).</p><p>Молнии энергии вырываются из вашего тела и распространяются наружу, поражая всех существ выбранного типа в пределах 10 футов. Любая цель, попавшая под удар, мгновенно умирает, если не преуспеет в спасброске Ловкости. При успехе существо теряет половину своих текущих хитов.</p><p>Существа, не относящиеся к выбранному типу, не получают урона.</p><p>Распространение эффекта:</p><p>В начале каждого вашего хода молнии движутся дальше ещё на 10 футов, пока не достигнут максимальной дальности. Барьеры (стены, деревья и др.) могут заблокировать молнии, но если в пределах дальности есть способ обойти препятствие, молнии найдут путь.</p></div>
+  <div class="weave-upcast"><strong>На более высоких уровнях</strong><p>Если вы используете ячейку 9-го уровня или выше, размер куба увеличивается на 5 футов за каждый уровень слота выше 8-го.</p><p>Оглушение</p><p>4-й уровень, Исцеление</p><p>[Женщины: Воздух, Огонь, Дух, Вода] (Обычное)</p><p>[Мужчины: Огонь, Дух] (Обычное)</p><p>Время плетения: 1 действие</p><p>Дальность: 60 футов</p><p>Цель: 1 существо</p><p>Длительность: Концентрация</p><p>Спасбросок: Телосложение, отменяет эффект</p><p>Вы пытаетесь оглушить одно существо, которое видите в пределах дальности.</p><p>Существо должно совершить спасбросок Телосложения.</p><p>При провале оно становится парализованным.</p><p>В конце каждого своего хода цель может повторить спасбросок, чтобы прекратить эффект при успехе.</p></div>
+</article></div>
+</section>
+<section class="weave-level-section anchor-nav" id="weave-level-9" data-level-group="9">
+  <div class="weave-level-head">
+    <span>9-й уровень</span>
+    <small>2 плет.</small>
+  </div>
+  <div class="weave-grid">
+<article class="weave-card rarity-rare level-9" data-level="9" data-school="Исцеление" data-rarity="Редкое" data-powers="Воздух Земля Огонь Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">9-й уровень · Исцеление</div>
+      <h3>Обмен душами</h3>
+    </div>
+    <span class="weave-rarity">Редкое</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>30 минута</p></div><div><span>Дальность</span><p>Прикосновение</p></div><div><span>Цель</span><p>Существо, к которому прикасаются</p></div><div><span>Длительность</span><p>Мгновенно</p></div><div><span>Спасбросок</span><p>Интеллект отменяет</p></div></div>
+  <div class="weave-text"><p>Это плетение позволяет переселить душу из умирающего тела в тело живого человека. Душа человека, которого хотят спасти, перемещается из умирающего тела в тело живого человека. В свою очередь душу из живого тела перемещают в умирающее тело.  Во время этого процесса, душа, которую перемещают в умирающее тело, может использовать Спасбросок против Интеллекта, чтобы противостоять перемещению.</p></div>
+  
+</article>
+
+<article class="weave-card rarity-lost level-9" data-level="9" data-school="Погибельный Огонь" data-rarity="Утрачено" data-powers="Воздух Земля Огонь Дух Вода">
+  <div class="weave-card-head">
+    <div>
+      <div class="weave-kicker">9-й уровень · Погибельный Огонь</div>
+      <h3>Пламя Тар Валона</h3>
+    </div>
+    <span class="weave-rarity">Утрачено</span>
+  </div>
+  <div class="weave-powers"><span class="power-chip power-air" title="Воздух">Воздух</span><span class="power-chip power-earth" title="Земля">Земля</span><span class="power-chip power-fire" title="Огонь">Огонь</span><span class="power-chip power-spirit" title="Дух">Дух</span><span class="power-chip power-water" title="Вода">Вода</span></div>
+  <div class="weave-meta-grid"><div><span>Время плетения</span><p>1 раунд</p></div><div><span>Дальность</span><p>См. текст</p></div><div><span>Длительность</span><p>Концентрация</p></div></div>
+  <div class="weave-text"><p>Описание:</p><p>Противоположное Погибельному Огню плетение, Пламя Тар Валон было открыто Эгвейн ал’Вир, Престол Амерлин, во время Последней Битвы.</p><p>Пламя принимает форму прозрачного белого кристалла и используется для восстановления повреждений в узоре, вызванных избыточным применением Огня Судьбы.</p><p>Эти разрывы выглядят как чёрные вены или крошечные бездонные ущелья на поверхности земли.</p><p>Плетение восстанавливает весь ущерб в области, диаметр которой зависит от уровня плетения и времени концентрации.</p><p>Размер области восстановления:</p><p>Ограничения:</p><p>Хотя Пламя Тар Валон восстанавливает целостность ткани реальности, оно не может воскресить существ, уничтоженных Огнём Судьбы, так как они более не существуют и не могут быть целью плетения.</p></div>
+  
+</article></div>
+</section>
+  </section>
+</main>
+</div>
+<footer>
+  <svg class="mini-wheel-ft" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs><radialGradient id="wg" cx="50%" cy="50%"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/></radialGradient></defs>
+  <g stroke="url(#wg)" fill="none" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"/><circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/><circle cx="40" cy="40" r="18" stroke-width=".5" opacity=".55"/><circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/><g stroke-width=".55" opacity=".7"><line x1="40" y1="4" x2="40" y2="76"/><line x1="4" y1="40" x2="76" y2="40"/><line x1="14.8" y1="14.8" x2="65.2" y2="65.2"/><line x1="65.2" y1="14.8" x2="14.8" y2="65.2"/></g><circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/></g>
+  </svg>
+  <div>Колесо Времени · 270 ПБ · Плетения Единой Силы</div>
+</footer>
+<script src="assets/shared.js"></script>
+<script src="assets/weaves.js"></script>
+</body>
+</html>

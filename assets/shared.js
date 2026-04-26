@@ -51,7 +51,7 @@
     {title:'Мир', items:['index.html','epoch.html','chronicles.html']},
     {title:'Иерархии', items:['hierarchies.html','unity.html','throne.html','madding.html','hierarchy-wall.html']},
     {title:'Орден и аномалии', items:['order.html','wall.html','anomalies.html','tsitadel.html']},
-    {title:'Игровые инструменты', items:['ingredients.html','loot-generator.html','encounter-generator.html','rituals.html','monsters.html']},
+    {title:'Игровые инструменты', items:['rituals.html','weaves.html','ingredients.html','loot-generator.html','encounter-generator.html','monsters.html']},
     {title:'Народы', items:['aiel.html','tuataan.html','freefolk.html']}
   ];
   const byHref = new Map(navLinks.map(a => [a.getAttribute('href'), a.textContent.trim()]));
@@ -157,6 +157,18 @@
       ['#access-hall','Зал Допусков'],
       ['#pattern-sphere-hall','Сердце Цитадели'],
       ['#silent-gardens','Сады Тишины']
+    ],
+    'weaves.html': [
+      ['#weave-level-0','Кантрипы'],
+      ['#weave-level-1','1-й уровень'],
+      ['#weave-level-2','2-й уровень'],
+      ['#weave-level-3','3-й уровень'],
+      ['#weave-level-4','4-й уровень'],
+      ['#weave-level-5','5-й уровень'],
+      ['#weave-level-6','6-й уровень'],
+      ['#weave-level-7','7-й уровень'],
+      ['#weave-level-8','8-й уровень'],
+      ['#weave-level-9','9-й уровень']
     ]
   };
   function slugify(text){
