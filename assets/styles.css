@@ -1934,21 +1934,19 @@ html.auth-lock body > *:not(.auth-overlay){filter:blur(5px);pointer-events:none;
 /* v31: Weaves catalog */
 .weaves-page .chapter.narrow{max-width:1180px;}
 .weave-page-header p{max-width:780px;margin-left:auto;margin-right:auto;}
- .weave-filter-panel{
+.weave-filter-panel{
   display:grid;
   grid-template-columns:1.6fr repeat(4, minmax(150px,1fr)) auto;
   gap:12px;
   align-items:end;
-  margin:0 auto 22px;
-  padding:18px 18px 16px;
-
-  background: transparent;
-
-  border:1px solid rgba(201,169,97,.12);
+  margin:0 auto 18px;
+  padding:18px;
+  border:1px solid rgba(201,169,97,.18);
   border-radius:22px;
-
-  position:relative;
-  box-shadow:none;
+  background:
+    radial-gradient(circle at 88% 18%,rgba(201,169,97,.10),transparent 34%),
+    linear-gradient(135deg,rgba(16,14,23,.92),rgba(8,8,12,.72));
+  box-shadow:0 18px 52px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.025);
 }
 .weave-filter-panel label{
   display:grid;
@@ -1964,26 +1962,14 @@ html.auth-lock body > *:not(.auth-overlay){filter:blur(5px);pointer-events:none;
   min-height:42px;
   width:100%;
   box-sizing:border-box;
-
-  border:1px solid rgba(201,169,97,.16);
+  border:1px solid rgba(201,169,97,.18);
   border-radius:14px;
-
-  background: rgba(0,0,0,.16);
-
+  background:rgba(0,0,0,.24);
   color:#eadfc4;
   font-family:Crimson Pro,Georgia,serif;
   font-size:16px;
   padding:9px 11px;
-
   outline:none;
-  transition:border-color .2s, box-shadow .2s, background .2s;
-}
-
-.weave-filter-panel input:focus,
-.weave-filter-panel select:focus{
-  border-color:rgba(232,200,120,.5);
-  box-shadow:0 0 0 2px rgba(201,169,97,.12);
-  background: rgba(0,0,0,.22);
 }
 .weave-filter-panel input:focus,
 .weave-filter-panel select:focus{border-color:rgba(232,200,120,.48);box-shadow:0 0 0 3px rgba(201,169,97,.08);}
@@ -2188,44 +2174,14 @@ html.auth-lock body > *:not(.auth-overlay){filter:blur(5px);pointer-events:none;
   color:var(--gold-pale);
 }
 @media(max-width:1100px){
-   .weave-filter-panel{
-  display:grid;
-  grid-template-columns:1.6fr repeat(4, minmax(150px,1fr)) auto;
-  gap:12px;
-  align-items:end;
-  margin:0 auto 22px;
-  padding:18px 18px 16px;
-
-  background: transparent;
-
-  border:1px solid rgba(201,169,97,.12);
-  border-radius:22px;
-
-  position:relative;
-  box-shadow:none;
-}
+  .weave-filter-panel{grid-template-columns:repeat(2,minmax(0,1fr));}
   .weave-filter-panel button{grid-column:auto;}
 }
 @media(max-width:860px){
   .weave-grid{grid-template-columns:1fr;}
 }
 @media(max-width:560px){
-   .weave-filter-panel{
-  display:grid;
-  grid-template-columns:1.6fr repeat(4, minmax(150px,1fr)) auto;
-  gap:12px;
-  align-items:end;
-  margin:0 auto 22px;
-  padding:18px 18px 16px;
-
-  background: transparent;
-
-  border:1px solid rgba(201,169,97,.12);
-  border-radius:22px;
-
-  position:relative;
-  box-shadow:none;
-}
+  .weave-filter-panel{grid-template-columns:1fr;}
   .weave-card{padding:18px 16px;border-radius:20px;}
   .weave-card-head{display:block;}
   .weave-rarity{display:inline-flex;margin-top:10px;}
@@ -2235,41 +2191,21 @@ html.auth-lock body > *:not(.auth-overlay){filter:blur(5px);pointer-events:none;
 }
 
 
-.weave-filter-panel::before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:24px;
-  right:24px;
-  height:1px;
-
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(232,200,120,.6),
-    transparent
-  );
-
-  box-shadow:
-    0 0 8px rgba(232,200,120,.35),
-    0 0 18px rgba(201,169,97,.25);
-}
-
-
-/* v31.1 FINAL OVERRIDE: Weaves filter panel visual integration */
-.weaves-page .weave-filter-panel{
+/* v32: final weaves filter integration override */
+body .weaves-page .weave-filter-panel{
   background: transparent !important;
+  background-color: transparent !important;
   background-image: none !important;
-  box-shadow: none !important;
   border: 1px solid rgba(201,169,97,.12) !important;
   border-radius: 22px !important;
+  box-shadow: none !important;
   position: relative !important;
   overflow: visible !important;
   margin: 0 auto 22px !important;
   padding: 18px 18px 16px !important;
 }
 
-.weaves-page .weave-filter-panel::before{
+body .weaves-page .weave-filter-panel::before{
   content: "" !important;
   position: absolute !important;
   top: 0 !important;
@@ -2277,37 +2213,31 @@ html.auth-lock body > *:not(.auth-overlay){filter:blur(5px);pointer-events:none;
   right: 24px !important;
   height: 1px !important;
   pointer-events: none !important;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(232,200,120,.62),
-    transparent
-  ) !important;
-  box-shadow:
-    0 0 8px rgba(232,200,120,.36),
-    0 0 18px rgba(201,169,97,.24) !important;
+  background: linear-gradient(90deg, transparent, rgba(232,200,120,.62), transparent) !important;
+  box-shadow: 0 0 8px rgba(232,200,120,.36), 0 0 18px rgba(201,169,97,.24) !important;
 }
 
-.weaves-page .weave-filter-panel input,
-.weaves-page .weave-filter-panel select{
-  background: rgba(0,0,0,.16) !important;
-  background-color: rgba(0,0,0,.16) !important;
+body .weaves-page .weave-filter-panel input,
+body .weaves-page .weave-filter-panel select,
+body .weaves-page .weave-filter-panel button{
+  background: rgba(0,0,0,.10) !important;
+  background-color: rgba(0,0,0,.10) !important;
+  background-image: none !important;
   border: 1px solid rgba(201,169,97,.16) !important;
   box-shadow: none !important;
   color: #eadfc4 !important;
 }
 
-.weaves-page .weave-filter-panel input:focus,
-.weaves-page .weave-filter-panel select:focus{
-  background: rgba(0,0,0,.22) !important;
-  background-color: rgba(0,0,0,.22) !important;
-  border-color: rgba(232,200,120,.50) !important;
-  box-shadow: 0 0 0 2px rgba(201,169,97,.12) !important;
+body .weaves-page .weave-filter-panel select option{
+  background-color: #0b0a11 !important;
+  color: #eadfc4 !important;
 }
 
-.weaves-page .weave-filter-panel button{
-  background: rgba(0,0,0,.16) !important;
-  background-color: rgba(0,0,0,.16) !important;
-  box-shadow: none !important;
-  border: 1px solid rgba(201,169,97,.16) !important;
+body .weaves-page .weave-filter-panel input:focus,
+body .weaves-page .weave-filter-panel select:focus,
+body .weaves-page .weave-filter-panel button:hover{
+  background: rgba(0,0,0,.18) !important;
+  background-color: rgba(0,0,0,.18) !important;
+  border-color: rgba(232,200,120,.50) !important;
+  box-shadow: 0 0 0 2px rgba(201,169,97,.12) !important;
 }
