@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DM Toolkit · NPC и бой</title>
+<script src="assets/auth.js"></script>
+<link rel="stylesheet" href="assets/dm-npc.css">
+</head>
+<body>
+<div class="dm-tool-badge">DM Toolkit · NPC / Бой</div>
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">WoT 5e · NPC</div>
+    <div class="sidebar-sub"><a href="index.html">← на сайт</a> · <span id="sb-count">— персонажей</span></div>
+  </div>
+  <div class="search-row">
+    <input class="search-input" id="sb-search" placeholder="Поиск по имени / классу / нации..." oninput="filterSidebar()">
+    <button class="group-btn active" id="grp-lv" onclick="setGroup('lv')" title="По уровню">ур</button>
+    <button class="group-btn" id="grp-na" onclick="setGroup('na')" title="По нации">н</button>
+    <button class="group-btn" id="grp-sh" onclick="setGroup('sh')" title="По классу">кл</button>
+      <button class="group-btn" onclick="resetAllDmState()" title="Сброс состояния боя">↺</button>
+  </div>
+  <div class="sidebar-list" id="sb"></div>
+</aside>
+<main class="main" id="mn">
+  <div class="placeholder" id="placeholder">← Выбери персонажа слева</div>
+</main>
+</div>
+
+<!-- HP Modal -->
+<div class="hp-modal" id="hp-modal" style="display:none">
+  <div class="hp-modal-box">
+    <div class="hp-modal-title" id="hp-modal-title">Урон / Лечение</div>
+    <input class="hp-modal-input" id="hp-modal-val" type="number" min="0" placeholder="0">
+    <div class="hp-modal-btns">
+      <button class="hp-modal-cancel" onclick="closeHpModal()">Отмена</button>
+      <button class="hp-modal-heal" onclick="applyHp(1)">+ Лечение</button>
+      <button class="hp-modal-dmg" onclick="applyHp(-1)">− Урон</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dice floating result -->
+<div class="dice-modal" id="dice-modal" style="display:none">
+  <button class="dice-modal-close" onclick="document.getElementById('dice-modal').style.display='none'">✕</button>
+  <div class="dice-modal-title" id="dice-modal-title">Бросок</div>
+  <div class="dice-modal-result" id="dice-modal-result">—</div>
+  <div class="dice-modal-detail" id="dice-modal-detail"></div>
+</div>
+<script src="assets/dm-npc.js"></script>
+</body>
+</html>
