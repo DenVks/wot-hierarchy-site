@@ -2240,6 +2240,140 @@ function setGroup(g) {
   buildSidebar();
 }
 
+
+// ── Weave full-description modal / tooltip ───────────────────────────────
+function normalizeWeaveName(name){
+  return String(name || '')
+    .replace(/[⚡⛔✅❌⭐]/g,'')
+    .replace(/\[[^\]]*\]/g,'')
+    .replace(/\([^)]*(?:ур\.|НЕДОСТУПЕН|кантрип|слот|аффинитет)[^)]*\)/gi,'')
+    .replace(/\([^)]*\)/g, function(m){
+      // Keep English aliases out of key; catalog titles may include them, lookup handles both.
+      return '';
+    })
+    .replace(/ё/g,'е').replace(/Ё/g,'Е')
+    .replace(/\s+/g,' ')
+    .trim()
+    .toLowerCase();
+}
+
+function getWeaveIndex(){
+  if (window.__WOT_WEAVE_INDEX) return window.__WOT_WEAVE_INDEX;
+  const index = new Map();
+  (window.WOT_WEAVES || []).forEach(w => {
+    const full = normalizeWeaveName(w.title);
+    index.set(full, w);
+    const noAlias = normalizeWeaveName(String(w.title).replace(/\([^)]*\)/g,''));
+    index.set(noAlias, w);
+  });
+  // Common aliases from NPC sheets to catalog names.
+  const alias = {
+    'подслушать':'подслушивание',
+    'анализ земли':'анализ почвы',
+    'уровнять землю':'выровнять землю',
+    'выровнять матрицу':'выравнивание матрицы',
+    'огненный меч':'огненный жезл',
+    'охр. от порожд. тени':'охрана от порождений тени',
+    'охрана от тени':'охрана от порождений тени',
+    'охр. от направляющих':'охрана от направляющих',
+    'охр. от единой силы':'охрана от единой силы',
+    'сокрытие направления':'сокрытие способности направлять',
+    'защитный купол':'охрана от единой силы',
+    'предложение':'влияние',
+    'исцелить':'исцеление',
+    'создать огонь':'создать огонь',
+    'воздушный кулак':'воздушный кулак',
+    'огненный шар':'огненный шар',
+    'каменный вихрь':'каменный вихрь',
+    'расколотая земля':'расколотая земля',
+    'маскировка':'маскировка',
+    'свернутый свет':'свернутый свет',
+    'узы стража':'узы стража',
+    'принуждение':'принуждение',
+    'влияние':'влияние'
+  };
+  Object.entries(alias).forEach(([a,b]) => {
+    const target = index.get(normalizeWeaveName(b));
+    if (target) index.set(normalizeWeaveName(a), target);
+  });
+  window.__WOT_WEAVE_INDEX = index;
+  return index;
+}
+
+function findWeaveByName(name){
+  const key = normalizeWeaveName(name);
+  const idx = getWeaveIndex();
+  if (idx.has(key)) return idx.get(key);
+  // fallback: substring match both ways
+  for (const [k,w] of idx.entries()){
+    if (key && (k.includes(key) || key.includes(k))) return w;
+  }
+  return null;
+}
+
+function weaveInfoButton(spName){
+  const w = findWeaveByName(spName);
+  if (!w) return '<button class="sp-info-btn missing" title="Описание не найдено в каталоге Плетений" type="button">?</button>';
+  const safeName = String(spName).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return `<button class="sp-info-btn" title="Показать полное описание из раздела Плетения" type="button" onmouseenter="showWeaveModal('${safeName}', event, true)" onfocus="showWeaveModal('${safeName}', event, true)" onclick="showWeaveModal('${safeName}', event, false)">i</button>`;
+}
+
+function renderWeaveModalContent(w){
+  const lvl = w.level === 0 ? 'Кантрип' : `${w.level}-й уровень`;
+  const powers = (w.powers || []).map(p=>`<span>${p}</span>`).join('');
+  const meta = (w.meta || []).map(m=>`<div><b>${m.label}</b><em>${m.value}</em></div>`).join('');
+  const desc = (w.desc || []).map(p=>`<p>${p}</p>`).join('');
+  const upcast = (w.upcast && w.upcast.length)
+    ? `<div class="weave-pop-upcast"><strong>На более высоких уровнях</strong>${w.upcast.map(p=>`<p>${p}</p>`).join('')}</div>`
+    : '';
+  return `<button class="weave-pop-close" onclick="hideWeaveModal()">×</button>
+    <div class="weave-pop-kicker">${lvl} · ${w.school} · ${w.rarity}</div>
+    <h3>${w.title}</h3>
+    <div class="weave-pop-powers">${powers}</div>
+    <div class="weave-pop-meta">${meta}</div>
+    <div class="weave-pop-desc">${desc}</div>
+    ${upcast}`;
+}
+
+function showWeaveModal(spName, event, hoverMode){
+  const w = findWeaveByName(spName);
+  if (!w) return;
+  let pop = document.getElementById('weave-popover');
+  if (!pop){
+    pop = document.createElement('div');
+    pop.id = 'weave-popover';
+    pop.className = 'weave-popover';
+    document.body.appendChild(pop);
+    pop.addEventListener('mouseenter',()=>{ pop.dataset.hover='1'; });
+    pop.addEventListener('mouseleave',()=>{ pop.dataset.hover='0'; setTimeout(()=>{ if(pop.dataset.locked!=='1') hideWeaveModal(); }, 120); });
+  }
+  pop.innerHTML = renderWeaveModalContent(w);
+  pop.style.display = 'block';
+  pop.dataset.locked = hoverMode ? '0' : '1';
+
+  const btn = event && event.currentTarget ? event.currentTarget : null;
+  const r = btn ? btn.getBoundingClientRect() : {left:innerWidth/2, top:innerHeight/2, bottom:innerHeight/2};
+  const width = Math.min(460, window.innerWidth - 24);
+  let left = Math.min(window.innerWidth - width - 12, Math.max(12, r.left - width/2 + 12));
+  let top = r.bottom + 10;
+  if (top + 420 > window.innerHeight) top = Math.max(12, r.top - 420);
+  pop.style.width = width + 'px';
+  pop.style.left = left + 'px';
+  pop.style.top = top + 'px';
+}
+
+function hideWeaveModal(){
+  const pop = document.getElementById('weave-popover');
+  if (pop) { pop.style.display = 'none'; pop.dataset.locked='0'; }
+}
+
+document.addEventListener('click', function(e){
+  const pop = document.getElementById('weave-popover');
+  if (!pop || pop.style.display === 'none') return;
+  if (!pop.contains(e.target) && !e.target.classList.contains('sp-info-btn')) hideWeaveModal();
+});
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') hideWeaveModal(); });
+
 // ── Show NPC ─────────────────────────────────────────────────────────────
 const lvClass = lv => lv<=1?'sp-lv1':lv===2?'sp-lv2':lv===3?'sp-lv3':lv===4?'sp-lv4':lv>=5&&lv<=6?'sp-lv5':lv>=7&&lv<=8?'sp-lv7':'sp-lv9';
 
@@ -2450,7 +2584,7 @@ ${c.tactics.map(t=>`<div class="tact-phase"><div class="tact-phase-name">${t.ph}
 <th>Плетение</th><th>Талант</th><th>Стихии</th><th>Время</th><th>Дальн.</th><th>Длит.</th><th>СБ</th><th>Слот</th><th>Урон</th><th>Описание</th>
 </tr></thead><tbody>
 ${c.spells.map(sp=>`<tr>
-<td class="sp-name ${sp.lv===0?'sp-lv0':lvClass(sp.lv)}">${sp.n}</td>
+<td class="sp-name ${sp.lv===0?'sp-lv0':lvClass(sp.lv)}"><span class="sp-title">${sp.n}</span> ${weaveInfoButton(sp.n)}</td>
 <td class="sp-dc">${sp.tal||'б/т'}</td>
 <td><span class="sp-el">${sp.el}</span></td>
 <td class="sp-dc">${sp.t}</td><td class="sp-dc">${sp.r||'—'}</td>

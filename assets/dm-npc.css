@@ -420,3 +420,159 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 }
 .sidebar-sub a{color:var(--gold2);text-decoration:none}
 .sidebar-sub a:hover{text-decoration:underline}
+
+
+/* v35: full weave description popover in NPC spell tables */
+.sp-name{position:relative;min-width:170px}
+.sp-title{vertical-align:middle}
+.sp-info-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:17px;
+  height:17px;
+  margin-left:5px;
+  border-radius:50%;
+  border:1px solid var(--gold);
+  background:rgba(201,168,76,.10);
+  color:var(--gold2);
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  line-height:1;
+  cursor:pointer;
+  vertical-align:middle;
+}
+.sp-info-btn:hover,
+.sp-info-btn:focus{
+  background:var(--warning-bg);
+  color:var(--gold3);
+  border-color:var(--gold2);
+  outline:none;
+  box-shadow:0 0 10px rgba(201,168,76,.28);
+}
+.sp-info-btn.missing{
+  opacity:.35;
+  border-color:var(--border2);
+  color:var(--text3);
+  cursor:help;
+}
+.weave-popover{
+  position:fixed;
+  z-index:500;
+  display:none;
+  max-height:min(74vh,620px);
+  overflow:auto;
+  padding:14px 16px 16px;
+  border:1px solid var(--border2);
+  border-left:3px solid var(--gold);
+  border-radius:10px;
+  background:
+    radial-gradient(circle at 88% 12%,rgba(201,168,76,.14),transparent 34%),
+    linear-gradient(145deg,var(--bg2),var(--bg));
+  color:var(--text);
+  box-shadow:0 18px 60px rgba(0,0,0,.72),0 0 28px rgba(201,168,76,.12);
+}
+.weave-popover::-webkit-scrollbar{width:5px}
+.weave-popover::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.weave-pop-close{
+  position:absolute;
+  top:7px;
+  right:9px;
+  border:0;
+  background:transparent;
+  color:var(--text3);
+  cursor:pointer;
+  font-size:18px;
+}
+.weave-pop-close:hover{color:var(--gold2)}
+.weave-pop-kicker{
+  padding-right:24px;
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:5px;
+}
+.weave-popover h3{
+  font-family:'Cinzel',serif;
+  font-size:18px;
+  color:var(--gold3);
+  margin-bottom:8px;
+  line-height:1.2;
+}
+.weave-pop-powers{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-bottom:10px;
+}
+.weave-pop-powers span{
+  border:1px solid var(--border2);
+  border-radius:999px;
+  background:var(--bg3);
+  color:var(--text2);
+  padding:1px 7px;
+  font-size:11px;
+}
+.weave-pop-meta{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:5px;
+  margin-bottom:10px;
+}
+.weave-pop-meta div{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:5px;
+  padding:5px 7px;
+}
+.weave-pop-meta b{
+  display:block;
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:1px;
+}
+.weave-pop-meta em{
+  display:block;
+  font-style:normal;
+  font-size:12px;
+  color:var(--text);
+  line-height:1.25;
+}
+.weave-pop-desc p,
+.weave-pop-upcast p{
+  font-size:13px;
+  line-height:1.45;
+  color:var(--text2);
+  margin-bottom:7px;
+}
+.weave-pop-upcast{
+  margin-top:10px;
+  padding:9px 10px;
+  border-left:2px solid var(--gold);
+  border-radius:5px;
+  background:var(--warning-bg);
+}
+.weave-pop-upcast strong{
+  display:block;
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--gold2);
+  margin-bottom:5px;
+}
+@media(max-width:700px){
+  .weave-popover{
+    left:10px!important;
+    right:10px!important;
+    top:70px!important;
+    width:auto!important;
+    max-height:78vh;
+  }
+  .weave-pop-meta{grid-template-columns:1fr}
+}
