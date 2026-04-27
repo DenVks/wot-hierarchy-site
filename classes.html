@@ -36,53 +36,101 @@
 </svg></div>
 
 <nav class="sitenav"><div class="inner"><a href="index.html" class="nav-brand"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="wg" cx="50%" cy="50%"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/></radialGradient></defs><g stroke="url(#wg)" fill="none" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"/><circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/><circle cx="40" cy="40" r="18" stroke-width=".5" opacity=".55"/><circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/><g stroke-width=".55" opacity=".7"><line x1="40" y1="4" x2="40" y2="76"/><line x1="4" y1="40" x2="76" y2="40"/><line x1="14.8" y1="14.8" x2="65.2" y2="65.2"/><line x1="65.2" y1="14.8" x2="14.8" y2="65.2"/><line x1="40" y1="4" x2="52" y2="76"/><line x1="40" y1="4" x2="28" y2="76"/><line x1="4" y1="40" x2="76" y2="52"/></g><circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="epoch.html">Эпоха</a><a href="hierarchies.html">Три Иерархии</a><a href="unity.html">Единство</a><a href="throne.html">Трон</a><a href="madding.html">Хранители</a><a href="hierarchy-wall.html">Иерархия Стены</a><a href="order.html">Орден</a><a href="wall.html">Стена</a><a href="chronicles.html">Хроника</a><a href="anomalies.html">Аномалии</a><a href="aiel.html">Айил</a><a href="tuataan.html">Туата’ан</a><a href="freefolk.html">Вольные</a><a href="rituals.html">Ритуалы</a><a href="classes.html">Классы</a><a href="weaves.html">Плетения</a><a href="ingredients.html">Ингредиенты</a><a href="loot-generator.html">Генератор</a><a href="encounter-generator.html">Энкаунтеры</a><a href="tsitadel.html">Цитадель</a><a href="monsters.html">Монстры</a><a href="dm-npc.html">NPC / Бой</a></div></div></nav>
+
 <div class="page-body">
-<header class="page-header classes-page-header">
-  <div class="eyebrow">WoT 5e · классы · архетипы · черты</div>
+<header class="page-header classes-reader-header">
+  <div class="eyebrow">WoT 5e · база классов</div>
   <h1>Классы и архетипы</h1>
-  <p>Системная база черт из дополнения к Книге Игрока по Колесу Времени. Используется как справочник для сайта, NPC, генераторов и будущих карточек персонажей.</p>
+  <p>Читаемый справочник по классам, архетипам и чертам. Данные сохранены в машинном виде, чтобы позже связывать их с листами NPC и открывать описания черт в модальных окнах.</p>
 </header>
 
-<main class="classes-page">
-  <section class="chapter narrow">
-    <div class="chapter-head">
-      <div class="chapter-roman">I · БАЗА ДАННЫХ</div>
-      <h2 class="chapter-title">Каталог классовых черт</h2>
-      <p class="chapter-desc">Фильтрация по классу, архетипу, уровню и типу записи. Полный текст черты открывается в карточке и модальном окне.</p>
+<main class="classes-reader-page">
+  <section class="chapter classes-reader-shell">
+    <div class="class-tabs-wrap reveal-target">
+      <div class="class-tabs-head">
+        <span>Выбор класса</span>
+        <small id="classes-total-note">7 классов · 292 черты</small>
+      </div>
+      <div id="class-tabs" class="class-tabs"></div>
     </div>
 
-    <div class="class-db-stats reveal-target" id="class-db-stats"></div>
+    <section class="class-hero reveal-target" id="class-hero">
+      <div class="class-hero-main">
+        <div class="class-kicker" id="class-kicker">Класс</div>
+        <h2 id="class-title">—</h2>
+        <p id="class-intro">Выберите класс сверху, чтобы открыть его прогрессию, базовые черты и архетипы.</p>
+      </div>
+      <div class="class-hero-stats" id="class-stats"></div>
+    </section>
 
-    <div class="class-filter-panel reveal-target">
-      <label>Поиск<input id="class-search" type="search" placeholder="Черта, описание, источник…"></label>
-      <label>Класс<select id="class-filter"></select></label>
-      <label>Архетип / путь<select id="archetype-filter"></select></label>
-      <label>Уровень<select id="level-filter"></select></label>
-      <label>Категория<select id="category-filter"></select></label>
+    <div class="class-reader-controls reveal-target">
+      <label>Архетип
+        <select id="archetype-filter"></select>
+      </label>
+      <label>Уровень
+        <select id="level-filter"></select>
+      </label>
+      <label>Поиск
+        <input id="class-search" type="search" placeholder="Название или текст черты…">
+      </label>
       <button id="class-reset" type="button">Сбросить</button>
     </div>
 
-    <div class="class-db-tabs reveal-target" data-class-tabs>
-      <button class="active" data-class-tab="features">Черты</button>
-      <button data-class-tab="progression">Прогрессия</button>
-      <button data-class-tab="archetypes">Архетипы</button>
-    </div>
+    <div class="class-reader-layout">
+      <aside class="class-local-nav reveal-target">
+        <div class="class-local-title">Разделы</div>
+        <a href="#class-progression-section">Прогрессия</a>
+        <a href="#class-base-section">Базовые черты</a>
+        <a href="#class-archetypes-section">Архетипы</a>
+        <a href="#class-all-features-section">Все черты</a>
+      </aside>
 
-    <section class="class-panel active" data-class-panel="features">
-      <div class="class-summary"><span id="class-feature-count">0</span> записей черт</div>
-      <div class="feature-grid" id="feature-grid"></div>
-    </section>
+      <div class="class-reader-content">
+        <section class="class-panel reveal-target anchor-nav" id="class-progression-section">
+          <div class="class-panel-head">
+            <div>
+              <span class="panel-kicker">I · развитие</span>
+              <h3>Прогрессия класса</h3>
+            </div>
+            <p>Таблица уровней 1–20 из базы прогрессии.</p>
+          </div>
+          <div id="class-progression" class="class-progression-table-wrap"></div>
+        </section>
 
-    <section class="class-panel" data-class-panel="progression">
-      <div class="progression-tools">
-        <label>Класс для таблицы прогрессии<select id="progression-class-filter"></select></label>
+        <section class="class-panel reveal-target anchor-nav" id="class-base-section">
+          <div class="class-panel-head">
+            <div>
+              <span class="panel-kicker">II · ядро</span>
+              <h3>Базовые черты класса</h3>
+            </div>
+            <p>Параметры, владения и основные черты, не зависящие от архетипа.</p>
+          </div>
+          <div id="class-base-features" class="feature-card-grid"></div>
+        </section>
+
+        <section class="class-panel reveal-target anchor-nav" id="class-archetypes-section">
+          <div class="class-panel-head">
+            <div>
+              <span class="panel-kicker">III · пути</span>
+              <h3>Архетипы</h3>
+            </div>
+            <p>Краткое описание архетипов и их черты. Фильтр выше может оставить только выбранный путь.</p>
+          </div>
+          <div id="class-archetypes" class="archetype-reader-list"></div>
+        </section>
+
+        <section class="class-panel reveal-target anchor-nav" id="class-all-features-section">
+          <div class="class-panel-head">
+            <div>
+              <span class="panel-kicker">IV · индекс</span>
+              <h3>Полный список черт</h3>
+            </div>
+            <p><span id="feature-count">0</span> записей после фильтрации.</p>
+          </div>
+          <div id="class-all-features" class="feature-card-grid compact"></div>
+        </section>
       </div>
-      <div class="progression-table-wrap" id="progression-table-wrap"></div>
-    </section>
-
-    <section class="class-panel" data-class-panel="archetypes">
-      <div class="archetype-grid" id="archetype-grid"></div>
-    </section>
+    </div>
   </section>
 </main>
 </div>

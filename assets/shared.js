@@ -169,6 +169,12 @@
       ['#weave-level-7','7-й уровень'],
       ['#weave-level-8','8-й уровень'],
       ['#weave-level-9','9-й уровень']
+    ],
+    'classes.html': [
+      ['#class-progression-section','Прогрессия'],
+      ['#class-base-section','Базовые черты'],
+      ['#class-archetypes-section','Архетипы'],
+      ['#class-all-features-section','Все черты']
     ]
   };
   function slugify(text){
