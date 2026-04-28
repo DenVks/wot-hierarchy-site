@@ -32,7 +32,8 @@
     className: classOrder[0] || (db.meta.classes || [])[0] || '',
     archetype: 'all',
     level: 'all',
-    q: ''
+    q: '',
+    section: 'class-progression-section'
   };
 
   function featureLevelLabel(f){
@@ -82,6 +83,7 @@
         state.archetype = 'all';
         state.level = 'all';
         state.q = '';
+        state.section = 'class-progression-section';
         renderAll();
         document.getElementById('class-hero')?.scrollIntoView({behavior:'smooth', block:'start'});
       });
@@ -160,6 +162,23 @@
     $('class-base-features').innerHTML = feats.length ? feats.map(f => featureCard(f)).join('') : '<p class="class-empty">Базовые черты не найдены по выбранному фильтру.</p>';
   }
 
+  function renderArchetypeStrip(){
+    const host = $('archetype-strip');
+    if(!host) return;
+    const archs = db.archetypes.filter(a => a.className === state.className).map(a => a.archetype);
+    if(!archs.length){ host.innerHTML = ''; return; }
+    host.innerHTML = '<button type="button" class="archetype-chip'+(state.archetype==='all'?' active':'')+'" data-archetype="all">Все архетипы</button>' +
+      archs.map(a => '<button type="button" class="archetype-chip'+(state.archetype===a?' active':'')+'" data-archetype="'+esc(a)+'">'+esc(a)+'</button>').join('');
+    host.querySelectorAll('.archetype-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.archetype = btn.dataset.archetype || 'all';
+        state.level = 'all';
+        state.q = '';
+        renderContentOnly();
+      });
+    });
+  }
+
   function renderArchetypes(){
     const host = $('class-archetypes');
     let archs = db.archetypes.filter(a => a.className === state.className);
@@ -226,10 +245,10 @@
   };
 
   function wireStaticEvents(){
-    $('archetype-filter').addEventListener('change', e => { state.archetype = e.target.value; renderContentOnly(); });
-    $('level-filter').addEventListener('change', e => { state.level = e.target.value; renderContentOnly(); });
-    $('class-search').addEventListener('input', e => { state.q = e.target.value; renderContentOnly(); });
-    $('class-reset').addEventListener('click', () => { state.archetype='all'; state.level='all'; state.q=''; renderAll(); });
+    $('archetype-filter')?.addEventListener('change', e => { state.archetype = e.target.value; renderContentOnly(); });
+    $('level-filter')?.addEventListener('change', e => { state.level = e.target.value; renderContentOnly(); });
+    $('class-search')?.addEventListener('input', e => { state.q = e.target.value; renderContentOnly(); });
+    $('class-reset')?.addEventListener('click', () => { state.archetype='all'; state.level='all'; state.q=''; renderAll(); });
     document.addEventListener('click', e => {
       const btn = e.target.closest('.feature-more');
       if(btn) openFeatureModal(btn.dataset.featureId);
@@ -242,14 +261,27 @@
       const target = document.querySelector(href);
       if(!target) return;
       e.preventDefault();
-      target.scrollIntoView({behavior:'smooth', block:'start'});
+      state.section = href.slice(1);
+      renderSectionTabs();
       history.replaceState(null, '', href);
-      document.querySelectorAll('.class-local-nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === href));
+      target.scrollIntoView({behavior:'smooth', block:'start'});
     });
     document.addEventListener('keydown', e => { if(e.key === 'Escape') closeFeatureModal(); });
   }
 
+  function renderSectionTabs(){
+    const activeId = state.section || 'class-progression-section';
+    document.querySelectorAll('.class-local-nav a').forEach(a => {
+      const href = a.getAttribute('href') || '';
+      a.classList.toggle('active', href === '#' + activeId);
+    });
+    document.querySelectorAll('.classes-reader-page .class-panel').forEach(panel => {
+      panel.classList.toggle('active', panel.id === activeId);
+    });
+  }
+
   function renderContentOnly(){
+    renderArchetypeStrip();
     renderBaseFeatures();
     renderArchetypes();
     renderAllFeatures();
@@ -261,6 +293,7 @@
     renderFilters();
     renderProgression();
     renderContentOnly();
+    renderSectionTabs();
   }
 
   renderAll();

@@ -354,7 +354,7 @@ st:{str:13,con:14,dex:10,int:15,wis:19,cha:9},
 co:{hp:73,ac:13,sp:30,ini:'+0',prof:'+4',sv:'МДР +8, Инт +6',pp:14,
     cr:'Плетения DC 16 · Атака плетений +8/+10(ангриал)'},
 at:[
-  {n:'Воздушный кулак (1 ур.)',a:'+8/+10',d:'2к8 (→+3к6 ангриал)',t:'Силовой',r:'30(→48) фт [60→96 с Меткими]',
+  {n:'Воздушный кулак (1 ур.)',a:'+8/+10',d:'2к8',t:'Силовой',r:'30(→48) фт [60→96 с Меткими]',
    no:'❌ИСПРАВЛЕНО: 1-й уровень (не кантрип!), базовый урон 2к8 (не 1к6). С ангриалом ур.3: доп. +3к6. Откидывает на 15 фт и роняет наземь. Бросок атаки (не СБ Лов!). Слот 1 ур.'},
   {n:'Огненный шар (2 ур.)',a:'DC 16',d:'5к6+3к6=8к6',t:'Огонь',r:'150(→240) фт',
    no:'AoE 20(→32) фт. Лов СБ на половину. Аффинитет F: использует слот 1 ур.'},
@@ -379,7 +379,7 @@ slots:[
   {lv:'1 ур.',n:4},{lv:'2 ур.',n:3},{lv:'3 ур.',n:3},{lv:'4 ур.',n:3},{lv:'5 ур.',n:1}
 ],
 spells:[
-  {n:'Воздушный кулак ⚡',lv:1,tal:'EL',el:'A',t:'1 д.',r:'30 / 48',dur:'Мгн.',sb:'Бросок атаки',slot:'1 (0*A)',dmg:'2к8 / 3к8 / 2к8+3к6',ef:'Бросок атаки плетением. Откидывает на 15 фт и роняет. Аффинитет A: слот 1→0, урон как 2-й ур. (3к8). С ангриалом ур.3: +3к6.'},
+  {n:'Воздушный кулак ⚡',lv:1,tal:'EL',el:'A',t:'1 д.',r:'30 / 48',dur:'Мгн.',sb:'Бросок атаки',slot:'1 (0*A)',dmg:'2к8 / 3к8',ef:'Бросок атаки плетением. Откидывает на 15 фт и роняет. Аффинитет A: слот 1→0, урон как 2-й ур. (3к8).'},
   {n:'Создать огонь',lv:0,tal:'EL',el:'F',t:'1 д.',r:'100 / 160',dur:'Конц.',sb:'Лов. пол.',slot:'0',dmg:'1к6 / — / 4к6',ef:'Создаёт/усиливает пламя. Нет аффинитета (F≠EL). С ангриалом +3к6=4к6.'},
   {n:'Анализ земли',lv:0,tal:'EL',el:'E',t:'1 д.',r:'На себе',dur:'Конц.',sb:'—',slot:'0',dmg:'—',ef:'Ощущает металлы/полости в земле 30 фт. +100 фт за каждый уровень слота.'},
   {n:'Огненный жезл',lv:1,tal:'EL',el:'E,F',t:'Бон.д.',r:'Касание',dur:'Конц.',sb:'—',slot:'1 (0*F)',dmg:'+1к4 / +4к4',ef:'Оружие: +1к4 огонь. Аффинитет F: слот 1→0, урон как 2-й ур. (+4к4). С ангриалом: +3к4 доп.'},
@@ -419,7 +419,7 @@ verify:[
   {s:'ok',t:'Слоты 4/3/3/3/1 — стандарт 5e для ур.9 Направляющего'},
   {s:'ok',t:'Аффинитеты Земля/Огонь — плетения E/F со слотом -1 ур.'},
   {s:'ok',t:'Закрепление (ур.9) — доступно, отличная боевая механика'},
-  {s:'err',t:'Воздушный кулак: указан как кантрип 0-го уровня — ОШИБКА! По книге: 1-й уровень плетения. Базовый урон 2к8 (не 1к6!). Дальность 30 фт (60 с Меткими). Бросок атаки (не СБ Ловкость).'},{s:'warn',t:'Медицина: в исходном листе +6 (Инт-основа), но должно быть +8 (МДР-основа для медицины в WoT?)'}
+  {s:'err',t:'Воздушный кулак: указан как кантрип 0-го уровня — ОШИБКА! По книге: 1-й уровень плетения. Базовый урон 2к8 (не 1к6, без добавочных 3к6). Дальность 30 фт (60 с Меткими). Бросок атаки (не СБ Ловкость).'},{s:'warn',t:'Медицина: в исходном листе +6 (Инт-основа), но должно быть +8 (МДР-основа для медицины в WoT?)'}
 ],
 tactics:[
   {ph:'Дистанция',d:'Держать 60-100 фт. Воздушный кулак (×1.6 ангриал = до 96 фт) — основная атака. Огненный шар — по скоплениям.'},
@@ -1989,6 +1989,14 @@ function roll(n, sides) {
   return {results, sum};
 }
 
+function normalizeDamageExpr(dmgExpr) {
+  let expr = String(dmgExpr || '');
+  if (expr.includes('=')) expr = expr.split('=').pop();
+  expr = expr.replace(/\([^)]*\)/g, ' ');
+  expr = expr.replace(/[→⇒]/g, ' ');
+  return expr.trim();
+}
+
 function rollDice(expr, label) {
   const m = expr.match(/^(\d+)к(\d+)([+-]\d+)?$/);
   if (!m) return;
@@ -2018,8 +2026,9 @@ function rollAttack(atkBonus, label) {
 }
 
 function rollDamage(dmgExpr, label, isCrit) {
-  const parts = (dmgExpr.match(/\d+к\d+/g) || []);
-  const bonusM = dmgExpr.match(/\+(\d+)(?!к)/g) || [];
+  const cleanExpr = normalizeDamageExpr(dmgExpr);
+  const parts = (cleanExpr.match(/\d+к\d+/g) || []);
+  const bonusM = cleanExpr.match(/\+(\d+)(?!к)/g) || [];
   const bonus = bonusM.reduce((s,b) => s + parseInt(b.replace('+','')), 0);
   let allResults = [], sum = 0;
   parts.forEach((p, pi) => {
@@ -2372,7 +2381,106 @@ document.addEventListener('click', function(e){
   if (!pop || pop.style.display === 'none') return;
   if (!pop.contains(e.target) && !e.target.classList.contains('sp-info-btn')) hideWeaveModal();
 });
-document.addEventListener('keydown', function(e){ if(e.key === 'Escape') hideWeaveModal(); });
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') { hideWeaveModal(); hideClassFeatureModal(); } });
+
+// ── Class feature modal / lookup from classes.html data ─────────────────────
+function normalizeFeatureName(name){
+  return String(name || '')
+    .replace(/[⚡⛔✅❌⭐★]/g,'')
+    .replace(/\([^)]*(?:ур\.|НЕДОСТУП|крит|слот)[^)]*\)/gi,'')
+    .replace(/\([^)]*\)/g,'')
+    .replace(/×\d+/g,'')
+    .replace(/\bур\.?\s*\d+\b/gi,'')
+    .replace(/:.*/,'')
+    .replace(/ё/g,'е').replace(/Ё/g,'Е')
+    .replace(/\s+/g,' ')
+    .trim()
+    .toLowerCase();
+}
+function npcClassContexts(c){
+  const text = [c.sh, c.ti].concat(c.tags || []).join(' ').toLowerCase();
+  const ctx = [];
+  const add = (className, archetype) => ctx.push({className, archetype});
+  if (text.includes('скиталец')) {
+    let a = text.includes('ассасин') ? 'Ассасин (Assassin)' : text.includes('охотник за ворами') ? 'Охотник за ворами (Thief Taker)' : text.includes('вор') ? 'Вор (Thief)' : text.includes('менестр') ? 'Менестрель (Gleeman)' : null;
+    add('Скиталец', a);
+  }
+  if (text.includes('мастер меча')) add('Мастер по оружию','Мастер Меча (Blademaster)');
+  else if (text.includes('чемпион')) add('Мастер по оружию','Архетип: Чемпион (Champion)');
+  else if (text.includes('командир') || text.includes('мастер по оружию') || text.includes('мечник')) add('Мастер по оружию',null);
+  if (text.includes('дичок')) add('Дичок', null);
+  if (text.includes('посвящ') || text.includes('аша') || text.includes('айз седай') || text.includes('ищущ')) add('Посвящённый', text.includes('аша') ? "Аша'ман (Asha'man)" : text.includes('айз седай') ? 'Айз Седай' : null);
+  if (text.includes('лесник')) add('Лесник', null);
+  if (text.includes('благород')) add('Благородный', null);
+  return ctx;
+}
+function findClassFeatureForNpc(c, abilityName){
+  const db = window.WOT_CLASSES_DB || {features:[]};
+  const key = normalizeFeatureName(abilityName);
+  if (!key) return null;
+  const contexts = npcClassContexts(c);
+  const candidates = db.features.filter(f => {
+    const fKey = normalizeFeatureName(f.feature);
+    if (!fKey) return false;
+    const nameMatch = fKey === key || fKey.includes(key) || key.includes(fKey);
+    if (!nameMatch) return false;
+    if (!contexts.length) return true;
+    return contexts.some(ctx => {
+      if (ctx.className && f.className !== ctx.className) return false;
+      if (ctx.archetype && !(/базов/i.test(f.archetype||'')) && f.archetype !== ctx.archetype) return false;
+      return true;
+    });
+  });
+  if (candidates.length) {
+    candidates.sort((a,b) => {
+      const aBase = /базов/i.test(a.archetype||'') ? 0 : 1;
+      const bBase = /базов/i.test(b.archetype||'') ? 0 : 1;
+      return aBase - bBase || (Number(a.levelSort||999)-Number(b.levelSort||999));
+    });
+    return candidates[0];
+  }
+  return null;
+}
+function classFeatureInfoButton(npcId, abilityName){
+  const safe = String(abilityName || '').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return '<button class="sp-info-btn feature-info-btn" title="Показать точное описание черты из classes.html" type="button" onclick="showClassFeatureModal('+npcId+',\''+safe+'\',event)">i</button>';
+}
+function showClassFeatureModal(npcId, abilityName, event){
+  const c = CS.find(x=>x.id===npcId);
+  if(!c) return;
+  const f = findClassFeatureForNpc(c, abilityName);
+  let pop = document.getElementById('class-feature-popover');
+  if(!pop){
+    pop = document.createElement('div');
+    pop.id = 'class-feature-popover';
+    pop.className = 'weave-popover class-feature-popover';
+    document.body.appendChild(pop);
+  }
+  if(f){
+    const desc = String(f.description || '').split(/\n+/).map(p=>'<p>'+p+'</p>').join('');
+    pop.innerHTML = '<button class="weave-pop-close" onclick="hideClassFeatureModal()">×</button>'+
+      '<div class="weave-pop-kicker">'+f.className+' · '+(f.archetype || 'Базовый класс')+' · ур. '+(f.levels || '—')+'</div>'+
+      '<h3>'+f.feature+'</h3>'+
+      '<div class="weave-pop-meta"><div><b>Категория</b><em>'+(f.category || 'Черта')+'</em></div><div><b>Источник</b><em>classes.html</em></div></div>'+
+      '<div class="weave-pop-desc">'+desc+'</div>';
+  } else {
+    const fallback = (c.ab||[]).find(a => normalizeFeatureName(a.n) === normalizeFeatureName(abilityName));
+    pop.innerHTML = '<button class="weave-pop-close" onclick="hideClassFeatureModal()">×</button>'+
+      '<div class="weave-pop-kicker">Описание не найдено в classes.html</div>'+
+      '<h3>'+abilityName+'</h3>'+
+      '<div class="weave-pop-desc"><p>'+(fallback ? fallback.d : 'Для этой записи нет точного совпадения в базе классов.')+'</p></div>';
+  }
+  const btn = event && event.currentTarget ? event.currentTarget : null;
+  pop.style.display = 'block';
+  if(btn){
+    const r = btn.getBoundingClientRect();
+    const w = Math.min(560, window.innerWidth - 24);
+    pop.style.width = w + 'px';
+    pop.style.left = Math.min(window.innerWidth - w - 12, Math.max(12, r.left - w + 28)) + 'px';
+    pop.style.top = Math.min(window.innerHeight - 80, r.bottom + 8) + 'px';
+  }
+}
+function hideClassFeatureModal(){ const pop=document.getElementById('class-feature-popover'); if(pop) pop.style.display='none'; }
 
 // ── Show NPC ─────────────────────────────────────────────────────────────
 const lvClass = lv => lv<=1?'sp-lv1':lv===2?'sp-lv2':lv===3?'sp-lv3':lv===4?'sp-lv4':lv>=5&&lv<=6?'sp-lv5':lv>=7&&lv<=8?'sp-lv7':'sp-lv9';
@@ -2475,6 +2583,7 @@ ${s.saOn?'✅ Активна':'⬜ Не использована'}
     const bonus = parseAtk(atk.a);
     const dmgSafe = atk.d.replace(/'/g,"\\'");
     const nameSafe = atk.n.replace(/'/g,"\\'");
+    const canCrit = /^[+\-]\d+/.test(String(atk.a || ''));
     html += `<div class="atk-card" id="atk-card-${id}-${ai}">
 <div class="atk-card-header">
   <span class="atk-name">${atk.n}</span>
@@ -2484,7 +2593,7 @@ ${s.saOn?'✅ Активна':'⬜ Не использована'}
 <div class="atk-btn-row">
   <button class="atk-roll-btn" onclick="rollAtkInline(${id},${ai},${bonus},'${nameSafe}','${dmgSafe}',false)">⚔ ${atk.a}</button>
   <button class="atk-dmg-btn" onclick="rollDmgInline(${id},${ai},'${dmgSafe}','${nameSafe}',false)">🎲 ${atk.d}</button>
-  <button class="atk-crit-btn" onclick="rollDmgInline(${id},${ai},'${dmgSafe}','${nameSafe}',true)">💥</button>
+  ${canCrit ? `<button class="atk-crit-btn" onclick="rollDmgInline(${id},${ai},'${dmgSafe}','${nameSafe}',true)">💥</button>` : ''}
 </div>
 <div class="atk-inline-result" id="atk-res-${id}-${ai}"></div>
 <div class="atk-note">${atk.no||''}</div>
@@ -2554,7 +2663,7 @@ ${c.tactics.map(t=>`<div class="tact-phase"><div class="tact-phase-name">${t.ph}
   // ── TAB: ABILITIES ────────────────────────────────────────────────────
   html += `<div class="tab-content" id="tab_${id}_abilities">
 <div class="sec"><div class="sec-h">Черты класса и архетипа</div>
-<div class="ab-grid">${c.ab.map(a=>`<div class="ab-card${a.hi?' highlight':''}"><div class="ab-name">${a.n}</div><div class="ab-desc">${a.d}</div></div>`).join('')}</div>
+<div class="ab-grid">${c.ab.map(a=>`<div class="ab-card${a.hi?' highlight':''}"><div class="ab-name">${a.n} ${classFeatureInfoButton(id, a.n)}</div><div class="ab-desc">${a.d}</div></div>`).join('')}</div>
 </div></div>`;
 
   // ── TAB: EQUIPMENT ────────────────────────────────────────────────────
@@ -2631,10 +2740,11 @@ function rollAtkInline(npcId, atkIdx, bonus, name, dmgExpr, saOn) {
 }
 
 function rollDmgInline(npcId, atkIdx, dmgExpr, name, isCrit) {
+  const cleanExpr = normalizeDamageExpr(dmgExpr);
   // Parse dice groups (e.g. "1к8", "3к6")
-  const parts = (dmgExpr.match(/\d+к\d+/g) || []);
+  const parts = (cleanExpr.match(/\d+к\d+/g) || []);
   // Parse flat bonus: +N where N is NOT followed by к (so "+4" yes, "+4к6" no)
-  const bonusM = dmgExpr.match(/\+(\d+)(?!к)/g) || [];
+  const bonusM = cleanExpr.match(/\+(\d+)(?!к)/g) || [];
   const bonus = bonusM.reduce((s,b) => s + parseInt(b.replace('+','')), 0);
 
   let allResults = [], sum = 0;

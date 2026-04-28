@@ -2845,3 +2845,34 @@ body .weaves-page .weave-filter-panel button:hover{
 .classes-reader-page .class-panel.active{
   display:block;
 }
+
+/* ==== v40: classes reader as section tabs + archetype chips ==== */
+.classes-reader-page .class-reader-controls{display:none;}
+.classes-reader-page .class-panel{display:none;}
+.classes-reader-page .class-panel.active{display:block;}
+.archetype-strip{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:0 0 18px;
+  padding:10px 0 14px;
+  border-bottom:1px solid rgba(192,132,252,.14);
+}
+.archetype-chip{
+  border:1px solid rgba(192,132,252,.22);
+  border-radius:999px;
+  padding:8px 12px;
+  background:rgba(0,0,0,.16);
+  color:#d8c0ff;
+  font-family:Cinzel,serif;
+  font-size:10px;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.archetype-chip:hover{border-color:rgba(216,192,255,.44);}
+.archetype-chip.active{
+  background:rgba(192,132,252,.14);
+  border-color:rgba(216,192,255,.52);
+  box-shadow:0 0 18px rgba(192,132,252,.10);
+}

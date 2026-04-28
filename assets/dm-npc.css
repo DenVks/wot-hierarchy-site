@@ -576,3 +576,12 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
   }
   .weave-pop-meta{grid-template-columns:1fr}
 }
+
+/* v40: class feature info buttons in NPC ability tab */
+.ab-name .feature-info-btn{
+  margin-left:6px;
+  vertical-align:middle;
+}
+.class-feature-popover{
+  z-index:9999;
+}
