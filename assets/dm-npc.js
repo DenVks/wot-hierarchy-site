@@ -2397,6 +2397,9 @@ function normalizeFeatureName(name){
     .trim()
     .toLowerCase();
 }
+function escHtml(v){
+  return String(v ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+}
 function npcClassContexts(c){
   const text = [c.sh, c.ti].concat(c.tags || []).join(' ').toLowerCase();
   const ctx = [];
@@ -2443,9 +2446,57 @@ function findClassFeatureForNpc(c, abilityName){
 }
 function classFeatureInfoButton(npcId, abilityName){
   const safe = String(abilityName || '').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-  return '<button class="sp-info-btn feature-info-btn" title="Показать точное описание черты из classes.html" type="button" onclick="showClassFeatureModal('+npcId+',\''+safe+'\',event)">i</button>';
+  return '<button class="sp-info-btn feature-info-btn" title="Показать полное описание черты из classes.html" type="button" '+
+    'onmouseenter="showClassFeatureModal('+npcId+',\''+safe+'\',event,true)" '+
+    'onfocus="showClassFeatureModal('+npcId+',\''+safe+'\',event,true)" '+
+    'onmouseleave="scheduleClassFeatureHide()" '+
+    'onclick="showClassFeatureModal('+npcId+',\''+safe+'\',event,false)">i</button>';
 }
-function showClassFeatureModal(npcId, abilityName, event){
+
+let classFeatureHideTimer = null;
+function scheduleClassFeatureHide(){
+  clearTimeout(classFeatureHideTimer);
+  classFeatureHideTimer = setTimeout(() => {
+    const pop = document.getElementById('class-feature-popover');
+    if(!pop || pop.dataset.locked === '1' || pop.dataset.hover === '1') return;
+    hideClassFeatureModal();
+  }, 140);
+}
+function relatedClassFeatureRows(f){
+  const db = window.WOT_CLASSES_DB || {features:[]};
+  if(!f) return [];
+  const parentKey = normalizeFeatureName(f.feature);
+  return db.features.filter(x => {
+    if (String(x.id) === String(f.id)) return false;
+    if (x.className !== f.className) return false;
+    if ((x.archetype || '') !== (f.archetype || '')) return false;
+    const xParent = normalizeFeatureName(x.parent || '');
+    const xFeature = normalizeFeatureName(x.feature || '');
+    return xParent === parentKey || (x.parent && parentKey && parentKey === xFeature);
+  }).sort((a,b)=>(Number(a.levelSort||999)-Number(b.levelSort||999)) || String(a.feature).localeCompare(String(b.feature),'ru'));
+}
+function renderClassFeatureModalContent(f, c, abilityName){
+  if(f){
+    const desc = String(f.description || '').split(/\n+/).filter(Boolean).map(p=>'<p>'+escHtml(p)+'</p>').join('');
+    const related = relatedClassFeatureRows(f);
+    const relatedHtml = related.length ? '<div class="weave-pop-upcast"><strong>Связанные уточнения / развитие черты</strong>'+
+      related.map(r => '<p><b>'+escHtml(r.feature)+'</b>'+(r.levels ? ' · ур. '+escHtml(r.levels) : '')+'</p>'+
+        String(r.description || '').split(/\n+/).filter(Boolean).map(p=>'<p>'+escHtml(p)+'</p>').join('')).join('')+
+      '</div>' : '';
+    return '<button class="weave-pop-close" onclick="hideClassFeatureModal()">×</button>'+
+      '<div class="weave-pop-kicker">'+escHtml(f.className)+' · '+escHtml(f.archetype || 'Базовый класс')+' · ур. '+escHtml(f.levels || '—')+'</div>'+
+      '<h3>'+escHtml(f.feature)+'</h3>'+
+      '<div class="weave-pop-meta"><div><b>Категория</b><em>'+escHtml(f.category || 'Черта')+'</em></div><div><b>Источник</b><em>classes.html</em></div></div>'+
+      '<div class="weave-pop-desc">'+desc+'</div>'+relatedHtml;
+  }
+  const fallback = (c.ab||[]).find(a => normalizeFeatureName(a.n) === normalizeFeatureName(abilityName));
+  const fallbackDesc = fallback ? fallback.d : 'Для этой записи нет точного совпадения в базе классов.';
+  return '<button class="weave-pop-close" onclick="hideClassFeatureModal()">×</button>'+
+    '<div class="weave-pop-kicker">Описание не найдено в classes.html</div>'+
+    '<h3>'+escHtml(abilityName)+'</h3>'+
+    '<div class="weave-pop-desc">'+String(fallbackDesc || '').split(/\n+/).filter(Boolean).map(p=>'<p>'+escHtml(p)+'</p>').join('')+'</div>';
+}
+function showClassFeatureModal(npcId, abilityName, event, hoverMode){
   const c = CS.find(x=>x.id===npcId);
   if(!c) return;
   const f = findClassFeatureForNpc(c, abilityName);
@@ -2455,32 +2506,29 @@ function showClassFeatureModal(npcId, abilityName, event){
     pop.id = 'class-feature-popover';
     pop.className = 'weave-popover class-feature-popover';
     document.body.appendChild(pop);
+    pop.addEventListener('mouseenter',()=>{ pop.dataset.hover='1'; clearTimeout(classFeatureHideTimer); });
+    pop.addEventListener('mouseleave',()=>{ pop.dataset.hover='0'; if(pop.dataset.locked !== '1') scheduleClassFeatureHide(); });
   }
-  if(f){
-    const desc = String(f.description || '').split(/\n+/).map(p=>'<p>'+p+'</p>').join('');
-    pop.innerHTML = '<button class="weave-pop-close" onclick="hideClassFeatureModal()">×</button>'+
-      '<div class="weave-pop-kicker">'+f.className+' · '+(f.archetype || 'Базовый класс')+' · ур. '+(f.levels || '—')+'</div>'+
-      '<h3>'+f.feature+'</h3>'+
-      '<div class="weave-pop-meta"><div><b>Категория</b><em>'+(f.category || 'Черта')+'</em></div><div><b>Источник</b><em>classes.html</em></div></div>'+
-      '<div class="weave-pop-desc">'+desc+'</div>';
-  } else {
-    const fallback = (c.ab||[]).find(a => normalizeFeatureName(a.n) === normalizeFeatureName(abilityName));
-    pop.innerHTML = '<button class="weave-pop-close" onclick="hideClassFeatureModal()">×</button>'+
-      '<div class="weave-pop-kicker">Описание не найдено в classes.html</div>'+
-      '<h3>'+abilityName+'</h3>'+
-      '<div class="weave-pop-desc"><p>'+(fallback ? fallback.d : 'Для этой записи нет точного совпадения в базе классов.')+'</p></div>';
-  }
-  const btn = event && event.currentTarget ? event.currentTarget : null;
+  clearTimeout(classFeatureHideTimer);
+  pop.innerHTML = renderClassFeatureModalContent(f, c, abilityName);
   pop.style.display = 'block';
+  pop.dataset.locked = hoverMode ? '0' : '1';
+  pop.dataset.hover = '0';
+  const btn = event && event.currentTarget ? event.currentTarget : null;
   if(btn){
     const r = btn.getBoundingClientRect();
     const w = Math.min(560, window.innerWidth - 24);
+    let top = r.bottom + 8;
+    if (top + 420 > window.innerHeight) top = Math.max(12, r.top - 420);
     pop.style.width = w + 'px';
     pop.style.left = Math.min(window.innerWidth - w - 12, Math.max(12, r.left - w + 28)) + 'px';
-    pop.style.top = Math.min(window.innerHeight - 80, r.bottom + 8) + 'px';
+    pop.style.top = top + 'px';
   }
 }
-function hideClassFeatureModal(){ const pop=document.getElementById('class-feature-popover'); if(pop) pop.style.display='none'; }
+function hideClassFeatureModal(){
+  const pop=document.getElementById('class-feature-popover');
+  if(pop){ pop.style.display='none'; pop.dataset.locked='0'; pop.dataset.hover='0'; }
+}
 
 // ── Show NPC ─────────────────────────────────────────────────────────────
 const lvClass = lv => lv<=1?'sp-lv1':lv===2?'sp-lv2':lv===3?'sp-lv3':lv===4?'sp-lv4':lv>=5&&lv<=6?'sp-lv5':lv>=7&&lv<=8?'sp-lv7':'sp-lv9';
