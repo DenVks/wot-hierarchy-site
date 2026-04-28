@@ -671,3 +671,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .sp-dmg-result{display:inline-flex;align-items:center;justify-content:center;min-width:30px;margin-left:5px;padding:1px 6px;border:1px solid transparent;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--gold2);background:transparent;vertical-align:middle;opacity:0;transition:all .15s}
 .sp-dmg-result.show{background:var(--warning-bg);border-color:var(--gold);opacity:1;box-shadow:0 0 8px rgba(201,168,76,.25)}
 .dice-modal.spell-roll-visible{z-index:500;right:24px;bottom:24px;border-color:var(--gold)}
+
+
+/* v47: result is visible directly in the spell damage dice button */
+.sp-dmg-roll.rolled{background:var(--warning-bg);border-color:var(--gold);color:var(--gold2);font-weight:700;min-width:44px;box-shadow:0 0 8px rgba(201,168,76,.25)}

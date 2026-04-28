@@ -2408,6 +2408,7 @@ function extractSpellDamageExpr(dmgExpr) {
 function rollSpellDamage(dmgExpr, label, resultTarget) {
   const cleanExpr = extractSpellDamageExpr(dmgExpr);
   if (!cleanExpr) return;
+
   const parts = (cleanExpr.match(/\d+к\d+/g) || []);
   const bonusM = cleanExpr.match(/\+\d+(?!к)/g) || [];
   const bonus = bonusM.reduce((s,b) => s + parseInt(b.replace('+','')), 0);
@@ -2420,18 +2421,29 @@ function rollSpellDamage(dmgExpr, label, resultTarget) {
   });
   sum += bonus;
 
+  // v47: результат пишется прямо в кнопку и в соседний span.
   let inline = null;
+  let btn = null;
+
   if (typeof resultTarget === 'string') {
     inline = document.getElementById(resultTarget);
   } else if (resultTarget && resultTarget.nodeType === 1) {
+    btn = resultTarget.tagName === 'BUTTON' ? resultTarget : resultTarget.closest('button');
     const cell = resultTarget.closest('.sp-dmg');
     inline = cell ? cell.querySelector('.sp-dmg-result') : null;
   }
+
   if (inline) {
     inline.textContent = String(sum);
     inline.classList.remove('show');
     void inline.offsetWidth;
     inline.classList.add('show');
+  }
+
+  if (btn) {
+    btn.textContent = '🎲 ' + sum;
+    btn.classList.add('rolled');
+    btn.title = (label || 'Урон плетения') + ': ' + sum;
   }
 
   const modal = document.getElementById('dice-modal');
@@ -2449,7 +2461,7 @@ function spellDamageButton(dmgExpr, label, resultId) {
   const cleanExpr = extractSpellDamageExpr(dmgExpr);
   if (!cleanExpr) return '';
   const safeId = resultId || ('sp-dmg-result-' + Math.random().toString(36).slice(2));
-  return ' <button class="sp-dmg-roll" type="button" title="Бросить урон" onclick="event.stopPropagation(); rollSpellDamage(' + JSON.stringify(dmgExpr) + ', ' + JSON.stringify(label) + ', ' + JSON.stringify(safeId) + ');">🎲</button><span id="' + safeId + '" class="sp-dmg-result" title="Результат броска урона"></span>';
+  return ' <button class="sp-dmg-roll" type="button" title="Бросить урон" onclick="event.stopPropagation(); rollSpellDamage(' + JSON.stringify(dmgExpr) + ', ' + JSON.stringify(label) + ', this);">🎲</button><span id="' + safeId + '" class="sp-dmg-result" title="Результат броска урона"></span>';
 }
 
 // ── HP System ────────────────────────────────────────────────────────────
