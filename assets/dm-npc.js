@@ -2405,7 +2405,7 @@ function extractSpellDamageExpr(dmgExpr) {
   return parts ? parts[0] : '';
 }
 
-function rollSpellDamage(dmgExpr, label, btn) {
+function rollSpellDamage(dmgExpr, label, resultTarget) {
   const cleanExpr = extractSpellDamageExpr(dmgExpr);
   if (!cleanExpr) return;
   const parts = (cleanExpr.match(/\d+к\d+/g) || []);
@@ -2420,15 +2420,18 @@ function rollSpellDamage(dmgExpr, label, btn) {
   });
   sum += bonus;
 
-  if (btn) {
-    const cell = btn.closest('.sp-dmg');
-    const inline = cell ? cell.querySelector('.sp-dmg-result') : null;
-    if (inline) {
-      inline.textContent = String(sum);
-      inline.classList.remove('show');
-      void inline.offsetWidth;
-      inline.classList.add('show');
-    }
+  let inline = null;
+  if (typeof resultTarget === 'string') {
+    inline = document.getElementById(resultTarget);
+  } else if (resultTarget && resultTarget.nodeType === 1) {
+    const cell = resultTarget.closest('.sp-dmg');
+    inline = cell ? cell.querySelector('.sp-dmg-result') : null;
+  }
+  if (inline) {
+    inline.textContent = String(sum);
+    inline.classList.remove('show');
+    void inline.offsetWidth;
+    inline.classList.add('show');
   }
 
   const modal = document.getElementById('dice-modal');
@@ -2442,10 +2445,11 @@ function rollSpellDamage(dmgExpr, label, btn) {
   }
 }
 
-function spellDamageButton(dmgExpr, label) {
+function spellDamageButton(dmgExpr, label, resultId) {
   const cleanExpr = extractSpellDamageExpr(dmgExpr);
   if (!cleanExpr) return '';
-  return ' <button class="sp-dmg-roll" type="button" title="Бросить урон" onclick="event.stopPropagation(); rollSpellDamage(' + JSON.stringify(dmgExpr) + ', ' + JSON.stringify(label) + ', this);">🎲</button><span class="sp-dmg-result" title="Результат броска урона"></span>';
+  const safeId = resultId || ('sp-dmg-result-' + Math.random().toString(36).slice(2));
+  return ' <button class="sp-dmg-roll" type="button" title="Бросить урон" onclick="event.stopPropagation(); rollSpellDamage(' + JSON.stringify(dmgExpr) + ', ' + JSON.stringify(label) + ', ' + JSON.stringify(safeId) + ');">🎲</button><span id="' + safeId + '" class="sp-dmg-result" title="Результат броска урона"></span>';
 }
 
 // ── HP System ────────────────────────────────────────────────────────────
@@ -3172,14 +3176,14 @@ ${c.tactics.map(t=>`<div class="tact-phase"><div class="tact-phase-name">${t.ph}
 <div style="overflow-x:auto"><table class="sp-table"><thead><tr>
 <th>Плетение</th><th>Талант</th><th>Стихии</th><th>Время</th><th>Дальн.</th><th>Длит.</th><th>СБ</th><th>Слот</th><th>Урон</th><th>Описание</th>
 </tr></thead><tbody>
-${c.spells.map(sp=>`<tr>
+${c.spells.map((sp,spi)=>`<tr>
 <td class="sp-name ${sp.lv===0?'sp-lv0':lvClass(sp.lv)}"><span class="sp-title">${sp.n}</span> ${weaveInfoButton(sp.n)}</td>
 <td class="sp-dc">${sp.tal||'б/т'}</td>
 <td><span class="sp-el">${sp.el}</span></td>
 <td class="sp-dc">${sp.t}</td><td class="sp-dc">${sp.r||'—'}</td>
 <td class="sp-dc">${sp.dur||'Мгн.'}</td><td class="sp-dc">${sp.sb}</td>
 <td class="sp-dc">${sp.slot!=null?sp.slot:sp.lv===0?'0':sp.lv+' ур.'}</td>
-<td class="sp-dmg">${sp.dmg||'—'}${spellDamageButton(sp.dmg, sp.n)}</td>
+<td class="sp-dmg">${sp.dmg||'—'}${spellDamageButton(sp.dmg, sp.n, 'sp-dmg-result-' + id + '-' + spi)}</td>
 <td class="sp-note">${sp.ef}</td></tr>`).join('')}
 </tbody></table></div></div>`;
     }

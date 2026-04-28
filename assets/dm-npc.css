@@ -666,8 +666,8 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .sp-dmg-roll{margin-left:6px;background:var(--danger-bg);border:1px solid var(--red);border-radius:4px;color:var(--red2);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1;padding:2px 5px;vertical-align:middle;transition:all .12s}
 .sp-dmg-roll:hover{background:#3a1010;border-color:var(--red2);color:#ffd0d0}
 
-/* v45: inline spell damage result */
+/* v46: inline spell damage result */
 .sp-dmg{white-space:nowrap}
-.sp-dmg-result{display:inline-flex;align-items:center;justify-content:center;min-width:28px;margin-left:5px;padding:1px 6px;border:1px solid transparent;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--gold2);background:transparent;vertical-align:middle;opacity:.45;transition:all .15s}
+.sp-dmg-result{display:inline-flex;align-items:center;justify-content:center;min-width:30px;margin-left:5px;padding:1px 6px;border:1px solid transparent;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--gold2);background:transparent;vertical-align:middle;opacity:0;transition:all .15s}
 .sp-dmg-result.show{background:var(--warning-bg);border-color:var(--gold);opacity:1;box-shadow:0 0 8px rgba(201,168,76,.25)}
 .dice-modal.spell-roll-visible{z-index:500;right:24px;bottom:24px;border-color:var(--gold)}
