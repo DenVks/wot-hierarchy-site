@@ -2405,7 +2405,7 @@ function extractSpellDamageExpr(dmgExpr) {
   return parts ? parts[0] : '';
 }
 
-function rollSpellDamage(dmgExpr, label) {
+function rollSpellDamage(dmgExpr, label, btn) {
   const cleanExpr = extractSpellDamageExpr(dmgExpr);
   if (!cleanExpr) return;
   const parts = (cleanExpr.match(/\d+к\d+/g) || []);
@@ -2419,19 +2419,33 @@ function rollSpellDamage(dmgExpr, label) {
     sum += rr.sum;
   });
   sum += bonus;
+
+  if (btn) {
+    const cell = btn.closest('.sp-dmg');
+    const inline = cell ? cell.querySelector('.sp-dmg-result') : null;
+    if (inline) {
+      inline.textContent = String(sum);
+      inline.classList.remove('show');
+      void inline.offsetWidth;
+      inline.classList.add('show');
+    }
+  }
+
   const modal = document.getElementById('dice-modal');
-  modal.className = 'dice-modal';
-  document.getElementById('dice-modal-title').textContent = label || 'Урон плетения';
-  document.getElementById('dice-modal-result').textContent = sum;
-  document.getElementById('dice-modal-detail').textContent = '';
-  modal.style.display = 'block';
-  setTimeout(() => modal.style.display='none', 8000);
+  if (modal) {
+    modal.className = 'dice-modal spell-roll-visible';
+    document.getElementById('dice-modal-title').textContent = label || 'Урон плетения';
+    document.getElementById('dice-modal-result').textContent = sum;
+    document.getElementById('dice-modal-detail').textContent = '';
+    modal.style.display = 'block';
+    setTimeout(() => modal.style.display='none', 5000);
+  }
 }
 
 function spellDamageButton(dmgExpr, label) {
   const cleanExpr = extractSpellDamageExpr(dmgExpr);
   if (!cleanExpr) return '';
-  return ' <button class="sp-dmg-roll" type="button" title="Бросить урон" onclick="event.stopPropagation(); rollSpellDamage(' + JSON.stringify(dmgExpr) + ', ' + JSON.stringify(label) + ');">🎲</button>';
+  return ' <button class="sp-dmg-roll" type="button" title="Бросить урон" onclick="event.stopPropagation(); rollSpellDamage(' + JSON.stringify(dmgExpr) + ', ' + JSON.stringify(label) + ', this);">🎲</button><span class="sp-dmg-result" title="Результат броска урона"></span>';
 }
 
 // ── HP System ────────────────────────────────────────────────────────────
