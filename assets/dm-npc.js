@@ -2533,6 +2533,30 @@ function hideClassFeatureModal(){
 // ── Show NPC ─────────────────────────────────────────────────────────────
 const lvClass = lv => lv<=1?'sp-lv1':lv===2?'sp-lv2':lv===3?'sp-lv3':lv===4?'sp-lv4':lv>=5&&lv<=6?'sp-lv5':lv>=7&&lv<=8?'sp-lv7':'sp-lv9';
 
+function parseSignedBonus(v){
+  const m = String(v || '').match(/[+\-]?\d+/);
+  return m ? parseInt(m[0], 10) : 0;
+}
+function getSkillBonus(c, names){
+  const list = Array.isArray(names) ? names : [names];
+  const sk = (c.sk || []).find(x => list.some(n => String(x.n || '').toLowerCase().includes(String(n).toLowerCase())));
+  return sk ? parseSignedBonus(sk.v) : null;
+}
+function getPassiveInsight(c){
+  const insight = getSkillBonus(c, ['Проницательность']);
+  if (insight !== null) return 10 + insight;
+  return 10 + Math.floor((((c.st && c.st.wis) || 10) - 10) / 2);
+}
+function canUseStealthQuickRoll(c){
+  return !!(c && c.sk && c.sk.some(x => String(x.n || '').toLowerCase().includes('скрытность')) &&
+    (c.tags || []).some(t => /Скиталец|Лесник/i.test(t)));
+}
+function getSneakAttackExpr(c){
+  const sources = [c && c.co && c.co.cr, ...((c && c.ab) || []).flatMap(a => [a.n, a.d])].filter(Boolean).join(' · ');
+  const m = sources.match(/(?:СА|Скрытн(?:ая|ая)? атака|Скрытая атака)\s*(\d+к\d+)/i) || sources.match(/(\d+к\d+)\s*(?:СА|скрытн|скрыт)/i);
+  return m ? m[1] : null;
+}
+
 function showNPC(id) {
   curNPC = id;
   buildSidebar(); // update active state
@@ -2566,6 +2590,8 @@ function showNPC(id) {
   <div class="cp-ac-box"><div class="cp-ac-val">${c.co.ac}</div><div class="cp-ac-lbl">КД</div></div>
   <div class="cp-ini-box" onclick="addToIni(${id})" title="Добавить в трекер инициативы"><div class="cp-ini-val">${c.co.ini}</div><div class="cp-ini-lbl">Иниц.</div></div>
   <div class="cp-sp-box"><div class="cp-sp-val">${c.co.sp} фт</div><div class="cp-sp-lbl">Скор.</div></div>
+  <div class="cp-pass-box" title="Пассивное восприятие"><div class="cp-pass-val">${c.co.pp}</div><div class="cp-pass-lbl">Пасс ВСПР</div></div>
+  <div class="cp-pass-box" title="Пассивная проницательность"><div class="cp-pass-val">${getPassiveInsight(c)}</div><div class="cp-pass-lbl">Пасс ПРН</div></div>
   <div class="cond-panel">
     ${COND_KEYS.map(k=>`<button class="cond-toggle${s.conditions.includes(k)?' on-'+k:''}" id="ct-${k}" onclick="toggleCondition(${id},'${k}')">${COND_LABELS[k]}</button>`).join('')}
   </div>
@@ -2610,14 +2636,19 @@ function showNPC(id) {
   <span class="dice-output" id="dice-out">—</span>
 </div></div>`;
 
-  // SA row
-  const saMatch = c.co.cr.match(/СА\s+(\d+к\d+)/);
-  const saExpr = saMatch ? saMatch[1] : null;
-  if (saExpr) {
-    html += `<div class="sa-row"><span class="sa-label">Скрытная атака ${saExpr} (1/ход)</span>
-<button class="sa-toggle${s.saOn?' on':''}" id="sa-btn" onclick="toggleSA(${id})">
-${s.saOn?'✅ Активна':'⬜ Не использована'}
-</button></div>`;
+  // Quick skill / precision damage tools
+  const saExpr = getSneakAttackExpr(c);
+  const stealthBonus = getSkillBonus(c, 'Скрытность');
+  if (saExpr || canUseStealthQuickRoll(c)) {
+    html += `<div class="quick-combat-row">`;
+    if (saExpr) {
+      html += `<button class="quick-roll-btn quick-sa" onclick="rollSADmg(${id},'${saExpr}')">🎲 Скрытая атака ${saExpr}</button>
+        <span class="quick-note">отдельно: применять только когда есть преимущество/союзник у цели</span>`;
+    }
+    if (canUseStealthQuickRoll(c)) {
+      html += `<button class="quick-roll-btn quick-stealth" onclick="rollSkillInline(${id},'Скрытность',${stealthBonus || 0})">🕶 Скрытность ${stealthBonus>=0?'+':''}${stealthBonus}</button>`;
+    }
+    html += `</div>`;
   }
 
   // Attack cards
@@ -2695,8 +2726,9 @@ ${['СИЛ','ТЕЛ','ЛОВ','ИНТ','МДР','ХАР'].map((name,si)=>{
 <div class="core-grid">
   <div class="core-box"><span style="font-size:10px;color:var(--text3)">Спасброски</span><span class="core-val" style="font-size:11px">${c.co.sv}</span></div>
   <div class="core-box"><span style="font-size:10px;color:var(--text3)">Бонус умения</span><span class="core-val">${c.co.prof}</span></div>
-  <div class="core-box"><span style="font-size:10px;color:var(--text3)">Пасс. Восприятие</span><span class="core-val">${c.co.pp}</span></div>
-  <div class="core-box"><span style="font-size:10px;color:var(--text3)">Особенности</span><span class="core-val" style="font-size:10px;color:var(--gold2)">${c.co.cr}</span></div>
+  <div class="core-box passive-core"><span class="core-label">Пасс ВСПР<br><em>пассивное восприятие</em></span><span class="core-val big">${c.co.pp}</span></div>
+  <div class="core-box passive-core"><span class="core-label">Пасс ПРН<br><em>пассивная проницательность</em></span><span class="core-val big">${getPassiveInsight(c)}</span></div>
+  <div class="core-box core-wide"><span style="font-size:10px;color:var(--text3)">Особенности</span><span class="core-val" style="font-size:10px;color:var(--gold2)">${c.co.cr}</span></div>
 </div>
 ${c.hi ? renderHi(c.hi) : ''}
 ${c.angrial ? renderAngrial(c.angrial) : ''}
@@ -2822,6 +2854,30 @@ function addToAtkLog(npcId, text) {
   line.textContent = text;
   log.insertBefore(line, log.firstChild);
   while (log.children.length > 8) log.removeChild(log.lastChild);
+}
+
+function rollDiceExpressionRaw(expr){
+  const cleanExpr = normalizeDamageExpr(expr);
+  const parts = (cleanExpr.match(/\d+к\d+/g) || []);
+  const bonusM = cleanExpr.match(/\+(\d+)(?!к)/g) || [];
+  const bonus = bonusM.reduce((sum,b)=>sum+parseInt(b.replace('+',''),10),0);
+  let rolls = [], total = bonus;
+  parts.forEach(p => {
+    const m = p.match(/(\d+)к(\d+)/);
+    if (!m) return;
+    const n = parseInt(m[1],10), sides = parseInt(m[2],10);
+    for (let i=0;i<n;i++) { const r = Math.floor(Math.random()*sides)+1; rolls.push(r); total += r; }
+  });
+  return {expr: cleanExpr, rolls, bonus, total};
+}
+function rollSADmg(npcId, expr){
+  const r = rollDiceExpressionRaw(expr);
+  addToAtkLog(npcId, `🎲 Скрытая атака ${expr}: ${r.total} ур. [${r.rolls.join('+')}${r.bonus?'+'+r.bonus:''}]`);
+}
+function rollSkillInline(npcId, name, bonus){
+  const d20 = Math.floor(Math.random()*20)+1;
+  const total = d20 + bonus;
+  addToAtkLog(npcId, `🕶 ${name}: ${total} (d20[${d20}]${bonus>=0?'+':''}${bonus})`);
 }
 
 function rollAllAtk(npcId) {

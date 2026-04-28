@@ -585,3 +585,78 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .class-feature-popover{
   z-index:9999;
 }
+
+/* v43 · compact combat buttons and passive senses */
+.cp-pass-box{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:5px;
+  padding:3px 8px;
+  text-align:center;
+  min-width:58px;
+}
+.cp-pass-val{
+  font-family:'Cinzel',serif;
+  font-size:16px;
+  font-weight:700;
+  color:var(--green2);
+}
+.cp-pass-lbl{
+  font-size:8px;
+  color:var(--text3);
+  letter-spacing:.045em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.atk-roll-btn{
+  flex:0 0 76px;
+  max-width:76px;
+  padding-left:6px;
+  padding-right:6px;
+  text-align:center;
+}
+.atk-dmg-btn{
+  flex:1 1 auto;
+  min-width:110px;
+  text-align:left;
+}
+.quick-combat-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:6px 8px;
+  margin-bottom:8px;
+}
+.quick-roll-btn{
+  border-radius:5px;
+  padding:5px 9px;
+  cursor:pointer;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  transition:all .12s;
+}
+.quick-sa{
+  background:var(--danger-bg);
+  border:1px solid var(--red);
+  color:var(--red2);
+}
+.quick-sa:hover{background:#3a1010;border-color:var(--red2)}
+.quick-stealth{
+  background:var(--bg3);
+  border:1px solid var(--blue);
+  color:var(--blue2);
+}
+.quick-stealth:hover{background:var(--info-bg);border-color:var(--blue2)}
+.quick-note{
+  font-size:10px;
+  color:var(--text3);
+  line-height:1.25;
+}
+.core-grid{grid-template-columns:repeat(2,1fr)}
+.core-box.core-wide{grid-column:1 / -1;}
+.passive-core .core-label{line-height:1.2;}
+.passive-core .core-label em{font-style:normal;font-size:9px;color:var(--text3);text-transform:none;letter-spacing:0;}
