@@ -2837,3 +2837,11 @@ body .weaves-page .weave-filter-panel button:hover{
   padding-left:20px;
 }
 .rank-table td li{margin:4px 0;}
+
+/* ==== v39: fix classes reader panels hidden by legacy class database CSS ==== */
+.classes-reader-page .class-panel{
+  display:block;
+}
+.classes-reader-page .class-panel.active{
+  display:block;
+}
