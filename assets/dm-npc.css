@@ -660,3 +660,8 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .core-box.core-wide{grid-column:1 / -1;}
 .passive-core .core-label{line-height:1.2;}
 .passive-core .core-label em{font-style:normal;font-size:9px;color:var(--text3);text-transform:none;letter-spacing:0;}
+
+
+/* v44: compact damage roller in spell table */
+.sp-dmg-roll{margin-left:6px;background:var(--danger-bg);border:1px solid var(--red);border-radius:4px;color:var(--red2);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1;padding:2px 5px;vertical-align:middle;transition:all .12s}
+.sp-dmg-roll:hover{background:#3a1010;border-color:var(--red2);color:#ffd0d0}
