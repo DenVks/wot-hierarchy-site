@@ -234,6 +234,18 @@
       const btn = e.target.closest('.feature-more');
       if(btn) openFeatureModal(btn.dataset.featureId);
     });
+    document.addEventListener('click', e => {
+      const link = e.target.closest('.class-local-nav a[href^="#"], .sidebar-toc-link[href^="#"]');
+      if(!link) return;
+      const href = link.getAttribute('href');
+      if(!href || href === '#') return;
+      const target = document.querySelector(href);
+      if(!target) return;
+      e.preventDefault();
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+      history.replaceState(null, '', href);
+      document.querySelectorAll('.class-local-nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === href));
+    });
     document.addEventListener('keydown', e => { if(e.key === 'Escape') closeFeatureModal(); });
   }
 

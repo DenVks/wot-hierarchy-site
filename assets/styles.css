@@ -2815,3 +2815,25 @@ body .weaves-page .weave-filter-panel button:hover{
   .class-feature-dialog{padding:20px 16px;}
   .class-feature-dialog h3{font-size:30px;}
 }
+
+/* ==== v38: classes reader section navigation fix ==== */
+.class-local-nav a.active{
+  border-color:rgba(232,200,120,.52);
+  color:var(--gold-bright);
+  background:rgba(201,169,97,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 0 14px rgba(201,169,97,.08);
+}
+
+/* ==== v38: throne rules reference ==== */
+.throne-rules-note{margin-top:22px;}
+.throne-rules-note h4{
+  margin:0 0 8px;
+  font-family:Marcellus,serif;
+  color:var(--gold-bright);
+  font-size:22px;
+}
+.rank-table td ul{
+  margin:0;
+  padding-left:20px;
+}
+.rank-table td li{margin:4px 0;}
