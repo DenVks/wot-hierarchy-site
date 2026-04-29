@@ -2876,3 +2876,100 @@ body .weaves-page .weave-filter-panel button:hover{
   border-color:rgba(216,192,255,.52);
   box-shadow:0 0 18px rgba(192,132,252,.10);
 }
+
+/* ==== v50: compact top navigation dropdown — Правила ==== */
+.nav-rule-group{
+  position:relative;
+  display:flex;
+  align-items:center;
+  flex:0 0 auto;
+}
+.nav-rule-btn{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:10px 12px;
+  border:0;
+  border-radius:999px;
+  background:transparent;
+  color:rgba(236,225,196,.72);
+  font-family:var(--font-title, 'Cinzel', serif);
+  font-size:10px;
+  line-height:1;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:color .2s ease, background .2s ease, box-shadow .2s ease;
+  white-space:nowrap;
+}
+.nav-rule-btn::after{
+  content:'▾';
+  font-size:9px;
+  line-height:1;
+  color:rgba(201,169,97,.75);
+  transform:translateY(-1px);
+}
+.nav-rule-btn:hover,
+.nav-rule-group.open .nav-rule-btn,
+.nav-rule-group.active .nav-rule-btn{
+  color:var(--gold-bright, #f0d98a);
+  background:rgba(201,169,97,.08);
+  box-shadow:inset 0 0 0 1px rgba(201,169,97,.22);
+}
+.nav-rule-menu{
+  position:absolute;
+  top:calc(100% + 8px);
+  left:0;
+  min-width:230px;
+  padding:8px;
+  border:1px solid rgba(201,169,97,.25);
+  border-radius:14px;
+  background:rgba(12,10,8,.96);
+  box-shadow:0 18px 40px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.035);
+  backdrop-filter:blur(10px);
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(-6px);
+  pointer-events:none;
+  transition:opacity .16s ease, transform .16s ease, visibility .16s ease;
+  z-index:999;
+}
+.nav-rule-group:hover .nav-rule-menu,
+.nav-rule-group.open .nav-rule-menu,
+.nav-rule-group:focus-within .nav-rule-menu{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+  pointer-events:auto;
+}
+.nav-rule-menu a{
+  display:block;
+  padding:9px 11px;
+  border-radius:9px;
+  color:rgba(236,225,196,.78);
+  font-size:10px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  text-decoration:none;
+  white-space:nowrap;
+  transition:color .15s ease, background .15s ease;
+}
+.nav-rule-menu a:hover,
+.nav-rule-menu a:focus,
+.nav-rule-menu a.active{
+  color:var(--gold-bright, #f0d98a);
+  background:rgba(201,169,97,.10);
+  outline:none;
+}
+.nav-links .nav-rule-menu a::before,
+.nav-links .nav-rule-menu a::after{
+  content:none !important;
+}
+@media (max-width:760px){
+  .nav-rule-menu{
+    left:auto;
+    right:0;
+    min-width:220px;
+  }
+}

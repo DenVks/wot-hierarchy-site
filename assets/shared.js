@@ -21,6 +21,104 @@
 (function(){const path=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.nav-links a').forEach(a=>{const href=a.getAttribute('href');a.classList.toggle('active',href===path);});})();
 
 
+/* ==== v50: compact Rules dropdown in top navigation ==== */
+(function(){
+  'use strict';
+  const nav = document.querySelector('.nav-links');
+  if(!nav || nav.querySelector('.nav-rule-group')) return;
+
+  const path = (location.pathname.split('/').pop() || 'index.html');
+  const ruleItems = [
+    {href:'classes.html', label:'Классы'},
+    {href:'weaves.html', label:'Плетения'},
+    {href:'classes.html#class-all-features-section', label:'Дополнительные черты'},
+    {href:'unity.html', label:'Единство'},
+    {href:'throne.html', label:'Трон'},
+    {href:'madding.html', label:'Хранители'},
+    {href:'hierarchy-wall.html', label:'Иерархия Стены'},
+    {href:'order.html', label:'Орден'}
+  ];
+  const groupedPages = new Set(ruleItems.map(i => i.href.split('#')[0]));
+
+  const existing = new Map();
+  Array.from(nav.querySelectorAll('a')).forEach(a => existing.set(a.getAttribute('href'), a));
+  let insertionPoint = existing.get('rituals.html') || existing.get('hierarchies.html') || existing.get('anomalies.html') || null;
+
+  // Remove grouped top-level links from the long horizontal navigation.
+  Array.from(nav.querySelectorAll('a')).forEach(a => {
+    const href = (a.getAttribute('href') || '').split('#')[0];
+    if(groupedPages.has(href)) a.remove();
+  });
+
+  const group = document.createElement('div');
+  group.className = 'nav-rule-group';
+  if(groupedPages.has(path)) group.classList.add('active');
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'nav-rule-btn';
+  btn.setAttribute('aria-haspopup','true');
+  btn.setAttribute('aria-expanded','false');
+  btn.textContent = 'Правила';
+
+  const menu = document.createElement('div');
+  menu.className = 'nav-rule-menu';
+  menu.setAttribute('role','menu');
+
+  ruleItems.forEach(item => {
+    const a = document.createElement('a');
+    a.href = item.href;
+    a.textContent = item.label;
+    a.setAttribute('role','menuitem');
+    if(item.href.split('#')[0] === path) a.classList.add('active');
+    menu.appendChild(a);
+  });
+
+  group.appendChild(btn);
+  group.appendChild(menu);
+
+  if(insertionPoint && insertionPoint.parentNode === nav){
+    insertionPoint.insertAdjacentElement('afterend', group);
+  } else {
+    nav.appendChild(group);
+  }
+
+  function setOpen(open){
+    group.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+  }
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    setOpen(!group.classList.contains('open'));
+  });
+  btn.addEventListener('keydown', e => {
+    if(e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      setOpen(true);
+      const first = menu.querySelector('a');
+      if(first) first.focus();
+    }
+  });
+  menu.addEventListener('keydown', e => {
+    const links = Array.from(menu.querySelectorAll('a'));
+    const i = links.indexOf(document.activeElement);
+    if(e.key === 'Escape'){
+      setOpen(false);
+      btn.focus();
+    } else if(e.key === 'ArrowDown'){
+      e.preventDefault();
+      links[(i + 1 + links.length) % links.length].focus();
+    } else if(e.key === 'ArrowUp'){
+      e.preventDefault();
+      links[(i - 1 + links.length) % links.length].focus();
+    }
+  });
+  document.addEventListener('click', e => {
+    if(!group.contains(e.target)) setOpen(false);
+  });
+})();
+
+
 (function(){
   const nav = document.querySelector('.nav-links');
   if(!nav) return;
