@@ -2457,13 +2457,26 @@ function rollSpellDamage(dmgExpr, label, resultTarget) {
   }
 }
 
+function escAttr(v) {
+  return String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
 function spellDamageButton(dmgExpr, label, resultId) {
   const cleanExpr = extractSpellDamageExpr(dmgExpr);
   if (!cleanExpr) return '';
   const safeId = resultId || ('sp-dmg-result-' + Math.random().toString(36).slice(2));
-  return ' <button class="sp-dmg-roll" type="button" title="Бросить урон" onclick="event.stopPropagation(); rollSpellDamage(' + JSON.stringify(dmgExpr) + ', ' + JSON.stringify(label) + ', this);">🎲</button><span id="' + safeId + '" class="sp-dmg-result" title="Результат броска урона"></span>';
+  return ' <button class="sp-dmg-roll" type="button" title="Бросить урон" data-dmg="' + escAttr(dmgExpr) + '" data-label="' + escAttr(label || 'Урон плетения') + '" data-result-id="' + escAttr(safeId) + '">🎲</button><span id="' + escAttr(safeId) + '" class="sp-dmg-result" title="Результат броска урона"></span>';
 }
 
+// Делегированный обработчик вместо inline-onclick.
+// Inline-обработчик ломался из-за JSON.stringify внутри HTML-атрибута в двойных кавычках.
+document.addEventListener('click', function(e) {
+  const btn = e.target && e.target.closest ? e.target.closest('.sp-dmg-roll') : null;
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  rollSpellDamage(btn.getAttribute('data-dmg') || '', btn.getAttribute('data-label') || 'Урон плетения', btn);
+});
 // ── HP System ────────────────────────────────────────────────────────────
 let hpModalNpcId = null;
 function openHpModal(id) {
