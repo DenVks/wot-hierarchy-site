@@ -3081,3 +3081,51 @@ nav.sitenav .inner{overflow:visible;}
   background:rgba(201,169,97,.10);
   outline:none;
 }
+
+/* ==== v53: DM Toolkit dropdown and mobile hardening ==== */
+.nav-dm-group{
+  margin-left:auto !important;
+}
+.nav-dm-btn{
+  border-color:rgba(190,61,48,.34) !important;
+  background:linear-gradient(135deg,rgba(190,61,48,.14),rgba(0,0,0,.08)) !important;
+}
+.nav-dm-group.active .nav-dm-btn,
+.nav-dm-group.open .nav-dm-btn,
+.nav-dm-btn:hover{
+  color:#ffd8c7 !important;
+  border-color:rgba(232,122,122,.56) !important;
+}
+.nav-dm-menu{
+  border-color:rgba(232,122,122,.28) !important;
+  background:linear-gradient(145deg,rgba(20,10,10,.98),rgba(9,8,10,.98)) !important;
+}
+.nav-dm-menu a:hover,
+.nav-dm-menu a:focus,
+.nav-dm-menu a.active{
+  color:#ffd8c7 !important;
+  background:rgba(190,61,48,.13) !important;
+}
+.dm-toolkit-auth-overlay{z-index:10000;}
+
+/* Base mobile safety for wide rules pages */
+.table-wrap,
+.table-scroll,
+.data-table-wrap{
+  max-width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.data-table,
+.compact-table{
+  max-width:100%;
+}
+@media(max-width:760px){
+  .nav-dm-group{margin-left:4px !important;}
+  .nav-rule-menu-floating{max-width:calc(100vw - 24px);}
+  .nav-rule-menu-floating a{white-space:normal;line-height:1.35;}
+  .sitenav .inner{gap:8px;}
+  .page-header h1{word-break:normal;overflow-wrap:anywhere;}
+  .data-table,.compact-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .data-table th,.data-table td,.compact-table th,.compact-table td{min-width:96px;}
+}

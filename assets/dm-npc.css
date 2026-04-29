@@ -681,3 +681,20 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .sp-dmg-result{display:none!important}
 .sp-dmg-roll{min-width:26px;text-align:center;user-select:none}
 .sp-dmg-roll.rolled{min-width:48px;background:var(--warning-bg);border-color:var(--gold);color:var(--gold2);font-weight:700;box-shadow:0 0 8px rgba(201,168,76,.25)}
+
+/* v53: DM Toolkit password overlay for standalone NPC page */
+html.auth-lock body > *:not(.auth-overlay){filter:blur(5px);pointer-events:none;user-select:none;}
+.auth-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(circle at 50% 30%,rgba(201,169,97,.16),transparent 32%),rgba(5,4,7,.88);backdrop-filter:blur(10px);}
+.auth-modal{width:min(92vw,460px);border:1px solid rgba(201,169,97,.34);border-radius:26px;padding:30px 28px 28px;background:linear-gradient(145deg,rgba(28,23,26,.98),rgba(10,9,14,.98));box-shadow:0 28px 90px rgba(0,0,0,.68),inset 0 1px 0 rgba(255,255,255,.05);text-align:center;color:#eadfc4;position:relative;overflow:hidden;}
+.auth-sigil{width:70px;height:70px;margin:0 auto 16px;border:1px solid rgba(201,169,97,.38);border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(201,169,97,.16),rgba(0,0,0,.18));}
+.auth-sigil span{width:34px;height:34px;border:2px solid rgba(237,213,150,.84);transform:rotate(45deg);display:block;}
+.auth-kicker{font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.22em;font-size:11px;color:#c9a84c;margin:0 0 8px;}
+.auth-modal h1{font-family:Cinzel,serif;font-size:30px;line-height:1.05;margin:0 0 10px;color:#f5dfa0;}
+.auth-text{font-size:16px;line-height:1.55;color:#cfc3aa;margin:0 auto 22px;max-width:36ch;}
+.auth-form{display:grid;gap:10px;text-align:left;}
+.auth-form label{font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:#c9a84c;}
+.auth-form input{width:100%;box-sizing:border-box;border:1px solid rgba(201,169,97,.28);border-radius:14px;background:rgba(0,0,0,.28);color:#f0e6ce;padding:13px 14px;font:16px Cinzel,serif;outline:none;}
+.auth-form input:focus{border-color:rgba(237,213,150,.75);box-shadow:0 0 0 3px rgba(201,169,97,.12);}
+.auth-form input.auth-input-error{border-color:rgba(190,61,48,.85);box-shadow:0 0 0 3px rgba(190,61,48,.14);}
+.auth-error{min-height:18px;margin:0;color:#e7a39a;font-size:13px;}
+.auth-form button{border:1px solid rgba(201,169,97,.42);border-radius:14px;padding:13px 18px;background:linear-gradient(135deg,rgba(201,169,97,.28),rgba(105,70,36,.38));color:#fff4d7;font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.14em;cursor:pointer;}
