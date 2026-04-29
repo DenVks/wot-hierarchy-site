@@ -2811,10 +2811,12 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') { hideW
 
 // ── Class feature modal / lookup from classes.html data ─────────────────────
 function normalizeFeatureName(name){
-  return String(name || '')
+  let s = String(name || '')
     .replace(/[⚡⛔✅❌⭐★]/g,'')
     .replace(/\([^)]*(?:ур\.|НЕДОСТУП|крит|слот)[^)]*\)/gi,'')
     .replace(/\([^)]*\)/g,'')
+    .replace(/\d+\s*[кkдd]\s*\d+/gi,'')
+    .replace(/\d+\s*[кkдd]\b/gi,'')
     .replace(/×\d+/g,'')
     .replace(/\bур\.?\s*\d+\b/gi,'')
     .replace(/:.*/,'')
@@ -2822,6 +2824,17 @@ function normalizeFeatureName(name){
     .replace(/\s+/g,' ')
     .trim()
     .toLowerCase();
+  s = s.replace(/доп\.?\s+/g,'дополнительная ')
+       .replace(/улучш\.?\s+/g,'улучшенный ')
+       .replace(/тяж\.?\s+/g,'тяжелых ')
+       .replace(/сред\.?\s+/g,'средних ')
+       .replace(/скрытная атака/g,'скрытая атака')
+       .replace(/всплеск действий/g,'всплеск действия')
+       .replace(/безмозглая ярость/g,'бездумная ярость')
+       .replace(/инстинктивная ловкость/g,'дикий инстинкт')
+       .replace(/\s+/g,' ')
+       .trim();
+  return s;
 }
 function escHtml(v){
   return String(v ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
@@ -2839,7 +2852,11 @@ function npcClassContexts(c){
   else if (text.includes('командир') || text.includes('мастер по оружию') || text.includes('мечник')) add('Мастер по оружию',null);
   if (text.includes('дичок')) add('Дичок', null);
   if (text.includes('посвящ') || text.includes('аша') || text.includes('айз седай') || text.includes('ищущ')) add('Посвящённый', text.includes('аша') ? "Аша'ман (Asha'man)" : text.includes('айз седай') ? 'Айз Седай' : null);
-  if (text.includes('лесник')) add('Лесник', null);
+  if (text.includes('лесник')) {
+    const a = text.includes('разведчик') ? 'Разведчик' : text.includes('охотник') ? 'Охотник' : text.includes('мастер зверей') ? 'Мастер зверей' : null;
+    add('Лесник', a);
+  }
+  if (text.includes('варвар') || text.includes('берсерк')) add('Варвар', text.includes('берсерк') ? 'Путь Берсерка' : null);
   if (text.includes('благород')) add('Благородный', null);
   return ctx;
 }
@@ -2870,13 +2887,38 @@ function findClassFeatureForNpc(c, abilityName){
   }
   return null;
 }
+
+function findExtraFeatForNpc(c, abilityName){
+  const db = window.WOT_FEATS_DB || {feats:[]};
+  const key = normalizeFeatureName(abilityName);
+  if(!key) return null;
+  const text = [c.sh, c.ti].concat(c.tags || []).join(' ').toLowerCase();
+  const candidates = (db.feats || []).filter(f => {
+    const fKey = normalizeFeatureName(f.name);
+    if(!fKey) return false;
+    const nameMatch = fKey === key || fKey.includes(key) || key.includes(fKey);
+    if(!nameMatch) return false;
+    const cls = String(f.cls || '').toLowerCase();
+    if(!cls || cls === '—' || cls === '-' || cls === 'любой') return true;
+    if(cls.includes('направля')) return text.includes('направля') || text.includes('дичок') || text.includes('ашаман') || text.includes('айз седай');
+    if(cls.includes('лесник')) return text.includes('лесник') || text.includes('следопыт');
+    return text.includes(cls);
+  });
+  if(!candidates.length) return null;
+  candidates.sort((a,b)=>String(a.book||'').localeCompare(String(b.book||''),'ru'));
+  return candidates[0];
+}
+function findFeatureInfoForNpc(c, abilityName){
+  const cls = findClassFeatureForNpc(c, abilityName);
+  if(cls) return {source:'classes.html', type:'class', data:cls};
+  const feat = findExtraFeatForNpc(c, abilityName);
+  if(feat) return {source:'feats.html', type:'feat', data:feat};
+  return null;
+}
+
 function classFeatureInfoButton(npcId, abilityName){
-  const safe = String(abilityName || '').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-  return '<button class="sp-info-btn feature-info-btn" title="Показать полное описание черты из classes.html" type="button" '+
-    'onmouseenter="showClassFeatureModal('+npcId+',\''+safe+'\',event,true)" '+
-    'onfocus="showClassFeatureModal('+npcId+',\''+safe+'\',event,true)" '+
-    'onmouseleave="scheduleClassFeatureHide()" '+
-    'onclick="showClassFeatureModal('+npcId+',\''+safe+'\',event,false)">i</button>';
+  return '<button class="sp-info-btn feature-info-btn" title="Показать полное описание черты из classes.html / feats.html" type="button" '+
+    'data-npc-id="'+escHtml(npcId)+'" data-feature-name="'+escHtml(abilityName)+'">i</button>';
 }
 
 let classFeatureHideTimer = null;
@@ -2901,8 +2943,9 @@ function relatedClassFeatureRows(f){
     return xParent === parentKey || (x.parent && parentKey && parentKey === xFeature);
   }).sort((a,b)=>(Number(a.levelSort||999)-Number(b.levelSort||999)) || String(a.feature).localeCompare(String(b.feature),'ru'));
 }
-function renderClassFeatureModalContent(f, c, abilityName){
-  if(f){
+function renderClassFeatureModalContent(found, c, abilityName){
+  if(found && found.type === 'class'){
+    const f = found.data;
     const desc = String(f.description || '').split(/\n+/).filter(Boolean).map(p=>'<p>'+escHtml(p)+'</p>').join('');
     const related = relatedClassFeatureRows(f);
     const relatedHtml = related.length ? '<div class="weave-pop-upcast"><strong>Связанные уточнения / развитие черты</strong>'+
@@ -2915,17 +2958,26 @@ function renderClassFeatureModalContent(f, c, abilityName){
       '<div class="weave-pop-meta"><div><b>Категория</b><em>'+escHtml(f.category || 'Черта')+'</em></div><div><b>Источник</b><em>classes.html</em></div></div>'+
       '<div class="weave-pop-desc">'+desc+'</div>'+relatedHtml;
   }
+  if(found && found.type === 'feat'){
+    const f = found.data;
+    const desc = (Array.isArray(f.desc) ? f.desc : [f.desc]).filter(Boolean).map(p=>'<p>'+escHtml(p)+'</p>').join('');
+    return '<button class="weave-pop-close" onclick="hideClassFeatureModal()">×</button>'+
+      '<div class="weave-pop-kicker">Дополнительная черта · '+escHtml(f.book || '—')+'</div>'+
+      '<h3>'+escHtml(f.name)+'</h3>'+
+      '<div class="weave-pop-meta"><div><b>Требование</b><em>'+escHtml(f.req || '—')+'</em></div><div><b>Класс</b><em>'+escHtml(f.cls || '—')+'</em></div><div><b>Источник</b><em>feats.html</em></div></div>'+
+      '<div class="weave-pop-desc">'+desc+'</div>';
+  }
   const fallback = (c.ab||[]).find(a => normalizeFeatureName(a.n) === normalizeFeatureName(abilityName));
-  const fallbackDesc = fallback ? fallback.d : 'Для этой записи нет точного совпадения в базе классов.';
+  const fallbackDesc = fallback ? fallback.d : 'Для этой записи нет точного совпадения в базе классов или дополнительных черт.';
   return '<button class="weave-pop-close" onclick="hideClassFeatureModal()">×</button>'+
-    '<div class="weave-pop-kicker">Описание не найдено в classes.html</div>'+
+    '<div class="weave-pop-kicker">Описание не найдено в classes.html / feats.html</div>'+
     '<h3>'+escHtml(abilityName)+'</h3>'+
     '<div class="weave-pop-desc">'+String(fallbackDesc || '').split(/\n+/).filter(Boolean).map(p=>'<p>'+escHtml(p)+'</p>').join('')+'</div>';
 }
 function showClassFeatureModal(npcId, abilityName, event, hoverMode){
   const c = CS.find(x=>x.id===npcId);
   if(!c) return;
-  const f = findClassFeatureForNpc(c, abilityName);
+  const f = findFeatureInfoForNpc(c, abilityName);
   let pop = document.getElementById('class-feature-popover');
   if(!pop){
     pop = document.createElement('div');
@@ -2955,6 +3007,31 @@ function hideClassFeatureModal(){
   const pop=document.getElementById('class-feature-popover');
   if(pop){ pop.style.display='none'; pop.dataset.locked='0'; pop.dataset.hover='0'; }
 }
+
+// Delegated handlers for feature info buttons. Avoid inline JS: feature names may contain apostrophes.
+document.addEventListener('mouseover', e => {
+  const btn = e.target.closest && e.target.closest('.feature-info-btn');
+  if(!btn) return;
+  showClassFeatureModal(Number(btn.dataset.npcId), btn.dataset.featureName || '', {currentTarget: btn}, true);
+});
+document.addEventListener('mouseout', e => {
+  const btn = e.target.closest && e.target.closest('.feature-info-btn');
+  if(!btn) return;
+  const pop = document.getElementById('class-feature-popover');
+  if(pop && e.relatedTarget && (pop.contains(e.relatedTarget) || btn.contains(e.relatedTarget))) return;
+  scheduleClassFeatureHide();
+});
+document.addEventListener('focusin', e => {
+  const btn = e.target.closest && e.target.closest('.feature-info-btn');
+  if(!btn) return;
+  showClassFeatureModal(Number(btn.dataset.npcId), btn.dataset.featureName || '', {currentTarget: btn}, true);
+});
+document.addEventListener('click', e => {
+  const btn = e.target.closest && e.target.closest('.feature-info-btn');
+  if(!btn) return;
+  e.preventDefault();
+  showClassFeatureModal(Number(btn.dataset.npcId), btn.dataset.featureName || '', {currentTarget: btn}, false);
+});
 
 // ── Show NPC ─────────────────────────────────────────────────────────────
 const lvClass = lv => lv<=1?'sp-lv1':lv===2?'sp-lv2':lv===3?'sp-lv3':lv===4?'sp-lv4':lv>=5&&lv<=6?'sp-lv5':lv>=7&&lv<=8?'sp-lv7':'sp-lv9';
