@@ -21,31 +21,28 @@
 (function(){const path=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.nav-links a').forEach(a=>{const href=a.getAttribute('href');a.classList.toggle('active',href===path);});})();
 
 
-/* ==== v50: compact Rules dropdown in top navigation ==== */
+/* ==== v51: compact Rules dropdown in top navigation — fixed outside clipped nav-links ==== */
 (function(){
   'use strict';
-  const nav = document.querySelector('.nav-links');
-  if(!nav || nav.querySelector('.nav-rule-group')) return;
+  const topNav = document.querySelector('nav.sitenav .inner');
+  const navLinks = document.querySelector('.nav-links');
+  if(!topNav || !navLinks || topNav.querySelector('.nav-rule-group')) return;
 
   const path = (location.pathname.split('/').pop() || 'index.html');
   const ruleItems = [
     {href:'classes.html', label:'Классы'},
     {href:'weaves.html', label:'Плетения'},
-    {href:'classes.html#class-all-features-section', label:'Дополнительные черты'},
+    {href:'feats.html', label:'Дополнительные черты'},
     {href:'unity.html', label:'Единство'},
     {href:'throne.html', label:'Трон'},
     {href:'madding.html', label:'Хранители'},
     {href:'hierarchy-wall.html', label:'Иерархия Стены'},
     {href:'order.html', label:'Орден'}
   ];
+  window.WOT_RULE_ITEMS = ruleItems.slice();
   const groupedPages = new Set(ruleItems.map(i => i.href.split('#')[0]));
 
-  const existing = new Map();
-  Array.from(nav.querySelectorAll('a')).forEach(a => existing.set(a.getAttribute('href'), a));
-  let insertionPoint = existing.get('rituals.html') || existing.get('hierarchies.html') || existing.get('anomalies.html') || null;
-
-  // Remove grouped top-level links from the long horizontal navigation.
-  Array.from(nav.querySelectorAll('a')).forEach(a => {
+  Array.from(navLinks.querySelectorAll('a')).forEach(a => {
     const href = (a.getAttribute('href') || '').split('#')[0];
     if(groupedPages.has(href)) a.remove();
   });
@@ -77,47 +74,29 @@
   group.appendChild(btn);
   group.appendChild(menu);
 
-  if(insertionPoint && insertionPoint.parentNode === nav){
-    insertionPoint.insertAdjacentElement('afterend', group);
-  } else {
-    nav.appendChild(group);
-  }
+  // Important: outside .nav-links, otherwise the horizontal scroll container clips the dropdown.
+  navLinks.insertAdjacentElement('afterend', group);
 
   function setOpen(open){
     group.classList.toggle('open', open);
     btn.setAttribute('aria-expanded', String(open));
   }
-  btn.addEventListener('click', e => {
-    e.stopPropagation();
-    setOpen(!group.classList.contains('open'));
-  });
+  btn.addEventListener('click', e => { e.stopPropagation(); setOpen(!group.classList.contains('open')); });
   btn.addEventListener('keydown', e => {
     if(e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' '){
-      e.preventDefault();
-      setOpen(true);
-      const first = menu.querySelector('a');
-      if(first) first.focus();
+      e.preventDefault(); setOpen(true);
+      const first = menu.querySelector('a'); if(first) first.focus();
     }
   });
   menu.addEventListener('keydown', e => {
     const links = Array.from(menu.querySelectorAll('a'));
     const i = links.indexOf(document.activeElement);
-    if(e.key === 'Escape'){
-      setOpen(false);
-      btn.focus();
-    } else if(e.key === 'ArrowDown'){
-      e.preventDefault();
-      links[(i + 1 + links.length) % links.length].focus();
-    } else if(e.key === 'ArrowUp'){
-      e.preventDefault();
-      links[(i - 1 + links.length) % links.length].focus();
-    }
+    if(e.key === 'Escape'){ setOpen(false); btn.focus(); }
+    else if(e.key === 'ArrowDown'){ e.preventDefault(); links[(i + 1 + links.length) % links.length].focus(); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); links[(i - 1 + links.length) % links.length].focus(); }
   });
-  document.addEventListener('click', e => {
-    if(!group.contains(e.target)) setOpen(false);
-  });
+  document.addEventListener('click', e => { if(!group.contains(e.target)) setOpen(false); });
 })();
-
 
 (function(){
   const nav = document.querySelector('.nav-links');
@@ -149,10 +128,20 @@
     {title:'Мир', items:['index.html','epoch.html','chronicles.html']},
     {title:'Иерархии', items:['hierarchies.html','unity.html','throne.html','madding.html','hierarchy-wall.html']},
     {title:'Орден и аномалии', items:['order.html','wall.html','anomalies.html','tsitadel.html']},
-    {title:'Игровые инструменты', items:['rituals.html','classes.html','weaves.html','ingredients.html','loot-generator.html','encounter-generator.html','monsters.html','dm-npc.html']},
+    {title:'Игровые инструменты', items:['rituals.html','classes.html','weaves.html','feats.html','ingredients.html','loot-generator.html','encounter-generator.html','monsters.html','dm-npc.html']},
     {title:'Народы', items:['aiel.html','tuataan.html','freefolk.html']}
   ];
   const byHref = new Map(navLinks.map(a => [a.getAttribute('href'), a.textContent.trim()]));
+  (window.WOT_RULE_ITEMS || [
+    {href:'classes.html', label:'Классы'},
+    {href:'weaves.html', label:'Плетения'},
+    {href:'feats.html', label:'Дополнительные черты'},
+    {href:'unity.html', label:'Единство'},
+    {href:'throne.html', label:'Трон'},
+    {href:'madding.html', label:'Хранители'},
+    {href:'hierarchy-wall.html', label:'Иерархия Стены'},
+    {href:'order.html', label:'Орден'}
+  ]).forEach(i => { if(!byHref.has(i.href)) byHref.set(i.href, i.label); });
   const path = (location.pathname.split('/').pop() || 'index.html');
 
   const toggle = document.createElement('button');
