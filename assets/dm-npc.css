@@ -675,3 +675,9 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 
 /* v47: result is visible directly in the spell damage dice button */
 .sp-dmg-roll.rolled{background:var(--warning-bg);border-color:var(--gold);color:var(--gold2);font-weight:700;min-width:44px;box-shadow:0 0 8px rgba(201,168,76,.25)}
+
+
+/* v49: результат урона плетения отображается только в самой кнопке */
+.sp-dmg-result{display:none!important}
+.sp-dmg-roll{min-width:26px;text-align:center;user-select:none}
+.sp-dmg-roll.rolled{min-width:48px;background:var(--warning-bg);border-color:var(--gold);color:var(--gold2);font-weight:700;box-shadow:0 0 8px rgba(201,168,76,.25)}

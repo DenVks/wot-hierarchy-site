@@ -2405,6 +2405,14 @@ function extractSpellDamageExpr(dmgExpr) {
   return parts ? parts[0] : '';
 }
 
+function resetSpellDamageButton(btn) {
+  if (!btn) return;
+  btn.textContent = '🎲';
+  btn.classList.remove('rolled');
+  btn.removeAttribute('data-last-result');
+  btn.title = 'ЛКМ — бросить урон; ПКМ или Shift+ЛКМ — сбросить результат';
+}
+
 function rollSpellDamage(dmgExpr, label, resultTarget) {
   const cleanExpr = extractSpellDamageExpr(dmgExpr);
   if (!cleanExpr) return;
@@ -2421,39 +2429,17 @@ function rollSpellDamage(dmgExpr, label, resultTarget) {
   });
   sum += bonus;
 
-  // v47: результат пишется прямо в кнопку и в соседний span.
-  let inline = null;
+  // v49: без модального окна и без соседнего результата.
+  // Итог виден только в самой кнопке: "🎲 37".
   let btn = null;
-
-  if (typeof resultTarget === 'string') {
-    inline = document.getElementById(resultTarget);
-  } else if (resultTarget && resultTarget.nodeType === 1) {
+  if (resultTarget && resultTarget.nodeType === 1) {
     btn = resultTarget.tagName === 'BUTTON' ? resultTarget : resultTarget.closest('button');
-    const cell = resultTarget.closest('.sp-dmg');
-    inline = cell ? cell.querySelector('.sp-dmg-result') : null;
   }
-
-  if (inline) {
-    inline.textContent = String(sum);
-    inline.classList.remove('show');
-    void inline.offsetWidth;
-    inline.classList.add('show');
-  }
-
   if (btn) {
     btn.textContent = '🎲 ' + sum;
     btn.classList.add('rolled');
-    btn.title = (label || 'Урон плетения') + ': ' + sum;
-  }
-
-  const modal = document.getElementById('dice-modal');
-  if (modal) {
-    modal.className = 'dice-modal spell-roll-visible';
-    document.getElementById('dice-modal-title').textContent = label || 'Урон плетения';
-    document.getElementById('dice-modal-result').textContent = sum;
-    document.getElementById('dice-modal-detail').textContent = '';
-    modal.style.display = 'block';
-    setTimeout(() => modal.style.display='none', 5000);
+    btn.setAttribute('data-last-result', String(sum));
+    btn.title = (label || 'Урон плетения') + ': ' + sum + '. ПКМ или Shift+ЛКМ — сбросить.';
   }
 }
 
@@ -2461,21 +2447,32 @@ function escAttr(v) {
   return String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 }
 
-function spellDamageButton(dmgExpr, label, resultId) {
+function spellDamageButton(dmgExpr, label) {
   const cleanExpr = extractSpellDamageExpr(dmgExpr);
   if (!cleanExpr) return '';
-  const safeId = resultId || ('sp-dmg-result-' + Math.random().toString(36).slice(2));
-  return ' <button class="sp-dmg-roll" type="button" title="Бросить урон" data-dmg="' + escAttr(dmgExpr) + '" data-label="' + escAttr(label || 'Урон плетения') + '" data-result-id="' + escAttr(safeId) + '">🎲</button><span id="' + escAttr(safeId) + '" class="sp-dmg-result" title="Результат броска урона"></span>';
+  return ' <button class="sp-dmg-roll" type="button" title="ЛКМ — бросить урон; ПКМ или Shift+ЛКМ — сбросить результат" data-dmg="' + escAttr(dmgExpr) + '" data-label="' + escAttr(label || 'Урон плетения') + '">🎲</button>';
 }
 
-// Делегированный обработчик вместо inline-onclick.
-// Inline-обработчик ломался из-за JSON.stringify внутри HTML-атрибута в двойных кавычках.
+// Делегированный обработчик кнопок урона плетений.
+// ЛКМ — бросить/перебросить. Shift+ЛКМ или ПКМ — сбросить результат до "🎲".
 document.addEventListener('click', function(e) {
   const btn = e.target && e.target.closest ? e.target.closest('.sp-dmg-roll') : null;
   if (!btn) return;
   e.preventDefault();
   e.stopPropagation();
+  if (e.shiftKey) {
+    resetSpellDamageButton(btn);
+    return;
+  }
   rollSpellDamage(btn.getAttribute('data-dmg') || '', btn.getAttribute('data-label') || 'Урон плетения', btn);
+});
+
+document.addEventListener('contextmenu', function(e) {
+  const btn = e.target && e.target.closest ? e.target.closest('.sp-dmg-roll') : null;
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  resetSpellDamageButton(btn);
 });
 // ── HP System ────────────────────────────────────────────────────────────
 let hpModalNpcId = null;
@@ -3208,7 +3205,7 @@ ${c.spells.map((sp,spi)=>`<tr>
 <td class="sp-dc">${sp.t}</td><td class="sp-dc">${sp.r||'—'}</td>
 <td class="sp-dc">${sp.dur||'Мгн.'}</td><td class="sp-dc">${sp.sb}</td>
 <td class="sp-dc">${sp.slot!=null?sp.slot:sp.lv===0?'0':sp.lv+' ур.'}</td>
-<td class="sp-dmg">${sp.dmg||'—'}${spellDamageButton(sp.dmg, sp.n, 'sp-dmg-result-' + id + '-' + spi)}</td>
+<td class="sp-dmg">${sp.dmg||'—'}${spellDamageButton(sp.dmg, sp.n)}</td>
 <td class="sp-note">${sp.ef}</td></tr>`).join('')}
 </tbody></table></div></div>`;
     }
