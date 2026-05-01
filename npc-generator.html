@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DM Toolkit · NPC Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css?v=60">
+<link rel="stylesheet" href="assets/npc-generator.css?v=60">
+<script src="assets/auth.js?v=60"></script>
+</head>
+<body>
+<div class="dm-tool-badge">DM Toolkit · NPC Generator</div>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>NPC Generator</h1>
+      <p class="lead">Черновая сборка NPC из баз сайта: классы, архетипы, дополнительные черты, плетения и иерархии. Финальная карточка остаётся за ГМ.</p>
+    </div>
+    <a class="back" href="index.html">← на сайт</a>
+  </div>
+  <div class="layout">
+    <section class="panel">
+      <h2>1. Концепция</h2>
+      <div class="field"><label>Имя</label><input id="npc-name" value="Новый NPC"></div>
+      <div class="grid2">
+        <div class="field"><label>Нация</label><input id="npc-nation" value="Андор"></div>
+        <div class="field"><label>Уровень</label><input id="npc-level" type="number" min="1" max="20" value="7"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Класс</label><select id="npc-class"></select></div>
+        <div class="field"><label>Архетип</label><select id="npc-arch"></select></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Роль</label><select id="npc-role"><option>Фронтлайн</option><option>Стрелок</option><option>Скиталец</option><option>Направляющий</option><option>Командир</option><option>Сбалансированный</option></select></div>
+        <div class="field"><label>Опасность</label><select id="npc-threat"><option>Обычный</option><option>Элитный</option><option>Мини-босс</option><option>Босс</option></select></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Фракция / Иерархия</label><select id="npc-faction"><option value="none">Без иерархии</option><option value="unity">Единство</option><option value="throne">Хрустальный Трон</option><option value="guild">Хранители Фар Мэддинга</option><option value="order">Орден</option><option value="wall">Иерархия Стены</option></select></div>
+        <div class="field"><label>Ранг</label><select id="npc-rank"><option value="0">—</option><option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option></select></div>
+      </div>
+      <h2>2. Характеристики</h2>
+      <div class="grid2">
+        <div class="field"><label>СИЛ</label><input id="str" type="number" min="1" max="30" value="14"></div>
+        <div class="field"><label>ЛОВ</label><input id="dex" type="number" min="1" max="30" value="14"></div>
+        <div class="field"><label>ТЕЛ</label><input id="con" type="number" min="1" max="30" value="14"></div>
+        <div class="field"><label>ИНТ</label><input id="int" type="number" min="1" max="30" value="10"></div>
+        <div class="field"><label>МДР</label><input id="wis" type="number" min="1" max="30" value="14"></div>
+        <div class="field"><label>ХАР</label><input id="cha" type="number" min="1" max="30" value="10"></div>
+      </div>
+      <div class="actions"><button type="button" id="apply-template">Применить роль</button><button type="button" id="generate">Собрать черновик</button></div>
+      <h2>3. Дополнительные черты</h2>
+      <div class="field"><input id="feat-search" placeholder="Фильтр черт..."></div>
+      <div class="checks" id="feat-list"></div>
+      <h2>4. Плетения</h2>
+      <div class="field"><label>Выбрать плетения вручную</label><textarea id="npc-weaves" placeholder="Например: Воздушный кулак, Огненный шар, Щит"></textarea></div>
+      <div class="actions"><button type="button" class="secondary" id="copy-export">Копировать JS</button><button type="button" id="save-local">Добавить в этот браузер</button><button type="button" class="danger" id="clear-custom">Очистить пользовательских NPC</button></div>
+    </section>
+    <section class="panel">
+      <h2>Черновая карточка</h2>
+      <div id="preview"></div>
+      <h2>Проверка</h2>
+      <div id="validation"></div>
+      <h2>Экспорт в формат dm-npc</h2>
+      <div class="export" id="export-box">Нажмите «Собрать черновик».</div>
+    </section>
+  </div>
+</div>
+<script src="assets/classes-data.js?v=60"></script>
+<script src="assets/feats-data.js?v=60"></script>
+<script src="assets/weaves-data.js?v=60"></script>
+<script src="assets/npc-data.js?v=60"></script>
+<script src="assets/npc-generator.js?v=60"></script>
+<script src="assets/shared.js?v=60"></script>
+</body>
+</html>
