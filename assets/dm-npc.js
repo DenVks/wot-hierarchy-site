@@ -2724,9 +2724,11 @@ function renderSidebarNpcButton(c, mode){
   const pct = Math.max(0,s.curHp/c.co.hp*100);
   const clLabel = c.isClone ? (baseNpcLabel(c) + ' #' + c.cloneNo) : ((c.tags[0]||'') + (c.tags[1]&&!String(c.tags[1]).startsWith('Ур.')?' / '+c.tags[1]:''));
   const nameLabel = c.isClone ? ((getNpcById(c.baseId)||{}).sh || 'Копия') : (c.sh !== c.tags[0] && c.sh !== (c.tags[0]+'-'+c.tags[1]) ? c.sh : '');
+  // На левой панели не показываем кнопку создания копии у базовых NPC,
+  // чтобы не накладывалась на иконки/бейджи. Копия создаётся только из карточки персонажа.
   const actionHtml = c.isClone
     ? '<button class="npc-copy-btn npc-copy-remove" title="Удалить копию из сцены" onclick="event.stopPropagation(); removeEncounterClone('+c.id+')">×</button>'
-    : '<button class="npc-copy-btn" title="Добавить копию этого NPC в сцену боя" onclick="event.stopPropagation(); addEncounterClone('+c.id+')">＋</button>';
+    : '';
   btn.innerHTML = '<span class="npc-btn-icon">'+c.ic+'</span>'+
     '<span class="npc-btn-info">'+
       '<span class="npc-btn-name">'+clLabel+'</span>'+
