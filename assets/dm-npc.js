@@ -54,7 +54,13 @@ const STORAGE_KEY = 'wot_dm_npc_state_v56';
 const LEGACY_STORAGE_KEYS = ['wot_dm_npc_state_v34'];
 
 function deepCloneNpc(obj){ return JSON.parse(JSON.stringify(obj)); }
-function getNpcById(id){ return CS.find(x => Number(x.id) === Number(id)); }
+function getNpcById(id){
+  let found = CS.find(x => String(x.id) === String(id) || Number(x.id) === Number(id));
+  if(found) return found;
+  // На случай, если NPC Generator добавил NPC в localStorage уже после загрузки страницы.
+  loadCustomNpcsFromStorage();
+  return CS.find(x => String(x.id) === String(id) || Number(x.id) === Number(id));
+}
 function isEncounterClone(id){ const c=getNpcById(id); return !!(c && c.isClone); }
 function baseNpcLabel(c){ return (c.tags && c.tags[0] ? c.tags[0] : c.sh || 'NPC') + (c.tags && c.tags[1] && !String(c.tags[1]).startsWith('Ур.') ? ' / ' + c.tags[1] : ''); }
 function nextCloneNoForBase(baseId){
@@ -505,18 +511,25 @@ function buildSidebar() {
   const sb = document.getElementById('sb');
   const search = document.getElementById('sb-search').value.toLowerCase();
   const baseList = CS.filter(c => !c.isClone);
-  const filtered = baseList.filter(c => {
+  const customList = baseList.filter(c => c.custom);
+  const normalBaseList = baseList.filter(c => !c.custom);
+  const filtered = normalBaseList.filter(c => {
     if (!search) return true;
     return c.sh.toLowerCase().includes(search) || c.na.toLowerCase().includes(search) ||
       c.ti.toLowerCase().includes(search) || c.tags.some(t=>t.toLowerCase().includes(search));
   });
 
-  document.getElementById('sb-count').textContent = filtered.length + ' / ' + baseList.length + ' базовых · копий: ' + ENCOUNTER_CLONES.length;
+  document.getElementById('sb-count').textContent = (filtered.length + customList.length) + ' / ' + baseList.length + ' базовых · копий: ' + ENCOUNTER_CLONES.length;
   sb.innerHTML = '';
 
   if (ENCOUNTER_CLONES.length) {
     sb.appendChild(sidebarGroupLabel('Сцена боя · копии', '<button class="enc-clear-btn" onclick="event.stopPropagation(); clearEncounterClonesOnly()" title="Удалить все копии NPC">очистить</button>'));
     ENCOUNTER_CLONES.slice().sort((a,b)=>Number(a.id)-Number(b.id)).forEach(c => sb.appendChild(renderSidebarNpcButton(c, 'clone')));
+  }
+
+  if (customList.length) {
+    sb.appendChild(sidebarGroupLabel('Пользовательские NPC'));
+    customList.slice().sort((a,b)=>String(a.sh||a.ti).localeCompare(String(b.sh||b.ti))).forEach(c => sb.appendChild(renderSidebarNpcButton(c, 'custom')));
   }
 
   let groups = {};
@@ -927,11 +940,16 @@ function getSneakAttackExpr(c){
 }
 
 function showNPC(id) {
-  curNPC = id;
-  buildSidebar(); // update active state
   const c = getNpcById(id);
-  const s = getState(id);
   const main = document.getElementById('mn');
+  if(!c){
+    if(main) main.innerHTML = '<div class="placeholder" id="placeholder">NPC не найден. Обновите страницу или проверьте localStorage.</div>';
+    return;
+  }
+  curNPC = c.id;
+  id = c.id;
+  buildSidebar(); // update active state
+  const s = getState(c.id);
   const ph = document.getElementById('placeholder');
   if (ph) ph.style.display = 'none';
 
@@ -944,27 +962,27 @@ function showNPC(id) {
   const tabLabels = {'battle':'⚔ Бой','overview':'📊 Обзор','abilities':'✨ Черты','equipment':'🎒 Снар.','forms':'🗡 Формы','spells':'🌀 Плетения','talents':'🌟 Таланты'};
 
   let html = `
-<div class="combat-panel" id="combat-panel-${id}">
+<div class="combat-panel" id="combat-panel-${c.id}">
   <span class="cp-name">${c.ic} ${(c.tags[0]||"")+(c.tags[1]&&!c.tags[1].startsWith("Ур.")?" / "+c.tags[1]:"")+(c.sh&&c.sh!==c.tags[0]?" · "+c.sh:"")}</span>
   <div class="cp-hp-block">
     <span class="cp-hp-label">ОЗ</span>
-    <span class="cp-hp-cur ${hpColor(s.curHp,c.co.hp).replace('hp-','')}" id="cp-hp-cur" onclick="openHpModal(${id})">${s.curHp}</span>
+    <span class="cp-hp-cur ${hpColor(s.curHp,c.co.hp).replace('hp-','')}" id="cp-hp-cur" onclick="openHpModal(${c.id})">${s.curHp}</span>
     <span class="cp-hp-sep">/</span>
     <span class="cp-hp-max">${c.co.hp}</span>
     <div class="cp-hp-bar"><div class="cp-hp-fill ${hpColor(s.curHp,c.co.hp)}" id="cp-hp-fill" style="width:${Math.max(0,s.curHp/c.co.hp*100)}%"></div></div>
   </div>
-  <button class="cp-dmg-btn" onclick="openHpModal(${id})">−ОЗ</button>
-  <button class="cp-heal-btn" onclick="openHpModal(${id})">+ОЗ</button>
-  <button class="cp-reset-btn" onclick="resetHP(${id})" title="Восстановить полные ОЗ">↺</button>
-  ${c.isClone ? `<button class="cp-reset-btn cp-clone-remove" onclick="removeEncounterClone(${id})" title="Удалить эту копию из сцены">× копия</button>` : `<button class="cp-reset-btn cp-clone-add" onclick="addEncounterClone(${id})" title="Создать ещё одну копию этого NPC">＋ копия</button>`}
-  ${c.custom && !c.isClone ? `<button class="cp-reset-btn cp-custom-remove" onclick="deleteCustomNpcFromBrowser(${id})" title="Удалить пользовательского NPC из этого браузера">× удалить NPC</button>` : ``}
+  <button class="cp-dmg-btn" onclick="openHpModal(${c.id})">−ОЗ</button>
+  <button class="cp-heal-btn" onclick="openHpModal(${c.id})">+ОЗ</button>
+  <button class="cp-reset-btn" onclick="resetHP(${c.id})" title="Восстановить полные ОЗ">↺</button>
+  ${c.isClone ? `<button class="cp-reset-btn cp-clone-remove" onclick="removeEncounterClone(${c.id})" title="Удалить эту копию из сцены">× копия</button>` : `<button class="cp-reset-btn cp-clone-add" onclick="addEncounterClone(${c.id})" title="Создать ещё одну копию этого NPC">＋ копия</button>`}
+  ${c.custom && !c.isClone ? `<button class="cp-reset-btn cp-custom-remove" onclick="deleteCustomNpcFromBrowser(${c.id})" title="Удалить пользовательского NPC из этого браузера">× удалить NPC</button>` : ``}
   <div class="cp-ac-box"><div class="cp-ac-val">${c.co.ac}</div><div class="cp-ac-lbl">КД</div></div>
-  <div class="cp-ini-box" onclick="addToIni(${id})" title="Добавить в трекер инициативы"><div class="cp-ini-val">${c.co.ini}</div><div class="cp-ini-lbl">Иниц.</div></div>
+  <div class="cp-ini-box" onclick="addToIni(${c.id})" title="Добавить в трекер инициативы"><div class="cp-ini-val">${c.co.ini}</div><div class="cp-ini-lbl">Иниц.</div></div>
   <div class="cp-sp-box"><div class="cp-sp-val">${c.co.sp} фт</div><div class="cp-sp-lbl">Скор.</div></div>
   <div class="cp-pass-box" title="Пассивное восприятие"><div class="cp-pass-val">${c.co.pp}</div><div class="cp-pass-lbl">Пасс ВСПР</div></div>
   <div class="cp-pass-box" title="Пассивная проницательность"><div class="cp-pass-val">${getPassiveInsight(c)}</div><div class="cp-pass-lbl">Пасс ПРН</div></div>
   <div class="cond-panel">
-    ${COND_KEYS.map(k=>`<button class="cond-toggle${s.conditions.includes(k)?' on-'+k:''}" id="ct-${k}" onclick="toggleCondition(${id},'${k}')">${COND_LABELS[k]}</button>`).join('')}
+    ${COND_KEYS.map(k=>`<button class="cond-toggle${s.conditions.includes(k)?' on-'+k:''}" id="ct-${k}" onclick="toggleCondition(${c.id},'${k}')">${COND_LABELS[k]}</button>`).join('')}
   </div>
 </div>`;
 

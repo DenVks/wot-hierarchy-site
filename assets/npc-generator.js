@@ -33,16 +33,40 @@ function getBaseStats(){return statKeys.reduce((o,k)=>(o[k]=Number($(k).value)||
 function getClass(){return $('npc-class').value}
 function getArch(){return $('npc-arch').value}
 function getNation(){return $('npc-nation').value.trim()||'—'}
-function primaryStats(cls,role,faction){
-  if(faction&&faction!=='none'&&rules.hierarchies&&rules.hierarchies[faction]) return rules.hierarchies[faction].priority||['str','con'];
-  if(/Варвар/.test(cls)) return ['str','con'];
-  if(/Мастер по оружию|Пустынный/.test(cls)) return ['str','dex','con'];
-  if(/Скиталец/.test(cls)) return ['dex','int','cha'];
-  if(/Лесник/.test(cls)) return ['dex','wis','con'];
-  if(/Дичок|Посвящ/.test(cls)) return ['wis','int','con'];
-  if(/Благород/.test(cls)) return ['cha','wis','int'];
-  const map={Фронтлайн:['str','con'],Стрелок:['dex','wis'],Скиталец:['dex','int'],Направляющий:['wis','int'],Командир:['cha','wis']};
-  return map[role]||['str','con'];
+function primaryStats(cls,role){
+  // Приоритеты берутся из требований класса/боевой роли, а не из шаблона Иерархии.
+  // Иерархия усиливает важные для данного NPC характеристики: основную, вторую, третью, затем поддерживающую.
+  if(/Варвар/.test(cls)) return ['str','con','dex','wis'];
+  if(/Мастер по оружию/.test(cls)){
+    if(/Стрелок|Скиталец/i.test(role||'')) return ['dex','str','con','wis'];
+    return ['str','dex','con','wis'];
+  }
+  if(/Пустынный/.test(cls)) return ['dex','con','wis','str'];
+  if(/Скиталец/.test(cls)) return ['dex','int','cha','wis'];
+  if(/Лесник/.test(cls)) return ['dex','wis','con','str'];
+  if(/Дичок|Посвящ/.test(cls)) return ['wis','int','con','dex'];
+  if(/Благород/.test(cls)) return ['cha','wis','int','con'];
+  const map={Фронтлайн:['str','con','dex','wis'],Стрелок:['dex','wis','con','str'],Скиталец:['dex','int','cha','wis'],Направляющий:['wis','int','con','dex'],Командир:['cha','wis','con','int']};
+  return map[role]||['str','con','dex','wis'];
+}
+function distributeStatPoints(stats, total, priorities, max, label, steps){
+  total = Number(total)||0;
+  if(!total) return {};
+  const applied={};
+  const pri = Array.from(new Set([...(priorities||[]), 'con','wis','dex','str','int','cha'])).filter(k=>statKeys.includes(k));
+  let remaining = total; let idx = 0;
+  while(remaining>0 && idx < pri.length*3){
+    const k = pri[idx % pri.length];
+    const before = stats[k]||10;
+    if(before < max){
+      const inc = Math.min(remaining, 2, max-before);
+      if(inc>0){ addStat(stats,k,inc,max); applied[k]=(applied[k]||0)+inc; remaining-=inc; }
+    }
+    idx++;
+  }
+  Object.entries(applied).forEach(([k,v])=>steps.push(label + ': ' + abbr[k] + ' +' + v + ' по приоритету класса'));
+  if(remaining>0) steps.push(label + ': ' + remaining + ' пункт(ов) не применены — достигнут предел характеристик.');
+  return applied;
 }
 function clone(o){return JSON.parse(JSON.stringify(o||{}))}
 function getAsiEvents(cls,lv){const arr=(rules.asiLevels&& (rules.asiLevels[cls]||rules.asiLevels.default))||[4,8,12,16,19]; return arr.filter(x=>x<=lv);}
@@ -54,7 +78,7 @@ function getNationBonus(nation){
 }
 function addStat(obj,k,v,max=20){obj[k]=cap((obj[k]||10)+(Number(v)||0),max)}
 function applyStatBlock(base,ctx){
-  const steps=[]; const stats=clone(base); const pri=primaryStats(ctx.cls,ctx.role,ctx.faction);
+  const steps=[]; const stats=clone(base); const pri=primaryStats(ctx.cls,ctx.role);
   const nb=getNationBonus(ctx.nation);
   Object.entries(nb).forEach(([k,v])=>{addStat(stats,k,v,20); steps.push(`Нация ${ctx.nation}: ${abbr[k]} +${v}`);});
   const asiEvents=getAsiEvents(ctx.cls,ctx.lv); let asiPoints=asiEvents.length*2; const featPenalty=ctx.featsSel.length;
@@ -82,7 +106,10 @@ function applyHierarchy(stats,ctx){
   ['I','II','III','IV','V'].slice(0,rn).forEach(rk=>{
     const r=hdb.ranks&&hdb.ranks[rk]; if(!r) return;
     const max=r.cap||out.cap||24;
-    if(r.stats) Object.entries(r.stats).forEach(([k,v])=>{addStat(stats,k,v,max); out.steps.push(`${hdb.name} ${rk}: ${abbr[k]} +${v}`);});
+    if(r.stats){
+      const total = Object.values(r.stats).reduce((a,b)=>a+(Number(b)>0?Number(b):0),0);
+      distributeStatPoints(stats, total, primaryStats(ctx.cls,ctx.role), max, hdb.name + ' ' + rk, out.steps);
+    }
     if(r.hp) out.hpBonus+=r.hp;
     if(r.hitDiceMult) out.hpMult=Math.max(out.hpMult||1,r.hitDiceMult);
     if(r.ac) out.acBonus+=r.ac;
