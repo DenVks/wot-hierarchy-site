@@ -957,6 +957,7 @@ function showNPC(id) {
   <button class="cp-heal-btn" onclick="openHpModal(${id})">+ОЗ</button>
   <button class="cp-reset-btn" onclick="resetHP(${id})" title="Восстановить полные ОЗ">↺</button>
   ${c.isClone ? `<button class="cp-reset-btn cp-clone-remove" onclick="removeEncounterClone(${id})" title="Удалить эту копию из сцены">× копия</button>` : `<button class="cp-reset-btn cp-clone-add" onclick="addEncounterClone(${id})" title="Создать ещё одну копию этого NPC">＋ копия</button>`}
+  ${c.custom && !c.isClone ? `<button class="cp-reset-btn cp-custom-remove" onclick="deleteCustomNpcFromBrowser(${id})" title="Удалить пользовательского NPC из этого браузера">× удалить NPC</button>` : ``}
   <div class="cp-ac-box"><div class="cp-ac-val">${c.co.ac}</div><div class="cp-ac-lbl">КД</div></div>
   <div class="cp-ini-box" onclick="addToIni(${id})" title="Добавить в трекер инициативы"><div class="cp-ini-val">${c.co.ini}</div><div class="cp-ini-lbl">Иниц.</div></div>
   <div class="cp-sp-box"><div class="cp-sp-val">${c.co.sp} фт</div><div class="cp-sp-lbl">Скор.</div></div>
@@ -1481,3 +1482,20 @@ function filterForms(btn, npcId, filter) {
 // Initialize
 loadPersistedState();
 buildSidebar();
+
+// ── Custom NPC deletion helper (v61) ──────────────────────────────────────
+function deleteCustomNpcFromBrowser(id){
+  const npc = getNpcById(id);
+  if(!npc || !npc.custom || npc.isClone) return;
+  if(!confirm('Удалить пользовательского NPC «' + (npc.sh||npc.ti||id) + '» из этого браузера?')) return;
+  try{
+    const arr = JSON.parse(localStorage.getItem(CUSTOM_NPC_STORAGE_KEY) || '[]').filter(x => Number(x.id) !== Number(id));
+    localStorage.setItem(CUSTOM_NPC_STORAGE_KEY, JSON.stringify(arr));
+  }catch(e){}
+  const idx = CS.findIndex(x => Number(x.id) === Number(id));
+  if(idx >= 0) CS.splice(idx,1);
+  delete STATE[id]; delete STATE[String(id)];
+  if(Number(curNPC) === Number(id)) curNPC = null;
+  saveState(); buildSidebar();
+  const main = document.getElementById('mn'); if(main) main.innerHTML = '<div class="placeholder" id="placeholder">← Выбери персонажа слева</div>';
+}
