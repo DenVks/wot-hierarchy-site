@@ -78,6 +78,29 @@ function getBaseStats(){return statKeys.reduce((o,k)=>(o[k]=Number($(k).value)||
 function getClass(){return $('npc-class').value}
 function getArch(){return $('npc-arch').value}
 function getNation(){return $('npc-nation').value.trim()||'—'}
+function normText(s){
+  return String(s||'').toLowerCase().replace(/ё/g,'е').replace(/[’'`]/g,'').replace(/[^a-zа-я0-9]+/g,' ').trim();
+}
+function getNationMatch(nation){
+  const db=rules.nationBonuses||{};
+  const raw=String(nation||'').trim();
+  const n=normText(raw);
+  if(!n) return {key:null, bonus:{}, status:'empty'};
+  if(db[raw]) return {key:raw, bonus:clone(db[raw]), status:'exact'};
+  const aliases={
+    'атаан миэйр':'Морской народ','ата ан миэйр':'Морской народ','атан миэйр':'Морской народ','sea folk':'Морской народ',
+    'порубежник':'Порубежники','порубежники':'Порубежники','арафелец':'Арафел','шайнарец':'Шайнар','салдеец':'Салдея','кандорец':'Кандор',
+    'домани женщина':'Домани жен','домани жен':'Домани жен','домани муж':'Домани муж','домани мужчина':'Домани муж',
+    'фар мэддинг':'Фар Мэддинг','фар мэддинга':'Фар Мэддинг','tar valon':'Тар Валон','seanchan':'Шончан'
+  };
+  if(aliases[n] && db[aliases[n]]) return {key:aliases[n], bonus:clone(db[aliases[n]]), status:'alias'};
+  const exactNorm=Object.keys(db).find(k=>normText(k)===n);
+  if(exactNorm) return {key:exactNorm, bonus:clone(db[exactNorm]), status:'exact-normalized'};
+  const contains=Object.keys(db).filter(k=>{const nk=normText(k); return nk && (n.includes(nk)||nk.includes(n));});
+  if(contains.length===1) return {key:contains[0], bonus:clone(db[contains[0]]), status:'fuzzy'};
+  if(contains.length>1) return {key:null, bonus:{}, status:'ambiguous', candidates:contains};
+  return {key:null, bonus:{}, status:'missing'};
+}
 function primaryStats(cls,role){
   // Приоритеты берутся из требований класса/боевой роли, а не из шаблона Иерархии.
   // Иерархия усиливает важные для данного NPC характеристики: основную, вторую, третью, затем поддерживающую.
@@ -116,16 +139,16 @@ function distributeStatPoints(stats, total, priorities, max, label, steps){
 function clone(o){return JSON.parse(JSON.stringify(o||{}))}
 function getAsiEvents(cls,lv){const arr=(rules.asiLevels&& (rules.asiLevels[cls]||rules.asiLevels.default))||[4,8,12,16,19]; return arr.filter(x=>x<=lv);}
 function getNationBonus(nation){
-  const db=rules.nationBonuses||{};
-  if(db[nation]) return clone(db[nation]);
-  const found=Object.keys(db).find(k=>nation.toLowerCase().includes(k.toLowerCase())||k.toLowerCase().includes(nation.toLowerCase()));
-  return found?clone(db[found]):{};
+  return getNationMatch(nation).bonus || {};
 }
 function addStat(obj,k,v,max=20){obj[k]=cap((obj[k]||10)+(Number(v)||0),max)}
 function applyStatBlock(base,ctx){
   const steps=[]; const stats=clone(base); const pri=primaryStats(ctx.cls,ctx.role);
-  const nb=getNationBonus(ctx.nation);
-  Object.entries(nb).forEach(([k,v])=>{addStat(stats,k,v,20); steps.push(`Нация ${ctx.nation}: ${abbr[k]} +${v}`);});
+  const nmatch=getNationMatch(ctx.nation);
+  const nb=nmatch.bonus||{};
+  Object.entries(nb).forEach(([k,v])=>{addStat(stats,k,v,20); steps.push(`Нация ${nmatch.key||ctx.nation}: ${abbr[k]} +${v}`);});
+  if(nmatch.status==='missing' || nmatch.status==='empty') steps.push(`Нация ${ctx.nation}: бонус не найден — проверьте написание.`);
+  if(nmatch.status==='ambiguous') steps.push(`Нация ${ctx.nation}: неоднозначное совпадение (${(nmatch.candidates||[]).join(', ')}) — уточните вариант.`);
   const asiEvents=getAsiEvents(ctx.cls,ctx.lv); let asiPoints=asiEvents.length*2; const featPenalty=ctx.featsSel.length;
   if(featPenalty){ asiPoints=Math.max(0,asiPoints-featPenalty); steps.push(`Доп. черты: предупреждение — уменьшено/должно быть уменьшено ${featPenalty} пункт(ов) из уровневого роста характеристик.`); }
   for(let i=0;i<asiPoints;i++){ const k=pri[i%pri.length]||'con'; if(stats[k]<20){addStat(stats,k,1,20); steps.push(`Рост характеристик ур. ${asiEvents[Math.floor(i/2)]||'?'}: ${abbr[k]} +1`);} }
@@ -267,7 +290,10 @@ function buildNpc(){
 function validateNpc(ctx){
   const out=[]; out.push({s:'ok',t:`Бонус мастерства: ${sign(prof(ctx.lv))}.`});
   out.push({s:'ok',t:`Рост характеристик: уровни ${ctx.applied.asiEvents.join(', ')||'нет'}; использовано пунктов +${ctx.applied.asiPointsUsed}.`});
-  if(Object.keys(ctx.applied.nationBonus).length) out.push({s:'ok',t:`Бонус нации применён: ${Object.entries(ctx.applied.nationBonus).map(([k,v])=>abbr[k]+' +'+v).join(', ')}.`}); else out.push({s:'warn',t:'Бонус нации не найден: проверьте написание нации.'});
+  const nmatch=getNationMatch(ctx.nation);
+  if(Object.keys(ctx.applied.nationBonus).length) out.push({s:'ok',t:`Бонус нации применён (${nmatch.key||ctx.nation}): ${Object.entries(ctx.applied.nationBonus).map(([k,v])=>abbr[k]+' +'+v).join(', ')}.`});
+  else if(nmatch.status==='ambiguous') out.push({s:'warn',t:`Нация указана неоднозначно: ${ctx.nation}. Возможные варианты: ${(nmatch.candidates||[]).join(', ')}.`});
+  else out.push({s:'warn',t:'Бонус нации не найден: проверьте написание нации.'});
   if(ctx.applied.featPenalty) out.push({s:'warn',t:`Выбрано дополнительных черт: ${ctx.applied.featPenalty}. По правилу нужно уменьшить один из уровневых приростов характеристик на 1 за каждую такую черту. Генератор уже уменьшил авто-распределение на ${ctx.applied.featPenalty}, но ГМ должен подтвердить выбор.`});
   if(!ctx.features.length) out.push({s:'err',t:'Не найдены классовые черты. Проверьте класс/архетип в classes-data.js.'}); else out.push({s:'ok',t:`Найдено черт класса/архетипа: ${ctx.features.length}.`});
   const st=getSelectedFightingStyle();

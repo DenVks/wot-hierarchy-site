@@ -29,30 +29,55 @@ const FORMS = [
 
 // ── Custom NPCs from NPC Generator ─────────────────────────────────────────
 const CUSTOM_NPC_STORAGE_KEY = 'wot_custom_npcs_v1';
+function stableCustomId(raw, index){
+  const n = Number(raw && raw.id);
+  if(Number.isFinite(n) && n > 0) return n;
+  const seed = String((raw && (raw.id || raw.ti || raw.sh)) || ('custom-'+index));
+  let h = 0;
+  for(let i=0;i<seed.length;i++) h = ((h * 31) + seed.charCodeAt(i)) >>> 0;
+  return 900000000 + (h % 99999999);
+}
+function normalizeCustomNpc(raw, index){
+  const npc = JSON.parse(JSON.stringify(raw || {}));
+  npc.id = stableCustomId(npc, index);
+  npc.custom = true;
+  npc.isClone = false;
+  npc.sh = String(npc.sh || npc.name || 'Пользовательский NPC');
+  npc.na = String(npc.na || npc.nation || '—');
+  npc.lv = Number(npc.lv || npc.level || 1);
+  npc.ic = npc.ic || '👤';
+  npc.ty = npc.ty || 'warning';
+  npc.ti = npc.ti || (npc.sh + ' — пользовательский NPC');
+  npc.su = npc.su || 'Создано генератором NPC';
+  npc.tags = Array.isArray(npc.tags) ? npc.tags.map(String) : ['Пользовательский NPC','Ур.'+npc.lv,npc.na];
+  npc.st = Object.assign({str:10,dex:10,con:10,int:10,wis:10,cha:10}, npc.st || {});
+  npc.co = Object.assign({hp:1,ac:10,sp:30,ini:'+0',prof:'+2',sv:'—',pp:10,cr:''}, npc.co || {});
+  npc.co.hp = Number(npc.co.hp || 1);
+  npc.co.ac = Number(npc.co.ac || 10);
+  npc.co.sp = Number(npc.co.sp || 30);
+  npc.co.pp = Number(npc.co.pp || 10);
+  npc.ab = Array.isArray(npc.ab) ? npc.ab : [];
+  npc.at = Array.isArray(npc.at) ? npc.at : [];
+  npc.eq = Array.isArray(npc.eq) ? npc.eq : [];
+  npc.sk = Array.isArray(npc.sk) ? npc.sk : [];
+  npc.verify = Array.isArray(npc.verify) ? npc.verify : [];
+  npc.tactics = Array.isArray(npc.tactics) ? npc.tactics : [{ph:'Проверка ГМ',d:'Пользовательский NPC. Проверьте тактику перед боем.'}];
+  npc.dm = npc.dm || 'Создано генератором. Требует утверждения ГМ.';
+  npc.hiIcon = npc.hiIcon || (npc.hi && npc.hi.ty === 'guild' ? 'guild' : npc.hi && npc.hi.ty === 'shonchan' ? 'throne' : npc.hi ? 'unity' : '');
+  return npc;
+}
+function npcIdEquals(a,b){ return String(a) === String(b); }
 function loadCustomNpcsFromStorage(){
   try{
     const arr = JSON.parse(localStorage.getItem(CUSTOM_NPC_STORAGE_KEY) || '[]');
     if(!Array.isArray(arr)) return;
-    // Полностью обновляем пользовательские NPC из localStorage.
-    // Это устраняет ситуацию, когда в левой панели видна старая запись,
-    // а в основном окне открывается другая/предыдущая карточка.
     for(let i=CS.length-1;i>=0;i--){
       if(CS[i] && CS[i].custom && !CS[i].isClone) CS.splice(i,1);
     }
-    arr.forEach(raw => {
-      if(!raw || raw.id == null) return;
-      const id = Number(raw.id);
-      if(CS.some(c => Number(c.id) === id)) return;
-      const npc = JSON.parse(JSON.stringify(raw));
-      npc.id = id;
-      npc.custom = true;
-      npc.tags = Array.isArray(npc.tags) ? npc.tags : [];
-      npc.co = npc.co || {hp:1,ac:10,sp:30,ini:'+0',prof:'+2',pp:10,cr:''};
-      npc.st = npc.st || {str:10,dex:10,con:10,int:10,wis:10,cha:10};
-      npc.ab = Array.isArray(npc.ab) ? npc.ab : [];
-      npc.at = Array.isArray(npc.at) ? npc.at : [];
-      npc.eq = Array.isArray(npc.eq) ? npc.eq : [];
-      npc.sk = Array.isArray(npc.sk) ? npc.sk : [];
+    arr.forEach((raw, idx) => {
+      if(!raw) return;
+      const npc = normalizeCustomNpc(raw, idx);
+      while(CS.some(c => npcIdEquals(c.id, npc.id))) npc.id += 1;
       CS.push(npc);
     });
   }catch(e){ console.warn('Cannot load custom NPCs', e); }
@@ -70,11 +95,11 @@ const LEGACY_STORAGE_KEYS = ['wot_dm_npc_state_v34'];
 
 function deepCloneNpc(obj){ return JSON.parse(JSON.stringify(obj)); }
 function getNpcById(id){
-  let found = CS.find(x => String(x.id) === String(id) || Number(x.id) === Number(id));
+  let found = CS.find(x => npcIdEquals(x.id, id));
   if(found) return found;
   // На случай, если NPC Generator добавил NPC в localStorage уже после загрузки страницы.
   loadCustomNpcsFromStorage();
-  return CS.find(x => String(x.id) === String(id) || Number(x.id) === Number(id));
+  return CS.find(x => npcIdEquals(x.id, id));
 }
 function isEncounterClone(id){ const c=getNpcById(id); return !!(c && c.isClone); }
 function baseNpcLabel(c){ return (c.tags && c.tags[0] ? c.tags[0] : c.sh || 'NPC') + (c.tags && c.tags[1] && !String(c.tags[1]).startsWith('Ур.') ? ' / ' + c.tags[1] : ''); }
@@ -501,7 +526,7 @@ function renderSidebarNpcButton(c, mode){
     c.hiIcon==='unity'?'<span class="hi-badge unity">⊙</span>':
     c.hiIcon==='guild'?'<span class="hi-badge guild">◇</span>':'';
   const btn = document.createElement('div');
-  btn.className = 'npc-btn ty-' + c.ty + (Number(c.id)===Number(curNPC)?' active':'') + (c.isClone?' npc-btn-clone':'');
+  btn.className = 'npc-btn ty-' + c.ty + (npcIdEquals(c.id,curNPC)?' active':'') + (c.isClone?' npc-btn-clone':'');
   btn.dataset.npcid = c.id;
   const pct = Math.max(0,s.curHp/c.co.hp*100);
   const clLabel = c.isClone ? (baseNpcLabel(c) + ' #' + c.cloneNo) : ((c.tags[0]||'') + (c.tags[1]&&!String(c.tags[1]).startsWith('Ур.')?' / '+c.tags[1]:''));
@@ -531,8 +556,8 @@ function buildSidebar() {
   const normalBaseList = baseList.filter(c => !c.custom);
   const filtered = normalBaseList.filter(c => {
     if (!search) return true;
-    return c.sh.toLowerCase().includes(search) || c.na.toLowerCase().includes(search) ||
-      c.ti.toLowerCase().includes(search) || c.tags.some(t=>t.toLowerCase().includes(search));
+    return String(c.sh||'').toLowerCase().includes(search) || String(c.na||'').toLowerCase().includes(search) ||
+      String(c.ti||'').toLowerCase().includes(search) || (c.tags||[]).some(t=>String(t).toLowerCase().includes(search));
   });
 
   document.getElementById('sb-count').textContent = (filtered.length + customList.length) + ' / ' + baseList.length + ' базовых · копий: ' + ENCOUNTER_CLONES.length;
@@ -965,6 +990,7 @@ function showNPC(id) {
   }
   curNPC = c.id;
   id = c.id;
+  try{
   buildSidebar(); // update active state
   const s = getState(c.id);
   const ph = document.getElementById('placeholder');
@@ -1198,6 +1224,10 @@ ${c.spells.map((sp,spi)=>`<tr>
   html += `</div></div>`; // sheet + app
 
   main.innerHTML = html;
+  }catch(err){
+    console.error('Cannot render NPC', c, err);
+    if(main) main.innerHTML = '<div class="placeholder" id="placeholder">Ошибка открытия NPC: '+(err && err.message ? err.message : err)+'</div>';
+  }
 }
 
 
@@ -1524,13 +1554,13 @@ function deleteCustomNpcFromBrowser(id){
   if(!npc || !npc.custom || npc.isClone) return;
   if(!confirm('Удалить пользовательского NPC «' + (npc.sh||npc.ti||id) + '» из этого браузера?')) return;
   try{
-    const arr = JSON.parse(localStorage.getItem(CUSTOM_NPC_STORAGE_KEY) || '[]').filter(x => Number(x.id) !== Number(id));
+    const arr = JSON.parse(localStorage.getItem(CUSTOM_NPC_STORAGE_KEY) || '[]').filter(x => !npcIdEquals(x.id, id));
     localStorage.setItem(CUSTOM_NPC_STORAGE_KEY, JSON.stringify(arr));
   }catch(e){}
-  const idx = CS.findIndex(x => Number(x.id) === Number(id));
+  const idx = CS.findIndex(x => npcIdEquals(x.id, id));
   if(idx >= 0) CS.splice(idx,1);
   delete STATE[id]; delete STATE[String(id)];
-  if(Number(curNPC) === Number(id)) curNPC = null;
+  if(npcIdEquals(curNPC, id)) curNPC = null;
   savePersistedState(); buildSidebar();
   const main = document.getElementById('mn'); if(main) main.innerHTML = '<div class="placeholder" id="placeholder">← Выбери персонажа слева</div>';
 }
