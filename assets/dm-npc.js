@@ -56,10 +56,22 @@ function normalizeCustomNpc(raw, index){
   npc.co.ac = Number(npc.co.ac || 10);
   npc.co.sp = Number(npc.co.sp || 30);
   npc.co.pp = Number(npc.co.pp || 10);
-  npc.ab = Array.isArray(npc.ab) ? npc.ab : [];
-  npc.at = Array.isArray(npc.at) ? npc.at : [];
-  npc.eq = Array.isArray(npc.eq) ? npc.eq : [];
-  npc.sk = Array.isArray(npc.sk) ? npc.sk : [];
+  npc.ab = Array.isArray(npc.ab) ? npc.ab.map((a,i)=>({
+    n: String(a && (a.n || a.name || a.feature) || ('Черта '+(i+1))),
+    d: String(a && (a.d || a.desc || a.description || '') || ''),
+    hi: !!(a && a.hi),
+    source: a && a.source || ''
+  })) : [];
+  npc.at = Array.isArray(npc.at) ? npc.at.map((a,i)=>({
+    n: String(a && (a.n || a.name || a.title) || ('Атака '+(i+1))),
+    a: String(a && (a.a || a.attack || a.bonus) || '+0'),
+    d: String(a && (a.d || a.damage || a.dmg) || '—'),
+    t: String(a && (a.t || a.type) || '—'),
+    r: String(a && (a.r || a.range) || '—'),
+    no: String(a && (a.no || a.note || a.notes || '') || '')
+  })) : [];
+  npc.eq = Array.isArray(npc.eq) ? npc.eq.map(e=>({r:!!(e&&e.r), t:String(e && (e.t || e.name || e.desc) || '')})) : [];
+  npc.sk = Array.isArray(npc.sk) ? npc.sk.map(x=>({n:String(x&&x.n||''), v:String(x&&x.v||'+0'), e:!!(x&&x.e), note:String(x&&x.note||'')})) : [];
   npc.verify = Array.isArray(npc.verify) ? npc.verify : [];
   npc.tactics = Array.isArray(npc.tactics) ? npc.tactics : [{ph:'Проверка ГМ',d:'Пользовательский NPC. Проверьте тактику перед боем.'}];
   npc.dm = npc.dm || 'Создано генератором. Требует утверждения ГМ.';
@@ -218,17 +230,26 @@ let iniOrder = []; // [{id, val}]
 let iniCurrent = 0;
 
 function getState(id) {
-  if (!STATE[id]) {
-    const c = getNpcById(id);
-    const slots = {};
-    if (c && c.slots) c.slots.forEach(s => { slots[s.lv] = {total: s.n, used: 0}; });
-    const sdTotal = c && c.co && c.co.cr && c.co.cr.includes('к8') ?
-      parseInt((c.co.cr.match(/(d+)к8/)||[0,0])[1]) : 0;
-    STATE[id] = { curHp: c ? c.co.hp : 0, conditions: [], slots, sdUsed: 0, sdTotal, saOn: false };
+  const c = getNpcById(id);
+  if (!STATE[id] || typeof STATE[id] !== 'object') STATE[id] = {};
+  const st = STATE[id];
+  const maxHp = Number(c && c.co && c.co.hp) || 1;
+  if (!Number.isFinite(Number(st.curHp))) st.curHp = maxHp;
+  st.conditions = Array.isArray(st.conditions) ? st.conditions : [];
+  st.slots = st.slots && typeof st.slots === 'object' ? st.slots : {};
+  if (c && Array.isArray(c.slots)) c.slots.forEach(sl => {
+    if (!st.slots[sl.lv]) st.slots[sl.lv] = {total: Number(sl.n)||0, used: 0};
+    if (!Number.isFinite(Number(st.slots[sl.lv].total))) st.slots[sl.lv].total = Number(sl.n)||0;
+    if (!Number.isFinite(Number(st.slots[sl.lv].used))) st.slots[sl.lv].used = 0;
+  });
+  st.sdUsed = Number.isFinite(Number(st.sdUsed)) ? Number(st.sdUsed) : 0;
+  if (!Number.isFinite(Number(st.sdTotal))) {
+    const m = String(c && c.co && c.co.cr || '').match(/(\d+)к8/);
+    st.sdTotal = m ? parseInt(m[1],10) : 0;
   }
-  return STATE[id];
+  st.saOn = !!st.saOn;
+  return st;
 }
-
 // ── Dice ──────────────────────────────────────────────────────────────────
 function roll(n, sides) {
   let results = [], sum = 0;
@@ -1009,7 +1030,7 @@ function showNPC(id) {
   <span class="cp-name">${c.ic} ${(c.tags[0]||"")+(c.tags[1]&&!c.tags[1].startsWith("Ур.")?" / "+c.tags[1]:"")+(c.sh&&c.sh!==c.tags[0]?" · "+c.sh:"")}</span>
   <div class="cp-hp-block">
     <span class="cp-hp-label">ОЗ</span>
-    <span class="cp-hp-cur ${hpColor(s.curHp,c.co.hp).replace('hp-','')}" id="cp-hp-cur" onclick="openHpModal(${c.id})">${s.curHp}</span>
+    <span class="cp-hp-cur ${(hpColor(s.curHp,c.co.hp)||'hp-low').replace('hp-','')}" id="cp-hp-cur" onclick="openHpModal(${c.id})">${s.curHp}</span>
     <span class="cp-hp-sep">/</span>
     <span class="cp-hp-max">${c.co.hp}</span>
     <div class="cp-hp-bar"><div class="cp-hp-fill ${hpColor(s.curHp,c.co.hp)}" id="cp-hp-fill" style="width:${Math.max(0,s.curHp/c.co.hp*100)}%"></div></div>
@@ -1092,18 +1113,18 @@ function showNPC(id) {
   const parseAtk = (a) => { const m = a.match(/^([+\-]\d+)/); return m ? parseInt(m[1]) : 0; };
   c.at.forEach((atk, ai) => {
     const bonus = parseAtk(atk.a);
-    const dmgSafe = atk.d.replace(/'/g,"\\'");
-    const nameSafe = atk.n.replace(/'/g,"\\'");
+    const dmgSafe = String(atk.d || '—').replace(/'/g,"\\'");
+    const nameSafe = String(atk.n || 'Атака').replace(/'/g,"\\'");
     const canCrit = /^[+\-]\d+/.test(String(atk.a || ''));
     html += `<div class="atk-card" id="atk-card-${id}-${ai}">
 <div class="atk-card-header">
-  <span class="atk-name">${atk.n}</span>
+  <span class="atk-name">${atk.n||'Атака'}</span>
   <span class="atk-type">${atk.t||'—'}</span>
   <span class="atk-range">${atk.r||'—'}</span>
 </div>
 <div class="atk-btn-row">
   <button class="atk-roll-btn" onclick="rollAtkInline(${id},${ai},${bonus},'${nameSafe}','${dmgSafe}',false)">⚔ ${atk.a}</button>
-  <button class="atk-dmg-btn" onclick="rollDmgInline(${id},${ai},'${dmgSafe}','${nameSafe}',false)">🎲 ${atk.d}</button>
+  <button class="atk-dmg-btn" onclick="rollDmgInline(${id},${ai},'${dmgSafe}','${nameSafe}',false)">🎲 ${atk.d||'—'}</button>
   ${canCrit ? `<button class="atk-crit-btn" onclick="rollDmgInline(${id},${ai},'${dmgSafe}','${nameSafe}',true)">💥</button>` : ''}
 </div>
 <div class="atk-inline-result" id="atk-res-${id}-${ai}"></div>

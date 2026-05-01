@@ -7,9 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=64">
-<link rel="stylesheet" href="assets/npc-generator.css?v=64">
-<script src="assets/auth.js?v=64"></script>
+<link rel="stylesheet" href="assets/styles.css?v=65">
+<link rel="stylesheet" href="assets/npc-generator.css?v=65">
+<script src="assets/auth.js?v=65"></script>
 </head>
 <body>
 <div class="dm-tool-badge">DM Toolkit · NPC Generator</div>
@@ -62,7 +62,23 @@
       <div class="field"><input id="feat-search" placeholder="Фильтр черт..."></div>
       <div class="checks" id="feat-list"></div>
       <h2>4. Плетения</h2>
-      <div class="field"><label>Выбрать плетения вручную</label><textarea id="npc-weaves" placeholder="Например: Воздушный кулак, Огненный шар, Щит"></textarea></div>
+      <div id="channeling-fields" class="channeling-fields" style="display:none">
+        <div class="field">
+          <label>Исключительные таланты</label>
+          <div class="checks compact" id="talent-list"></div>
+          <p class="hint">Кантрипы и плетения 1-го уровня доступны без исключительного таланта. Для Дичка дополнительно доступны плетения 2-го уровня. Более высокие уровни требуют выбранного таланта плетения.</p>
+        </div>
+        <div class="field">
+          <label>Аффинитеты</label>
+          <div class="checks compact" id="affinity-list"></div>
+        </div>
+        <div class="field">
+          <label>Плетения по уровням и талантам</label>
+          <div class="weave-toolbar"><input id="weave-search" placeholder="Фильтр плетений..."><button type="button" class="secondary" id="clear-weaves">Сбросить</button></div>
+          <div class="weave-picker" id="weave-picker"></div>
+        </div>
+      </div>
+      <div class="field" id="manual-weave-field"><label>Дополнительные плетения вручную</label><textarea id="npc-weaves" placeholder="Опционально: названия через запятую, если нужно добавить плетение вне списка"></textarea></div>
       <h2>5. Экипировка</h2>
       <div class="field"><label>Оружие</label><select id="weapon-select"></select></div>
       <div class="grid2">
@@ -89,12 +105,12 @@
   </div>
 </div>
 <div id="feature-modal" class="feature-modal" style="display:none"></div>
-<script src="assets/classes-data.js?v=64"></script>
-<script src="assets/feats-data.js?v=64"></script>
-<script src="assets/weaves-data.js?v=64"></script>
-<script src="assets/npc-rules-data.js?v=64"></script>
-<script src="assets/npc-data.js?v=64"></script>
-<script src="assets/npc-generator.js?v=64"></script>
-<script src="assets/shared.js?v=64"></script>
+<script src="assets/classes-data.js?v=65"></script>
+<script src="assets/feats-data.js?v=65"></script>
+<script src="assets/weaves-data.js?v=65"></script>
+<script src="assets/npc-rules-data.js?v=65"></script>
+<script src="assets/npc-data.js?v=65"></script>
+<script src="assets/npc-generator.js?v=65"></script>
+<script src="assets/shared.js?v=65"></script>
 </body>
 </html>
