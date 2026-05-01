@@ -32,14 +32,29 @@ const CUSTOM_NPC_STORAGE_KEY = 'wot_custom_npcs_v1';
 function loadCustomNpcsFromStorage(){
   try{
     const arr = JSON.parse(localStorage.getItem(CUSTOM_NPC_STORAGE_KEY) || '[]');
-    if(Array.isArray(arr)){ arr.forEach(raw => {
+    if(!Array.isArray(arr)) return;
+    // Полностью обновляем пользовательские NPC из localStorage.
+    // Это устраняет ситуацию, когда в левой панели видна старая запись,
+    // а в основном окне открывается другая/предыдущая карточка.
+    for(let i=CS.length-1;i>=0;i--){
+      if(CS[i] && CS[i].custom && !CS[i].isClone) CS.splice(i,1);
+    }
+    arr.forEach(raw => {
       if(!raw || raw.id == null) return;
       const id = Number(raw.id);
       if(CS.some(c => Number(c.id) === id)) return;
       const npc = JSON.parse(JSON.stringify(raw));
-      npc.id = id; npc.custom = true;
+      npc.id = id;
+      npc.custom = true;
+      npc.tags = Array.isArray(npc.tags) ? npc.tags : [];
+      npc.co = npc.co || {hp:1,ac:10,sp:30,ini:'+0',prof:'+2',pp:10,cr:''};
+      npc.st = npc.st || {str:10,dex:10,con:10,int:10,wis:10,cha:10};
+      npc.ab = Array.isArray(npc.ab) ? npc.ab : [];
+      npc.at = Array.isArray(npc.at) ? npc.at : [];
+      npc.eq = Array.isArray(npc.eq) ? npc.eq : [];
+      npc.sk = Array.isArray(npc.sk) ? npc.sk : [];
       CS.push(npc);
-    }); }
+    });
   }catch(e){ console.warn('Cannot load custom NPCs', e); }
 }
 loadCustomNpcsFromStorage();
@@ -508,6 +523,7 @@ function renderSidebarNpcButton(c, mode){
 }
 
 function buildSidebar() {
+  loadCustomNpcsFromStorage();
   const sb = document.getElementById('sb');
   const search = document.getElementById('sb-search').value.toLowerCase();
   const baseList = CS.filter(c => !c.isClone);
@@ -940,6 +956,7 @@ function getSneakAttackExpr(c){
 }
 
 function showNPC(id) {
+  loadCustomNpcsFromStorage();
   const c = getNpcById(id);
   const main = document.getElementById('mn');
   if(!c){
@@ -1514,6 +1531,6 @@ function deleteCustomNpcFromBrowser(id){
   if(idx >= 0) CS.splice(idx,1);
   delete STATE[id]; delete STATE[String(id)];
   if(Number(curNPC) === Number(id)) curNPC = null;
-  saveState(); buildSidebar();
+  savePersistedState(); buildSidebar();
   const main = document.getElementById('mn'); if(main) main.innerHTML = '<div class="placeholder" id="placeholder">← Выбери персонажа слева</div>';
 }

@@ -21,6 +21,51 @@ const roleTemplates={
   'Командир':{str:12,dex:12,con:14,int:14,wis:14,cha:16},
   'Сбалансированный':{str:13,dex:13,con:14,int:12,wis:13,cha:12}
 };
+const FIGHTING_STYLES = {
+  master: [
+    {id:'archery', n:'Стрельба из лука', d:'Вы получаете бонус +2 к броскам атаки, которые совершаете с использованием дальнобойного оружия.'},
+    {id:'defense', n:'Защита', d:'Когда вы носите доспехи, вы получаете бонус +1 к КД.'},
+    {id:'dueling', n:'Дуэль', d:'Когда вы держите оружие ближнего боя в одной руке и не используете другого оружия, вы получаете +2 к урону этим оружием.'},
+    {id:'great_weapon', n:'Бой с большим оружием', d:'При атаке двуручным или универсальным оружием ближнего боя можно перебросить 1 или 2 на кубике урона.'},
+    {id:'protection', n:'Протекция', d:'Реакцией наложить помеху на атаку по союзнику в 5 фт, если вы держите щит.'},
+    {id:'two_weapon', n:'Бой двумя оружиями', d:'При бое двумя оружиями вы добавляете модификатор характеристики к урону второй атаки.'}
+  ],
+  lesnik: [
+    {id:'archery', n:'Стрельба', d:'Вы получаете бонус +2 к броскам атаки дальнобойным оружием.'},
+    {id:'defense', n:'Защита', d:'Пока вы носите доспехи, вы получаете бонус +1 к КД.'},
+    {id:'dueling', n:'Дуэль', d:'Когда вы сражаетесь оружием ближнего боя в одной руке и не держите другого оружия, вы получаете +2 к урону этим оружием.'},
+    {id:'two_weapon', n:'Бой двумя оружиями', d:'При бое двумя оружиями вы добавляете модификатор характеристики к урону второй атаки.'}
+  ],
+  ashaman: [
+    {id:'dueling', n:'Дуэль', d:'Когда вы держите оружие ближнего боя в одной руке и не используете другого оружия, вы получаете +2 к урону этим оружием.'},
+    {id:'great_weapon', n:'Бой с тяжёлым оружием', d:'При атаке двуручным или универсальным оружием ближнего боя можно перебросить 1 или 2 на кубике урона.'},
+    {id:'two_weapon', n:'Бой двумя оружиями', d:'При бое двумя оружиями вы добавляете модификатор характеристики к урону второй атаки.'}
+  ]
+};
+function getFightingStyleOptions(cls,arch,lv){
+  lv=Number(lv)||1;
+  if(/Мастер по оружию/.test(cls) && lv>=1) return FIGHTING_STYLES.master;
+  if(/Лесник/.test(cls) && lv>=2) return FIGHTING_STYLES.lesnik;
+  if(/Посвящ/.test(cls) && /Аша'?ман/i.test(String(arch||'')) && lv>=3) return FIGHTING_STYLES.ashaman;
+  return [];
+}
+function getSelectedFightingStyle(){
+  const el=$('npc-fighting-style');
+  if(!el || !el.value) return null;
+  const opts=getFightingStyleOptions(getClass(),getArch(),getLevel());
+  return opts.find(x=>x.id===el.value)||null;
+}
+function updateFightingStyleSelect(){
+  const field=$('fighting-style-field'), sel=$('npc-fighting-style');
+  if(!field||!sel) return;
+  const opts=getFightingStyleOptions(getClass(),getArch(),getLevel());
+  const old=sel.value;
+  if(!opts.length){ field.style.display='none'; sel.innerHTML=''; return; }
+  field.style.display='';
+  sel.innerHTML='<option value="">— выберите стиль боя —</option>'+opts.map(o=>`<option value="${safe(o.id)}">${safe(o.n)}</option>`).join('');
+  if(opts.some(o=>o.id===old)) sel.value=old;
+}
+
 function mod(v){return Math.floor((Number(v)-10)/2)}
 function sign(v){v=Number(v)||0; return (v>=0?'+':'')+v}
 function prof(lv){return Math.ceil(Number(lv)/4)+1}
@@ -136,6 +181,7 @@ function initClassSelect(){
 function updateArchSelect(){
   const c=getClass(); const archs=Array.from(new Set(clsDb.features.filter(f=>f.className===c).map(f=>f.archetype).filter(a=>a&&a!=='Базовый класс')));
   $('npc-arch').innerHTML='<option value="Базовый класс">Базовый класс</option>'+archs.sort((a,b)=>a.localeCompare(b)).map(a=>`<option>${safe(a)}</option>`).join('');
+  updateFightingStyleSelect();
 }
 function initNationSelect(){ const nats=Object.keys(rules.nationBonuses||{}).sort((a,b)=>a.localeCompare(b)); const inp=$('npc-nation'); if(!inp) return; const val=inp.value||'Андор'; const dl=document.createElement('datalist'); dl.id='nation-list'; dl.innerHTML=nats.map(n=>`<option value="${safe(n)}">`).join(''); document.body.appendChild(dl); inp.setAttribute('list','nation-list'); inp.value=val; }
 function initEquipment(){
@@ -167,7 +213,7 @@ function getEquipment(){
   const s=S[Number($('shield-select').value)||0]||S[0]||{name:'Нет',ac:0};
   return {weapon:w,armor:a,shield:s,weaponBonus:Number($('weapon-bonus').value)||0,armorBonus:Number($('armor-bonus').value)||0,shieldBonus:Number($('shield-bonus').value)||0};
 }
-function calcAc(cls,stats,eq,h){
+function calcAc(cls,stats,eq,h,style){
   const a=eq.armor, shield=(eq.shield.ac||0)+eq.shieldBonus, dex=mod(stats.dex); let ac=10+dex;
   let note='Без доспеха: 10 + ЛОВ';
   if(a.category==='none'){
@@ -176,30 +222,40 @@ function calcAc(cls,stats,eq,h){
   }else{
     const dexPart=a.dexMax===null?dex:Math.min(dex,a.dexMax); ac=a.base+dexPart+eq.armorBonus+shield; note=`${a.name}: ${a.base} + ЛОВ${a.dexMax===null?'':' макс. '+a.dexMax} + магия/щит`;
   }
+  if(style && style.id==='defense' && a.category!=='none'){ ac+=1; note+=' + стиль Защита +1'; }
   ac+=h.acBonus||0; if(h.acBonus) note+=` + Иерархия ${h.acBonus}`;
   return {ac,note};
 }
 function hasFeat(name,sel){return sel.some(x=>x.toLowerCase()===name.toLowerCase())}
-function calcAttack(cls,stats,eq,p,featsSel,h){
+function calcAttack(cls,stats,eq,p,featsSel,h,style){
   const w=eq.weapon; let stat=w.stat||'str'; if(w.properties&&/Finesse/i.test(w.properties)){ stat=mod(stats.dex)>=mod(stats.str)?'dex':'str'; }
   let attack=mod(stats[stat])+p+eq.weaponBonus+(h.attackBonus||0); let dmgBonus=mod(stats[stat])+eq.weaponBonus+(h.damageBonus||0);
   const notes=[];
   if(hasFeat('Пламя и пустота',featsSel)){ attack+=mod(stats.wis); notes.push(`Пламя и пустота: +${mod(stats.wis)} МДР к атаке`); }
-  if(/Лесник/.test(cls)&&w.type==='ranged'){ attack+=2; notes.push('Стиль Стрельба: +2 к атаке'); }
+  if(style){
+    if(style.id==='archery' && w.type==='ranged'){ attack+=2; notes.push(`${style.n}: +2 к атаке дальнобойным оружием`); }
+    if(style.id==='dueling' && w.type==='melee' && !/two-handed|двуруч/i.test(w.properties||'')){ dmgBonus+=2; notes.push(`${style.n}: +2 к урону одноручным оружием`); }
+    if(style.id==='great_weapon') notes.push(`${style.n}: переброс 1–2 на кубиках урона двуручного/универсального оружия`);
+    if(style.id==='protection') notes.push(`${style.n}: реакция, помеха атаке по союзнику в 5 фт при наличии щита`);
+    if(style.id==='two_weapon') notes.push(`${style.n}: модификатор характеристики добавляется к урону второй атаки`);
+  }
   if(/Варвар/.test(cls)&&w.type==='melee') notes.push('Ярость добавляет урон ярости только при атаке Силой и активной ярости.');
-  if(hasFeat('Мастер большого оружия',featsSel) && /Heavy/i.test(w.properties||'')) notes.push('Мастер большого оружия: можно −5 к атаке / +10 к урону.');
+  if(hasFeat('Мастер большого оружия',featsSel) && /Heavy|тяж/i.test(w.properties||'')) notes.push('Мастер большого оружия: можно −5 к атаке / +10 к урону.');
   if(hasFeat('Меткий стрелок',featsSel) && w.type==='ranged') notes.push('Меткий стрелок: можно −5 к атаке / +10 к урону, игнор укрытий.');
   return {name:w.name,a:sign(attack),d:`${w.damage}${sign(dmgBonus)}`,t:w.type==='ranged'?'Прон.':'Руб./Прон.',r:w.type==='ranged'?'дистанция по оружию':'Ближний',no:[w.properties, ...notes].filter(Boolean).join(' · ')};
 }
+
 function findWeavesInput(){ const names=$("npc-weaves").value.split(/[;,\n]/).map(s=>s.trim()).filter(Boolean); return names.map(n=>weaves.find(w=>String(w.title).toLowerCase()===n.toLowerCase())||{title:n,level:"?",school:"?",desc:"Плетение не найдено в базе."}); }
 function buildNpc(){
   const name=$('npc-name').value.trim()||'Новый NPC', nation=getNation(), lv=getLevel(), cls=getClass(), arch=getArch(), role=$('npc-role').value, faction=$('npc-faction').value, rank=$('npc-rank').value, p=prof(lv), featsSel=selectedFeats();
-  const baseStats=getBaseStats(), applied=applyStatBlock(baseStats,{cls,role,faction,rank,lv,nation,featsSel}), stats=applied.stats, h=applied.hierarchy, eq=getEquipment(), acCalc=calcAc(cls,stats,eq,h), features=availableFeatures(cls,arch,lv);
+  const style=getSelectedFightingStyle();
+  const baseStats=getBaseStats(), applied=applyStatBlock(baseStats,{cls,role,faction,rank,lv,nation,featsSel}), stats=applied.stats, h=applied.hierarchy, eq=getEquipment(), acCalc=calcAc(cls,stats,eq,h,style), features=availableFeatures(cls,arch,lv);
   const hp=avgHp(cls,lv,stats.con,h), ini=mod(stats.dex)+(h.initiativeBonus||0), pp=10+mod(stats.wis)+p+((featsSel.includes('Внимательный'))?5:0);
-  const attack=calcAttack(cls,stats,eq,p,featsSel,h), hi=h.name?{nm:h.name,ty:h.type,items:[...h.items,{n:'Сводные бонусы',d:`ОЗ ${h.hpBonus?'+ '+h.hpBonus:''}${h.hpMult?' ×'+h.hpMult:''}; КД +${h.acBonus||0}; скорость +${h.speedBonus||0}; инициатива +${h.initiativeBonus||0}${h.initiativeAdv?' и преимущество':''}; спасброски +${h.saveBonus||0}; DC плетений +${h.dcBonus||0}; сила плетений +${h.weavePower||0}; доп. плетения ${h.extraSlots||0}.`}]}:null;
+  const attack=calcAttack(cls,stats,eq,p,featsSel,h,style), hi=h.name?{nm:h.name,ty:h.type,items:[...h.items,{n:'Сводные бонусы',d:`ОЗ ${h.hpBonus?'+ '+h.hpBonus:''}${h.hpMult?' ×'+h.hpMult:''}; КД +${h.acBonus||0}; скорость +${h.speedBonus||0}; инициатива +${h.initiativeBonus||0}${h.initiativeAdv?' и преимущество':''}; спасброски +${h.saveBonus||0}; DC плетений +${h.dcBonus||0}; сила плетений +${h.weavePower||0}; доп. плетения ${h.extraSlots||0}.`}]}:null;
   const spells=findWeavesInput().map(w=>({n:w.title,lv:w.level,tal:w.school||'',el:Array.isArray(w.powers)?w.powers.join('·'):'',t:w.cast||'',r:w.range||'',dur:w.duration||'',sb:w.save||'',slot:String(w.level||''),dmg:w.damage||'—',ef:(w.summary||w.desc||'').slice(0,320)}));
   const ab=[];
   features.forEach(f=>ab.push({n:f.feature,d:f.description,hi:Number(f.levelSort||0)===lv||f.archetype===arch,source:'class'}));
+  if(style) ab.push({n:style.n,d:style.d,hi:true,source:'fighting-style'});
   featsSel.forEach(fn=>{const f=feats.find(x=>x.name===fn); ab.push({n:fn,d:f?f.desc.join(' '):'Дополнительная черта.',hi:false,source:'feat'});});
   h.traits.forEach(t=>ab.push({n:t.n,d:t.d,hi:true,source:'hierarchy',color:t.color}));
   const id=200000+Date.now()%100000000;
@@ -214,6 +270,10 @@ function validateNpc(ctx){
   if(Object.keys(ctx.applied.nationBonus).length) out.push({s:'ok',t:`Бонус нации применён: ${Object.entries(ctx.applied.nationBonus).map(([k,v])=>abbr[k]+' +'+v).join(', ')}.`}); else out.push({s:'warn',t:'Бонус нации не найден: проверьте написание нации.'});
   if(ctx.applied.featPenalty) out.push({s:'warn',t:`Выбрано дополнительных черт: ${ctx.applied.featPenalty}. По правилу нужно уменьшить один из уровневых приростов характеристик на 1 за каждую такую черту. Генератор уже уменьшил авто-распределение на ${ctx.applied.featPenalty}, но ГМ должен подтвердить выбор.`});
   if(!ctx.features.length) out.push({s:'err',t:'Не найдены классовые черты. Проверьте класс/архетип в classes-data.js.'}); else out.push({s:'ok',t:`Найдено черт класса/архетипа: ${ctx.features.length}.`});
+  const st=getSelectedFightingStyle();
+  const opts=getFightingStyleOptions(ctx.cls,ctx.arch,ctx.lv);
+  if(opts.length && st) out.push({s:'ok',t:`Стиль боя выбран: ${st.n}. Бонусы стиля учтены в финальной карточке.`});
+  if(opts.length && !st) out.push({s:'warn',t:'Класс/архетип получает Стиль боя, но стиль не выбран.'});
   if(ctx.arch!=='Базовый класс'&&!ctx.features.some(f=>f.archetype===ctx.arch)) out.push({s:'warn',t:'Для выбранного архетипа нет доступных черт на этом уровне.'});
   if(/Дичок|Посвящ/.test(ctx.cls)&&!ctx.spells.length) out.push({s:'warn',t:'NPC-направляющему не выбраны плетения.'});
   if(ctx.h.name) out.push({s:'ok',t:`Иерархия применена: ${ctx.h.name}. Бонусы будут удалены/заменены при смене Иерархии, так как расчёт каждый раз идёт от базовых характеристик.`});
@@ -250,11 +310,11 @@ function renderCustomManager(){ const box=$('custom-list'); if(!box) return; con
 function clearCustom(){ if(confirm('Удалить всех пользовательских NPC из этого браузера?')){localStorage.removeItem(CUSTOM_KEY); renderCustomManager(); alert('Пользовательские NPC удалены.');}}
 function copyExport(){navigator.clipboard&&navigator.clipboard.writeText($('export-box').textContent).then(()=>alert('JS/JSON скопирован.'));}
 function bind(){
-  initClassSelect(); initNationSelect(); initEquipment(); initFeats(); buildNpc(); renderCustomManager();
-  $('npc-class').addEventListener('change',()=>{updateArchSelect(); buildNpc();}); $('npc-arch').addEventListener('change',buildNpc); $('feat-search').addEventListener('input',initFeats);
+  initClassSelect(); initNationSelect(); initEquipment(); initFeats(); updateFightingStyleSelect(); buildNpc(); renderCustomManager();
+  $('npc-class').addEventListener('change',()=>{updateArchSelect(); updateFightingStyleSelect(); buildNpc();}); $('npc-arch').addEventListener('change',()=>{updateFightingStyleSelect(); buildNpc();}); $('npc-fighting-style')?.addEventListener('change',buildNpc); $('feat-search').addEventListener('input',initFeats);
   $('apply-template').addEventListener('click',applyTemplate); $('generate').addEventListener('click',buildNpc); $('copy-export').addEventListener('click',copyExport); $('save-local').addEventListener('click',saveLocal); $('clear-custom').addEventListener('click',clearCustom);
   document.addEventListener('click',e=>{ const i=e.target.closest('.info-dot'); if(i){showFeatureModal(Number(i.dataset.featureIndex));} const d=e.target.closest('[data-del-custom]'); if(d){deleteCustomNpc(d.dataset.delCustom);} if(e.target.id==='feature-modal') e.target.style.display='none'; });
-  document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('change',()=>{ if(el.id!=='feat-search') buildNpc(); }));
+  document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('change',()=>{ if(el.id==='feat-search') return; if(el.id==='npc-class'||el.id==='npc-arch'||el.id==='npc-fighting-style') return; if(el.id==='npc-level') updateFightingStyleSelect(); buildNpc(); }));
 }
 document.addEventListener('DOMContentLoaded',bind);
 })();
