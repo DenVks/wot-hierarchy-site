@@ -2283,14 +2283,104 @@ const FORMS = [
 
 ;
 
-// ── State ──────────────────────────────────────────────────────────────────
-const STATE = {}; // {npcId: {curHp, conditions:[], slots:{}, sdUsed, saOn}}
-const STORAGE_KEY = 'wot_dm_npc_state_v34';
+// ── State / Encounter copies ───────────────────────────────────────────────
+const BASE_NPC_IDS = CS.map(c => c.id);
+const STATE = {}; // {npcIdOrCloneId: {curHp, conditions:[], slots:{}, sdUsed, saOn}}
+let ENCOUNTER_CLONES = []; // полноценные копии NPC, созданные на время боя
+let ENCOUNTER_CLONE_COUNTER = 1;
+const CLONE_ID_BASE = 100000;
+const STORAGE_KEY = 'wot_dm_npc_state_v56';
+const LEGACY_STORAGE_KEYS = ['wot_dm_npc_state_v34'];
+
+function deepCloneNpc(obj){ return JSON.parse(JSON.stringify(obj)); }
+function getNpcById(id){ return CS.find(x => Number(x.id) === Number(id)); }
+function isEncounterClone(id){ const c=getNpcById(id); return !!(c && c.isClone); }
+function baseNpcLabel(c){ return (c.tags && c.tags[0] ? c.tags[0] : c.sh || 'NPC') + (c.tags && c.tags[1] && !String(c.tags[1]).startsWith('Ур.') ? ' / ' + c.tags[1] : ''); }
+function nextCloneNoForBase(baseId){
+  const used = ENCOUNTER_CLONES.filter(c => Number(c.baseId) === Number(baseId)).map(c => Number(c.cloneNo || 0));
+  let n = 1; while(used.includes(n)) n++; return n;
+}
+function hydrateEncounterClones(clones){
+  if(!Array.isArray(clones)) return;
+  clones.forEach(raw => {
+    if(!raw || raw.id == null) return;
+    const id = Number(raw.id);
+    if(CS.some(c => Number(c.id) === id)) return;
+    const clone = deepCloneNpc(raw);
+    clone.id = id;
+    clone.isClone = true;
+    CS.push(clone);
+    ENCOUNTER_CLONES.push(clone);
+    ENCOUNTER_CLONE_COUNTER = Math.max(ENCOUNTER_CLONE_COUNTER, id - CLONE_ID_BASE + 1);
+  });
+}
+function addEncounterClone(baseId){
+  const base = getNpcById(baseId);
+  if(!base) return;
+  const source = base.isClone ? getNpcById(base.baseId) || base : base;
+  const clone = deepCloneNpc(source);
+  const cloneNo = nextCloneNoForBase(source.id);
+  let id = CLONE_ID_BASE + ENCOUNTER_CLONE_COUNTER++;
+  while(CS.some(c => Number(c.id) === id)) id = CLONE_ID_BASE + ENCOUNTER_CLONE_COUNTER++;
+  clone.id = id;
+  clone.baseId = source.id;
+  clone.cloneNo = cloneNo;
+  clone.isClone = true;
+  clone.sh = (source.sh || baseNpcLabel(source)) + ' #' + cloneNo;
+  clone.ti = (source.ti || source.sh || 'NPC') + ' · копия ' + cloneNo;
+  clone.su = 'Копия для текущей боевой сцены · ' + (source.su || '');
+  clone.tags = Array.from(new Set([...(source.tags || []), 'Копия']));
+  CS.push(clone);
+  ENCOUNTER_CLONES.push(clone);
+  getState(id);
+  savePersistedState();
+  buildSidebar();
+  showNPC(id);
+}
+function removeEncounterClone(id){
+  const clone = getNpcById(id);
+  if(!clone || !clone.isClone) return;
+  if(!confirm('Удалить эту копию NPC из текущей сцены?')) return;
+  const idx = CS.findIndex(c => Number(c.id) === Number(id));
+  if(idx >= 0) CS.splice(idx, 1);
+  ENCOUNTER_CLONES = ENCOUNTER_CLONES.filter(c => Number(c.id) !== Number(id));
+  delete STATE[id]; delete STATE[String(id)];
+  iniOrder = iniOrder.filter(e => Number(e.id) !== Number(id));
+  if(iniCurrent >= iniOrder.length) iniCurrent = Math.max(0, iniOrder.length - 1);
+  if(Number(curNPC) === Number(id)) {
+    curNPC = -1;
+    document.getElementById('mn').innerHTML = '<div class="placeholder" id="placeholder">← Выбери персонажа слева</div>';
+  }
+  savePersistedState();
+  buildSidebar();
+  refreshIniTracker();
+}
+function clearEncounterClonesOnly(){
+  if(!ENCOUNTER_CLONES.length) return;
+  if(!confirm('Удалить все копии NPC из текущей сцены? Базовые NPC останутся.')) return;
+  const cloneIds = new Set(ENCOUNTER_CLONES.map(c => Number(c.id)));
+  for(let i=CS.length-1;i>=0;i--) if(cloneIds.has(Number(CS[i].id))) CS.splice(i,1);
+  cloneIds.forEach(id => { delete STATE[id]; delete STATE[String(id)]; });
+  ENCOUNTER_CLONES = [];
+  iniOrder = iniOrder.filter(e => !cloneIds.has(Number(e.id)));
+  if(iniCurrent >= iniOrder.length) iniCurrent = Math.max(0, iniOrder.length - 1);
+  if(cloneIds.has(Number(curNPC))) {
+    curNPC = -1;
+    document.getElementById('mn').innerHTML = '<div class="placeholder" id="placeholder">← Выбери персонажа слева</div>';
+  }
+  savePersistedState();
+  buildSidebar();
+  refreshIniTracker();
+}
 function loadPersistedState(){
   try{
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) {
+      for(const k of LEGACY_STORAGE_KEYS){ raw = localStorage.getItem(k); if(raw) break; }
+    }
     if(!raw) return;
     const data = JSON.parse(raw);
+    hydrateEncounterClones(data && data.encounterClones);
     if(data && data.STATE) Object.assign(STATE, data.STATE);
     if(data && Array.isArray(data.iniOrder)) iniOrder = data.iniOrder;
     if(data && typeof data.iniCurrent === 'number') iniCurrent = data.iniCurrent;
@@ -2298,15 +2388,20 @@ function loadPersistedState(){
 }
 function savePersistedState(){
   try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({STATE, iniOrder, iniCurrent}));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({STATE, iniOrder, iniCurrent, encounterClones: ENCOUNTER_CLONES}));
   }catch(e){ console.warn('Не удалось сохранить состояние DM NPC', e); }
 }
 function resetAllDmState(){
-  if(!confirm('Сбросить все ОЗ, состояния, слоты и инициативу?')) return;
+  if(!confirm('Сбросить бой: ОЗ, состояния, слоты, инициативу и все созданные копии NPC?')) return;
   localStorage.removeItem(STORAGE_KEY);
+  LEGACY_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
   Object.keys(STATE).forEach(k=>delete STATE[k]);
+  const cloneIds = new Set(ENCOUNTER_CLONES.map(c => Number(c.id)));
+  for(let i=CS.length-1;i>=0;i--) if(cloneIds.has(Number(CS[i].id))) CS.splice(i,1);
+  ENCOUNTER_CLONES = [];
   iniOrder = [];
   iniCurrent = 0;
+  curNPC = -1;
   buildSidebar();
   document.getElementById('mn').innerHTML = '<div class="placeholder" id="placeholder">← Выбери персонажа слева</div>';
 }
@@ -2317,11 +2412,11 @@ let iniCurrent = 0;
 
 function getState(id) {
   if (!STATE[id]) {
-    const c = CS.find(x => x.id === id);
+    const c = getNpcById(id);
     const slots = {};
     if (c && c.slots) c.slots.forEach(s => { slots[s.lv] = {total: s.n, used: 0}; });
     const sdTotal = c && c.co && c.co.cr && c.co.cr.includes('к8') ?
-      parseInt((c.co.cr.match(/(\d+)к8/)||[0,0])[1]) : 0;
+      parseInt((c.co.cr.match(/(d+)к8/)||[0,0])[1]) : 0;
     STATE[id] = { curHp: c ? c.co.hp : 0, conditions: [], slots, sdUsed: 0, sdTotal, saOn: false };
   }
   return STATE[id];
@@ -2478,7 +2573,7 @@ document.addEventListener('contextmenu', function(e) {
 let hpModalNpcId = null;
 function openHpModal(id) {
   hpModalNpcId = id;
-  const c = CS.find(x=>x.id===id);
+  const c = getNpcById(id);
   document.getElementById('hp-modal-title').textContent = (c?c.sh:'NPC') + ' — HP';
   document.getElementById('hp-modal-val').value = '';
   document.getElementById('hp-modal').style.display = 'flex';
@@ -2488,7 +2583,7 @@ function closeHpModal() { document.getElementById('hp-modal').style.display='non
 function applyHp(sign) {
   const id = hpModalNpcId;
   const val = parseInt(document.getElementById('hp-modal-val').value) || 0;
-  const c = CS.find(x=>x.id===id);
+  const c = getNpcById(id);
   const s = getState(id);
   s.curHp = Math.max(0, Math.min(c.co.hp, s.curHp + sign * val));
   savePersistedState();
@@ -2550,7 +2645,7 @@ function refreshSidebarHP(id) {
   const btn = document.querySelector(`[data-npcid="${id}"]`);
   if (!btn) return;
   const s = getState(id);
-  const c = CS.find(x=>x.id===id);
+  const c = getNpcById(id);
   const maxHp = c.co.hp;
   const pct = Math.max(0, s.curHp/maxHp*100);
   const fill = btn.querySelector('.npc-btn-hp-fill');
@@ -2565,7 +2660,7 @@ function refreshSidebarHP(id) {
 
 function refreshCombatPanel(id) {
   const s = getState(id);
-  const c = CS.find(x=>x.id===id);
+  const c = getNpcById(id);
   if (!c) return;
   const maxHp = c.co.hp;
   const pct = Math.max(0, s.curHp/maxHp*100);
@@ -2584,7 +2679,7 @@ function refreshCombatPanel(id) {
 
 function refreshSlotsPanel(id) {
   const s = getState(id);
-  const c = CS.find(x=>x.id===id);
+  const c = getNpcById(id);
   if (!c || !c.slots) return;
   c.slots.forEach(slot => {
     const st = s.slots[slot.lv];
@@ -2611,60 +2706,68 @@ function refreshSDPanel(id) {
 // ── Sidebar ───────────────────────────────────────────────────────────────
 const m = v => { const r=Math.floor((v-10)/2); return (r>=0?'+':'')+r; };
 
+function sidebarGroupLabel(text, extraHtml){
+  const lbl = document.createElement('div');
+  lbl.className = 'sb-group-label';
+  lbl.innerHTML = '<span>' + text + '</span>' + (extraHtml || '');
+  return lbl;
+}
+
+function renderSidebarNpcButton(c, mode){
+  const s = getState(c.id);
+  const hiHtml = c.hiIcon==='throne'?'<span class="hi-badge throne">△</span>':
+    c.hiIcon==='unity'?'<span class="hi-badge unity">⊙</span>':
+    c.hiIcon==='guild'?'<span class="hi-badge guild">◇</span>':'';
+  const btn = document.createElement('div');
+  btn.className = 'npc-btn ty-' + c.ty + (Number(c.id)===Number(curNPC)?' active':'') + (c.isClone?' npc-btn-clone':'');
+  btn.dataset.npcid = c.id;
+  const pct = Math.max(0,s.curHp/c.co.hp*100);
+  const clLabel = c.isClone ? (baseNpcLabel(c) + ' #' + c.cloneNo) : ((c.tags[0]||'') + (c.tags[1]&&!String(c.tags[1]).startsWith('Ур.')?' / '+c.tags[1]:''));
+  const nameLabel = c.isClone ? ((getNpcById(c.baseId)||{}).sh || 'Копия') : (c.sh !== c.tags[0] && c.sh !== (c.tags[0]+'-'+c.tags[1]) ? c.sh : '');
+  const actionHtml = c.isClone
+    ? '<button class="npc-copy-btn npc-copy-remove" title="Удалить копию из сцены" onclick="event.stopPropagation(); removeEncounterClone('+c.id+')">×</button>'
+    : '<button class="npc-copy-btn" title="Добавить копию этого NPC в сцену боя" onclick="event.stopPropagation(); addEncounterClone('+c.id+')">＋</button>';
+  btn.innerHTML = '<span class="npc-btn-icon">'+c.ic+'</span>'+
+    '<span class="npc-btn-info">'+
+      '<span class="npc-btn-name">'+clLabel+'</span>'+
+      '<span class="npc-btn-sub">'+(nameLabel ? nameLabel+' · ' : '')+c.na+'</span>'+
+      '<div class="npc-btn-hp"><div class="npc-btn-hp-fill '+hpColor(s.curHp,c.co.hp)+'" style="width:'+pct+'%"></div></div>'+
+      '<div class="cond-badges">'+s.conditions.map(k=>'<span class="cond-badge cb-'+k+'">'+(COND_LABELS[k]||k)+'</span>').join('')+'</div>'+
+    '</span>'+hiHtml+actionHtml+'<span class="npc-btn-lv">'+c.lv+'</span>';
+  btn.onclick = () => showNPC(c.id);
+  return btn;
+}
+
 function buildSidebar() {
   const sb = document.getElementById('sb');
   const search = document.getElementById('sb-search').value.toLowerCase();
-  const filtered = CS.filter(c => {
+  const baseList = CS.filter(c => !c.isClone);
+  const filtered = baseList.filter(c => {
     if (!search) return true;
     return c.sh.toLowerCase().includes(search) || c.na.toLowerCase().includes(search) ||
       c.ti.toLowerCase().includes(search) || c.tags.some(t=>t.toLowerCase().includes(search));
   });
 
-  // Group
-  let groups = {};
-  if (groupBy === 'lv') {
-    filtered.sort((a,b)=>a.lv-b.lv).forEach(c => {
-      const k = 'Ур. '+c.lv; (groups[k]=groups[k]||[]).push(c);
-    });
-  } else if (groupBy === 'na') {
-    filtered.sort((a,b)=>a.na.localeCompare(b.na)).forEach(c => {
-      (groups[c.na]=groups[c.na]||[]).push(c);
-    });
-  } else {
-    filtered.sort((a,b)=>(a.tags[0]||'').localeCompare(b.tags[0]||'')).forEach(c => {
-      const k = c.tags[0]||c.sh; (groups[k]=groups[k]||[]).push(c);
-    });
+  document.getElementById('sb-count').textContent = filtered.length + ' / ' + baseList.length + ' базовых · копий: ' + ENCOUNTER_CLONES.length;
+  sb.innerHTML = '';
+
+  if (ENCOUNTER_CLONES.length) {
+    sb.appendChild(sidebarGroupLabel('Сцена боя · копии', '<button class="enc-clear-btn" onclick="event.stopPropagation(); clearEncounterClonesOnly()" title="Удалить все копии NPC">очистить</button>'));
+    ENCOUNTER_CLONES.slice().sort((a,b)=>Number(a.id)-Number(b.id)).forEach(c => sb.appendChild(renderSidebarNpcButton(c, 'clone')));
   }
 
-  document.getElementById('sb-count').textContent = `${filtered.length} / ${CS.length} персонажей`;
-  sb.innerHTML = '';
+  let groups = {};
+  if (groupBy === 'lv') {
+    filtered.sort((a,b)=>a.lv-b.lv).forEach(c => { const k = 'Ур. '+c.lv; (groups[k]=groups[k]||[]).push(c); });
+  } else if (groupBy === 'na') {
+    filtered.sort((a,b)=>a.na.localeCompare(b.na)).forEach(c => { (groups[c.na]=groups[c.na]||[]).push(c); });
+  } else {
+    filtered.sort((a,b)=>(a.tags[0]||'').localeCompare(b.tags[0]||'')).forEach(c => { const k = c.tags[0]||c.sh; (groups[k]=groups[k]||[]).push(c); });
+  }
+
   Object.entries(groups).forEach(([gname, list]) => {
-    if (Object.keys(groups).length > 1) {
-      const lbl = document.createElement('div');
-      lbl.className = 'sb-group-label'; lbl.textContent = gname;
-      sb.appendChild(lbl);
-    }
-    list.forEach(c => {
-      const s = getState(c.id);
-      const hiHtml = c.hiIcon==='throne'?`<span class="hi-badge throne">△</span>`:
-        c.hiIcon==='unity'?`<span class="hi-badge unity">⊙</span>`:
-        c.hiIcon==='guild'?`<span class="hi-badge guild">◇</span>`:'';
-      const btn = document.createElement('div');
-      btn.className = `npc-btn ty-${c.ty}${c.id===curNPC?' active':''}`;
-      btn.dataset.npcid = c.id;
-      const pct = Math.max(0,s.curHp/c.co.hp*100);
-      const clLabel = (c.tags[0]||'') + (c.tags[1]&&!c.tags[1].startsWith('Ур.')?' / '+c.tags[1]:'');
-      const nameLabel = c.sh !== c.tags[0] && c.sh !== (c.tags[0]+'-'+c.tags[1]) ? c.sh : '';
-      btn.innerHTML = `<span class="npc-btn-icon">${c.ic}</span>
-<span class="npc-btn-info">
-  <span class="npc-btn-name">${clLabel}</span>
-  <span class="npc-btn-sub">${nameLabel ? nameLabel+' · ' : ''}${c.na}</span>
-  <div class="npc-btn-hp"><div class="npc-btn-hp-fill ${hpColor(s.curHp,c.co.hp)}" style="width:${pct}%"></div></div>
-  <div class="cond-badges">${s.conditions.map(k=>`<span class="cond-badge cb-${k}">${COND_LABELS[k]||k}</span>`).join('')}</div>
-</span>${hiHtml}<span class="npc-btn-lv">${c.lv}</span>`;
-      btn.onclick = () => showNPC(c.id);
-      sb.appendChild(btn);
-    });
+    if (Object.keys(groups).length > 1 || ENCOUNTER_CLONES.length) sb.appendChild(sidebarGroupLabel(gname));
+    list.forEach(c => sb.appendChild(renderSidebarNpcButton(c, 'base')));
   });
 }
 
@@ -2975,7 +3078,7 @@ function renderClassFeatureModalContent(found, c, abilityName){
     '<div class="weave-pop-desc">'+String(fallbackDesc || '').split(/\n+/).filter(Boolean).map(p=>'<p>'+escHtml(p)+'</p>').join('')+'</div>';
 }
 function showClassFeatureModal(npcId, abilityName, event, hoverMode){
-  const c = CS.find(x=>x.id===npcId);
+  const c = getNpcById(npcId);
   if(!c) return;
   const f = findFeatureInfoForNpc(c, abilityName);
   let pop = document.getElementById('class-feature-popover');
@@ -3063,7 +3166,7 @@ function getSneakAttackExpr(c){
 function showNPC(id) {
   curNPC = id;
   buildSidebar(); // update active state
-  const c = CS.find(x=>x.id===id);
+  const c = getNpcById(id);
   const s = getState(id);
   const main = document.getElementById('mn');
   const ph = document.getElementById('placeholder');
@@ -3090,6 +3193,7 @@ function showNPC(id) {
   <button class="cp-dmg-btn" onclick="openHpModal(${id})">−ОЗ</button>
   <button class="cp-heal-btn" onclick="openHpModal(${id})">+ОЗ</button>
   <button class="cp-reset-btn" onclick="resetHP(${id})" title="Восстановить полные ОЗ">↺</button>
+  ${c.isClone ? `<button class="cp-reset-btn cp-clone-remove" onclick="removeEncounterClone(${id})" title="Удалить эту копию из сцены">× копия</button>` : `<button class="cp-reset-btn cp-clone-add" onclick="addEncounterClone(${id})" title="Создать ещё одну копию этого NPC">＋ копия</button>`}
   <div class="cp-ac-box"><div class="cp-ac-val">${c.co.ac}</div><div class="cp-ac-lbl">КД</div></div>
   <div class="cp-ini-box" onclick="addToIni(${id})" title="Добавить в трекер инициативы"><div class="cp-ini-val">${c.co.ini}</div><div class="cp-ini-lbl">Иниц.</div></div>
   <div class="cp-sp-box"><div class="cp-sp-val">${c.co.sp} фт</div><div class="cp-sp-lbl">Скор.</div></div>
@@ -3104,7 +3208,7 @@ function showNPC(id) {
   html += `<div class="ini-tracker" id="ini-tracker">
   <span class="ini-tracker-label">Инициатива:</span>
   ${iniOrder.length ? iniOrder.map((e,i)=>{
-    const nc=CS.find(x=>x.id===e.id);
+    const nc=getNpcById(e.id);
     return `<div class="ini-slot${i===iniCurrent?' current':''}" onclick="iniJump(${i})">${nc?nc.ic:'?'} <span class="ini-slot-name">${nc?nc.sh.split(' ')[0]:'?'}</span><span class="ini-slot-val">${e.val}</span></div>`;
   }).join('') : '<span style="color:var(--text3);font-size:10px">Нажмите на Иниц. чтобы добавить NPC</span>'}
   ${iniOrder.length?`<button class="ini-next-btn" onclick="iniNext()">→ След.</button><button class="ini-clear-btn" onclick="iniClear()">✕</button>`:''}
@@ -3384,7 +3488,7 @@ function rollSkillInline(npcId, name, bonus){
 }
 
 function rollAllAtk(npcId) {
-  const c = CS.find(x=>x.id===npcId);
+  const c = getNpcById(npcId);
   if (!c) return;
   const parseAtk = a => { const m=a.match(/^([+\-]\d+)/); return m?parseInt(m[1]):0; };
   c.at.forEach((atk, ai) => {
@@ -3395,7 +3499,7 @@ function rollAllAtk(npcId) {
 // ── Rest functions ───────────────────────────────────────────────────────
 function shortRest(id) {
   const s = getState(id);
-  const c = CS.find(x=>x.id===id);
+  const c = getNpcById(id);
   // Restore: Second Wind, Action Surge, SD, Battle Master SD, Oгл.удар
   s.sdUsed = 0;
   // Roll HD to restore HP (simplified: restore 1d8+con or 1d10+con)
@@ -3414,7 +3518,7 @@ function shortRest(id) {
 
 function longRest(id) {
   const s = getState(id);
-  const c = CS.find(x=>x.id===id);
+  const c = getNpcById(id);
   s.curHp = c.co.hp;
   s.sdUsed = 0;
   s.saOn = false;
@@ -3456,7 +3560,7 @@ function refreshIniTracker() {
   if (!el) return;
   let html = '<span class="ini-tracker-label">Инициатива:</span>';
   html += iniOrder.map((e,i)=>{
-    const nc = e.id>0 ? CS.find(x=>x.id===e.id) : null;
+    const nc = e.id>0 ? getNpcById(e.id) : null;
     const ico = nc?nc.ic:'👤';
     const nm = nc?nc.sh.split(' ')[0]:(e.manualName||'?');
     return `<div class="ini-slot${i===iniCurrent?' current':''}" onclick="${e.id>0?'iniJump('+i+')':'iniJump('+i+')'}">${ico} <span class="ini-slot-name">${nm}</span><span class="ini-slot-val">${e.val}</span></div>`;
@@ -3536,19 +3640,19 @@ function toggleSA(id) {
 
 // ── Reset HP ─────────────────────────────────────────────────────────────
 function resetHP(id) {
-  const c = CS.find(x=>x.id===id);
+  const c = getNpcById(id);
   if (c) { getState(id).curHp = c.co.hp; savePersistedState(); refreshCombatPanel(id); refreshSidebarHP(id); }
 }
 
 // ── Initiative Tracker ────────────────────────────────────────────────────
 function addToIni(id) {
-  const c = CS.find(x=>x.id===id);
+  const c = getNpcById(id);
   if (!c) return;
   const iniStr = c.co.ini.replace(/[^0-9+\-]/g,'');
   const iniBonus = parseInt(iniStr)||0;
   const roll20 = Math.floor(Math.random()*20)+1;
   const total = roll20 + iniBonus;
-  if (!iniOrder.find(e=>e.id===id)) {
+  if (!iniOrder.find(e=>Number(e.id)===Number(id))) {
     iniOrder.push({id, val:total});
     iniOrder.sort((a,b)=>b.val-a.val);
     savePersistedState();

@@ -698,3 +698,16 @@ html.auth-lock body > *:not(.auth-overlay){filter:blur(5px);pointer-events:none;
 .auth-form input.auth-input-error{border-color:rgba(190,61,48,.85);box-shadow:0 0 0 3px rgba(190,61,48,.14);}
 .auth-error{min-height:18px;margin:0;color:#e7a39a;font-size:13px;}
 .auth-form button{border:1px solid rgba(201,169,97,.42);border-radius:14px;padding:13px 18px;background:linear-gradient(135deg,rgba(201,169,97,.28),rgba(105,70,36,.38));color:#fff4d7;font-family:Cinzel,serif;text-transform:uppercase;letter-spacing:.14em;cursor:pointer;}
+
+/* ── Encounter copies / temporary battle roster ── */
+.sb-group-label{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.enc-clear-btn{background:var(--danger-bg);border:1px solid var(--danger-border);border-radius:3px;color:var(--red2);font-family:'Cinzel',serif;font-size:8px;letter-spacing:.05em;text-transform:uppercase;padding:1px 5px;cursor:pointer}
+.enc-clear-btn:hover{border-color:var(--red);color:var(--red2);background:#351010}
+.npc-copy-btn{flex-shrink:0;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1;padding:3px 5px;cursor:pointer;transition:all .12s}
+.npc-copy-btn:hover{background:var(--warning-bg);border-color:var(--gold);color:var(--gold3)}
+.npc-copy-remove{background:var(--danger-bg);border-color:var(--danger-border);color:var(--red2)}
+.npc-copy-remove:hover{background:#351010;border-color:var(--red);color:var(--red2)}
+.npc-btn-clone{background:rgba(201,168,76,.04);border-color:rgba(201,168,76,.18)}
+.npc-btn-clone .npc-btn-name{color:var(--gold2)}
+.cp-clone-add{border-color:var(--gold);color:var(--gold2)}
+.cp-clone-remove{border-color:var(--danger-border);color:var(--red2);background:var(--danger-bg)}
