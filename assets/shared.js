@@ -138,7 +138,7 @@
 })();
 
 
-/* ==== v53: DM Toolkit dropdown at the right edge + password-gated links ==== */
+/* ==== v58: DM Toolkit dropdown at the right edge + password-gated links ==== */
 (function(){
   'use strict';
   const navLinks = document.querySelector('.nav-links');
@@ -150,6 +150,7 @@
   const path = (location.pathname.split('/').pop() || 'index.html');
   const dmItems = [
     {href:'monsters.html', label:'Монстры'},
+    {href:'monsters-battle.html', label:'Monsters / Бой'},
     {href:'encounter-generator.html', label:'Генератор энкаунтеров'},
     {href:'dm-npc.html', label:'NPC / Бой'}
   ];

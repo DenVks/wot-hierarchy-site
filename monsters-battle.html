@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DM Toolkit · Monsters / Бой</title>
+<script src="assets/auth.js?v=58"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#0f0e0c;--bg2:#161410;--bg3:#1e1b16;--bg4:#252118;
+  --border:#3a3020;--border2:#4a4030;
+  --gold:#c9a84c;--gold2:#e8c97a;--gold3:#f5dfa0;
+  --red:#c94c4c;--red2:#e87a7a;--blue:#4c7ac9;--blue2:#7aa8e8;
+  --green:#4ca84c;--green2:#7ac97a;--purple:#8a4cc9;--purple2:#b07ae8;
+  --teal:#4ac9b0;--teal2:#7ae8d4;
+  --text:#e8dcc8;--text2:#b8a888;--text3:#887860;
+  --danger-bg:#2a1010;--danger-border:#5a2020;
+  --warning-bg:#1e1a08;--warning-border:#4a3c10;
+  --info-bg:#0a1020;--info-border:#1a3060;
+  --success-bg:#0a1810;--success-border:#1a4020;
+  --purple-bg:#1a0a28;--purple-border:#3a1a5a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font-size:15px;line-height:1.5;min-height:100vh}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:230px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-header{padding:10px 10px 8px;border-bottom:1px solid var(--border)}
+.sidebar-title{font-family:'Cinzel',serif;font-size:12px;color:var(--gold);letter-spacing:.08em;text-transform:uppercase}
+.sidebar-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.search-row{padding:6px 8px;border-bottom:1px solid var(--border);display:flex;gap:4px;align-items:center}
+.search-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:3px 7px;color:var(--text);font-size:11px;outline:none}
+.search-input:focus{border-color:var(--gold)}
+.search-input::placeholder{color:var(--text3)}
+.sidebar-list{flex:1;overflow-y:auto;padding:4px}
+.sidebar-list::-webkit-scrollbar{width:4px}
+.sidebar-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sb-group-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;padding:8px 8px 3px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px}
+.sb-group-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+.mon-btn{width:100%;background:none;border:1px solid transparent;border-radius:5px;padding:5px 8px;cursor:pointer;text-align:left;color:var(--text2);transition:all .12s;margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.mon-btn:hover{background:var(--bg3);border-color:var(--border);color:var(--text)}
+.mon-btn.active{background:var(--bg4);border-color:var(--border2);color:var(--gold)}
+.mon-btn-cr{font-family:'JetBrains Mono',monospace;font-size:10px;padding:1px 4px;border-radius:2px;flex-shrink:0;font-weight:500}
+.mon-btn-info{flex:1;min-width:0}
+.mon-btn-name{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mon-btn-sub{font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mon-btn-hp{width:100%;height:3px;background:var(--border);border-radius:1px;margin-top:3px}
+.mon-btn-hp-fill{height:100%;border-radius:1px;transition:width .3s}
+.hp-high{background:var(--green2)}.hp-mid{background:var(--gold2)}.hp-low{background:var(--red2)}.hp-dead{background:#555}
+
+/* Zone colors */
+.mon-btn.z-oreol.active{border-color:var(--gold);color:var(--gold2)}
+.mon-btn.z-greb.active{border-color:var(--blue);color:var(--blue2)}
+.mon-btn.z-yadro.active{border-color:var(--red);color:var(--red2)}
+
+/* Main */
+.main{flex:1;overflow-y:auto;background:var(--bg);display:flex;flex-direction:column}
+.main::-webkit-scrollbar{width:6px}
+.main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.placeholder{display:flex;align-items:center;justify-content:center;flex:1;color:var(--text3);font-family:'Cinzel',serif;font-size:13px;letter-spacing:.1em;text-align:center;padding:40px}
+
+/* Combat Panel */
+.combat-panel{background:var(--bg2);border-bottom:2px solid var(--border2);padding:8px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0;position:sticky;top:0;z-index:10}
+.cp-name{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--gold3);flex-shrink:0}
+.cp-hp-block{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;cursor:pointer}
+.cp-hp-block:hover .cp-hp-cur{text-shadow:0 0 8px currentColor}
+.cp-hp-label{font-size:10px;color:var(--text3);font-family:'Cinzel',serif;text-transform:uppercase;letter-spacing:.06em}
+.cp-hp-cur{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--green2);cursor:pointer;min-width:40px;text-align:center}
+.cp-hp-sep{color:var(--text3);font-size:14px}
+.cp-hp-max{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--text3)}
+.cp-hp-bar{width:80px;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.cp-hp-fill{height:100%;border-radius:3px;transition:width .3s}
+.cp-dmg-btn{background:var(--danger-bg);border:1px solid var(--red);border-radius:4px;color:var(--red2);padding:3px 8px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;transition:all .12s}
+.cp-dmg-btn:hover{background:#3a1010}
+.cp-heal-btn{background:var(--success-bg);border:1px solid var(--green);border-radius:4px;color:var(--green2);padding:3px 8px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;transition:all .12s}
+.cp-heal-btn:hover{background:#102010}
+.cp-ac-box{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;text-align:center}
+.cp-ac-val{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--blue2)}
+.cp-ac-lbl{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
+.cp-ini-box{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;text-align:center}
+.cp-ini-val{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--gold2)}
+.cp-ini-lbl{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
+.cp-pp-box{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;text-align:center}
+.cp-pp-val{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--teal2)}
+.cp-pp-lbl{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
+.cp-cr-box{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;text-align:center;max-width:200px}
+.cp-cr-val{font-family:'Cinzel',serif;font-size:10px;font-weight:600;color:var(--gold2)}
+.cp-cr-lbl{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
+
+/* Phase badge */
+.phase-badge{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 6px;border-radius:3px;cursor:pointer;transition:all .12s}
+.phase-badge.ph1{background:var(--success-bg);border:1px solid var(--green);color:var(--green2)}
+.phase-badge.ph2{background:var(--danger-bg);border:1px solid var(--red);color:var(--red2)}
+
+/* Conditions */
+.cond-panel{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.cond-toggle{padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;font-size:11px;transition:all .12s;font-family:'Cinzel',serif;letter-spacing:.04em}
+.cond-toggle:hover{border-color:var(--border2);color:var(--text)}
+.cond-toggle.on-stun{background:#2a1a00;border-color:#c97a00;color:#e8a84c}
+.cond-toggle.on-prone{background:#1a1a0a;border-color:#8a8a4c;color:#c8c87a}
+.cond-toggle.on-blind{background:#0a0a1a;border-color:#4c7ac9;color:#7aa8e8}
+.cond-toggle.on-restrained{background:#1a0a1a;border-color:#8a4cc9;color:#b07ae8}
+.cond-toggle.on-poison{background:#0a1a0a;border-color:#4a8a4a;color:#7ac97a}
+.cond-toggle.on-fear{background:#1a0a2a;border-color:#7a4cc9;color:#b07ae8}
+
+/* Dice */
+.dice-section{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.dice-btn{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text2);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 7px;transition:all .12s}
+.dice-btn:hover{border-color:var(--gold);color:var(--gold2)}
+.dice-output{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold2);background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:2px 8px;min-width:40px;text-align:center;display:inline-block}
+
+/* Sheet */
+.sheet{padding:12px 16px 40px;flex:1}
+.sheet-header{padding:12px 16px;border-radius:8px;margin-bottom:10px;border:1px solid var(--border)}
+.sheet-header.z-oreol{background:var(--warning-bg);border-color:var(--warning-border)}
+.sheet-header.z-greb{background:var(--info-bg);border-color:var(--info-border)}
+.sheet-header.z-yadro{background:var(--danger-bg);border-color:var(--danger-border)}
+.sh-row1{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.sh-icon{font-size:20px}
+.sh-title{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--gold3)}
+.sh-en{font-size:12px;color:var(--text3);font-style:italic}
+.sh-sub{font-size:12px;color:var(--text2);font-style:italic}
+.sh-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.tag{font-family:'JetBrains Mono',monospace;font-size:9px;padding:1px 6px;border-radius:3px;border:1px solid;letter-spacing:.04em}
+.tag-danger{background:var(--danger-bg);border-color:var(--red);color:var(--red2)}
+.tag-warning{background:var(--warning-bg);border-color:var(--gold);color:var(--gold2)}
+.tag-info{background:var(--info-bg);border-color:var(--blue);color:var(--blue2)}
+.tag-success{background:var(--success-bg);border-color:var(--green);color:var(--green2)}
+.tag-neutral{background:var(--bg3);border-color:var(--border2);color:var(--text2)}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;margin-bottom:10px;background:var(--bg2);padding:3px;border-radius:7px;border:1px solid var(--border);flex-wrap:wrap}
+.tab-btn{flex:1;padding:5px 3px;border:none;border-radius:5px;background:transparent;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.05em;color:var(--text3);transition:all .12s;text-transform:uppercase;min-width:50px}
+.tab-btn:hover{color:var(--text);background:var(--bg3)}
+.tab-btn.active{background:var(--bg4);color:var(--gold);border:1px solid var(--border2)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:10px}
+.stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:6px 3px;text-align:center}
+.stat-name{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.06em;color:var(--text3);text-transform:uppercase;margin-bottom:2px}
+.stat-val{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--gold3);line-height:1}
+.stat-mod{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);margin-top:1px}
+.stat-box.hi .stat-val{color:var(--red2)}
+.stat-box.hi .stat-mod{color:var(--red2)}
+
+/* Highlight boxes (ОЗ, КД, Инит, П.Восп) */
+.highlight-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px}
+.hl-box{border-radius:6px;padding:8px 5px;text-align:center;border:1px solid}
+.hl-box.z-oreol{background:var(--warning-bg);border-color:var(--gold)}
+.hl-box.z-greb{background:var(--info-bg);border-color:var(--blue)}
+.hl-box.z-yadro{background:var(--danger-bg);border-color:var(--red)}
+.hl-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.hl-box.z-oreol .hl-label{color:var(--gold)}
+.hl-box.z-greb .hl-label{color:var(--blue2)}
+.hl-box.z-yadro .hl-label{color:var(--red2)}
+.hl-val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;line-height:1.1}
+.hl-box.z-oreol .hl-val{color:var(--gold2)}
+.hl-box.z-greb .hl-val{color:var(--blue2)}
+.hl-box.z-yadro .hl-val{color:var(--red2)}
+.hl-sub{font-size:10px;margin-top:2px}
+.hl-box.z-oreol .hl-sub{color:var(--gold)}
+.hl-box.z-greb .hl-sub{color:var(--blue)}
+.hl-box.z-yadro .hl-sub{color:var(--red)}
+
+.core-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:10px}
+.core-box{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:6px 8px;display:flex;justify-content:space-between;align-items:center}
+.core-label{font-size:10px;color:var(--text3)}
+.core-val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);font-weight:500}
+
+/* Section headers */
+.sec{margin-bottom:10px}
+.sec-h{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.sec-h::before{content:'';display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:1px}
+
+/* Attack cards */
+.atk-card{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;margin-bottom:6px}
+.atk-card-header{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.atk-name{font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:var(--text);flex:1}
+.atk-bonus{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold2);flex-shrink:0}
+.atk-dmg{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--red2);flex-shrink:0}
+.atk-type{font-size:10px;color:var(--text3);flex-shrink:0;background:var(--bg4);padding:1px 5px;border-radius:3px;border:1px solid var(--border)}
+.atk-range{font-size:10px;color:var(--text2);margin-top:1px}
+.atk-note{font-size:11px;color:var(--text2);line-height:1.4;margin-top:3px}
+.atk-btn-row{display:flex;gap:5px;align-items:center;margin-top:6px}
+.atk-roll-btn{flex:1;background:var(--bg4);border:1px solid var(--gold);border-radius:5px;color:var(--gold2);padding:4px 8px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;transition:all .12s}
+.atk-roll-btn:hover{background:var(--warning-bg);border-color:var(--gold2)}
+.atk-dmg-btn{background:var(--danger-bg);border:1px solid var(--red);border-radius:5px;color:var(--red2);padding:4px 8px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;transition:all .12s}
+.atk-dmg-btn:hover{background:#3a1010}
+.atk-inline-result{font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 8px;border-radius:4px;margin-top:3px;min-height:0;transition:all .2s;line-height:1.6}
+.atk-inline-result.show{background:var(--bg4);border:1px solid var(--border2)}
+.r-d20{font-size:16px;font-weight:700}.r-hit{color:var(--gold2)}.r-miss{color:var(--text3)}.r-crit{color:var(--red2)}.r-dmg{color:var(--red2);font-size:15px;font-weight:700}.r-label{color:var(--text3);font-size:10px}
+
+/* Ability cards */
+.ab-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px}
+.ab-card{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:6px 8px}
+.ab-card.highlight{border-color:var(--border2);background:var(--bg4)}
+.ab-name{font-family:'Cinzel',serif;font-size:10px;color:var(--gold2);margin-bottom:2px}
+.ab-desc{font-size:11px;color:var(--text2);line-height:1.35}
+
+/* Counter-mechanics */
+.km-box{background:var(--bg3);border-radius:8px;padding:14px 16px;margin-bottom:10px;border:2px solid}
+.km-box.z-oreol{background:var(--warning-bg);border-color:var(--gold)}
+.km-box.z-greb{background:var(--info-bg);border-color:var(--blue)}
+.km-box.z-yadro{background:var(--danger-bg);border-color:var(--red)}
+.km-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.km-box.z-oreol .km-label{color:var(--gold)}
+.km-box.z-greb .km-label{color:var(--blue2)}
+.km-box.z-yadro .km-label{color:var(--red2)}
+.km-text{font-size:14px;line-height:1.6;font-weight:600}
+.km-box.z-oreol .km-text{color:var(--gold3)}
+.km-box.z-greb .km-text{color:var(--blue2)}
+.km-box.z-yadro .km-text{color:var(--red2)}
+
+/* Phase 2 box */
+.phase2-box{background:var(--danger-bg);border:1px solid var(--red);border-radius:6px;padding:10px 12px;margin-bottom:10px}
+.phase2-title{font-family:'Cinzel',serif;font-size:11px;color:var(--red2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.phase2-indicator{width:8px;height:8px;border-radius:50%;background:var(--red2);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.phase2-text{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* Defense tab */
+.def-row{display:flex;gap:8px;padding:6px 8px;background:var(--bg3);border-radius:4px;border:1px solid var(--border);margin-bottom:4px;align-items:flex-start}
+.def-key{font-size:11px;color:var(--text3);min-width:110px;flex-shrink:0;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.05em;text-transform:uppercase}
+.def-val{font-size:11px;color:var(--text);line-height:1.4}
+
+/* Legendary actions */
+.la-card{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:5px;padding:6px 8px;margin-bottom:4px}
+.la-name{font-family:'Cinzel',serif;font-size:10px;color:var(--gold);margin-bottom:2px}
+.la-desc{font-size:11px;color:var(--text2);line-height:1.35}
+.re-card{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:5px;padding:6px 8px;margin-bottom:4px}
+.re-name{font-family:'Cinzel',serif;font-size:10px;color:var(--teal2);margin-bottom:2px}
+.re-desc{font-size:11px;color:var(--text2);line-height:1.35}
+
+/* HP modal */
+.hp-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center}
+.hp-modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:20px;min-width:240px}
+.hp-modal-title{font-family:'Cinzel',serif;font-size:13px;color:var(--gold);margin-bottom:12px;text-align:center}
+.hp-modal-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:20px;text-align:center;outline:none;margin-bottom:10px}
+.hp-modal-input:focus{border-color:var(--gold)}
+.hp-modal-btns{display:flex;gap:6px}
+.hp-modal-dmg{flex:1;background:var(--danger-bg);border:1px solid var(--red);border-radius:5px;color:var(--red2);padding:7px;cursor:pointer;font-family:'Cinzel',serif;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.hp-modal-heal{flex:1;background:var(--success-bg);border:1px solid var(--green);border-radius:5px;color:var(--green2);padding:7px;cursor:pointer;font-family:'Cinzel',serif;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.hp-modal-cancel{background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text3);padding:7px 12px;cursor:pointer;font-size:12px}
+
+/* Dice floating */
+.dice-modal{position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;z-index:100;min-width:180px;box-shadow:0 4px 20px rgba(0,0,0,.6)}
+.dice-modal-title{font-family:'Cinzel',serif;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.dice-modal-result{font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--gold2);text-align:center;margin:6px 0;font-weight:700;line-height:1}
+.dice-modal-detail{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);text-align:center;margin-bottom:4px}
+.dice-modal-close{position:absolute;top:6px;right:8px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px}
+.dice-modal.crit .dice-modal-result{color:var(--red2)}
+.dice-modal.fumble .dice-modal-result{color:var(--text3)}
+
+/* DM Toolkit badge */
+.dm-tool-badge{position:fixed;top:8px;right:12px;z-index:50;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold2);background:rgba(15,14,12,.86);border:1px solid var(--border2);border-radius:999px;padding:4px 10px;pointer-events:none}
+.sidebar-sub a{color:var(--gold2);text-decoration:none}.sidebar-sub a:hover{text-decoration:underline}
+
+@media(max-width:700px){
+  .app{flex-direction:column;height:auto}
+  .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border)}
+  .ab-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(3,1fr)}
+  .highlight-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="dm-tool-badge">DM Toolkit · Monsters / Бой</div>
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">WoT 5e · Монстры Стены</div>
+    <div class="sidebar-sub"><a href="index.html">← на сайт</a> · CR 5–18 · Аномальная Стена</div>
+  </div>
+  <div class="search-row">
+    <input class="search-input" id="sb-search" placeholder="Поиск по имени / CR / зоне..." oninput="filterSidebar()">
+  </div>
+  <div class="sidebar-list" id="sb"></div>
+</aside>
+<main class="main" id="mn">
+  <div class="placeholder" id="placeholder">← Выбери существо слева</div>
+</main>
+</div>
+
+<div class="hp-modal" id="hp-modal" style="display:none">
+  <div class="hp-modal-box">
+    <div class="hp-modal-title" id="hp-modal-title">Урон / Лечение</div>
+    <input class="hp-modal-input" id="hp-modal-val" type="number" min="0" placeholder="0">
+    <div class="hp-modal-btns">
+      <button class="hp-modal-cancel" onclick="closeHpModal()">Отмена</button>
+      <button class="hp-modal-heal" onclick="applyHp(1)">+ Лечение</button>
+      <button class="hp-modal-dmg" onclick="applyHp(-1)">− Урон</button>
+    </div>
+  </div>
+</div>
+
+<div class="dice-modal" id="dice-modal" style="display:none">
+  <button class="dice-modal-close" onclick="document.getElementById('dice-modal').style.display='none'">✕</button>
+  <div class="dice-modal-title" id="dice-modal-title">Бросок</div>
+  <div class="dice-modal-result" id="dice-modal-result">—</div>
+  <div class="dice-modal-detail" id="dice-modal-detail"></div>
+</div>
+
+<script>
+const MS=[
+{id:1,z:'oreol',cr:'7',crN:7,xp:'2 900',nm:'Картограф',en:'Cartographer',ly:'Внешняя Тень',sz:'Среднее, аберрация',
+st:{str:10,con:16,dex:16,int:14,wis:18,cha:10},
+hp:105,hpF:'14к8+42',ac:15,acN:'силовая броня',spd:'парение 40 фт',ini:'+3',pp:17,
+sv:'Лов +6, МДР +7',sk:'Восприятие +7, История +5',
+res:'Силовой; прон. от немагич. оружия',idmg:'',ics:'Испуг, очарование, сбивание с ног',sn:'Тёмное зрение 120 фт',lng:'Понимает все языки, не говорит',
+tr:[
+  {n:'Разметка маршрута (аура 30 фт)',d:'Янтарные маршрутные контуры в ауре. Начало хода в ауре: МДР СЛ 15 или движение только по прямым (горизонталь/вертикаль), нельзя Рывок.',hi:true},
+  {n:'Судья маршрута',d:'При телепортации/мгновенном перемещении в 60 фт: реакцией переместить цель на 1к6×5 фт в случ. направлении (ТЕЛ СЛ 15 отменяет).'}
+],
+at:[
+  {n:'Мультиатака',d:'Две атаки Печатью маршрута.',isMulti:true},
+  {n:'Печать маршрута',a:'+7',d:'2к8+4',t:'Силовой',r:'дос. 10 фт',no:'Помечает цель: если движется не к Картографу — получает 1к8 силового урона. Метка до начала след. хода Картографа.',dice:'2к8',bonus:4},
+  {n:'Принудительный возврат',a:'пер.5–6',d:'—',t:'МДР',r:'60 фт',no:'МДР СЛ 15: провал = телепортация к точке начала хода. Успех = 10 фт к исходной позиции (без атак возм.).',dice:'',bonus:0,sv:true}
+],
+re:[{n:'Перехват маршрута (1/раунд)',d:'При попытке телепортации в ауре — активирует «Судью маршрута».'}],
+la:null,laC:0,
+km:'Не двигаться с места в течение хода — Картограф теряет интерес: все его броски атаки по неподвижной цели с помехой до начала следующего хода этого существа.'},
+
+{id:2,z:'oreol',cr:'8',crN:8,xp:'3 900',nm:'Пиявка',en:'Stability Leech',ly:'Внешняя Тень',sz:'Среднее, аберрация',
+st:{str:18,con:16,dex:16,int:6,wis:14,cha:6},
+hp:120,hpF:'16к8+48',ac:16,acN:'естественная броня',spd:'40 фт, лазание 30 фт',ini:'+3',pp:15,
+sv:'Сил +7, Тел +6',sk:'Скрытность +6, Восприятие +5',
+res:'Некротический; прон. от немагич. оружия',idmg:'',ics:'Испуг, очарование',sn:'Тёмное зрение 60 фт',lng:'—',
+tr:[
+  {n:'Паразит устойчивости',d:'При кости превосходства, Вдохновении или восстановлении хп от реакции/бон.д. в 30 фт — Пиявка получает 12 вр.хп (макс. 36).',hi:true},
+  {n:'Паразитический захват',d:'Пока цель захвачена: восстанавливает вдвое меньше хп; нельзя использовать кости превосходства и Вдохновение.'}
+],
+at:[
+  {n:'Мультиатака',d:'Истощающий укус + Захват (или два укуса).',isMulti:true},
+  {n:'Истощающий укус',a:'+7',d:'2к6+4 прон. + 2к6 некрот.',t:'Прон./Некрот.',r:'5 фт',no:'ТЕЛ СЛ 14 или нет костей превосходства до конца след. хода.',dice:'2к6',bonus:4},
+  {n:'Захват',a:'+7',d:'1к8+4 дроб.',t:'Дроб.',r:'5 фт',no:'Захват Escape DC 15. Пока захвачена — бон.д.: Укус.',dice:'1к8',bonus:4},
+  {n:'Поглощение запаса (бон.д., 1/раунд)',a:'—',d:'+15 ОЗ',t:'Особ.',r:'захвачена',no:'Истощает 1 ячейку 1+ ур. захваченной цели → Пиявка восст. 15 хп.',dice:'',bonus:0,sv:true}
+],
+re:[{n:'Инстинкт паразита (1/раунд)',d:'Союзник в 30 фт получает урон — Пиявка перемещается на 10 фт к атакующему без атак возм.'}],
+la:null,laC:0,
+km:'Атаковать Force (силовым) уроном — «Паразит устойчивости» не срабатывает на это существо в этот раунд.'},
+
+{id:3,z:'oreol',cr:'9',crN:9,xp:'5 000',nm:'Арбитр',en:'Arbiter',ly:'Внешняя Тень',sz:'Большое, аберрация',
+st:{str:14,con:18,dex:14,int:16,wis:18,cha:14},
+hp:152,hpF:'16к10+64',ac:17,acN:'силовая броня',spd:'парение 50 фт',ini:'+2',pp:17,
+sv:'Тел +7, МДР +7, Хар +5',sk:'Восприятие +7, Проницательность +7',
+res:'Психический; силовой',idmg:'Огонь',ics:'Испуг, очарование, ослепление',sn:'Истинное зрение 30 фт, ТЗ 120 фт',lng:'Понимает все языки, говорит тихо',
+tr:[
+  {n:'Накопление нарушений (макс. 6)',d:'Реакция/бон.д./кость превосходства/маг.предмет в 60 фт = +1 маркер. Все маркеры сбрасываются в начале хода Арбитра.',hi:true},
+  {n:'Правосудие маршрута',d:'Промах атакой по Арбитру → атакующий автоматически получает 1к8 силового урона.'}
+],
+at:[
+  {n:'Мультиатака',d:'Два Вердикта, или Вынести приговор (если есть маркеры).',isMulti:true},
+  {n:'Вердикт',a:'+7',d:'3к8+4',t:'Силовой',r:'60 фт',no:'+1 маркер нарушения при попадании.',dice:'3к8',bonus:4},
+  {n:'Вынести приговор',a:'все маркеры',d:'маркеры×2к8',t:'Силовой',r:'60 фт',no:'Тратит ВСЕ маркеры. ТЕЛ СЛ 15 или ошеломлён до конца след. хода. При успехе — полный урон без ошеломления.',dice:'2к8',bonus:0,sv:true},
+  {n:'Запрет действия (1/день)',a:'—',d:'—',t:'Особ.',r:'60 фт',no:'Запрещает тип (Рывок/Бон.д./Реакции) всем в 60 фт до след. хода Арбитра. МДР СЛ 15 отменяет.',dice:'',bonus:0,sv:true}
+],
+re:[{n:'Отдача нарушения (авто.)',d:'При промахе атакой по Арбитру: атакующий получает 1к8 силового урона автоматически.'}],
+la:null,laC:0,
+km:'Не использовать реакции, бон. действия и спецспособности весь раунд — Арбитр не накапливает маркеры нарушений от этого существа в этот ход.'},
+
+{id:4,z:'oreol',cr:'8',crN:8,xp:'3 900',nm:'Сборщик',en:'Imprint Collector',ly:'Внутренняя Тень',sz:'Среднее, аберрация',
+st:{str:12,con:14,dex:18,int:12,wis:16,cha:8},
+hp:117,hpF:'18к8+36',ac:15,acN:'естественная броня',spd:'35 фт, лазание 25 фт',ini:'+4',pp:16,
+sv:'Лов +7, МДР +6',sk:'Скрытность +7, Восприятие +6',
+res:'Некротический',idmg:'',ics:'Испуг, очарование',sn:'Тёмное зрение 90 фт',lng:'—',
+tr:[
+  {n:'Сбор отпечатка',d:'При завершении движения существом в 15 фт — бон.д.: «снять отпечаток». Хранит 1 отпечаток (новый заменяет старый).',hi:true},
+  {n:'Двойной след',d:'Все в 30 фт оставляют двойные следы. Выживание (отслеживание) и Восприятие (следы) — с помехой.'}
+],
+at:[
+  {n:'Мультиатака',d:'Две атаки Хватательным щупальцем.',isMulti:true},
+  {n:'Хватательное щупальце',a:'+7',d:'2к6+4',t:'Прон.',r:'дос. 10 фт',no:'Крит — авто. снимает отпечаток цели.',dice:'2к6',bonus:4},
+  {n:'Выпустить тень',a:'—',d:'—',t:'Иллюзия',r:'30 фт',no:'Материализует отпечаток. Тень: КД 13, 1 хп. При атаке оригинала: к6 — 1–3 попадают в Тень, 4–6 — в оригинал. 1 минута.',dice:'',bonus:0,sv:true},
+  {n:'Петля следа (пер. 5–6)',a:'—',d:'—',t:'МДР',r:'30 фт',no:'МДР СЛ 14: 3 раунда — начало хода цели = принудит. движение 10 фт по прошлому маршруту.',dice:'',bonus:0,sv:true}
+],
+re:[{n:'Подмена следа (1/раунд)',d:'Если есть активная Тень существа в 15 фт — переключает входящую атаку на Тень.'}],
+la:null,laC:0,
+km:'Истинное зрение или заклинание Рассеивание магии (Dispel Magic) — уничтожает все тени Сборщика и ошеломляет его до конца следующего хода.'},
+
+{id:5,z:'oreol',cr:'9',crN:9,xp:'5 000',nm:'Клеймовщик',en:'Brander',ly:'Внутренняя Тень',sz:'Среднее, аберрация',
+st:{str:16,con:18,dex:18,int:10,wis:14,cha:8},
+hp:136,hpF:'16к8+64',ac:17,acN:'силовые скобы',spd:'40 фт, парение 20 фт',ini:'+4',pp:15,
+sv:'Лов +7, Тел +7',sk:'Скрытность +7, Восприятие +5',
+res:'Силовой; прон. от немагич.',idmg:'',ics:'Испуг, очарование, захват',sn:'Тёмное зрение 90 фт',lng:'—',
+tr:[
+  {n:'Печать возврата',d:'При попадании: цель помечена. Начало её след. хода: МДР СЛ 16 или телепорт 15 фт к Клеймовщику. Снимается при срабатывании или гибели Клеймовщика.',hi:true},
+  {n:'Маркировка стаи',d:'Существа Ореола получают +2 к атаке по целям с активной «Печатью возврата».'}
+],
+at:[
+  {n:'Мультиатака',d:'Скоба + Навесить скобу (если перезаряжено).',isMulti:true},
+  {n:'Скоба',a:'+7',d:'2к8+4',t:'Прон.',r:'5 фт',no:'Накладывает «Печать возврата».',dice:'2к8',bonus:4},
+  {n:'Навесить скобу (пер.5–6)',a:'+7',d:'2к6+4',t:'Прон.',r:'40/80 фт',no:'−2 КД + помеха Скрытности до конца боя. Накладывает «Печать возврата».',dice:'2к6',bonus:4},
+  {n:'Рывок меток (пер.6)',a:'—',d:'—',t:'МДР',r:'все с печатью',no:'Все «Печати возврата» срабатывают одновременно: МДР СЛ 16 или телепорт к Клеймовщику.',dice:'',bonus:0,sv:true}
+],
+re:[{n:'Скобяной щит (1/раунд)',d:'При получении урона: снизить на 1к10+4.'}],
+la:null,laC:0,
+km:'Уничтожение Клеймовщика снимает ВСЕ его активные метки со всех существ немедленно.'},
+
+{id:6,z:'oreol',cr:'10',crN:10,xp:'5 900',nm:'Магистр',en:'Magistrate',ly:'Внутренняя Тень (старожил)',sz:'Большое, аберрация',
+st:{str:16,con:20,dex:14,int:16,wis:20,cha:14},
+hp:178,hpF:'17к10+85',ac:18,acN:'силовые одежды',spd:'парение 60 фт',ini:'+2',pp:19,
+sv:'Тел +9, МДР +9, Хар +6',sk:'Восприятие +9, Проницательность +9, История +7',
+res:'Психический; силовой',idmg:'Огонь',ics:'Испуг, очарование, паралич',sn:'Истинное зрение 30 фт, ТЗ 120 фт',lng:'Все языки',
+tr:[
+  {n:'Домен маршрута (аура 30 фт)',d:'Начало хода в ауре: МДР СЛ 17 или двигаться только К Магистру или НАЗАД к позиции начала предыдущего хода.',hi:true},
+  {n:'Накопленное правосудие',d:'Запоминает 3 разных типа урона. При 3 накопленных — Вспышка: все в 20 фт: Лов СЛ 17: 6к8 Force или ½. Счётчик сбрасывается.'},
+  {n:'Маршрутная память',d:'Знает точное положение движущихся существ в 60 фт. Нельзя застать врасплох. Невидимость не даёт бонус атаки.'}
+],
+at:[
+  {n:'Мультиатака',d:'Два Постановления + один Устав, или три Постановления.',isMulti:true},
+  {n:'Постановление',a:'+9',d:'3к8+5',t:'Силовой',r:'60 фт',no:'Базовая дальнобойная атака.',dice:'3к8',bonus:5},
+  {n:'Устав',a:'+9',d:'4к6+5',t:'Силовой',r:'дос. 10 фт',no:'МДР СЛ 17 или скованность (restrained) до конца след. хода цели.',dice:'4к6',bonus:5},
+  {n:'Закон Ореола (1/день)',a:'—',d:'—',t:'МДР',r:'60 фт',no:'Запрещает тип (Конц./Легенд.д./Бон.д.) всем в 60 фт до след. хода. МДР СЛ 17 отменяет.',dice:'',bonus:0,sv:true}
+],
+re:[],
+la:[
+  {n:'1. Сдвиг домена (1 д.)',d:'Центр ауры — в любую точку в 30 фт от Магистра (без перемещения). До начала след. хода.'},
+  {n:'2. Немедленный приговор (1 д.)',d:'Атака Постановлением по цели в 60 фт (+9, 3к8+5 Force).'}
+],laC:2,
+km:'Атаковать одним и тем же типом урона два хода подряд — Магистр «замирает» (ошеломлён) на 1 раунд, пока обрабатывает повторяющийся паттерн.'},
+
+{id:7,z:'greb',cr:'5',crN:5,xp:'1 800',nm:'Осколок Узора',en:'Pattern Shard',ly:'Гребень (миньон)',sz:'Маленькое, аберрация',
+st:{str:8,con:16,dex:16,int:4,wis:12,cha:4},
+hp:65,hpF:'10к6+30',ac:15,acN:'кристальная броня',spd:'30 фт, парение 20 фт',ini:'+3',pp:11,
+sv:'Лов +6, Тел +6',sk:'—',
+res:'',idmg:'Холод; психический',ics:'Испуг, очарование, захват, сбивание с ног',sn:'Тёмное зрение 60 фт',lng:'—',
+tr:[
+  {n:'Кристальная хрупкость',d:'10+ урона грома за один удар — взрыв: все в 5 фт: Лов СЛ 13 или 2к6 холод; труднопроходимая местность. Осколок погибает мгновенно.',hi:true},
+  {n:'Инстинкт роя',d:'3+ Осколков рядом с целью: Роевая атака (с преим.): 3к6+3 холод + ТЕЛ СЛ 13 или скованность до конца след. хода. Все участвующие тратят действие.'}
+],
+at:[
+  {n:'Кристальный Шип',a:'+6',d:'1к6+3 кол. + 1к6 хол.',t:'Кол./Холод',r:'5 фт',no:'Основная атака.',dice:'1к6',bonus:3},
+  {n:'Вспышка Пустоты (пер.5–6)',a:'—',d:'3к8',t:'Холод',r:'все в 15 фт',no:'ТЕЛ СЛ 13: 3к8 холод + ослепление до конца след. хода. Успех: ½ урона, без ослепления.',dice:'3к8',bonus:0,sv:true}
+],
+re:[],la:null,laC:0,
+km:'Удар грома (Thunder) 10+ за один раз → мгновенная гибель Осколка + 2к6 холода всем в 5 фт + труднопроходимая местность.'},
+
+{id:8,z:'greb',cr:'7',crN:7,xp:'2 900',nm:'Пустошник',en:'Hollowborn',ly:'Гребень (миньон)',sz:'Среднее, аберрация',
+st:{str:14,con:18,dex:20,int:8,wis:16,cha:6},
+hp:110,hpF:'13к8+52',ac:16,acN:'естественная броня',spd:'35 фт, парение 15 фт',ini:'+5',pp:16,
+sv:'Лов +7, Тел +7, МДР +6',sk:'Скрытность +10, Восприятие +6',
+res:'Психический; прон. от немагич.',idmg:'',ics:'Испуг, очарование',sn:'Тёмное зрение 120 фт',lng:'—',
+tr:[
+  {n:'Лицо-пустота',d:'Начало хода видя Пустошника в 30 фт: МДР СЛ 15 или якорь взгляда — нельзя отвести взгляд; атаки по другим с помехой. Отвести взгляд = действие; после: атаки по Пустошнику с помехой до конца хода.',hi:true},
+  {n:'Опустошение (1/раунд)',d:'Реакция при получении урона: поглощает удар → 2к8 вр.хп; след. атака Пустошника +2к6 психич. Вр.хп не суммируются.'}
+],
+at:[
+  {n:'Мультиатака',d:'Пустотный Коготь + Укол Пустоты.',isMulti:true},
+  {n:'Пустотный Коготь',a:'+8',d:'1к8+5 руб. + 1к8 псих.',t:'Руб./Псих.',r:'5 фт',no:'Базовая атака.',dice:'1к8',bonus:5},
+  {n:'Укол Пустоты',a:'+8',d:'2к6+5',t:'Некрот.',r:'5 фт',no:'Максимум хп цели снижается на величину нанесённого некроурона (долгий отдых снимает).',dice:'2к6',bonus:5},
+  {n:'Вход в трещину (бон.д.)',a:'—',d:'—',t:'Особ.',r:'30 фт',no:'Телепортация в тёмное место без атак возм. Если в 5 фт от цели с якорем взгляда — бонус. атака Коготем.',dice:'',bonus:0,sv:true}
+],
+re:[{n:'Поглощение удара (1/раунд)',d:'При получении урона: «Опустошение» (2к8 вр.хп; след. атака Пустошника +2к6 психич.).'}],
+la:null,laC:0,
+km:'Закрыть глаза (действие) — снимает «Лицо-пустота»; атаки по Пустошнику с помехой до конца хода.'},
+
+{id:9,z:'greb',cr:'11',crN:11,xp:'7 200',nm:'Нитеразрыватель',en:'Thread-Severer',ly:'Гребень',sz:'Большое, аберрация',
+st:{str:20,con:22,dex:14,int:10,wis:16,cha:8},
+hp:195,hpF:'17к10+102',ac:17,acN:'кристальная броня',spd:'40 фт, лазание 20 фт',ini:'+2',pp:17,
+sv:'Сил +9, Тел +10, МДР +7',sk:'Восприятие +7, Проницательность +7',
+res:'Холод; психический; руб/кол/дроб от немагич.',idmg:'',ics:'Испуг, очарование, паралич',sn:'Тёмное зрение 120 фт',lng:'—',
+tr:[
+  {n:'Разрыв ауры (аура 20 фт)',d:'В ауре: нельзя Помощь; Вдохновение расходуется впустую; начало хода: ТЕЛ СЛ 15 или концентрация прерывается.',hi:true},
+  {n:'Питание разрывом (1/раунд)',d:'При прерывании концентрации в ауре (любая причина) — бесплатная атака Лезвием по ближайшему + восст. 15 хп.',hi:true},
+  {n:'Деградация без добычи',d:'3 раунда без разрывов концентрации — аура 10 фт, атаки с помехой до конца след. раунда.'},
+  {n:'Кристальная стойкость',d:'1/раз: провальный спасбросок считать успешным. Восст. после успешного СБ.'}
+],
+at:[
+  {n:'Мультиатака',d:'Три Лезвия-нити, или два Лезвия + Хлёст разрыва.',isMulti:true},
+  {n:'Лезвие-нить',a:'+9',d:'2к8+5 руб. + 1к8 сил.',t:'Руб./Force',r:'дос. 10 фт',no:'Основная атака.',dice:'2к8',bonus:5},
+  {n:'Хлёст разрыва',a:'+9',d:'2к10+5',t:'Силовой',r:'дос. 20 фт',no:'При попадании: цель перемещается на 10 фт (выбор Нитеразрывателя). Без атак возм.',dice:'2к10',bonus:5},
+  {n:'Великий Разрыв (пер.5–6)',a:'—',d:'6к8',t:'Force/ТЕЛ',r:'все в 30 фт',no:'ТЕЛ СЛ 17: 6к8 Force + авто. прерывание концентрации. Успех: ½ урона.',dice:'6к8',bonus:0,sv:true},
+  {n:'Сечение связи (1/день)',a:'+9',d:'особый',t:'Особ.',r:'5 фт',no:'При попадании: теряет одну атунированность к маг. предмету до долгого отдыха.',dice:'',bonus:0}
+],
+re:[{n:'Отклонение клинка (1/раунд)',d:'При ударе оружием: снизить урон на 1к10+5.'}],
+la:null,laC:0,
+km:'3 раунда без разрывов концентрации в ауре — аура сужается до 10 фт, все атаки Нитеразрывателя с помехой.'},
+
+{id:10,z:'greb',cr:'12',crN:12,xp:'8 400',nm:'Зеркало Шва',en:'Rift Mirror',ly:'Гребень (старожил)',sz:'Большое, аберрация',
+st:{str:18,con:20,dex:16,int:14,wis:18,cha:10},
+hp:210,hpF:'20к10+100',ac:18,acN:'',spd:'30 фт, парение 30 фт',ini:'+3',pp:18,
+sv:'Тел +9, МДР +8',sk:'Восприятие +8, Проницательность +8',
+res:'Психический; силовой',idmg:'Холод',ics:'Испуг, очарование, ослепление',sn:'Истинное зрение 30 фт, ТЗ 120 фт',lng:'—',
+tr:[
+  {n:'Зеркальное отражение (аура 10 фт)',d:'При физическом попадании: к20. Чётный результат — атакующий получает ½ нанесённого урона.',hi:true},
+  {n:'Адаптивное зеркало',d:'Начало раунда: сопр. к типу урона прошлого раунда. Если 3+ разных типа — адаптация не работает, атаки с помехой до конца раунда (перегрузка).',hi:true},
+  {n:'Жидкая геометрия',d:'Начало хода: движется 20 фт к цели с наибольшим уроном в пр. раунде. Без атак возм.'},
+  {n:'Эхо памяти',d:'Запоминает все заклинания, применённые против него. Воспроизводит через «Воспроизведение памяти».'}
+],
+at:[
+  {n:'Мультиатака',d:'Две атаки Отражением.',isMulti:true},
+  {n:'Отражение',a:'+8',d:'3к8+4',t:'Силовой',r:'дос. 10 фт',no:'Основная ближняя атака.',dice:'3к8',bonus:4},
+  {n:'Удар Пустотой',a:'+8',d:'4к8',t:'Психич.',r:'60 фт',no:'МДР СЛ 16 или концентрация прерывается до конца след. хода.',dice:'4к8',bonus:0},
+  {n:'Зеркальный Двойник (пер.5–6)',a:'—',d:'—',t:'Иллюзия',r:'60 фт',no:'Создаёт копию существа (КД и хп оригинала, его бонус и урон). 1 минута или до уничтожения.',dice:'',bonus:0,sv:true},
+  {n:'Воспроизведение памяти (пер.5–6)',a:'+8/DC16',d:'как оригинал',t:'Маг.',r:'по заклинанию',no:'Воспроизводит запомненное заклинание. Цель выбирает Зеркало.',dice:'',bonus:0,sv:true}
+],
+re:[{n:'Зеркальный ответ (1/раунд)',d:'Когда существо в 30 фт атакует — Зеркало может изменить цель атаки на другое существо в дальности оригинала.'}],
+la:null,laC:0,
+km:'Три разных типа урона за один раунд — Зеркало перегружается: все его атаки до конца раунда с помехой.'},
+
+{id:11,z:'greb',cr:'13',crN:13,xp:'10 000',nm:'Страж Узла',en:'Knot Warden',ly:'Гребень (иммунный ответ Стены)',sz:'Огромное, аберрация',
+st:{str:24,con:24,dex:12,int:14,wis:18,cha:12},
+hp:261,hpF:'18к12+126',ac:19,acN:'кристальная броня',spd:'40 фт, парение 20 фт',ini:'+1',pp:19,
+sv:'Сил +12, Тел +12, МДР +9',sk:'Восприятие +9, Проницательность +9',
+res:'Дроб/кол/руб от немагич.; психический; силовой',idmg:'Холод',ics:'Испуг, очарование, паралич, нокдаун',sn:'Истинное зрение 60 фт, ТЗ 120 фт',lng:'—',
+ph2:true,ph2text:'Маска трескается → УЯЗВИМОСТЬ к Force. Атаки +2 к броскам и +2к8 к урону.',
+tr:[
+  {n:'Домен Возврата (аура 30 фт)',d:'Начало хода в ауре: МДР СЛ 18 или телепортируется на позицию начала своего предыдущего хода (без атак возм.).',hi:true},
+  {n:'Иммунный ответ',d:'При крите по Стражу: случайный союзник атакующего в 60 фт — МДР СЛ 18 или телепорт в точку в 30 фт от Стража (выбор ГМ).'},
+  {n:'Непробиваемое Ядро (Ф1 · 100–50%)',d:'Первый удар каждого раунда наносит только ½ урона. Пассивно.',hi:true},
+  {n:'Кризис Ядра (Ф2 · <50%)',d:'Маска трескается → УЯЗВИМОСТЬ к Force. Атаки +2 и +2к8 к урону. Объявить вслух при достижении порога.',hi:true}
+],
+at:[
+  {n:'Мультиатака',d:'Два Кулака Кристалла + один Удар Узла.',isMulti:true},
+  {n:'Кулак Кристалла',a:'+12',d:'3к8+7 дроб. + 2к6 хол.',t:'Дроб./Холод',r:'дос. 10 фт',no:'Основная атака.',dice:'3к8',bonus:7},
+  {n:'Удар Узла',a:'+12',d:'3к10+7',t:'Силовой',r:'дос. 15 фт',no:'Сил СЛ 20 или откинут 20 фт + сбит с ног.',dice:'3к10',bonus:7},
+  {n:'Линия Возврата (пер.5–6)',a:'—',d:'8к8',t:'Force/Лов',r:'линия 60×5 фт',no:'Лов СЛ 18: 8к8 Force + телепорт к началу линии. Успех: ½ урона.',dice:'8к8',bonus:0,sv:true},
+  {n:'Печать Ядра (1/день)',a:'—',d:'—',t:'Особ.',r:'60 фт',no:'Цель не может восстанавливать хп до конца боя или гибели Стража.',dice:'',bonus:0,sv:true}
+],
+re:[{n:'Отражение силы (1/раунд)',d:'При спасброске от заклинания: −20 хп → бросок считается успешным автоматически.'}],
+la:[
+  {n:'1. Сдвиг домена (1 д.)',d:'Центр ауры Возврата — в любую точку в 30 фт от Стража (без перемещения). До начала след. хода.'},
+  {n:'2. Кристальный Выброс (1 д.)',d:'3к6 холода цели в 60 фт. Лов СЛ 18 — успех: ½ урона.'},
+  {n:'3. Узловой Захват (2 д.)',d:'Существо в 15 фт: Сил СЛ 20 или захвачено (Escape DC 20). Пока захвачено: 1 легенд.д./раунд → 2к8+7 дроб.'}
+],laC:2,
+km:'В Фазе 2 (<50% ОЗ): УЯЗВИМОСТЬ к Force (Силовому) урону. Открытое Ядро — единственная уязвимость.'},
+
+{id:12,z:'yadro',cr:'15',crN:15,xp:'13 000',nm:'Узловой Паразит',en:'Node Parasite',ly:'Ядро',sz:'Большое, аберрация',
+st:{str:18,con:22,dex:14,int:12,wis:14,cha:8},
+hp:218,hpF:'19к10+114',ac:18,acN:'кристальная броня',spd:'40 фт, лазание 40 фт',ini:'+2',pp:17,
+sv:'Сил +9, Тел +11, МДР +7',sk:'Восприятие +7, Проницательность +7',
+res:'Холод; психический; руб/кол/дроб от немагич.',idmg:'',ics:'Испуг, очарование, паралич',sn:'Истинное зрение 30 фт, ТЗ 120 фт',lng:'—',
+tr:[
+  {n:'Паразитическое прикрепление',d:'При попадании по Среднему/Большому существу: бон.д. — прикрепиться (Escape DC 18, действие). Прикреплён: не цель атак возм.; движется с целью; цель не использует реакции.',hi:true},
+  {n:'Кража действия (прикреплён, 1/раунд)',d:'Начало хода цели: к6 — 1–2: действие; 3–4: бон.д.; 5–6: реакция. Украденное: атака Щупальцем ИЛИ принудить цель атаковать союзника.',hi:true},
+  {n:'Использование украденного',d:'Укр. действие → атака Щупальцем (+9) ИЛИ принудить прикреплённую цель атаковать союзника в 5 фт с её бонусом.'}
+],
+at:[
+  {n:'Мультиатака',d:'Три Щупальца-зажима. Если прикреплён — одно заменяется Кражей действия.',isMulti:true},
+  {n:'Щупальце-зажим',a:'+9',d:'2к10+4 прон. + 2к6 сил.',t:'Прон./Force',r:'дос. 10 фт',no:'Основная атака.',dice:'2к10',bonus:4},
+  {n:'Массовое прикрепление (пер.5–6)',a:'+9',d:'—',t:'Особ.',r:'до 2 существ в 10 фт',no:'При попадании по обоим: прикрепляется к ближайшему + немедленно крадёт бон.д. у второго без броска к6.',dice:'',bonus:0}
+],
+re:[{n:'Перенаправление удара (1/раунд)',d:'Пока прикреплён и должен получить урон: прикреплённая цель — Лов СЛ 17 или получает ½ урона вместо Паразита.'}],
+la:null,laC:0,
+km:'Критическое попадание союзника по Паразиту (пока прикреплён) → сбрасывает прикрепление + ошеломляет Паразита до конца его след. хода.'},
+
+{id:13,z:'yadro',cr:'16',crN:16,xp:'15 000',nm:'Переписыватель',en:'Position Rewriter',ly:'Ядро',sz:'Большое, аберрация',
+st:{str:14,con:24,dex:18,int:16,wis:18,cha:10},
+hp:237,hpF:'19к10+133',ac:18,acN:'силовая геометрия',spd:'парение 50 фт (неподвижен)',ini:'+4',pp:19,
+sv:'Лов +9, Тел +12, МДР +9',sk:'Восприятие +9, Проницательность +9',
+res:'Силовой; психический',idmg:'Холод',ics:'Испуг, очарование, паралич, захват, сбивание с ног',sn:'Истинное зрение 60 фт, ТЗ 120 фт',lng:'Понимает все языки, не говорит',
+tr:[
+  {n:'Нестабильная геометрия',d:'При дальней атаке или заклинании: к20 (без участия). 11+ — атака авто. промахивается (Переписыватель «перемещается»). 1–10 — нормально.',hi:true},
+  {n:'Пространственное эхо (аура 40 фт)',d:'Начало хода в ауре: МДР СЛ 17 или Переписыватель бон.д. телепортирует это существо на 2к6×5 фт в случ. направлении.',hi:true}
+],
+at:[
+  {n:'Мультиатака',d:'Три Разряда перезаписи. Вместо одного — Обмен позиций.',isMulti:true},
+  {n:'Разряд перезаписи',a:'+9',d:'3к10+4',t:'Силовой',r:'60 фт',no:'МДР СЛ 17 или цель движется 10 фт к Переписывателю.',dice:'3к10',bonus:4},
+  {n:'Обмен позиций',a:'—',d:'—',t:'МДР',r:'два сущ. в 60 фт',no:'МДР СЛ 17. Провал обоих = меняются. Провал одного = он к другому. Успех обоих = нет эффекта.',dice:'',bonus:0,sv:true},
+  {n:'Петля пространства (пер.5–6)',a:'—',d:'—',t:'Особ.',r:'обл. 20×20 фт, 60 фт',no:'3 раунда. Завершение движения внутри = возврат к точке начала движения.',dice:'',bonus:0,sv:true},
+  {n:'Полный переброс (1/день)',a:'—',d:'—',t:'МДР',r:'до 6 сущ. в ауре',no:'МДР СЛ 17 или телепорт в случ. место ауры. Переписыватель также смещается на 30 фт.',dice:'',bonus:0,sv:true}
+],
+re:[{n:'Переадресация (1/раунд)',d:'Когда сущ. в 60 фт наносит урон союзнику Переписывателя: атакующий — Лов СЛ 17 или 2к10 Force (успех: ½).'}],
+la:null,laC:0,
+km:'Hold Monster или любой эффект обездвиженности — отключает ВСЕ способности перемещения (своего и чужого) на время действия.'},
+
+{id:14,z:'yadro',cr:'17',crN:17,xp:'18 000',nm:'Архив Забвения',en:'Archive of Forgetting',ly:'Ядро',sz:'Большое, аберрация',
+st:{str:12,con:26,dex:14,int:20,wis:18,cha:16},
+hp:256,hpF:'19к10+152',ac:19,acN:'кристальная броня',spd:'парение 40 фт',ini:'+2',pp:20,
+sv:'Тел +14, Инт +11, МДР +10',sk:'Восприятие +10, Проницательность +10, История +11',
+res:'Психический; силовой',idmg:'Холод',ics:'Испуг, очарование, паралич, ошеломление',sn:'Истинное зрение 60 фт, ТЗ 120 фт',lng:'Все языки (понимает, не говорит)',
+tr:[
+  {n:'Коллектор паттернов (до 6)',d:'Запоминает заклинания и именованные способности сущ. в 60 фт. До 6 паттернов; новый вытесняет старейший.',hi:true},
+  {n:'Стирание (аура 30 фт)',d:'Начало каждого раунда: одно случ. сущ. в ауре — Инт СЛ 18 или провал памяти: случ. способность/1-в-день недоступна до конца боя. Не чаще 1/2 раунда на сущ.',hi:true},
+  {n:'Чистая страница',d:'Попытка использовать стёртую способность = потеря действия или бон.д. без эффекта (пустое движение).'}
+],
+at:[
+  {n:'Мультиатака',d:'Две Записи + Стереть навык (если перезаряжено) или Воспроизвести паттерн.',isMulti:true},
+  {n:'Запись',a:'+11',d:'4к8+5',t:'Психич.',r:'90 фт',no:'При попадании: немедленно запоминает последнюю использованную способность цели как паттерн.',dice:'4к8',bonus:5},
+  {n:'Стереть навык (пер.5–6)',a:'—',d:'—',t:'Инт',r:'60 фт',no:'Инт СЛ 18. Провал: теряет владение оружием/доспехами ИЛИ черту класса ИЛИ навыковый бонус (до конца боя). Успех: 4к10 психич.',dice:'4к10',bonus:0,sv:true},
+  {n:'Воспроизвести паттерн',a:'+11/DC18',d:'как оригинал',t:'Маг.',r:'по заклинанию',no:'Воспроизводит запомненный паттерн. Только мгновенный эффект.',dice:'',bonus:0,sv:true},
+  {n:'Массовое стирание (1/день)',a:'—',d:'—',t:'Инт',r:'все в 40 фт',no:'Инт СЛ 18 или провал памяти по случ. способности. До конца след. хода — нет реакций.',dice:'',bonus:0,sv:true}
+],
+re:[{n:'Перехват паттерна (1/раунд)',d:'При использовании заклинания/способности в 60 фт: немедленно добавляет в хранилище (вытесняя старейший). Без броска.'}],
+la:null,laC:0,
+km:'Одиночный удар, нанёсший 50+ урона, вызывает «рассыпание»: Архив теряет ВСЕ паттерны + ошеломлён (помеха атак, нет перезарядных) до конца след. хода.'},
+
+{id:15,z:'yadro',cr:'18',crN:18,xp:'20 000',nm:'Нулевой Шовник',en:'Null Seam',ly:'Ядро (страж шва)',sz:'Огромное, аберрация',
+st:{str:20,con:26,dex:14,int:18,wis:20,cha:14},
+hp:333,hpF:'18к12+198',ac:20,acN:'кристальная броня',spd:'40 фт, парение 40 фт',ini:'+2',pp:21,
+sv:'Сил +11, Тел +14, МДР +11',sk:'Восприятие +11, Проницательность +11',
+res:'Руб/кол/дроб от немагич.; психический',idmg:'Холод; силовой',ics:'Испуг, очарование, паралич, ошеломление, нокдаун',sn:'Истинное зрение 120 фт, ТЗ 120 фт',lng:'Все языки',
+ph2:true,ph2text:'Аура расширяется до 60 фт. Атаки +2 и +2к10 к урону. Все СБ в ауре с помехой (дважды — брать худший).',
+tr:[
+  {n:'Живой шов — снятие действий (аура 40 фт, Ф1)',d:'Начало хода в ауре: МДР СЛ 19 или теряет (к3): 1=действие; 2=бон.д.; 3=реакцию до след. хода. Пассивно.',hi:true},
+  {n:'Живой шов — переписывание позиции (аура 40 фт, Ф1)',d:'Реакция: при добровольном движении в ауре — телепорт в другое место в 20 фт от старта (ТЕЛ СЛ 19 отменяет). 1 реакция/сущ./раунд.',hi:true},
+  {n:'Живой шов — провалы памяти (аура 40 фт, Ф1)',d:'При крите по Шовнику: атакующий — Инт СЛ 19 или: концентрация прерывается + одна перезарядная/1-в-день считается использованной.',hi:true},
+  {n:'Непробиваемое Ядро (Ф1 · 100–50%)',d:'Первый удар каждого раунда — только ½ урона. Пассивно.'},
+  {n:'Кризис шва (Ф2 · <50%)',d:'Аура 60 фт. Атаки +2/+2к10. ВСЕ СБ в ауре с помехой (дважды, брать худший).',hi:true}
+],
+at:[
+  {n:'Мультиатака',d:'Три Лезвия шва + один Разрыв, или четыре Лезвия.',isMulti:true},
+  {n:'Лезвие шва',a:'+11',d:'3к8+5 руб. + 2к8 сил.',t:'Руб./Force',r:'дос. 10 фт',no:'Основная атака.',dice:'3к8',bonus:5},
+  {n:'Разрыв',a:'+11',d:'4к10+5',t:'Силовой',r:'дос. 15 фт',no:'ТЕЛ СЛ 19 или сбит с ног + обездвижен до конца след. хода цели.',dice:'4к10',bonus:5},
+  {n:'Нулевая линия (пер.5–6)',a:'—',d:'10к10',t:'Force/Лов',r:'линия 90×10 фт',no:'Лов СЛ 19: 10к10 Force + телепорт в ауру (выбор ГМ). Успех: ½ урона.',dice:'10к10',bonus:0,sv:true},
+  {n:'Печать шва (1/день)',a:'—',d:'—',t:'Особ.',r:'60 фт',no:'Цель: не восстанавливает хп; Конц. требует ТЕЛ СЛ 19 в начале каждого хода. До конца боя.',dice:'',bonus:0,sv:true}
+],
+re:[{n:'Переписывание позиции (1/раунд)',d:'При добровольном движении в ауре: ТЕЛ СЛ 19 или телепортируется в другое место в 20 фт от старта.'}],
+la:[
+  {n:'1. Сдвиг ауры (1 д.)',d:'Центр трёх механик ауры — в точку в 40 фт от Шовника (без перемещения). До начала след. хода.'},
+  {n:'2. Мгновенный разрыв (1 д.)',d:'Атака Лезвием шва по цели в 15 фт (+11, 3к8+5 руб.+2к8 Force).'},
+  {n:'3. Коллапс памяти (2 д.)',d:'Одно сущ. в ауре: Инт СЛ 19 или теряет способность/заклинание по выбору ГМ (аналог «Стереть навык»).'}
+],laC:3,
+km:'В одном раунде: крит по Шовнику + Hold Monster + удар 50+ за раз → «схлопывание шва»: ошеломлён + уязвимость к Force до конца след. хода.'}
+];
+
+/* ── State ── */
+const STATE={};
+MS.forEach(m=>{STATE[m.id]={hp:m.hp,conds:{},phase:1,roll:{}}});
+let cur=null,tab='combat';
+
+/* ── Dice ── */
+function rollDie(sides){return Math.floor(Math.random()*sides)+1}
+function parseDice(str){
+  const m=/^(\d+)к(\d+)/.exec(str.trim());
+  if(!m)return{total:0,rolls:[],sides:1};
+  const n=parseInt(m[1]),s=parseInt(m[2]);
+  const rolls=Array.from({length:n},()=>rollDie(s));
+  return{total:rolls.reduce((a,b)=>a+b,0),rolls,sides:s};
+}
+function showDiceModal(title,result,detail,isCrit){
+  const dm=document.getElementById('dice-modal');
+  dm.className='dice-modal'+(isCrit?' crit':'');
+  document.getElementById('dice-modal-title').textContent=title;
+  document.getElementById('dice-modal-result').textContent=result;
+  document.getElementById('dice-modal-detail').textContent=detail;
+  dm.style.display='block';
+  clearTimeout(dm._t);
+  dm._t=setTimeout(()=>dm.style.display='none',4000);
+}
+function rollAttack(atk,isAdv){
+  const d1=rollDie(20),d2=rollDie(20);
+  const d20=isAdv?Math.max(d1,d2):d1;
+  const total=d20+(parseInt(atk)||0);
+  const isCrit=d20===20,isFumble=d20===1;
+  return{d20,total,isCrit,isFumble};
+}
+function rollDamage(diceStr,bonus,isCrit){
+  if(!diceStr)return{total:bonus,text:String(bonus)};
+  const r=parseDice(diceStr);
+  let rolls=[...r.rolls];
+  if(isCrit)rolls=[...rolls,...Array.from({length:r.rolls.length},()=>rollDie(r.sides))];
+  const t=rolls.reduce((a,b)=>a+b,0)+(parseInt(bonus)||0);
+  return{total:t,text:`[${rolls.join('+')}]${bonus>0?'+'+bonus:bonus<0?bonus:''}`};
+}
+
+/* ── HP ── */
+function openHpModal(){
+  if(!cur)return;
+  document.getElementById('hp-modal-title').textContent=`ОЗ: ${cur.nm} (${STATE[cur.id].hp}/${cur.hp})`;
+  document.getElementById('hp-modal-val').value='';
+  document.getElementById('hp-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('hp-modal-val').focus(),50);
+}
+function closeHpModal(){document.getElementById('hp-modal').style.display='none'}
+function applyHp(sign){
+  const v=parseInt(document.getElementById('hp-modal-val').value)||0;
+  if(!cur||v===0){closeHpModal();return;}
+  const s=STATE[cur.id];
+  s.hp=Math.max(0,Math.min(cur.hp,s.hp+sign*v));
+  closeHpModal();
+  render();
+}
+
+/* ── Sidebar ── */
+const ZONES=[{id:'oreol',lb:'Ореол',dot:'#c9a84c'},{id:'greb',lb:'Гребень',dot:'#4c7ac9'},{id:'yadro',lb:'Ядро',dot:'#c94c4c'}];
+function filterSidebar(){
+  const q=document.getElementById('sb-search').value.toLowerCase();
+  document.querySelectorAll('.mon-btn').forEach(b=>{
+    const show=!q||b.dataset.search.includes(q);
+    b.style.display=show?'':'none';
+  });
+  document.querySelectorAll('.sb-group-label').forEach(g=>{
+    const visible=[...g.nextElementSibling?.querySelectorAll('.mon-btn')||[]].some(b=>b.style.display!=='none');
+    g.style.display=visible||!q?'':'none';
+  });
+}
+function buildSidebar(){
+  const sb=document.getElementById('sb');
+  sb.innerHTML='';
+  ZONES.forEach(z=>{
+    const items=MS.filter(m=>m.z===z.id);
+    const gl=document.createElement('div');
+    gl.className='sb-group-label';
+    gl.innerHTML=`<span class="sb-group-dot" style="background:${z.dot}"></span>${z.lb}`;
+    sb.appendChild(gl);
+    const wrap=document.createElement('div');
+    items.forEach(m=>{
+      const s=STATE[m.id];
+      const pct=Math.max(0,s.hp/m.hp);
+      const hpCls=s.hp===0?'hp-dead':pct>0.5?'hp-high':pct>0.25?'hp-mid':'hp-low';
+      const btn=document.createElement('button');
+      btn.className=`mon-btn z-${m.z}${cur&&cur.id===m.id?' active':''}`;
+      btn.dataset.search=`${m.nm.toLowerCase()} ${m.en.toLowerCase()} cr${m.crN} ${z.lb.toLowerCase()} ${m.ly.toLowerCase()}`;
+      btn.onclick=()=>selectMon(m.id);
+      btn.innerHTML=`
+        <span class="mon-btn-cr" style="background:${pct>0.5?'#1a1810':pct>0.25?'#1e1a08':'#2a1010'};color:${z.dot};border:1px solid ${z.dot}">CR${m.cr}</span>
+        <span class="mon-btn-info">
+          <div class="mon-btn-name">${m.nm}</div>
+          <div class="mon-btn-sub">${m.ly}</div>
+          <div class="mon-btn-hp"><div class="mon-btn-hp-fill ${hpCls}" style="width:${pct*100}%"></div></div>
+        </span>`;
+      wrap.appendChild(btn);
+    });
+    sb.appendChild(wrap);
+  });
+}
+
+function selectMon(id){
+  cur=MS.find(m=>m.id===id);
+  if(!cur)return;
+  tab='combat';
+  buildSidebar();
+  renderFull();
+}
+
+/* ── HP color ── */
+function hpColor(s,m){
+  const p=s.hp/m.hp;
+  return p>0.5?'var(--green2)':p>0.25?'var(--gold2)':'var(--red2)';
+}
+
+/* ── Zone colors ── */
+const ZC={
+  oreol:{main:'var(--gold)',bg:'var(--warning-bg)',border:'var(--gold)',light:'var(--gold2)',text:'var(--gold3)'},
+  greb:{main:'var(--blue)',bg:'var(--info-bg)',border:'var(--blue)',light:'var(--blue2)',text:'var(--blue2)'},
+  yadro:{main:'var(--red)',bg:'var(--danger-bg)',border:'var(--red)',light:'var(--red2)',text:'var(--red2)'}
+};
+
+/* ── Render ── */
+function renderFull(){
+  const mn=document.getElementById('mn');
+  if(!cur){mn.innerHTML='<div class="placeholder">← Выбери существо слева</div>';return;}
+  const m=cur,s=STATE[m.id],zc=ZC[m.z];
+  const modStr=v=>{const r=Math.floor((v-10)/2);return(r>=0?'+':'')+r};
+  const STATS=[['СИЛ','str'],['ЛОВ','dex'],['ТЕЛ','con'],['ИНТ','int'],['МДР','wis'],['ХАР','cha']];
+  const pct=Math.max(0,s.hp/m.hp);
+  const hpCls=pct>0.5?'hp-high':pct>0.25?'hp-mid':'hp-low';
+  const hpCol=hpColor(s,m);
+  const zTag=m.z==='oreol'?'warning':m.z==='greb'?'info':'danger';
+  const condNames={stun:'Ошеломл.',prone:'Сбит с ног',blind:'Ослеплён',restrained:'Скован',poison:'Отравлен',fear:'Испуган'};
+
+  const TABS=[
+    {id:'combat',lb:'Бой'},
+    {id:'traits',lb:'Черты'},
+    {id:'km',lb:'Контр-механика'},
+    {id:'defense',lb:'Защита'}
+  ];
+
+  const combatHTML=()=>{
+    let h='';
+    // Attacks
+    h+='<div class="sec"><div class="sec-h">Атаки и действия</div>';
+    m.at.forEach((a,i)=>{
+      if(a.isMulti){
+        h+=`<div class="ab-card highlight" style="margin-bottom:6px"><div class="ab-name">Мультиатака</div><div class="ab-desc">${a.d}</div></div>`;
+      } else {
+        const hasRoll=a.dice&&a.dice.length>0;
+        const hasSv=a.sv;
+        h+=`<div class="atk-card">
+          <div class="atk-card-header">
+            <div class="atk-name">${a.n}</div>
+            ${a.a&&a.a!=='—'?`<div class="atk-bonus">${a.a}</div>`:''}
+            ${a.d&&a.d!=='—'?`<div class="atk-dmg">${a.d}</div>`:''}
+            <div class="atk-type">${a.t}</div>
+          </div>
+          <div class="atk-range" style="color:var(--text3);font-size:10px">${a.r}</div>
+          ${a.no?`<div class="atk-note">${a.no}</div>`:''}
+          ${(hasRoll||hasSv)?`<div class="atk-btn-row">
+            ${hasRoll?`<button class="atk-roll-btn" onclick="doAtkRoll(${i})">🎲 Атака ${a.a}</button>
+            <button class="atk-dmg-btn" onclick="doDmgRoll(${i},false)">⚔ Урон</button>
+            <button class="atk-dmg-btn" style="font-size:11px;padding:4px 5px" onclick="doDmgRoll(${i},true)">💥</button>`:''}
+            ${hasSv&&!hasRoll?`<button class="atk-dmg-btn" onclick="doSvRoll(${i})" style="flex:1">🎲 Кидаю</button>`:''}
+          </div>
+          <div class="atk-inline-result" id="roll-r-${i}"></div>`:''}
+        </div>`;
+      }
+    });
+    h+='</div>';
+    // Reactions
+    if(m.re&&m.re.length){
+      h+='<div class="sec"><div class="sec-h">Реакции</div>';
+      m.re.forEach(r=>{h+=`<div class="re-card"><div class="re-name">${r.n}</div><div class="re-desc">${r.d}</div></div>`;});
+      h+='</div>';
+    }
+    // Legendary
+    if(m.la&&m.la.length){
+      h+=`<div class="sec"><div class="sec-h">Легендарные действия (${m.laC}/раунд)</div>`;
+      m.la.forEach(l=>{h+=`<div class="la-card"><div class="la-name">${l.n}</div><div class="la-desc">${l.d}</div></div>`;});
+      h+='</div>';
+    }
+    // Phase 2
+    if(m.ph2){
+      h+=`<div class="phase2-box"><div class="phase2-title"><div class="phase2-indicator"></div>Фаза 2 (ниже 50% ОЗ = ${Math.floor(m.hp/2)} ОЗ)</div>
+        <div class="phase2-text">${m.ph2text}</div></div>`;
+    }
+    return h;
+  };
+
+  const traitsHTML=()=>{
+    let h='<div class="ab-grid">';
+    m.tr.forEach(t=>{
+      h+=`<div class="ab-card${t.hi?' highlight':''}"><div class="ab-name">${t.n}</div><div class="ab-desc">${t.d}</div></div>`;
+    });
+    h+='</div>';
+    return h;
+  };
+
+  const kmHTML=()=>{
+    let h=`<div class="km-box z-${m.z}"><div class="km-label">⚠ Контр-механика · ${m.nm}</div><div class="km-text">${m.km}</div></div>`;
+    if(m.ph2){
+      h+=`<div class="phase2-box"><div class="phase2-title"><div class="phase2-indicator"></div>Фаза 2 (ниже 50% ОЗ)</div>
+        <div class="phase2-text">${m.ph2text}</div></div>`;
+    }
+    h+=`<div class="ab-grid" style="margin-top:10px">`;
+    m.tr.filter(t=>t.hi).forEach(t=>{
+      h+=`<div class="ab-card highlight"><div class="ab-name">${t.n}</div><div class="ab-desc">${t.d}</div></div>`;
+    });
+    h+='</div>';
+    return h;
+  };
+
+  const defenseHTML=()=>{
+    const rows=[
+      ['Спасброски',m.sv],['Навыки',m.sk||'—'],['Сопротивления',m.res||'—'],
+      ['Иммун. к урону',m.idmg||'—'],['Иммун. состояния',m.ics],
+      ['Чувства',m.sn],['Языки',m.lng||'—']
+    ];
+    return rows.map(([k,v])=>`<div class="def-row"><div class="def-key">${k}</div><div class="def-val">${v}</div></div>`).join('');
+  };
+
+  const tabContent=tab==='combat'?combatHTML():tab==='traits'?traitsHTML():tab==='km'?kmHTML():defenseHTML();
+
+  mn.innerHTML=`
+  <div class="combat-panel" id="cp">
+    <div class="cp-name">${m.nm}</div>
+    <div class="cp-hp-block" onclick="openHpModal()">
+      <div>
+        <div class="cp-hp-label">ОЗ</div>
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <span class="cp-hp-cur" style="color:${hpCol}">${s.hp}</span>
+          <span class="cp-hp-sep">/</span>
+          <span class="cp-hp-max">${m.hp}</span>
+        </div>
+        <div class="cp-hp-bar"><div class="cp-hp-fill ${hpCls}" style="width:${pct*100}%"></div></div>
+      </div>
+    </div>
+    <button class="cp-dmg-btn" onclick="openHpModal()">− Урон</button>
+    <button class="cp-heal-btn" onclick="openHpModal()">+ Лечение</button>
+    <div class="cp-ac-box"><div class="cp-ac-val" style="color:${zc.light}">${m.ac}</div><div class="cp-ac-lbl">КД</div></div>
+    <div class="cp-ini-box"><div class="cp-ini-val">${m.ini}</div><div class="cp-ini-lbl">Инит.</div></div>
+    <div class="cp-pp-box"><div class="cp-pp-val">${m.pp}</div><div class="cp-pp-lbl">П.Вос.</div></div>
+    ${m.ph2?`<span class="phase-badge ${s.phase===1?'ph1':'ph2'}" onclick="togglePhase()" title="Переключить фазу">Фаза ${s.phase}</span>`:''}
+    <div class="cond-panel">
+      ${Object.entries(condNames).map(([k,v])=>`<button class="cond-toggle${s.conds[k]?' on-'+k:''}" onclick="toggleCond('${k}')">${v}</button>`).join('')}
+    </div>
+    <div class="dice-section">
+      ${['4','6','8','10','12','20'].map(d=>`<button class="dice-btn" onclick="quickDice(${d})">к${d}</button>`).join('')}
+      <span class="dice-output" id="quick-out">—</span>
+    </div>
+  </div>
+
+  <div class="sheet">
+    <div class="sheet-header z-${m.z}">
+      <div class="sh-row1">
+        <span class="sh-title">${m.nm}</span>
+        <span class="sh-en">${m.en}</span>
+      </div>
+      <div class="sh-sub">${m.sz} · ${m.ly} · CR ${m.cr} · ${m.xp} опыта</div>
+      <div class="sh-tags">
+        <span class="tag tag-${zTag}">${m.z==='oreol'?'Ореол':m.z==='greb'?'Гребень':'Ядро'}</span>
+        <span class="tag tag-${zTag}">CR ${m.cr}</span>
+        <span class="tag tag-neutral">${m.spd}</span>
+        ${m.ph2?`<span class="tag tag-danger">Двухфазный</span>`:''}
+      </div>
+    </div>
+
+    <div class="highlight-grid">
+      <div class="hl-box z-${m.z}"><div class="hl-label">ОЗ</div><div class="hl-val">${s.hp}</div><div class="hl-sub">${m.hpF}</div></div>
+      <div class="hl-box z-${m.z}"><div class="hl-label">КД</div><div class="hl-val">${m.ac}</div><div class="hl-sub">${m.acN||'—'}</div></div>
+      <div class="hl-box z-${m.z}"><div class="hl-label">Инициатива</div><div class="hl-val">${m.ini}</div><div class="hl-sub">от ЛОВ ${modStr(m.st.dex)}</div></div>
+      <div class="hl-box z-${m.z}"><div class="hl-label">П. Восприятие</div><div class="hl-val">${m.pp}</div><div class="hl-sub">Пасс. Внимат.</div></div>
+    </div>
+
+    <div class="stats-grid">
+      ${STATS.map(([l,k])=>{
+        const v=m.st[k],r=modStr(v),hi=v>=20;
+        return`<div class="stat-box${hi?' hi':''}"><div class="stat-name">${l}</div><div class="stat-val">${v}</div><div class="stat-mod">${r}</div></div>`;
+      }).join('')}
+    </div>
+
+    <div class="core-grid">
+      <div class="core-box"><span class="core-label">Спасброски</span><span class="core-val" style="font-size:11px">${m.sv}</span></div>
+      <div class="core-box"><span class="core-label">Скорость</span><span class="core-val">${m.spd}</span></div>
+    </div>
+
+    <div class="tabs">
+      ${TABS.map(t=>`<button class="tab-btn${tab===t.id?' active':''}" onclick="switchTab('${t.id}')">${t.lb}</button>`).join('')}
+    </div>
+    <div class="tab-content active" id="tc">${tabContent}</div>
+  </div>
+  `;
+}
+
+function render(){renderFull();}
+
+function switchTab(t){tab=t;renderFull();}
+
+function toggleCond(k){
+  if(!cur)return;
+  const s=STATE[cur.id];
+  s.conds[k]=!s.conds[k];
+  renderFull();
+}
+function togglePhase(){
+  if(!cur||!cur.ph2)return;
+  const s=STATE[cur.id];
+  s.phase=s.phase===1?2:1;
+  renderFull();
+}
+
+function doAtkRoll(idx){
+  const m=cur;if(!m)return;
+  const a=m.at[idx];
+  const bonus=parseInt(a.a)||0;
+  const r=rollAttack(bonus,false);
+  const el=document.getElementById(`roll-r-${idx}`);
+  if(!el)return;
+  el.className='atk-inline-result show';
+  let cls=r.isCrit?'r-crit':r.isFumble?'r-miss':'r-hit';
+  let label=r.isCrit?'КРИТ!':(r.isFumble?'ПРОВАЛ':r.total>=12?'Попадание':'Промах?');
+  el.innerHTML=`<span class="${cls} r-d20">${r.d20}</span> <span class="r-label">d20</span> <span style="color:var(--text3)">+${bonus}</span> = <span class="${cls}" style="font-size:14px;font-weight:700">${r.total}</span> <span class="r-label">${label}</span>`;
+  showDiceModal(`Атака: ${a.n}`,r.total,`d20(${r.d20}) + ${bonus}${r.isCrit?' ⚡КРИТ':''}`,r.isCrit);
+}
+function doDmgRoll(idx,isCrit){
+  const m=cur;if(!m)return;
+  const a=m.at[idx];
+  const r=rollDamage(a.dice,a.bonus,isCrit);
+  const el=document.getElementById(`roll-r-${idx}`);
+  if(!el)return;
+  el.className='atk-inline-result show';
+  el.innerHTML=`${isCrit?'<span class="r-crit">💥КРИТ </span>':''}<span class="r-label">Урон: </span><span class="r-dmg">${r.total}</span> <span class="r-label">${r.text}</span>`;
+  showDiceModal(isCrit?`КРИТ: ${a.n}`:`Урон: ${a.n}`,r.total,r.text,isCrit);
+}
+function doSvRoll(idx){
+  const d=rollDie(20);
+  const el=document.getElementById(`roll-r-${idx}`);
+  if(!el)return;
+  el.className='atk-inline-result show';
+  el.innerHTML=`<span class="r-label">к20: </span><span class="${d===20?'r-crit':d===1?'r-miss':'r-hit'} r-d20">${d}</span> <span class="r-label">(СБ цели)</span>`;
+  showDiceModal('Бросок кубика',d,'к20 (ГМ добавляет бонус цели)',d===20);
+}
+function quickDice(sides){
+  const r=rollDie(sides);
+  document.getElementById('quick-out').textContent=r;
+  showDiceModal(`к${sides}`,r,`Результат к${sides}`,r===sides);
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeHpModal();
+});
+
+buildSidebar();
+</script>
+</body>
+</html>
