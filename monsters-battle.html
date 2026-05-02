@@ -692,8 +692,18 @@ desc:'Человекоподобная фигура 2–2,3 м, собранна
 
 /* ── State ── */
 const STATE={};
-MS.forEach(m=>{STATE[m.id]={hp:m.hp,conds:{},phase:1,roll:{}}});
+const CLONES=[];
+const INITIATIVE=[];
+let cloneSeq=1;
+let turnIndex=0;
+function makeState(m){return{hp:m.hp,conds:{},phase:1,roll:{},ini:null}}
+MS.forEach(m=>{STATE[String(m.id)]=makeState(m)});
 let cur=null,tab='combat';
+function keyOf(m){return String(m&&m.id)}
+function allMonsters(){return [...CLONES,...MS]}
+function getMon(id){const sid=String(id);return allMonsters().find(m=>String(m.id)===sid)}
+function baseOf(m){return m&&m.isClone?MS.find(x=>x.id===m.baseId):m}
+function cleanName(n){return String(n||'').replace(/\s+#\d+$/,'')}
 
 /* ── Dice ── */
 function rollDie(sides){return Math.floor(Math.random()*sides)+1}
@@ -753,7 +763,7 @@ function rollDamage(diceStr,bonus,isCrit){
 /* ── HP ── */
 function openHpModal(){
   if(!cur)return;
-  document.getElementById('hp-modal-title').textContent=`ОЗ: ${cur.nm} (${STATE[cur.id].hp}/${cur.hp})`;
+  document.getElementById('hp-modal-title').textContent=`ОЗ: ${cur.nm} (${STATE[keyOf(cur)].hp}/${cur.hp})`;
   document.getElementById('hp-modal-val').value='';
   document.getElementById('hp-modal').style.display='flex';
   setTimeout(()=>document.getElementById('hp-modal-val').focus(),50);
@@ -762,7 +772,7 @@ function closeHpModal(){document.getElementById('hp-modal').style.display='none'
 function applyHp(sign){
   const v=parseInt(document.getElementById('hp-modal-val').value)||0;
   if(!cur||v===0){closeHpModal();return;}
-  const s=STATE[cur.id];
+  const s=STATE[keyOf(cur)];
   s.hp=Math.max(0,Math.min(cur.hp,s.hp+sign*v));
   closeHpModal();
   render();
@@ -781,9 +791,37 @@ function filterSidebar(){
     g.style.display=visible||!q?'':'none';
   });
 }
+function renderSidebarButton(m,wrap,isClone=false){
+  const s=STATE[keyOf(m)]||makeState(m);
+  const pct=Math.max(0,s.hp/m.hp);
+  const hpCls=s.hp===0?'hp-dead':pct>0.5?'hp-high':pct>0.25?'hp-mid':'hp-low';
+  const z=ZONES.find(z=>z.id===m.z)||{lb:m.z,dot:'#c9a84c'};
+  const btn=document.createElement('button');
+  btn.className=`mon-btn z-${m.z}${cur&&keyOf(cur)===keyOf(m)?' active':''}`;
+  btn.dataset.search=`${String(m.nm||'').toLowerCase()} ${String(m.en||'').toLowerCase()} cr${m.crN} ${z.lb.toLowerCase()} ${String(m.ly||'').toLowerCase()}`;
+  btn.onclick=()=>selectMon(m.id);
+  btn.innerHTML=`
+    <span class="mon-btn-cr" style="background:${pct>0.5?'#1a1810':pct>0.25?'#1e1a08':'#2a1010'};color:${z.dot};border:1px solid ${z.dot}">CR${m.cr}</span>
+    <span class="mon-btn-info">
+      <div class="mon-btn-name">${m.nm}</div>
+      <div class="mon-btn-sub">${m.ly}${isClone?' · копия':''}</div>
+      <div class="mon-btn-hp"><div class="mon-btn-hp-fill ${hpCls}" style="width:${pct*100}%"></div></div>
+    </span>
+    ${isClone?`<span class="clone-remove-btn" onclick="event.stopPropagation();removeClone('${m.id}')">×</span>`:''}`;
+  wrap.appendChild(btn);
+}
 function buildSidebar(){
   const sb=document.getElementById('sb');
   sb.innerHTML='';
+  if(CLONES.length){
+    const box=document.createElement('div');
+    box.className='encounter-clones';
+    box.innerHTML=`<div class="encounter-clones-head"><span>Сцена боя · копии</span><button class="encounter-clear-btn" onclick="clearClones()">очистить</button></div>`;
+    const wrap=document.createElement('div');
+    CLONES.forEach(m=>renderSidebarButton(m,wrap,true));
+    box.appendChild(wrap);
+    sb.appendChild(box);
+  }
   ZONES.forEach(z=>{
     const items=MS.filter(m=>m.z===z.id);
     const gl=document.createElement('div');
@@ -791,34 +829,61 @@ function buildSidebar(){
     gl.innerHTML=`<span class="sb-group-dot" style="background:${z.dot}"></span>${z.lb}`;
     sb.appendChild(gl);
     const wrap=document.createElement('div');
-    items.forEach(m=>{
-      const s=STATE[m.id];
-      const pct=Math.max(0,s.hp/m.hp);
-      const hpCls=s.hp===0?'hp-dead':pct>0.5?'hp-high':pct>0.25?'hp-mid':'hp-low';
-      const btn=document.createElement('button');
-      btn.className=`mon-btn z-${m.z}${cur&&cur.id===m.id?' active':''}`;
-      btn.dataset.search=`${m.nm.toLowerCase()} ${m.en.toLowerCase()} cr${m.crN} ${z.lb.toLowerCase()} ${m.ly.toLowerCase()}`;
-      btn.onclick=()=>selectMon(m.id);
-      btn.innerHTML=`
-        <span class="mon-btn-cr" style="background:${pct>0.5?'#1a1810':pct>0.25?'#1e1a08':'#2a1010'};color:${z.dot};border:1px solid ${z.dot}">CR${m.cr}</span>
-        <span class="mon-btn-info">
-          <div class="mon-btn-name">${m.nm}</div>
-          <div class="mon-btn-sub">${m.ly}</div>
-          <div class="mon-btn-hp"><div class="mon-btn-hp-fill ${hpCls}" style="width:${pct*100}%"></div></div>
-        </span>`;
-      wrap.appendChild(btn);
-    });
+    items.forEach(m=>renderSidebarButton(m,wrap,false));
     sb.appendChild(wrap);
   });
 }
 
 function selectMon(id){
-  cur=MS.find(m=>m.id===id);
+  cur=getMon(id);
   if(!cur)return;
   tab='combat';
   buildSidebar();
   renderFull();
 }
+
+function createClone(source){
+  const base=baseOf(source||cur);
+  if(!base)return;
+  const sameExisting=CLONES.filter(c=>c.baseId===base.id).length;
+  const cid='clone-'+(cloneSeq++);
+  const clone={...base,id:cid,baseId:base.id,isClone:true,nm:`${base.nm} #${sameExisting+1}`,en:base.en,ly:base.ly};
+  CLONES.push(clone);
+  STATE[keyOf(clone)]=makeState(clone);
+  cur=clone;
+  tab='combat';
+  buildSidebar();
+  renderFull();
+}
+function removeClone(id){
+  const sid=String(id);
+  const idx=CLONES.findIndex(c=>String(c.id)===sid);
+  if(idx<0)return;
+  CLONES.splice(idx,1);
+  delete STATE[sid];
+  removeFromInitiative(sid,false);
+  if(cur&&keyOf(cur)===sid){cur=null;tab='combat';}
+  buildSidebar();
+  renderFull();
+}
+function clearClones(){
+  CLONES.slice().forEach(c=>removeFromInitiative(keyOf(c),false));
+  CLONES.splice(0,CLONES.length);
+  Object.keys(STATE).filter(k=>k.startsWith('clone-')).forEach(k=>delete STATE[k]);
+  if(cur&&String(cur.id).startsWith('clone-'))cur=null;
+  buildSidebar();
+  renderFull();
+}
+function resetCombat(){
+  MS.forEach(m=>{STATE[String(m.id)]=makeState(m)});
+  CLONES.splice(0,CLONES.length);
+  Object.keys(STATE).filter(k=>k.startsWith('clone-')).forEach(k=>delete STATE[k]);
+  INITIATIVE.splice(0,INITIATIVE.length);
+  turnIndex=0;
+  cur=null;tab='combat';
+  buildSidebar();renderFull();
+}
+
 
 /* ── HP color ── */
 function hpColor(s,m){
@@ -834,11 +899,59 @@ const ZC={
   r7:{main:'var(--purple)',bg:'var(--purple-bg)',border:'var(--purple)',light:'var(--purple2)',text:'var(--purple2)'}
 };
 
+/* ── Initiative / encounter control ── */
+function parseBonus(str){
+  const m=String(str||'').match(/[+-]?\d+/);
+  return m?parseInt(m[0],10):0;
+}
+function hasAdvantageText(str){return /преим/i.test(String(str||''));}
+function upsertInitiative(mon,val){
+  const id=keyOf(mon);
+  const old=INITIATIVE.find(x=>x.id===id);
+  if(old){old.val=val;old.name=mon.nm;old.z=mon.z;}
+  else INITIATIVE.push({id,val,name:mon.nm,z:mon.z});
+  INITIATIVE.sort((a,b)=>b.val-a.val || String(a.name).localeCompare(String(b.name),'ru'));
+  turnIndex=Math.max(0,Math.min(turnIndex,INITIATIVE.length-1));
+}
+function rollInitiativeCurrent(){
+  if(!cur)return;
+  const bonus=parseBonus(cur.ini);
+  const d1=rollDie(20),d2=rollDie(20);
+  const d20=hasAdvantageText(cur.ini)?Math.max(d1,d2):d1;
+  const total=d20+bonus;
+  STATE[keyOf(cur)].ini=total;
+  upsertInitiative(cur,total);
+  showDiceModal(`Инициатива: ${cur.nm}`,total,`d20(${d20}) ${bonus>=0?'+':''}${bonus}${hasAdvantageText(cur.ini)?' · с преимуществом':''}`,d20===20);
+  renderFull();
+}
+function removeFromInitiative(id,rerender=true){
+  const sid=String(id);
+  const idx=INITIATIVE.findIndex(x=>x.id===sid);
+  if(idx>=0)INITIATIVE.splice(idx,1);
+  turnIndex=Math.max(0,Math.min(turnIndex,INITIATIVE.length-1));
+  if(rerender)renderFull();
+}
+function nextTurn(){
+  if(!INITIATIVE.length)return;
+  turnIndex=(turnIndex+1)%INITIATIVE.length;
+  const item=INITIATIVE[turnIndex];
+  const mon=getMon(item.id);
+  if(mon)cur=mon;
+  buildSidebar();
+  renderFull();
+}
+function clearInitiative(){INITIATIVE.splice(0,INITIATIVE.length);turnIndex=0;renderFull();}
+function renderInitiativeTracker(){
+  if(!INITIATIVE.length)return `<div class="ini-tracker"><span class="ini-tracker-label">Инициатива</span><button class="ini-next-btn" onclick="rollInitiativeCurrent()">🎲 для выбранного</button></div>`;
+  return `<div class="ini-tracker"><span class="ini-tracker-label">Инициатива</span><button class="ini-next-btn" onclick="nextTurn()">следующий</button><button class="ini-clear-btn" onclick="clearInitiative()">очистить</button>${INITIATIVE.map((it,i)=>`<div class="ini-slot ${i===turnIndex?'current':''}" onclick="selectMon('${it.id}')"><span class="ini-slot-name">${it.name}</span><span class="ini-slot-val">${it.val}</span><button class="ini-remove-btn" onclick="event.stopPropagation();removeFromInitiative('${it.id}')">×</button></div>`).join('')}</div>`;
+}
+
+
 /* ── Render ── */
 function renderFull(){
   const mn=document.getElementById('mn');
   if(!cur){mn.innerHTML='<div class="placeholder">← Выбери существо слева</div>';return;}
-  const m=cur,s=STATE[m.id],zc=ZC[m.z];
+  const m=cur,s=STATE[keyOf(m)],zc=ZC[m.z];
   const modStr=v=>{const r=Math.floor((v-10)/2);return(r>=0?'+':'')+r};
   const STATS=[['СИЛ','str'],['ЛОВ','dex'],['ТЕЛ','con'],['ИНТ','int'],['МДР','wis'],['ХАР','cha']];
   const pct=Math.max(0,s.hp/m.hp);
@@ -941,6 +1054,10 @@ function renderFull(){
   mn.innerHTML=`
   <div class="combat-panel" id="cp">
     <div class="cp-name">${m.nm}</div>
+    <button class="cp-util-btn" onclick="createClone(cur)">＋ копия</button>
+    ${m.isClone?`<button class="cp-util-btn danger" onclick="removeClone('${m.id}')">× копия</button>`:''}
+    <button class="cp-util-btn" onclick="rollInitiativeCurrent()">🎲 инициатива</button>
+    <button class="cp-util-btn danger" onclick="resetCombat()">↺ бой</button>
     <div class="cp-hp-block" onclick="openHpModal()">
       <div>
         <div class="cp-hp-label">ОЗ</div>
@@ -966,6 +1083,7 @@ function renderFull(){
       <span class="dice-output" id="quick-out">—</span>
     </div>
   </div>
+  ${renderInitiativeTracker()}
 
   <div class="sheet">
     <div class="sheet-header z-${m.z}">
@@ -1015,13 +1133,13 @@ function switchTab(t){tab=t;renderFull();}
 
 function toggleCond(k){
   if(!cur)return;
-  const s=STATE[cur.id];
+  const s=STATE[keyOf(cur)];
   s.conds[k]=!s.conds[k];
   renderFull();
 }
 function togglePhase(){
   if(!cur||!cur.ph2)return;
-  const s=STATE[cur.id];
+  const s=STATE[keyOf(cur)];
   s.phase=s.phase===1?2:1;
   renderFull();
 }
