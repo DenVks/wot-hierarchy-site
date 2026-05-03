@@ -1,1 +1,1 @@
-v77 — Monster Manual 5e bestiary tab integration patch
+v78 — MM monsters are loaded into battle only by explicit В бой link

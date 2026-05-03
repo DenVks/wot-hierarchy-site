@@ -717,7 +717,21 @@ desc:'Человекоподобная фигура 2–2,3 м, собранна
 
  ];
 if(window.ANOMALY_MONSTERS){MS.push(...window.ANOMALY_MONSTERS);}
-if(window.MM_ADAPTER){MS.push(...window.MM_ADAPTER.buildBattleMonsters());}
+
+function ensureMmMonsterLoaded(monsterId){
+  if(!window.MM_ADAPTER)return null;
+  const raw=String(monsterId||'');
+  const match=/^mm-(\d+)$/.exec(raw);
+  if(!match)return null;
+  if(MS.some(m=>String(m.id)===raw))return getMon(raw);
+  const idx=parseInt(match[1],10);
+  const mmList=window.MM_ADAPTER.buildBattleMonsters();
+  const found=mmList[idx];
+  if(!found)return null;
+  MS.push(found);
+  STATE[String(found.id)]=makeState(found);
+  return found;
+}
 
 /* ── State ── */
 const STATE={};
@@ -913,6 +927,7 @@ function handlePackQuery(){
   const monster=q.get('monster');
   if(pack) addPackToCombat(pack);
   if(monster){
+    ensureMmMonsterLoaded(monster);
     const m=getMon(monster);
     if(m) selectMon(m.id);
   }
