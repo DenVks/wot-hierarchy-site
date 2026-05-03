@@ -1,0 +1,8 @@
+WoT Hierarchy Site — full assembled version v71
+Base: wot_hierarchy_site_v62_npc_generator_fixes.zip
+Applied patches: v63, v64, v65, v66, v67, v68, v69, v70, v71
+Assembled: 2026-05-03
+Notes:
+- DM Toolkit password: WOT-ANOMALY-773
+- Includes NPC Generator, custom NPC localStorage support, NPC / Battle copies and initiative, Monsters / Battle copies and initiative, R7 monsters, NPC 32–33.
+- v71: Monsters / Battle combat panel aligned with NPC / Battle: HP reset, clickable initiative block, manual initiative entries, rest/new-round row, and fuller encounter controls.

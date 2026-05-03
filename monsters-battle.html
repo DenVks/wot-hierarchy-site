@@ -77,6 +77,12 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .cp-dmg-btn:hover{background:#3a1010}
 .cp-heal-btn{background:var(--success-bg);border:1px solid var(--green);border-radius:4px;color:var(--green2);padding:3px 8px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;transition:all .12s}
 .cp-heal-btn:hover{background:#102010}
+.cp-reset-btn,.cp-util-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text2);padding:3px 8px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;transition:all .12s}
+.cp-reset-btn:hover,.cp-util-btn:hover{border-color:var(--gold);color:var(--gold2);background:var(--bg4)}
+.cp-util-btn.danger,.cp-reset-btn.danger{background:var(--danger-bg);border-color:var(--red);color:var(--red2)}
+.cp-clone-add{border-color:var(--gold);color:var(--gold2)}
+.cp-clone-remove{border-color:var(--danger-border);color:var(--red2);background:var(--danger-bg)}
+.cp-ini-box{cursor:pointer;transition:all .12s}.cp-ini-box:hover{border-color:var(--gold);background:var(--bg4)}
 .cp-ac-box{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;text-align:center}
 .cp-ac-val{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--blue2)}
 .cp-ac-lbl{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
@@ -86,6 +92,9 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .cp-pp-box{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;text-align:center}
 .cp-pp-val{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--teal2)}
 .cp-pp-lbl{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
+.cp-sp-box,.cp-pass-box{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;text-align:center}
+.cp-sp-val,.cp-pass-val{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--teal2)}
+.cp-sp-lbl,.cp-pass-lbl{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
 .cp-cr-box{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;text-align:center;max-width:200px}
 .cp-cr-val{font-family:'Cinzel',serif;font-size:10px;font-weight:600;color:var(--gold2)}
 .cp-cr-lbl{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
@@ -111,6 +120,23 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .dice-btn{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text2);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 7px;transition:all .12s}
 .dice-btn:hover{border-color:var(--gold);color:var(--gold2)}
 .dice-output{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold2);background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:2px 8px;min-width:40px;text-align:center;display:inline-block}
+.ini-tracker{background:var(--bg2);border-bottom:1px solid var(--border);padding:6px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex-shrink:0}
+.ini-tracker-label{font-family:'Cinzel',serif;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.ini-slot{display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:2px 6px;cursor:pointer}
+.ini-slot.current{border-color:var(--gold);background:var(--bg4)}
+.ini-slot-name{font-family:'Cinzel',serif;font-size:9px;color:var(--text2);white-space:nowrap}
+.ini-slot-val{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold2)}
+.ini-next-btn{background:var(--bg3);border:1px solid var(--gold);border-radius:4px;color:var(--gold2);padding:2px 8px;cursor:pointer;font-size:10px;font-family:'Cinzel',serif;letter-spacing:.04em}
+.ini-clear-btn{background:none;border:1px solid var(--border);border-radius:4px;color:var(--text3);padding:2px 6px;cursor:pointer;font-size:10px}
+.ini-add-manual{display:flex;gap:4px;align-items:center;margin-left:auto}
+.ini-manual-name,.ini-manual-val{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 6px;outline:none}
+.ini-manual-name{width:120px}.ini-manual-val{width:52px;text-align:center}
+.ini-add-btn{background:var(--bg3);border:1px solid var(--gold);border-radius:4px;color:var(--gold2);padding:2px 7px;cursor:pointer;font-family:'Cinzel',serif;font-size:10px}
+.ini-remove-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;line-height:1;padding:0 0 0 2px}.ini-remove-btn:hover{color:var(--red2)}
+.rest-row{display:flex;gap:6px;margin-bottom:8px;padding:6px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.new-round-btn,.short-rest-btn,.long-rest-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--text2);padding:4px 10px;cursor:pointer;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.04em;text-transform:uppercase;transition:all .12s}
+.new-round-btn:hover,.short-rest-btn:hover,.long-rest-btn:hover{border-color:var(--gold);color:var(--gold2);background:var(--bg4)}
+.long-rest-btn{border-color:var(--green);color:var(--green2)}
 
 /* Sheet */
 .sheet{padding:12px 16px 40px;flex:1}
@@ -775,7 +801,42 @@ function applyHp(sign){
   const s=STATE[keyOf(cur)];
   s.hp=Math.max(0,Math.min(cur.hp,s.hp+sign*v));
   closeHpModal();
+  buildSidebar();
   render();
+}
+function resetHP(){
+  if(!cur)return;
+  const s=STATE[keyOf(cur)];
+  s.hp=cur.hp;
+  buildSidebar();
+  render();
+}
+function newRound(){
+  if(!cur)return;
+  const s=STATE[keyOf(cur)];
+  s.roll={};
+  showDiceModal('Новый раунд','↻','Сброшены видимые результаты бросков выбранного существа',false);
+  renderFull();
+}
+function shortRest(){
+  if(!cur)return;
+  const s=STATE[keyOf(cur)];
+  const heal=Math.max(1,Math.floor(cur.hp*0.25));
+  s.hp=Math.min(cur.hp,s.hp+heal);
+  showDiceModal('Короткий отдых',`+${heal}`,`${cur.nm}: ${s.hp}/${cur.hp} ОЗ`,false);
+  buildSidebar();
+  renderFull();
+}
+function longRest(){
+  if(!cur)return;
+  const s=STATE[keyOf(cur)];
+  s.hp=cur.hp;
+  s.conds={};
+  s.phase=1;
+  s.roll={};
+  showDiceModal('Долгий отдых',cur.hp,'Полное восстановление выбранного существа',false);
+  buildSidebar();
+  renderFull();
 }
 
 /* ── Sidebar ── */
@@ -908,8 +969,8 @@ function hasAdvantageText(str){return /преим/i.test(String(str||''));}
 function upsertInitiative(mon,val){
   const id=keyOf(mon);
   const old=INITIATIVE.find(x=>x.id===id);
-  if(old){old.val=val;old.name=mon.nm;old.z=mon.z;}
-  else INITIATIVE.push({id,val,name:mon.nm,z:mon.z});
+  if(old){old.val=val;old.name=mon.nm;old.z=mon.z;old.manual=false;}
+  else INITIATIVE.push({id,val,name:mon.nm,z:mon.z,manual:false});
   INITIATIVE.sort((a,b)=>b.val-a.val || String(a.name).localeCompare(String(b.name),'ru'));
   turnIndex=Math.max(0,Math.min(turnIndex,INITIATIVE.length-1));
 }
@@ -924,6 +985,19 @@ function rollInitiativeCurrent(){
   showDiceModal(`Инициатива: ${cur.nm}`,total,`d20(${d20}) ${bonus>=0?'+':''}${bonus}${hasAdvantageText(cur.ini)?' · с преимуществом':''}`,d20===20);
   renderFull();
 }
+function addManualInitiative(){
+  const nameEl=document.getElementById('ini-manual-name');
+  const valEl=document.getElementById('ini-manual-val');
+  const name=(nameEl&&nameEl.value.trim())||'Игрок';
+  const val=parseInt(valEl&&valEl.value,10);
+  if(!Number.isFinite(val))return;
+  const id='manual-'+Date.now();
+  INITIATIVE.push({id,val,name,z:'manual',manual:true});
+  INITIATIVE.sort((a,b)=>b.val-a.val || String(a.name).localeCompare(String(b.name),'ru'));
+  if(nameEl)nameEl.value='';
+  if(valEl)valEl.value='';
+  renderFull();
+}
 function removeFromInitiative(id,rerender=true){
   const sid=String(id);
   const idx=INITIATIVE.findIndex(x=>x.id===sid);
@@ -931,20 +1005,37 @@ function removeFromInitiative(id,rerender=true){
   turnIndex=Math.max(0,Math.min(turnIndex,INITIATIVE.length-1));
   if(rerender)renderFull();
 }
+function iniJump(i){
+  if(i<0||i>=INITIATIVE.length)return;
+  turnIndex=i;
+  const item=INITIATIVE[turnIndex];
+  const mon=item&&!item.manual?getMon(item.id):null;
+  if(mon)cur=mon;
+  buildSidebar();
+  renderFull();
+}
 function nextTurn(){
   if(!INITIATIVE.length)return;
   turnIndex=(turnIndex+1)%INITIATIVE.length;
   const item=INITIATIVE[turnIndex];
-  const mon=getMon(item.id);
+  const mon=item&&!item.manual?getMon(item.id):null;
   if(mon)cur=mon;
   buildSidebar();
   renderFull();
 }
 function clearInitiative(){INITIATIVE.splice(0,INITIATIVE.length);turnIndex=0;renderFull();}
 function renderInitiativeTracker(){
-  if(!INITIATIVE.length)return `<div class="ini-tracker"><span class="ini-tracker-label">Инициатива</span><button class="ini-next-btn" onclick="rollInitiativeCurrent()">🎲 для выбранного</button></div>`;
-  return `<div class="ini-tracker"><span class="ini-tracker-label">Инициатива</span><button class="ini-next-btn" onclick="nextTurn()">следующий</button><button class="ini-clear-btn" onclick="clearInitiative()">очистить</button>${INITIATIVE.map((it,i)=>`<div class="ini-slot ${i===turnIndex?'current':''}" onclick="selectMon('${it.id}')"><span class="ini-slot-name">${it.name}</span><span class="ini-slot-val">${it.val}</span><button class="ini-remove-btn" onclick="event.stopPropagation();removeFromInitiative('${it.id}')">×</button></div>`).join('')}</div>`;
+  let html=`<div class="ini-tracker"><span class="ini-tracker-label">Инициатива:</span>`;
+  if(INITIATIVE.length){
+    html+=INITIATIVE.map((it,i)=>`<div class="ini-slot ${i===turnIndex?'current':''}" onclick="iniJump(${i})"><span class="ini-slot-name">${it.manual?'👤 ':''}${it.name}</span><span class="ini-slot-val">${it.val}</span><button class="ini-remove-btn" onclick="event.stopPropagation();removeFromInitiative('${it.id}')">×</button></div>`).join('');
+    html+=`<button class="ini-next-btn" onclick="nextTurn()">→ След.</button><button class="ini-clear-btn" onclick="clearInitiative()">✕</button>`;
+  }else{
+    html+=`<span style="color:var(--text3);font-size:10px">Нажмите на блок «Иниц.» у монстра или добавьте значение вручную</span>`;
+  }
+  html+=`<div class="ini-add-manual"><input class="ini-manual-name" id="ini-manual-name" placeholder="Имя (игрок)" maxlength="18"><input class="ini-manual-val" id="ini-manual-val" type="number" placeholder="20"><button class="ini-add-btn" onclick="addManualInitiative()">+</button></div></div>`;
+  return html;
 }
+
 
 
 /* ── Render ── */
@@ -968,7 +1059,11 @@ function renderFull(){
   ];
 
   const combatHTML=()=>{
-    let h='';
+    let h=`<div class="rest-row">
+      <button class="new-round-btn" onclick="newRound()">🔄 Новый раунд</button>
+      <button class="short-rest-btn" onclick="shortRest()">☕ Кор. отдых</button>
+      <button class="long-rest-btn" onclick="longRest()">🌙 Долг. отдых</button>
+    </div>`;
     // Attacks
     h+='<div class="sec"><div class="sec-h">Атаки и действия</div>';
     m.at.forEach((a,i)=>{
@@ -1053,27 +1148,23 @@ function renderFull(){
 
   mn.innerHTML=`
   <div class="combat-panel" id="cp">
-    <div class="cp-name">${m.nm}</div>
-    <button class="cp-util-btn" onclick="createClone(cur)">＋ копия</button>
-    ${m.isClone?`<button class="cp-util-btn danger" onclick="removeClone('${m.id}')">× копия</button>`:''}
-    <button class="cp-util-btn" onclick="rollInitiativeCurrent()">🎲 инициатива</button>
-    <button class="cp-util-btn danger" onclick="resetCombat()">↺ бой</button>
+    <div class="cp-name">${m.nm}${m.isClone?' · копия':''}</div>
     <div class="cp-hp-block" onclick="openHpModal()">
-      <div>
-        <div class="cp-hp-label">ОЗ</div>
-        <div style="display:flex;align-items:baseline;gap:4px">
-          <span class="cp-hp-cur" style="color:${hpCol}">${s.hp}</span>
-          <span class="cp-hp-sep">/</span>
-          <span class="cp-hp-max">${m.hp}</span>
-        </div>
-        <div class="cp-hp-bar"><div class="cp-hp-fill ${hpCls}" style="width:${pct*100}%"></div></div>
-      </div>
+      <span class="cp-hp-label">ОЗ</span>
+      <span class="cp-hp-cur" style="color:${hpCol}">${s.hp}</span>
+      <span class="cp-hp-sep">/</span>
+      <span class="cp-hp-max">${m.hp}</span>
+      <div class="cp-hp-bar"><div class="cp-hp-fill ${hpCls}" style="width:${pct*100}%"></div></div>
     </div>
-    <button class="cp-dmg-btn" onclick="openHpModal()">− Урон</button>
-    <button class="cp-heal-btn" onclick="openHpModal()">+ Лечение</button>
+    <button class="cp-dmg-btn" onclick="openHpModal()">−ОЗ</button>
+    <button class="cp-heal-btn" onclick="openHpModal()">+ОЗ</button>
+    <button class="cp-reset-btn" onclick="resetHP()" title="Восстановить полные ОЗ выбранного монстра">↺</button>
+    ${m.isClone?`<button class="cp-reset-btn cp-clone-remove" onclick="removeClone('${m.id}')" title="Удалить эту копию из сцены">× копия</button>`:`<button class="cp-reset-btn cp-clone-add" onclick="createClone(cur)" title="Создать ещё одну копию этого монстра">＋ копия</button>`}
+    <button class="cp-reset-btn danger" onclick="resetCombat()" title="Сбросить ОЗ, состояния, инициативу и копии монстров">↺ бой</button>
     <div class="cp-ac-box"><div class="cp-ac-val" style="color:${zc.light}">${m.ac}</div><div class="cp-ac-lbl">КД</div></div>
-    <div class="cp-ini-box"><div class="cp-ini-val">${m.ini}</div><div class="cp-ini-lbl">Инит.</div></div>
-    <div class="cp-pp-box"><div class="cp-pp-val">${m.pp}</div><div class="cp-pp-lbl">П.Вос.</div></div>
+    <div class="cp-ini-box" onclick="rollInitiativeCurrent()" title="Бросить инициативу и добавить в трекер"><div class="cp-ini-val">${m.ini}</div><div class="cp-ini-lbl">Иниц.</div></div>
+    <div class="cp-sp-box"><div class="cp-sp-val">${m.spd}</div><div class="cp-sp-lbl">Скор.</div></div>
+    <div class="cp-pass-box"><div class="cp-pass-val">${m.pp}</div><div class="cp-pass-lbl">Пасс ВСПР</div></div>
     ${m.ph2?`<span class="phase-badge ${s.phase===1?'ph1':'ph2'}" onclick="togglePhase()" title="Переключить фазу">Фаза ${s.phase}</span>`:''}
     <div class="cond-panel">
       ${Object.entries(condNames).map(([k,v])=>`<button class="cond-toggle${s.conds[k]?' on-'+k:''}" onclick="toggleCond('${k}')">${v}</button>`).join('')}
