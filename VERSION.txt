@@ -1,1 +1,1 @@
-v78 — MM monsters are loaded into battle only by explicit В бой link
+v79 — MM battle card open fix

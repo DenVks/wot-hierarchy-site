@@ -999,7 +999,8 @@ const ZC={
   r5a:{main:'#d99a3d',bg:'rgba(217,154,61,.12)',border:'#d99a3d',light:'#f0c16c',text:'#f0c16c'},
   r5b:{main:'#79d0a3',bg:'rgba(121,208,163,.12)',border:'#79d0a3',light:'#b5f0cf',text:'#b5f0cf'},
   r5c:{main:'#9fb6d9',bg:'rgba(159,182,217,.12)',border:'#9fb6d9',light:'#d6e4ff',text:'#d6e4ff'},
-  r6a:{main:'#dda14a',bg:'rgba(221,161,74,.13)',border:'#dda14a',light:'#f2c879',text:'#f2c879'}
+  r6a:{main:'#dda14a',bg:'rgba(221,161,74,.13)',border:'#dda14a',light:'#f2c879',text:'#f2c879'},
+  mm5e:{main:'#8fd0b0',bg:'rgba(143,208,176,.12)',border:'#8fd0b0',light:'#c8f5dc',text:'#c8f5dc'}
 };
 
 /* ── Initiative / encounter control ── */
@@ -1084,13 +1085,15 @@ function renderInitiativeTracker(){
 function renderFull(){
   const mn=document.getElementById('mn');
   if(!cur){mn.innerHTML='<div class="placeholder">← Выбери существо слева</div>';return;}
-  const m=cur,s=STATE[keyOf(m)],zc=ZC[m.z];
+  const m=cur,s=STATE[keyOf(m)],zc=ZC[m.z]||ZC.yadro;
   const modStr=v=>{const r=Math.floor((v-10)/2);return(r>=0?'+':'')+r};
   const STATS=[['СИЛ','str'],['ЛОВ','dex'],['ТЕЛ','con'],['ИНТ','int'],['МДР','wis'],['ХАР','cha']];
   const pct=Math.max(0,s.hp/m.hp);
   const hpCls=pct>0.5?'hp-high':pct>0.25?'hp-mid':'hp-low';
   const hpCol=hpColor(s,m);
-  const zTag=m.z==='oreol'?'warning':m.z==='greb'?'info':m.z==='r7'?'purple':'danger';
+  const zTag=m.z==='oreol'?'warning':m.z==='greb'?'info':m.z==='r7'?'purple':m.z==='mm5e'?'success':'danger';
+  const zLabel=m.z==='oreol'?'Ореол':m.z==='greb'?'Гребень':m.z==='yadro'?'Ядро':m.z==='r7'?'R7':m.z==='mm5e'?'Monster Manual 5e':(ZONES.find(z=>z.id===m.z)?.lb||m.z);
+  const zcSafe=ZC[m.z]||ZC.yadro;
   const condNames={stun:'Ошеломл.',prone:'Сбит с ног',blind:'Ослеплён',restrained:'Скован',poison:'Отравлен',fear:'Испуган'};
 
   const TABS=[
@@ -1226,7 +1229,7 @@ function renderFull(){
       </div>
       <div class="sh-sub">${m.sz} · ${m.ly} · CR ${m.cr} · ${m.xp} опыта</div>
       <div class="sh-tags">
-        <span class="tag tag-${zTag}">${m.z==='oreol'?'Ореол':m.z==='greb'?'Гребень':'Ядро'}</span>
+        <span class="tag tag-${zTag}">${zLabel}</span>
         <span class="tag tag-${zTag}">CR ${m.cr}</span>
         <span class="tag tag-neutral">${m.spd}</span>
         ${m.ph2?`<span class="tag tag-danger">Двухфазный</span>`:''}
