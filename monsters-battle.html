@@ -332,6 +332,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
   <div class="dice-modal-detail" id="dice-modal-detail"></div>
 </div>
 
+<script src="assets/monster-packs-data.js?v=72"></script>
 <script>
 const MS=[
 {id:1,z:'oreol',cr:'7',crN:7,xp:'2 900',nm:'Картограф',en:'Cartographer',ly:'Внешняя Тень',sz:'Среднее, аберрация',
@@ -714,7 +715,8 @@ re:[],la:null,laC:0,
 km:'Контр-игра: Носитель — “кнопка сложности”. Убрав его, партия возвращает когнитивную волну R7 к базовой частоте раз в 2 раунда и ослабляет ложные цели Ловчих.',
 desc:'Человекоподобная фигура 2–2,3 м, собранная из слоёв тёмного стекла, пепла и обрывков памяти. Вместо головы — сфера дымной ткани с проступающими полулицами. За спиной — вертикальный шов воздуха высотой 3–4 м, от которого нити цепляются за стены и землю.'}
 
-];
+ ];
+if(window.ANOMALY_MONSTERS){MS.push(...window.ANOMALY_MONSTERS);}
 
 /* ── State ── */
 const STATE={};
@@ -840,7 +842,7 @@ function longRest(){
 }
 
 /* ── Sidebar ── */
-const ZONES=[{id:'oreol',lb:'Ореол',dot:'#c9a84c'},{id:'greb',lb:'Гребень',dot:'#4c7ac9'},{id:'yadro',lb:'Ядро',dot:'#c94c4c'},{id:'r7',lb:'R7 · Ложные цели',dot:'#b07ae8'}];
+const ZONES=[{id:'oreol',lb:'Ореол',dot:'#c9a84c'},{id:'greb',lb:'Гребень',dot:'#4c7ac9'},{id:'yadro',lb:'Ядро',dot:'#c94c4c'},{id:'r7',lb:'R7 · Ложные цели',dot:'#b07ae8'},{id:'r5a',lb:'R5 · Type A · Тёплый',dot:'#d99a3d'},{id:'r5c',lb:'R5 · Type C · Холодный',dot:'#9fb6d9'}];
 function filterSidebar(){
   const q=document.getElementById('sb-search').value.toLowerCase();
   document.querySelectorAll('.mon-btn').forEach(b=>{
@@ -893,6 +895,26 @@ function buildSidebar(){
     items.forEach(m=>renderSidebarButton(m,wrap,false));
     sb.appendChild(wrap);
   });
+}
+
+
+function addPackToCombat(packId){
+  const ids=(window.ANOMALY_MONSTER_PACKS||[]).find(p=>p.id===packId)?.monsterIds||[];
+  ids.map(getMon).filter(Boolean).forEach(m=>createClone(m));
+  if(ids.length){
+    const firstClone=CLONES[CLONES.length-ids.length];
+    if(firstClone) selectMon(firstClone.id);
+  }
+}
+function handlePackQuery(){
+  const q=new URLSearchParams(location.search);
+  const pack=q.get('pack');
+  const monster=q.get('monster');
+  if(pack) addPackToCombat(pack);
+  if(monster){
+    const m=getMon(monster);
+    if(m) selectMon(m.id);
+  }
 }
 
 function selectMon(id){
@@ -957,7 +979,9 @@ const ZC={
   oreol:{main:'var(--gold)',bg:'var(--warning-bg)',border:'var(--gold)',light:'var(--gold2)',text:'var(--gold3)'},
   greb:{main:'var(--blue)',bg:'var(--info-bg)',border:'var(--blue)',light:'var(--blue2)',text:'var(--blue2)'},
   yadro:{main:'var(--red)',bg:'var(--danger-bg)',border:'var(--red)',light:'var(--red2)',text:'var(--red2)'},
-  r7:{main:'var(--purple)',bg:'var(--purple-bg)',border:'var(--purple)',light:'var(--purple2)',text:'var(--purple2)'}
+  r7:{main:'var(--purple)',bg:'var(--purple-bg)',border:'var(--purple)',light:'var(--purple2)',text:'var(--purple2)'},
+  r5a:{main:'#d99a3d',bg:'rgba(217,154,61,.12)',border:'#d99a3d',light:'#f0c16c',text:'#f0c16c'},
+  r5c:{main:'#9fb6d9',bg:'rgba(159,182,217,.12)',border:'#9fb6d9',light:'#d6e4ff',text:'#d6e4ff'}
 };
 
 /* ── Initiative / encounter control ── */
@@ -1277,6 +1301,8 @@ document.addEventListener('keydown',e=>{
 });
 
 buildSidebar();
+handlePackQuery();
+if(!cur) selectMon(1);
 </script>
 </body>
 </html>
