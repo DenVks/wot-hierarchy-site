@@ -1,1 +1,1 @@
-v76 — added R5 Type B and R6 Type A anomaly monster cards
+v77 — Monster Manual 5e bestiary tab integration patch

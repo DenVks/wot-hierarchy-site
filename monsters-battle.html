@@ -332,7 +332,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
   <div class="dice-modal-detail" id="dice-modal-detail"></div>
 </div>
 
-<script src="assets/monster-packs-data.js?v=76"></script>
+<script src="assets/monster-packs-data.js?v=77"></script><script src="assets/mm-monsters-data.js?v=77"></script><script src="assets/mm-bestiary-adapter.js?v=77"></script>
 <script>
 const MS=[
 {id:1,z:'oreol',cr:'7',crN:7,xp:'2 900',nm:'Картограф',en:'Cartographer',ly:'Внешняя Тень',sz:'Среднее, аберрация',
@@ -717,6 +717,7 @@ desc:'Человекоподобная фигура 2–2,3 м, собранна
 
  ];
 if(window.ANOMALY_MONSTERS){MS.push(...window.ANOMALY_MONSTERS);}
+if(window.MM_ADAPTER){MS.push(...window.MM_ADAPTER.buildBattleMonsters());}
 
 /* ── State ── */
 const STATE={};
@@ -842,7 +843,7 @@ function longRest(){
 }
 
 /* ── Sidebar ── */
-const ZONES=[{id:'oreol',lb:'Ореол',dot:'#c9a84c'},{id:'greb',lb:'Гребень',dot:'#4c7ac9'},{id:'yadro',lb:'Ядро',dot:'#c94c4c'},{id:'r7',lb:'R7 · Ложные цели',dot:'#b07ae8'},{id:'r5a',lb:'R5 · Type A · Тёплый',dot:'#d99a3d'},{id:'r5b',lb:'R5 · Type B · Тёплый',dot:'#79d0a3'},{id:'r5c',lb:'R5 · Type C · Холодный',dot:'#9fb6d9'},{id:'r6a',lb:'R6 · Type A · Тёплый',dot:'#dda14a'}];
+const ZONES=[{id:'oreol',lb:'Ореол',dot:'#c9a84c'},{id:'greb',lb:'Гребень',dot:'#4c7ac9'},{id:'yadro',lb:'Ядро',dot:'#c94c4c'},{id:'r7',lb:'R7 · Ложные цели',dot:'#b07ae8'},{id:'r5a',lb:'R5 · Type A · Тёплый',dot:'#d99a3d'},{id:'r5b',lb:'R5 · Type B · Тёплый',dot:'#79d0a3'},{id:'r5c',lb:'R5 · Type C · Холодный',dot:'#9fb6d9'},{id:'r6a',lb:'R6 · Type A · Тёплый',dot:'#dda14a'},{id:'mm5e',lb:'Monster Manual 5e',dot:'#8fd0b0'}];
 function filterSidebar(){
   const q=document.getElementById('sb-search').value.toLowerCase();
   document.querySelectorAll('.mon-btn').forEach(b=>{
