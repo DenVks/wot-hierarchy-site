@@ -1,9 +1,1 @@
-v73 — expanded anomalies mechanics and descriptions
-
-Changes:
-- Expanded anomalies.html into a full technical D&D 5e-compatible reference for temporary anomalies R1–R10.
-- Added general anomaly definitions: rating, DC formula, core, halo, pulses, collapse, loot.
-- Added manifestation types A/B/C with narrative and mechanical guidance.
-- Replaced old size/mobility assumptions with independent 1d6 size and 1d4 mobility tables.
-- Added detailed R1–R10 cards with visualization text, mechanics, creature waves, loot, and GM usage notes.
-- Added quick GM summary table for DC, core damage, halo/pulse, CR range, wave cadence, and loot chance.
+v74 — states and peoples dropdown + Borderlands encyclopedia pages

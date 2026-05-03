@@ -138,6 +138,110 @@
 })();
 
 
+/* ==== v74: Государства и народы dropdown ==== */
+(function(){
+  'use strict';
+  const navLinks = document.querySelector('.nav-links');
+  if(!navLinks || navLinks.querySelector('.nav-nations-group')) return;
+
+  const path = (location.pathname.split('/').pop() || 'index.html');
+  const nationItems = [
+    {href:'aiel.html', label:'Айил'},
+    {href:'tuataan.html', label:'Туата’ан'},
+    {href:'arafel.html', label:'Арафел'},
+    {href:'kandor.html', label:'Кандор'},
+    {href:'shienar.html', label:'Шайнар'},
+    {href:'tar-valon.html', label:'Тар Валон'}
+  ];
+  window.WOT_NATION_ITEMS = nationItems.slice();
+  const nationPages = new Set(nationItems.map(i => i.href.split('#')[0]));
+
+  Array.from(navLinks.querySelectorAll('a')).forEach(a => {
+    const href = (a.getAttribute('href') || '').split('#')[0];
+    if(nationPages.has(href)) a.remove();
+  });
+
+  const group = document.createElement('div');
+  group.className = 'nav-nations-group nav-rule-group';
+  if(nationPages.has(path)) group.classList.add('active');
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'nav-nations-btn nav-rule-btn';
+  btn.setAttribute('aria-haspopup','true');
+  btn.setAttribute('aria-expanded','false');
+  btn.textContent = 'Государства и народы';
+  group.appendChild(btn);
+
+  const menu = document.createElement('div');
+  menu.className = 'nav-nations-menu nav-rule-menu nav-rule-menu-floating';
+  menu.setAttribute('role','menu');
+
+  nationItems.forEach(item => {
+    const a = document.createElement('a');
+    a.href = item.href;
+    a.textContent = item.label;
+    a.setAttribute('role','menuitem');
+    if(item.href.split('#')[0] === path) a.classList.add('active');
+    menu.appendChild(a);
+  });
+  document.body.appendChild(menu);
+
+  const rules = navLinks.querySelector('.nav-rule-group');
+  const anchor = Array.from(navLinks.querySelectorAll('a')).find(a => (a.getAttribute('href') || '').split('#')[0] === 'hierarchies.html');
+  if(rules) rules.insertAdjacentElement('afterend', group);
+  else if(anchor) anchor.insertAdjacentElement('afterend', group);
+  else navLinks.prepend(group);
+
+  let closeTimer = 0;
+  function positionMenu(){
+    const r = btn.getBoundingClientRect();
+    const width = Math.max(260, menu.offsetWidth || 260);
+    let left = r.left;
+    const maxLeft = window.innerWidth - width - 12;
+    if(left > maxLeft) left = Math.max(12, maxLeft);
+    menu.style.left = left + 'px';
+    menu.style.top = (r.bottom + 8) + 'px';
+  }
+  function setOpen(open){
+    clearTimeout(closeTimer);
+    group.classList.toggle('open', open);
+    menu.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    if(open){
+      positionMenu();
+      const r = btn.getBoundingClientRect();
+      menu.style.setProperty('--bridge-left', r.left + 'px');
+      menu.style.setProperty('--bridge-top', r.bottom + 'px');
+      menu.style.setProperty('--bridge-width', r.width + 'px');
+    }
+  }
+  function scheduleClose(){ clearTimeout(closeTimer); closeTimer = window.setTimeout(() => setOpen(false), 320); }
+  function cancelClose(){ clearTimeout(closeTimer); setOpen(true); }
+  group.addEventListener('mouseenter', cancelClose);
+  group.addEventListener('mouseleave', scheduleClose);
+  menu.addEventListener('mouseenter', cancelClose);
+  menu.addEventListener('mouseleave', scheduleClose);
+  btn.addEventListener('click', e => { e.stopPropagation(); setOpen(!group.classList.contains('open')); });
+  btn.addEventListener('keydown', e => {
+    if(e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' '){
+      e.preventDefault(); setOpen(true);
+      const first = menu.querySelector('a'); if(first) first.focus();
+    }
+  });
+  menu.addEventListener('keydown', e => {
+    const links = Array.from(menu.querySelectorAll('a'));
+    const i = links.indexOf(document.activeElement);
+    if(e.key === 'Escape'){ setOpen(false); btn.focus(); }
+    else if(e.key === 'ArrowDown'){ e.preventDefault(); links[(i + 1 + links.length) % links.length].focus(); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); links[(i - 1 + links.length) % links.length].focus(); }
+  });
+  document.addEventListener('click', e => { if(!group.contains(e.target) && !menu.contains(e.target)) setOpen(false); });
+  window.addEventListener('resize', () => { if(menu.classList.contains('open')) positionMenu(); });
+  window.addEventListener('scroll', () => { if(menu.classList.contains('open')) positionMenu(); }, {passive:true});
+})();
+
+
 /* ==== v58: DM Toolkit dropdown at the right edge + password-gated links ==== */
 (function(){
   'use strict';
