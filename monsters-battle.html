@@ -332,7 +332,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
   <div class="dice-modal-detail" id="dice-modal-detail"></div>
 </div>
 
-<script src="assets/monster-packs-data.js?v=72"></script>
+<script src="assets/monster-packs-data.js?v=76"></script>
 <script>
 const MS=[
 {id:1,z:'oreol',cr:'7',crN:7,xp:'2 900',nm:'Картограф',en:'Cartographer',ly:'Внешняя Тень',sz:'Среднее, аберрация',
@@ -842,7 +842,7 @@ function longRest(){
 }
 
 /* ── Sidebar ── */
-const ZONES=[{id:'oreol',lb:'Ореол',dot:'#c9a84c'},{id:'greb',lb:'Гребень',dot:'#4c7ac9'},{id:'yadro',lb:'Ядро',dot:'#c94c4c'},{id:'r7',lb:'R7 · Ложные цели',dot:'#b07ae8'},{id:'r5a',lb:'R5 · Type A · Тёплый',dot:'#d99a3d'},{id:'r5c',lb:'R5 · Type C · Холодный',dot:'#9fb6d9'}];
+const ZONES=[{id:'oreol',lb:'Ореол',dot:'#c9a84c'},{id:'greb',lb:'Гребень',dot:'#4c7ac9'},{id:'yadro',lb:'Ядро',dot:'#c94c4c'},{id:'r7',lb:'R7 · Ложные цели',dot:'#b07ae8'},{id:'r5a',lb:'R5 · Type A · Тёплый',dot:'#d99a3d'},{id:'r5b',lb:'R5 · Type B · Тёплый',dot:'#79d0a3'},{id:'r5c',lb:'R5 · Type C · Холодный',dot:'#9fb6d9'},{id:'r6a',lb:'R6 · Type A · Тёплый',dot:'#dda14a'}];
 function filterSidebar(){
   const q=document.getElementById('sb-search').value.toLowerCase();
   document.querySelectorAll('.mon-btn').forEach(b=>{
@@ -981,7 +981,9 @@ const ZC={
   yadro:{main:'var(--red)',bg:'var(--danger-bg)',border:'var(--red)',light:'var(--red2)',text:'var(--red2)'},
   r7:{main:'var(--purple)',bg:'var(--purple-bg)',border:'var(--purple)',light:'var(--purple2)',text:'var(--purple2)'},
   r5a:{main:'#d99a3d',bg:'rgba(217,154,61,.12)',border:'#d99a3d',light:'#f0c16c',text:'#f0c16c'},
-  r5c:{main:'#9fb6d9',bg:'rgba(159,182,217,.12)',border:'#9fb6d9',light:'#d6e4ff',text:'#d6e4ff'}
+  r5b:{main:'#79d0a3',bg:'rgba(121,208,163,.12)',border:'#79d0a3',light:'#b5f0cf',text:'#b5f0cf'},
+  r5c:{main:'#9fb6d9',bg:'rgba(159,182,217,.12)',border:'#9fb6d9',light:'#d6e4ff',text:'#d6e4ff'},
+  r6a:{main:'#dda14a',bg:'rgba(221,161,74,.13)',border:'#dda14a',light:'#f2c879',text:'#f2c879'}
 };
 
 /* ── Initiative / encounter control ── */
