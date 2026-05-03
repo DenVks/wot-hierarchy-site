@@ -38,22 +38,45 @@
 <nav class="sitenav"><div class="inner"><a href="index.html" class="nav-brand"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="wg" cx="50%" cy="50%"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/></radialGradient></defs><g stroke="url(#wg)" fill="none" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"/><circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/><circle cx="40" cy="40" r="18" stroke-width=".5" opacity=".55"/><circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/><g stroke-width=".55" opacity=".7"><line x1="40" y1="4" x2="40" y2="76"/><line x1="4" y1="40" x2="76" y2="40"/><line x1="14.8" y1="14.8" x2="65.2" y2="65.2"/><line x1="65.2" y1="14.8" x2="14.8" y2="65.2"/><line x1="40" y1="4" x2="52" y2="76"/><line x1="40" y1="4" x2="28" y2="76"/><line x1="4" y1="40" x2="76" y2="52"/></g><circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="epoch.html">Эпоха</a><a href="hierarchies.html">Три Иерархии</a><a href="unity.html">Единство</a><a href="throne.html">Трон</a><a href="madding.html">Хранители</a><a href="hierarchy-wall.html">Иерархия Стены</a><a href="order.html">Орден</a><a href="wall.html">Стена</a><a href="chronicles.html">Хроника</a><a href="anomalies.html">Аномалии</a><a href="aiel.html">Айил</a><a href="tuataan.html">Туата’ан</a><a href="freefolk.html">Вольные</a><a href="rituals.html">Ритуалы</a><a href="classes.html">Классы</a><a href="weaves.html">Плетения</a><a href="ingredients.html">Ингредиенты</a><a href="loot-generator.html">Генератор</a><a href="encounter-generator.html">Энкаунтеры</a><a href="tsitadel.html">Цитадель</a><a href="monsters.html">Монстры</a><a href="dm-npc.html">NPC / Бой</a></div></div></nav>
 <div class="page-body">
 <style>
-.anom-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin:40px 0}
-.anom-card{background:linear-gradient(180deg,var(--bg-card) 0%,var(--bg-deep) 100%);border:1px solid var(--border);padding:24px;position:relative;border-left:3px solid var(--anom-color)}
+.anom-hero-note{max-width:980px;margin:22px auto 0;color:var(--ink-soft);font-size:15px;line-height:1.75;text-align:center}
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:32px 0}
+.rule-card{background:linear-gradient(180deg,var(--bg-card) 0%,var(--bg-deep) 100%);border:1px solid var(--border);padding:22px;position:relative;overflow:hidden}
+.rule-card:before{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.45}
+.rule-card h3{font-family:'Cinzel',serif;font-size:16px;color:var(--gold);margin:0 0 12px;font-weight:500;letter-spacing:.04em}
+.rule-card p,.rule-card li{font-size:14px;color:var(--ink-soft);line-height:1.72}
+.rule-card ul{margin:8px 0 0;padding-left:20px}
+.formula-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:24px 0}
+.formula-item{border:1px solid var(--border);background:rgba(201,169,97,.05);padding:14px;text-align:center}
+.formula-item .k{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+.formula-item .v{font-family:'Cinzel',serif;font-size:20px;color:var(--gold);margin-top:6px}
+.size-table,.mobility-table,.loot-table,.wave-table{max-width:1040px;margin:28px auto}
+.size-table table,.mobility-table table,.loot-table table,.wave-table table{width:100%;border-collapse:collapse;background:rgba(13,13,25,.4);border:1px solid var(--border)}
+.size-table th,.size-table td,.mobility-table th,.mobility-table td,.loot-table th,.loot-table td,.wave-table th,.wave-table td{padding:12px 13px;text-align:left;border-bottom:1px solid rgba(42,40,64,.5);font-size:13.5px;color:var(--ink-soft);vertical-align:top}
+.size-table th,.mobility-table th,.loot-table th,.wave-table th{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.18em;color:var(--gold);background:rgba(201,169,97,.05);text-transform:uppercase}
+.size-table .r,.mobility-table .r,.loot-table .r,.wave-table .r{font-family:'Cinzel',serif;color:var(--gold);white-space:nowrap}
+.anom-grid{display:grid;grid-template-columns:1fr;gap:22px;margin:38px 0}
+.anom-card{background:linear-gradient(180deg,var(--bg-card) 0%,var(--bg-deep) 100%);border:1px solid var(--border);padding:24px;position:relative;border-left:4px solid var(--anom-color);overflow:hidden}
+.anom-card:after{content:"";position:absolute;right:-80px;top:-80px;width:220px;height:220px;border:1px solid var(--anom-color);border-radius:50%;opacity:.08}
 .anom-card.r1,.anom-card.r2{--anom-color:#10b981}
 .anom-card.r3,.anom-card.r4{--anom-color:#eab308}
 .anom-card.r5,.anom-card.r6{--anom-color:#f59e0b}
 .anom-card.r7,.anom-card.r8{--anom-color:#dc2626}
 .anom-card.r9,.anom-card.r10{--anom-color:#b91c1c}
 .anom-card .rank-badge{display:inline-block;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;padding:4px 10px;background:rgba(255,255,255,.04);border:1px solid var(--anom-color);color:var(--anom-color);text-transform:uppercase;margin-bottom:12px}
-.anom-card h3{font-family:'Cinzel',serif;font-size:17px;color:var(--ink);margin-bottom:10px;font-weight:500}
-.anom-card .threat{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--anom-color);margin-bottom:10px}
-.anom-card p{font-size:13.5px;color:var(--ink-soft);line-height:1.7}
-.size-table,.mobility-table{max-width:780px;margin:40px auto}
-.size-table table,.mobility-table table{width:100%;border-collapse:collapse;background:rgba(13,13,25,.4);border:1px solid var(--border)}
-.size-table th,.size-table td,.mobility-table th,.mobility-table td{padding:13px;text-align:left;border-bottom:1px solid rgba(42,40,64,.5);font-size:14px;color:var(--ink-soft)}
-.size-table th,.mobility-table th{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;color:var(--gold);background:rgba(201,169,97,.05);text-transform:uppercase}
-.size-table .r,.mobility-table .r{font-family:'Cinzel',serif;color:var(--gold)}
+.anom-card h3{font-family:'Cinzel',serif;font-size:20px;color:var(--ink);margin:0 0 8px;font-weight:500}
+.anom-card .threat{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--anom-color);margin-bottom:12px}
+.anom-card p{font-size:14px;color:var(--ink-soft);line-height:1.72;margin:0 0 10px}
+.anom-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:14px}
+.anom-detail{border:1px solid rgba(42,40,64,.8);background:rgba(13,13,25,.35);padding:14px}
+.anom-detail h4{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 8px}
+.anom-detail p,.anom-detail li{font-size:13.5px;color:var(--ink-soft);line-height:1.65}
+.anom-detail ul{margin:0;padding-left:18px}
+.type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:30px 0}
+.type-card{border:1px solid var(--border);background:rgba(13,13,25,.42);padding:20px}
+.type-card h3{font-family:'Cinzel',serif;font-size:16px;color:var(--gold);margin:0 0 10px}
+.type-card p{font-size:14px;color:var(--ink-soft);line-height:1.7}
+.warning-box strong{color:var(--gold)}
+@media(max-width:760px){.size-table,.mobility-table,.loot-table,.wave-table{overflow-x:auto}.size-table table,.mobility-table table,.loot-table table,.wave-table table{min-width:720px}.anom-card{padding:18px}}
 </style>
 <header class="page-header">
   <div class="page-header-flourish left" style="color:var(--gold)"><svg viewBox="0 0 60 160" xmlns="http://www.w3.org/2000/svg">
@@ -78,117 +101,307 @@
 </svg></div>
   <div class="eyebrow">Раздел V · Угрозы</div>
   <h1>Временные аномалии</h1>
-  <p class="lead">Десять рангов разрывов Узора. От ряби, которую можно не заметить, до Прорыва Ядра, который невозможно не заметить</p>
+  <p class="lead">Техническая классификация временных разрывов Узора: рейтинг, размер, подвижность, урон среды, волны существ и артефактные остатки.</p>
+  <p class="anom-hero-note">Аномалия — это не просто монстр и не обычная ловушка. Это состояние местности, где пространство, время, память действия или физические законы на короткий срок работают неправильно. Рейтинг показывает опасность и мощность, но не размер: маленькая трещина может быть смертельной, а квартальный ореол — сравнительно слабым, если его ядро нестабильно, но неглубоко.</p>
 </header>
 
 <section class="chapter">
   <div class="chapter-head">
-    <div class="chapter-roman">V.I · КЛАССИФИКАЦИЯ</div>
-    <h2 class="chapter-title">Ранговая система</h2>
-    <p class="chapter-desc">Оценка Ордена Стражей Узора. Соответствует СЛ извлечения и требуемому рангу иерарха</p>
+    <div class="chapter-roman">V.I · ОБЩАЯ МЕХАНИКА</div>
+    <h2 class="chapter-title">Базовые определения</h2>
+    <p class="chapter-desc">Единые правила для всех временных аномалий R1–R10</p>
   </div>
 
-  <div class="anom-grid reveal-target">
-    <div class="component-card component-card--anomaly anomaly-card anom-card r1">
-      <div class="rank-badge">R1</div>
-      <h3>Лёгкая рябь</h3>
-      <div class="threat">Угроза: лёгкая</div>
-      <p>Минимальное искажение Узора. Проявляется как кратковременная дрожь воздуха, смещение теней, внезапное эхо в тишине. Местные животные нервничают, молоко скисает быстрее обычного. Проходит за часы без вмешательства.</p>
+  <div class="formula-strip reveal-target">
+    <div class="formula-item"><div class="k">Рейтинг</div><div class="v">R = 1–10</div></div>
+    <div class="formula-item"><div class="k">СЛ аномалии</div><div class="v">10 + R</div></div>
+    <div class="formula-item"><div class="k">Пульсации</div><div class="v">СЛ = 10 + R</div></div>
+    <div class="formula-item"><div class="k">Размер</div><div class="v">1d6 отдельно</div></div>
+  </div>
+
+  <div class="rules-grid reveal-target">
+    <div class="rule-card">
+      <h3>Рейтинг</h3>
+      <p>Рейтинг аномалии — это уровень опасности, глубина разрыва и сложность противодействия. Он задаёт СЛ спасбросков, силу урона среды, частоту волн существ и вероятность артефактного остатка.</p>
+      <p><strong>Формула:</strong> СЛ всех спасбросков и противодействия = <strong>10 + R</strong>.</p>
     </div>
-    <div class="component-card component-card--anomaly anomaly-card anom-card r2">
-      <div class="rank-badge">R2</div>
-      <h3>Узелок</h3>
-      <div class="threat">Угроза: лёгкая</div>
-      <p>Точечное возмущение. Небольшая область (радиусом до 10 фт), где предметы могут менять вес, ориентацию или цвет. Безопасна для здоровья. Исчезает за сутки или после простого извлечения пирамидкой Послушника.</p>
+    <div class="rule-card">
+      <h3>Ядро и ореол</h3>
+      <ul>
+        <li><strong>Ядро</strong> — зона прямого контакта с разрывом. Здесь работает основной урон и самые жёсткие эффекты.</li>
+        <li><strong>Ореол</strong> — внешняя зона искажения. Она слабее ядра, но меняет восприятие, движение и тактику.</li>
+        <li>Существо, входящее в ядро добровольно, должно понимать: это не «площадка боя», а активная опасность среды.</li>
+      </ul>
     </div>
-    <div class="component-card component-card--anomaly anomaly-card anom-card r3">
-      <div class="rank-badge">R3</div>
-      <h3>Разлом малый</h3>
-      <div class="threat">Угроза: умеренная</div>
-      <p>Локальный разрыв реальности. Возможны <em>сбои памяти</em> у тех, кто провёл рядом более часа. Изредка из разлома выходят Осколки Узора (CR 5). Требует Стража Узла или выше.</p>
+    <div class="rule-card">
+      <h3>Пульсации</h3>
+      <p>Пульсация — повторяющийся эффект аномалии: всплеск энергии, перестройка поверхности, когнитивная волна, сдвиг пространства или выпуск существ. Если конкретный паспорт не говорит иначе, пульсация использует СЛ аномалии.</p>
     </div>
-    <div class="component-card component-card--anomaly anomaly-card anom-card r4">
-      <div class="rank-badge">R4</div>
-      <h3>Дрожащий узел</h3>
-      <div class="threat">Угроза: умеренная</div>
-      <p>Нестабильная аномалия, меняющая конфигурацию каждые несколько минут. Опасна непредсказуемостью. Из неё могут выходить Пустошники (CR 7). Требует отряд из двух Стражей.</p>
-    </div>
-    <div class="component-card component-card--anomaly anomaly-card anom-card r5">
-      <div class="rank-badge">R5</div>
-      <h3>Петля</h3>
-      <div class="threat">Угроза: существенная</div>
-      <p>Временная аномалия: небольшой участок времени (до минуты) начинает повторяться. Вошедшие могут застрять на несколько циклов, пока Ткач Потока не разорвёт петлю. Память искажается.</p>
-    </div>
-    <div class="component-card component-card--anomaly anomaly-card anom-card r6">
-      <div class="rank-badge">R6</div>
-      <h3>Разлом крупный</h3>
-      <div class="threat">Угроза: существенная</div>
-      <p>Масштабный разрыв, выпускающий Нитеразрывателей (CR 11). Область вокруг становится непригодной: концентрационные заклинания прерываются, связи атунированности ослабевают. Требует Старшего Ткача.</p>
-    </div>
-    <div class="component-card component-card--anomaly anomaly-card anom-card r7">
-      <div class="rank-badge">R7</div>
-      <h3>Зеркальный узел</h3>
-      <div class="threat">Угроза: опасная</div>
-      <p>Аномалия, создающая искажённые копии людей и событий. Копии действуют с задержкой в несколько секунд и с ошибками — иногда опаснее оригиналов. Может порождать Зеркал Шва (CR 12).</p>
-    </div>
-    <div class="component-card component-card--anomaly anomaly-card anom-card r8">
-      <div class="rank-badge">R8</div>
-      <h3>Обратный поток</h3>
-      <div class="threat">Угроза: опасная</div>
-      <p>Область, где причина и следствие меняются местами: удары наносятся <em>до</em> того, как их готовят. Чрезвычайно дезориентирующая. Летальна для незащищённых направляющих.</p>
-    </div>
-    <div class="component-card component-card--anomaly anomaly-card anom-card r9">
-      <div class="rank-badge">R9</div>
-      <h3>Стационарный разлом</h3>
-      <div class="threat">Угроза: критическая</div>
-      <p>Постоянная аномалия, не закрывающаяся стандартным извлечением. Источник Стражей Узла (CR 13). Требует группы Чемпионов и резерва Сферы Узора. Часто — ядро будущего Окна.</p>
-    </div>
-    <div class="component-card component-card--anomaly anomaly-card anom-card r10">
-      <div class="rank-badge">R10</div>
-      <h3>Прорыв Ядра</h3>
-      <div class="threat">Угроза: критическая</div>
-      <p>Область, в которой проявляются механики Ядра: <strong>удаление действий</strong>, <strong>переписывание позиции</strong>, <strong>сбой памяти</strong>. Только Архистраж. Такие инциденты за всю историю Ордена — единичны.</p>
+    <div class="rule-card">
+      <h3>Схлопывание и лут</h3>
+      <p>Артефакты появляются после успешного схлопывания или естественного затухания. Бросок на лут — один на аномалию. Если аномалия схлопнута ритуалом извлечения с пирамидкой, добавляется <strong>+10%</strong> к шансу любого лута и, по решению Мастера, одна ступень редкости для одного предмета.</p>
     </div>
   </div>
 </section>
 
 <section class="chapter narrow">
   <div class="chapter-head">
-    <div class="chapter-roman">V.II · МАСШТАБ</div>
-    <h2 class="chapter-title">Размеры и подвижность</h2>
-    <p class="chapter-desc">Физический размер аномалии и её способность смещаться</p>
+    <div class="chapter-roman">V.II · ТИП ПРОЯВЛЕНИЯ</div>
+    <h2 class="chapter-title">A / B / C</h2>
+    <p class="chapter-desc">Тип влияет на характер эффектов, но не меняет базовые численные параметры рейтинга</p>
+  </div>
+  <div class="type-grid reveal-target">
+    <div class="type-card">
+      <h3>Type A · Выброс внеземной энергии</h3>
+      <p>Аномалия выглядит как авария физики: озонная дымка, силовые плоскости, ровные срезы, микроискры на металле, гравитационные провалы, вспышки тепла или холода. Основной язык механики — чистый урон, принудительное движение, срыв концентрации и опасные геометрические зоны.</p>
+    </div>
+    <div class="type-card">
+      <h3>Type B · Прорыв из иных измерений</h3>
+      <p>Зона ведёт себя как чужая экосистема. Камень покрывается слизью, появляются нити, коконы, ферментный туман, охотничьи маршруты и физические существа. Основной язык механики — волны монстров, опутывание, захват, трудная местность, заражение, истощение и добивание из засады.</p>
+    </div>
+    <div class="type-card">
+      <h3>Type C · Проникновение из Мира Снов</h3>
+      <p>Аномалия атакует волю, память действия и уверенность. Возникают ложные цели, afterimage, повторяющиеся отражения, кошмары, страх и «победа», которая оказывается сном. Основной язык механики — психический урон, очарование, ужас, потеря реакции, ложное перемещение и проверки Мудрости/Интеллекта.</p>
+    </div>
+  </div>
+  <div class="warning-box reveal-target">
+    <strong>Правило ведущего и вторичного типа.</strong> У временной аномалии почти всегда есть один ведущий тип. Вторичный тип можно добавить для усложнения сцены: например, R5 Type A с вторичным Type C может наносить силовой урон, но создавать ложные траектории движения.
+  </div>
+</section>
+
+<section class="chapter narrow">
+  <div class="chapter-head">
+    <div class="chapter-roman">V.III · РАЗМЕР И ПОДВИЖНОСТЬ</div>
+    <h2 class="chapter-title">Размер не зависит от рейтинга</h2>
+    <p class="chapter-desc">Рейтинг — это мощность; размер — отдельный масштаб зоны</p>
   </div>
 
   <div class="size-table reveal-target">
     <table>
-      <thead><tr><th>Категория</th><th>Радиус</th><th>Типичные ранги</th></tr></thead>
+      <thead><tr><th>1d6</th><th>Размер S</th><th>Ядро</th><th>Ореол</th><th>Описание для сцены</th></tr></thead>
       <tbody>
-        <tr><td class="r">Точечная</td><td>до 10 фт</td><td>R1, R2</td></tr>
-        <tr><td class="r">Малая</td><td>10–50 фт</td><td>R3, R4</td></tr>
-        <tr><td class="r">Средняя</td><td>50–200 фт</td><td>R5, R6, R7</td></tr>
-        <tr><td class="r">Большая</td><td>200 фт – 1 миля</td><td>R8, R9</td></tr>
-        <tr><td class="r">Зональная</td><td>более мили</td><td>R10 · <em>редчайший случай</em></td></tr>
+        <tr><td class="r">1</td><td>Точечная</td><td>радиус 10 фт</td><td>радиус 30 фт</td><td>Разлом в дверном проёме, у колодца, на алтаре, в центре комнаты.</td></tr>
+        <tr><td class="r">2</td><td>Комната</td><td>20 фт</td><td>60 фт</td><td>Захватывает зал, склад, участок подземелья, небольшую мастерскую.</td></tr>
+        <tr><td class="r">3</td><td>Дом</td><td>40 фт</td><td>120 фт</td><td>Искажает всё здание и двор вокруг него.</td></tr>
+        <tr><td class="r">4</td><td>Участок / двор</td><td>80 фт</td><td>240 фт</td><td>Подходит для полноценной боевой карты: площадь, двор, перекрёсток, часть руин.</td></tr>
+        <tr><td class="r">5</td><td>Малая улица</td><td>160 фт</td><td>480 фт</td><td>Занимает улицу, квартальную артерию, доки или участок стены.</td></tr>
+        <tr><td class="r">6</td><td>Квартал</td><td>320 фт</td><td>960 фт</td><td>Временный максимум: квартал может дрейфовать, но не должен становиться континентальной зоной.</td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="mobility-table reveal-target">
     <table>
-      <thead><tr><th>Тип</th><th>Поведение</th><th>Частота</th></tr></thead>
+      <thead><tr><th>1d4</th><th>Подвижность</th><th>Механика</th><th>Как описывать</th></tr></thead>
       <tbody>
-        <tr><td class="r">Стационарная</td><td>Не перемещается. Ждёт извлечения.</td><td>~60%</td></tr>
-        <tr><td class="r">Дрейфующая</td><td>Смещается со скоростью пешехода. Может «следовать» за сильным направляющим.</td><td>~25%</td></tr>
-        <tr><td class="r">Мигрирующая</td><td>Скачкообразные смещения на мили. Чаще всего — по путям Силы.</td><td>~12%</td></tr>
-        <tr><td class="r">Злонамеренная</td><td>Активно ищет жертв. Редчайший тип. Обычно — высокого ранга.</td><td>~3%</td></tr>
+        <tr><td class="r">1</td><td>Неподвижна</td><td>Стоит на месте.</td><td>Мир вокруг раны застыл; опасность понятна, но не безопасна.</td></tr>
+        <tr><td class="r">2</td><td>Ползущая</td><td>Каждые 10 минут смещается на 1d6×10 фт.</td><td>Следы, стены, пятна инея или слизи медленно переползают по местности.</td></tr>
+        <tr><td class="r">3</td><td>Блуждающая</td><td>Каждые 1d4 минут смещается на 1d6×10 фт.</td><td>Зона как будто выбирает новый центр; безопасный путь внезапно оказывается внутри ореола.</td></tr>
+        <tr><td class="r">4</td><td>Рывками</td><td>Каждый пульс может сместить центр на 2d6×10 фт.</td><td>После вспышки всё «переставлено»: ядро уже не там, где было мгновение назад.</td></tr>
       </tbody>
     </table>
   </div>
-
   <div class="warning-box reveal-target">
-    <strong>Заметка для мастеров.</strong> Аномалии — это не бестиарий, а <em>состояние местности</em>. Встреча с Осколком Узора внутри аномалии R4 отличается от встречи с тем же Осколком в аномалии R9 не количеством, а правилами пространства вокруг. Расчёт сложности — не только CR существ, но и ранг аномалии.
+    Если ведущий тип — <strong>Мир Снов</strong>, подвижность можно повысить на одну ступень: сонная логика чаще меняет положение дверей, границ, отражений и маршрутов.
   </div>
 </section>
-</div>
+
+<section class="chapter narrow">
+  <div class="chapter-head">
+    <div class="chapter-roman">V.IV · ВОЛНЫ И АРТЕФАКТЫ</div>
+    <h2 class="chapter-title">Прорывы существ и остатки Узора</h2>
+    <p class="chapter-desc">CR задаёт качество угрозы, количество и частота — темп сцены</p>
+  </div>
+  <div class="rules-grid reveal-target">
+    <div class="rule-card">
+      <h3>Волна существ</h3>
+      <p>Аномалия «дышит» волнами. Каждая волна выпускает существ в указанном диапазоне CR. На низких рейтингах это одиночные прорывы; на высоких — постоянный темп, где поле боя пополняется каждый раунд.</p>
+    </div>
+    <div class="rule-card">
+      <h3>Частота</h3>
+      <p>Если сцена короткая, Мастер может ускорить частоту волн, но не должен одновременно повышать CR, количество и частоту без компенсации. Иначе аномалия превращается из опасной среды в математически невыигрываемую мясорубку.</p>
+    </div>
+    <div class="rule-card">
+      <h3>Артефакты</h3>
+      <p>Артефакт — не гарантированная награда за бой, а остаточная структура после схлопывания. Чем выше рейтинг, тем выше шанс редких и легендарных фрагментов, но тем опаснее само извлечение.</p>
+    </div>
+  </div>
+</section>
+
+<section class="chapter">
+  <div class="chapter-head">
+    <div class="chapter-roman">V.V · РЕЙТИНГИ R1–R10</div>
+    <h2 class="chapter-title">Полная техническая классификация</h2>
+    <p class="chapter-desc">Описание, механика D&D 5e, волны существ и артефактные остатки</p>
+  </div>
+
+  <div class="anom-grid reveal-target">
+    <div class="component-card component-card--anomaly anomaly-card anom-card r1">
+      <div class="rank-badge">R1 · СЛ 11</div>
+      <h3>Опасная трещина</h3>
+      <div class="threat">Угроза: локальная, но уже боевая</div>
+      <p>На первый взгляд это почти безобидная рябь: плывущие тени, стеклянная трава, дрожь воздуха над камнем, слишком длинное эхо шагов. Но внутри ядра Узор уже режет материю тонкими, нерегулярными касаниями. Существо чувствует покалывание кожи, сухой металлический привкус и ощущение, будто мир на миг стал тоньше.</p>
+      <div class="anom-detail-grid">
+        <div class="anom-detail"><h4>Воздействие</h4><ul><li>Ядро: каждый раунд спасбросок СЛ 11.</li><li>Провал: 2d6 урона; успех: половина, если Мастер использует стандартную модель половинного урона.</li><li>Тип урона по ведущему проявлению: силовой, психический, холод или огонь.</li><li>Ореол: раз в 1d4 раунда малый всплеск — 1 существо получает 1d6 урона или помеху на 1 бросок.</li></ul></div>
+        <div class="anom-detail"><h4>Существа</h4><p>CR 4–6. Волна: 1 существо каждые 1d4 раунда.</p></div>
+        <div class="anom-detail"><h4>Артефакты</h4><p>Шанс лута 25%. Редкость: обычный 20%, необычный 5%.</p></div>
+        <div class="anom-detail"><h4>Ведение сцены</h4><p>Использовать как предупреждение: игроки должны понять, что даже «малая» аномалия наносит реальный урон, если стоять в ядре.</p></div>
+      </div>
+    </div>
+
+    <div class="component-card component-card--anomaly anomaly-card anom-card r2">
+      <div class="rank-badge">R2 · СЛ 12</div>
+      <h3>Живой разлом</h3>
+      <div class="threat">Угроза: малая зона с активным поведением</div>
+      <p>Разлом уже выглядит живым: камень становится влажным или слизистым, трещины меняют направление, тени не совпадают с источником света. Гравитация может на миг потянуть в сторону, а предметы соскальзывают туда, где не должно быть уклона.</p>
+      <div class="anom-detail-grid">
+        <div class="anom-detail"><h4>Воздействие</h4><ul><li>Ядро: СЛ 12, 3d6 урона за раунд при провале.</li><li>Дополнительно 1/минуту: краткая петля — случайный сдвиг на 10 фт или трудная местность на 1 раунд.</li><li>Петля не провоцирует атаки, если это именно аномальный сдвиг, а не движение существа.</li></ul></div>
+        <div class="anom-detail"><h4>Существа</h4><p>CR 5–7. Волна: 1–2 существа каждые 1d3 раунда.</p></div>
+        <div class="anom-detail"><h4>Артефакты</h4><p>Шанс 35%. Обычный 20%, необычный 12%, редкий 3%.</p></div>
+        <div class="anom-detail"><h4>Ведение сцены</h4><p>Подходит для боя в помещении: разлом не обязан убивать сразу, но ломает позиционирование и вынуждает двигаться.</p></div>
+      </div>
+    </div>
+
+    <div class="component-card component-card--anomaly anomaly-card anom-card r3">
+      <div class="rank-badge">R3 · СЛ 13</div>
+      <h3>Пульс Узора</h3>
+      <div class="threat">Угроза: перестройка рельефа</div>
+      <p>Пульс Узора уже виден как повторяющийся ритм. Камень складывается в ступени, стены появляются там, где были проходы, зеркальные поверхности отражают зал с задержкой, а почва становится липкой и тянется за сапогами. Это первая категория, где сама карта боя начинает меняться.</p>
+      <div class="anom-detail-grid">
+        <div class="anom-detail"><h4>Воздействие</h4><ul><li>Каждые 1d4 раунда меняется 1 элемент рельефа: стена, яма, зеркальная поверхность, липкая почва.</li><li>Ядро: СЛ 13, 4d6 урона за раунд при провале.</li><li>Ореол: раз в 3 раунда эхо — при провале СЛ 13 помеха на Восприятие/ориентацию до конца следующего хода.</li></ul></div>
+        <div class="anom-detail"><h4>Существа</h4><p>CR 6–8. Волна: 2 существа каждые 2 раунда или 1 существо за раунд на коротких сценах.</p></div>
+        <div class="anom-detail"><h4>Артефакты</h4><p>Шанс 45%. Обычный 20%, необычный 15%, редкий 8%, очень редкий 2%.</p></div>
+        <div class="anom-detail"><h4>Ведение сцены</h4><p>Каждый пульс должен менять решение игроков: закрыть линию видимости, открыть опасный путь, разделить группу или создать укрытие.</p></div>
+      </div>
+    </div>
+
+    <div class="component-card component-card--anomaly anomaly-card anom-card r4">
+      <div class="rank-badge">R4 · СЛ 14</div>
+      <h3>Разрыв правил</h3>
+      <div class="threat">Угроза: локальная отмена нормальной физики</div>
+      <p>Законы мира начинают сбоить открыто. Огонь горит без топлива, вода течёт вверх по стенам, звук обрывается на середине слова, а падение может задержаться на секунду. Это всё ещё временная аномалия, но она уже убеждает свидетелей, что нормальные правила здесь не являются обязательными.</p>
+      <div class="anom-detail-grid">
+        <div class="anom-detail"><h4>Воздействие</h4><ul><li>Ядро: СЛ 14, 5d6 урона за раунд при провале.</li><li>Раз в 1d4 раунда: контроль среды по типу проявления.</li><li>Провал СЛ 14: ослепление или оглушение на 1 раунд.</li><li>Эффект должен быть объявлен до броска, чтобы игроки понимали угрозу.</li></ul></div>
+        <div class="anom-detail"><h4>Существа</h4><p>CR 7–9. Волна: 2–3 существа каждые 2 раунда.</p></div>
+        <div class="anom-detail"><h4>Артефакты</h4><p>Шанс 55%. Необычный 25%, редкий 20%, очень редкий 8%, легендарный 2%.</p></div>
+        <div class="anom-detail"><h4>Ведение сцены</h4><p>Использовать один ясный «сбой правила» за сцену, а не набор случайностей. Например: звук не работает, вода тянет вверх, огонь режет как стекло.</p></div>
+      </div>
+    </div>
+
+    <div class="component-card component-card--anomaly anomaly-card anom-card r5">
+      <div class="rank-badge">R5 · СЛ 15</div>
+      <h3>Срыв реальности</h3>
+      <div class="threat">Угроза: полноценный боевой разлом</div>
+      <p>Реальность срывается слоями. Глаза существ смотрят «не туда», кожа покрывается инеем или медной пылью, голос получает второе эхо, а следы на земле не совпадают с движением тела. R5 — рабочий порог для серьёзных пакетов монстров: аномалия уже не фон, а равноправный участник боя.</p>
+      <div class="anom-detail-grid">
+        <div class="anom-detail"><h4>Воздействие</h4><ul><li>Ядро: СЛ 15, 6d6 урона за раунд при провале.</li><li>Возможны временные косметические мутации без прямого штрафа: глаза, кожа, голос, следы.</li><li>Раз в 3 раунда: волна — принудительное перемещение на 10–20 фт или падение ничком при провале СЛ 15.</li></ul></div>
+        <div class="anom-detail"><h4>Существа</h4><p>CR 8–10. Волна: 3 существа каждые 2 раунда, иногда 1 существо за раунд для поддержания давления.</p></div>
+        <div class="anom-detail"><h4>Артефакты</h4><p>Шанс 65%. Редкий 30%, очень редкий 25%, легендарный 10%. Остальное — нет лута.</p></div>
+        <div class="anom-detail"><h4>Ведение сцены</h4><p>Хороший стандарт для готового боевого пакета 8/1/4: ложный босс отвлекает, хищник наказывает ошибки, арбитр задаёт правила зоны.</p></div>
+      </div>
+    </div>
+
+    <div class="component-card component-card--anomaly anomaly-card anom-card r6">
+      <div class="rank-badge">R6 · СЛ 16</div>
+      <h3>Открытая рана</h3>
+      <div class="threat">Угроза: ядро опасно даже при кратком контакте</div>
+      <p>Здесь Узор уже не просто треснул, а открыт. Предметы стареют за минуты: кожа дубеет, металл крошится, краска осыпается. Свет кажется грязнее, воздух тяжелее, а любое сосредоточение даётся с усилием, будто сама зона мешает удерживать мысль.</p>
+      <div class="anom-detail-grid">
+        <div class="anom-detail"><h4>Воздействие</h4><ul><li>Ядро: СЛ 16, 7d6 урона за раунд при провале.</li><li>Предметы могут получать нарративное старение; боевые штрафы применять только по решению Мастера.</li><li>Раз в 2 раунда: аномальная метка. Провал СЛ 16 — помеха на следующий спасбросок или проверку концентрации.</li></ul></div>
+        <div class="anom-detail"><h4>Существа</h4><p>CR 9–11. Волна: 3–4 существа каждые 2 раунда или 1–2 существа за раунд.</p></div>
+        <div class="anom-detail"><h4>Артефакты</h4><p>Шанс 75%. Редкий 25%, очень редкий 35%, легендарный 15%.</p></div>
+        <div class="anom-detail"><h4>Ведение сцены</h4><p>Давить на ресурсы: концентрация, реакции, спасброски и безопасные позиции. Зона должна ощущаться как рана, из которой постоянно выходит давление.</p></div>
+      </div>
+    </div>
+
+    <div class="component-card component-card--anomaly anomaly-card anom-card r7">
+      <div class="rank-badge">R7 · СЛ 17</div>
+      <h3>Разлом с памятью</h3>
+      <div class="threat">Угроза: аномалия реагирует на страх и волю</div>
+      <p>Разлом запоминает тех, кто вошёл внутрь. Он возвращает жесты, лица и голоса с ошибками; подсовывает ложные цели; создаёт сцены, которых не было, но которые могли бы случиться. Часто такой разлом выглядит «сонным», даже если ведущий тип не C: он работает с памятью боя.</p>
+      <div class="anom-detail-grid">
+        <div class="anom-detail"><h4>Воздействие</h4><ul><li>Ядро: СЛ 17, 8d6 урона за раунд при провале.</li><li>Раз в 2 раунда: когнитивная волна.</li><li>Провал СЛ 17: очарование, ужас или потеря реакции на 1 раунд.</li><li>Эффект не должен полностью отнимать агентность дольше 1 раунда без отдельного паспорта.</li></ul></div>
+        <div class="anom-detail"><h4>Существа</h4><p>CR 10–12. Волна: 4 существа каждые 2 раунда, часто 2 существа за раунд.</p></div>
+        <div class="anom-detail"><h4>Артефакты</h4><p>Шанс 85%. Очень редкий 45%, легендарный 20%, артефакт 20%.</p></div>
+        <div class="anom-detail"><h4>Ведение сцены</h4><p>Использовать страхи и намерения персонажей как форму поля боя, но сохранять проверяемую механику: СЛ, длительность, снятие эффекта.</p></div>
+      </div>
+    </div>
+
+    <div class="component-card component-card--anomaly anomaly-card anom-card r8">
+      <div class="rank-badge">R8 · СЛ 18</div>
+      <h3>Пограничный провал</h3>
+      <div class="threat">Угроза: одна точка существует в двух состояниях</div>
+      <p>Территория ломается слоями. Один и тот же коридор одновременно открыт и завален; существо стоит на мосту и падает с него; дверь ведёт в комнату и в её отражение. Карта боя должна ощущаться ненадёжной: игрок видит позицию, но не может быть уверен, что она одна.</p>
+      <div class="anom-detail-grid">
+        <div class="anom-detail"><h4>Воздействие</h4><ul><li>Ядро: СЛ 18, 10d6 урона за раунд при провале.</li><li>Каждый раунд в ядре: дополнительный эффект по СЛ 18.</li><li>Варианты: слепота, немота, замедление, срыв концентрации.</li><li>Длительность базового эффекта: до конца следующего хода цели, если паспорт не задаёт иное.</li></ul></div>
+        <div class="anom-detail"><h4>Существа</h4><p>CR 12–14. Волна: 2–3 существа каждый раунд или 5 существ за 2 раунда.</p></div>
+        <div class="anom-detail"><h4>Артефакты</h4><p>Шанс 90%. Редкий 10%, очень редкий 50%, легендарный 30%.</p></div>
+        <div class="anom-detail"><h4>Ведение сцены</h4><p>Не перегружать случайностью. Лучше выбрать 2 состояния зоны и переключать их по пульсу, чем каждый раунд придумывать новую физику.</p></div>
+      </div>
+    </div>
+
+    <div class="component-card component-card--anomaly anomaly-card anom-card r9">
+      <div class="rank-badge">R9 · СЛ 19</div>
+      <h3>Катастрофическая временная</h3>
+      <div class="threat">Угроза: смертельная для неподготовленных</div>
+      <p>Это уже не опасное место, а катастрофа в форме местности. В ядре время проваливается кусками: человек делает шаг и не помнит, как оказался на коленях; металл исчезает с края клинка; фразы произносятся без начала. Ореол сам по себе становится опасной зоной, а ядро — почти запретной областью.</p>
+      <div class="anom-detail-grid">
+        <div class="anom-detail"><h4>Воздействие</h4><ul><li>Ядро: СЛ 19, 12d6 урона за раунд при провале.</li><li>Провал на 5+: дополнительный слом — краткая потеря хода или провал памяти на 1 сцену, преимущественно нарративно.</li><li>Ореол: раз в раунд СЛ 19; провал — «малая смерть», 3d6 урона.</li></ul></div>
+        <div class="anom-detail"><h4>Существа</h4><p>CR 14–16. Волна: 3 существа каждый раунд или 1 сильное + 1–2 средних.</p></div>
+        <div class="anom-detail"><h4>Артефакты</h4><p>Шанс 95%. Редкий 5%, очень редкий 45%, легендарный 45%.</p></div>
+        <div class="anom-detail"><h4>Ведение сцены</h4><p>Требует Чемпиона, Архистража или подготовленного ритуала. Для обычной группы это не «энкаунтер на победу», а катастрофа, которую надо пережить или стабилизировать.</p></div>
+      </div>
+    </div>
+
+    <div class="component-card component-card--anomaly anomaly-card anom-card r10">
+      <div class="rank-badge">R10 · СЛ 20</div>
+      <h3>Пролом Узора</h3>
+      <div class="threat">Угроза: экзистенциальная</div>
+      <p>Пролом Узора ведёт себя как временная аномалия, которая пытается стать постоянной. Внутри возможны остановки времени на доли секунды, обнуление расстояния, невозможность речи, исчезновения предметов и людей. Это не просто битва, а событие уровня истории региона.</p>
+      <div class="anom-detail-grid">
+        <div class="anom-detail"><h4>Воздействие</h4><ul><li>Ядро: СЛ 20, 16d6 урона за раунд при провале.</li><li>Каждый раунд: дополнительный феномен по выбору Мастера.</li><li>Феномены должны иметь явную механику: спасбросок, длительность, условие снятия, область действия.</li></ul></div>
+        <div class="anom-detail"><h4>Существа</h4><p>CR 16–18, иногда выше как уникальное существо. Волна: 1–2 существа каждый раунд + раз в 3 раунда 1 якорное элитное/уникальное.</p></div>
+        <div class="anom-detail"><h4>Артефакты</h4><p>Шанс 98%. Легендарный 60%, очень редкий 35%, остальное — редкий.</p></div>
+        <div class="anom-detail"><h4>Ведение сцены</h4><p>Использовать как кульминацию арки. Победа — не «убить всех монстров», а закрыть, отвести, стабилизировать или пережить пролом до завершения ритуала.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter narrow">
+  <div class="chapter-head">
+    <div class="chapter-roman">V.VI · СВОДНАЯ ТАБЛИЦА</div>
+    <h2 class="chapter-title">Быстрый справочник Мастера</h2>
+    <p class="chapter-desc">Числа для подготовки сцены и проверки баланса</p>
+  </div>
+  <div class="wave-table reveal-target">
+    <table>
+      <thead><tr><th>R</th><th>СЛ</th><th>Ядро</th><th>Ореол / пульс</th><th>CR существ</th><th>Волна</th><th>Лут</th></tr></thead>
+      <tbody>
+        <tr><td class="r">R1</td><td>11</td><td>2d6</td><td>1d6 или помеха раз в 1d4 раунда</td><td>4–6</td><td>1 каждые 1d4 раунда</td><td>25%</td></tr>
+        <tr><td class="r">R2</td><td>12</td><td>3d6</td><td>петля 1/мин: сдвиг 10 фт или трудная местность</td><td>5–7</td><td>1–2 каждые 1d3 раунда</td><td>35%</td></tr>
+        <tr><td class="r">R3</td><td>13</td><td>4d6</td><td>перестройка 1 элемента каждые 1d4 раунда</td><td>6–8</td><td>2 каждые 2 раунда</td><td>45%</td></tr>
+        <tr><td class="r">R4</td><td>14</td><td>5d6</td><td>контроль среды раз в 1d4 раунда</td><td>7–9</td><td>2–3 каждые 2 раунда</td><td>55%</td></tr>
+        <tr><td class="r">R5</td><td>15</td><td>6d6</td><td>волна перемещения/падения раз в 3 раунда</td><td>8–10</td><td>3 каждые 2 раунда</td><td>65%</td></tr>
+        <tr><td class="r">R6</td><td>16</td><td>7d6</td><td>аномальная метка раз в 2 раунда</td><td>9–11</td><td>3–4 каждые 2 раунда</td><td>75%</td></tr>
+        <tr><td class="r">R7</td><td>17</td><td>8d6</td><td>когнитивная волна раз в 2 раунда</td><td>10–12</td><td>4 каждые 2 раунда</td><td>85%</td></tr>
+        <tr><td class="r">R8</td><td>18</td><td>10d6</td><td>доп. эффект каждый раунд в ядре</td><td>12–14</td><td>2–3 каждый раунд</td><td>90%</td></tr>
+        <tr><td class="r">R9</td><td>19</td><td>12d6</td><td>ореол: 3d6/раунд при провале</td><td>14–16</td><td>3 каждый раунд</td><td>95%</td></tr>
+        <tr><td class="r">R10</td><td>20</td><td>16d6</td><td>феномен каждый раунд</td><td>16–18+</td><td>1–2/раунд + якорное раз в 3 раунда</td><td>98%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="chapter narrow">
+  <div class="chapter-head">
+    <div class="chapter-roman">V.VII · ПРАВИЛО МАСТЕРА</div>
+    <h2 class="chapter-title">Как не сломать сцену</h2>
+  </div>
+  <div class="warning-box reveal-target">
+    <strong>Сложность аномалии считается не только по CR существ.</strong> Урон ядра, ореол, пульсации, трудная местность, потеря реакций, срыв концентрации и частота волн — всё это часть энкаунтера. Если повышается частота волн, лучше снизить количество существ. Если зона уже наносит высокий урон каждый раунд, не заставляй всех монстров одновременно обладать контролем, реакциями и легендарными действиями.
+  </div>
+</section></div>
 <footer>
   <svg class="mini-wheel-ft" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
   <defs>
