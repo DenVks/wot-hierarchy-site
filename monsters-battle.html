@@ -298,6 +298,25 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .dm-tool-badge{position:fixed;top:8px;right:12px;z-index:50;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold2);background:rgba(15,14,12,.86);border:1px solid var(--border2);border-radius:999px;padding:4px 10px;pointer-events:none}
 .sidebar-sub a{color:var(--gold2);text-decoration:none}.sidebar-sub a:hover{text-decoration:underline}
 
+
+/* Anomaly scene background */
+.anomaly-bg-panel{margin:10px 10px 12px;padding:10px;border:1px solid var(--border);border-radius:8px;background:linear-gradient(180deg,rgba(30,27,22,.96),rgba(18,16,13,.96));box-shadow:0 8px 22px rgba(0,0,0,.22)}
+.anomaly-bg-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.anomaly-bg-title{font-family:'Cinzel',serif;color:var(--gold2);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.anomaly-bg-status{font-size:11px;color:var(--text2)}
+.anomaly-bg-controls{display:grid;grid-template-columns:minmax(200px,1fr) repeat(4,auto);gap:6px;align-items:center}
+.anomaly-bg-select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:5px 7px;font-size:12px;min-width:0}
+.anomaly-bg-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text);padding:5px 8px;font-size:11px;cursor:pointer;white-space:nowrap}
+.anomaly-bg-btn:hover{border-color:var(--gold);color:var(--gold2)}
+.anomaly-bg-btn.primary{background:rgba(201,168,76,.16);border-color:var(--gold);color:var(--gold2)}
+.anomaly-bg-btn.danger{background:rgba(201,76,76,.12);border-color:var(--red);color:var(--red2)}
+.anomaly-bg-detail{margin-top:8px;padding:8px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(0,0,0,.14);font-size:12px;color:var(--text2)}
+.anomaly-bg-detail b{color:var(--gold2)}
+.anomaly-bg-kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:6px;margin-top:6px}
+.anomaly-bg-kv div{border:1px solid var(--border);border-radius:5px;padding:5px;background:rgba(0,0,0,.12)}
+.anomaly-bg-read{margin-top:8px;color:var(--text);font-style:italic;border-left:3px solid var(--gold);padding-left:8px}
+@media(max-width:900px){.anomaly-bg-controls{grid-template-columns:1fr 1fr}.anomaly-bg-select{grid-column:1/-1}}
+
 @media(max-width:700px){
   .app{flex-direction:column;height:auto}
   .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border)}
@@ -344,7 +363,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
   <div class="dice-modal-detail" id="dice-modal-detail"></div>
 </div>
 
-<script src="assets/monster-packs-data.js?v=81"></script><script src="assets/mm-monsters-data.js?v=80"></script><script src="assets/mm-bestiary-adapter.js?v=80"></script>
+<script src="assets/monster-packs-data.js?v=82"></script><script src="assets/anomaly-backgrounds-data.js?v=82"></script><script src="assets/mm-monsters-data.js?v=80"></script><script src="assets/mm-bestiary-adapter.js?v=80"></script>
 <script>
 const MS=[
 {id:1,z:'oreol',cr:'7',crN:7,xp:'2 900',nm:'Картограф',en:'Cartographer',ly:'Внешняя Тень',sz:'Среднее, аберрация',
@@ -751,6 +770,8 @@ const CLONES=[];
 const INITIATIVE=[];
 let cloneSeq=1;
 let turnIndex=0;
+let activeAnomalyBackgroundId='';
+let anomalyBgExpanded=false;
 function makeState(m){return{hp:m.hp,conds:{},phase:1,roll:{},ini:null}}
 MS.forEach(m=>{STATE[String(m.id)]=makeState(m)});
 let cur=null,tab='combat';
@@ -1094,6 +1115,98 @@ function renderInitiativeTracker(){
 
 
 
+
+/* ── Anomaly background layer ── */
+function escHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function getActiveAnomalyBackground(){return (window.ANOMALY_BACKGROUNDS||[]).find(b=>b.id===activeAnomalyBackgroundId)||null;}
+function isEditableAnomalyMonster(m){return !!m && m.z!=='mm5e' && m.z!=='manual';}
+function setAnomalyBackground(){
+  const el=document.getElementById('anomaly-bg-select');
+  activeAnomalyBackgroundId=el?el.value:'';
+  anomalyBgExpanded=!!activeAnomalyBackgroundId;
+  renderFull();
+}
+function toggleAnomalyBgDetails(){anomalyBgExpanded=!anomalyBgExpanded;renderFull();}
+function clearAnomalyBackground(){activeAnomalyBackgroundId='';anomalyBgExpanded=false;renderFull();}
+function inferBodyTags(m){
+  const txt=String([m.nm,m.en,m.ly,m.sz,m.res,m.vul,m.desc,m.km,(m.tr||[]).map(x=>x.n+' '+x.d).join(' ')].join(' ')).toLowerCase();
+  const tags=[];
+  const add=(cond,tag)=>{if(cond)tags.push(tag)};
+  add(/стекл|glass|оскол|зеркал/.test(txt),'glass');
+  add(/кристалл|crystal/.test(txt),'crystal');
+  add(/резон|звон|echo|эхо/.test(txt),'resonant');
+  add(/пл[её]нк|force-film|силов/.test(txt),'forceFilm');
+  add(/слиз|slime|смол|вязк/.test(txt),'slime');
+  add(/кокон|cocoon/.test(txt),'dryCocoon');
+  add(/спор|spore/.test(txt),'spore');
+  add(/хитин|chitin|панцир/.test(txt),'chitin');
+  add(/лак|lacquer/.test(txt),'lacquer');
+  add(/растен|plant|корн|ветв/.test(txt),'plant');
+  add(/воск|wax/.test(txt),'wax');
+  add(/тен|shadow|кошмар|nightmare/.test(txt),'shadow');
+  add(/памят|memory/.test(txt),'memory');
+  add(/сон|dream|тел.?аран/.test(txt),'dream');
+  add(/зеркал|mirror|отраж/.test(txt),'mirror');
+  return Array.from(new Set(tags));
+}
+function pickBgVulnerabilities(bg,m){
+  const map=(bg.spawnTemplate&&bg.spawnTemplate.possibleVulnerabilitiesByTag)||{};
+  const tags=inferBodyTags(m);
+  const out=[];
+  tags.forEach(t=>(map[t]||[]).forEach(v=>out.push(v)));
+  if(!out.length && bg.spawnTemplate&&bg.spawnTemplate.fallbackVulnerability)out.push(bg.spawnTemplate.fallbackVulnerability);
+  return Array.from(new Set(out)).slice(0,1);
+}
+function mergeProfileField(m,kind,vals){
+  const list=splitProfileValue(m[kind]);
+  (vals||[]).forEach(v=>{v=String(v||'').trim(); if(v&&!list.some(x=>x.toLowerCase()===v.toLowerCase()))list.push(v);});
+  m[kind]=joinProfileValue(list);
+}
+function addBgTrait(m,bg){
+  const trait=bg.spawnTemplate&&bg.spawnTemplate.trait;
+  if(!trait||!m.tr)return;
+  if(!m.tr.some(t=>String(t.n||'').toLowerCase()===String(trait.name||'').toLowerCase())){
+    m.tr.push({n:trait.name,d:trait.text,hi:true});
+  }
+}
+function applyAnomalyBackgroundTo(mon){
+  const bg=getActiveAnomalyBackground();
+  if(!bg||!isEditableAnomalyMonster(mon))return false;
+  const st=bg.spawnTemplate||{};
+  mergeProfileField(mon,'res',st.addResistances||[]);
+  mergeProfileField(mon,'vul',pickBgVulnerabilities(bg,mon));
+  addBgTrait(mon,bg);
+  return true;
+}
+function applyAnomalyBackgroundToCurrent(){
+  if(!cur)return;
+  if(applyAnomalyBackgroundTo(cur))showDiceModal('Фон применён','✓',`${cur.nm}: профиль защиты и черта среды обновлены`,false);
+  renderFull();
+}
+function applyAnomalyBackgroundToAll(){
+  let n=0;
+  allMonsters().forEach(m=>{if(isEditableAnomalyMonster(m)&&applyAnomalyBackgroundTo(m))n++;});
+  showDiceModal('Фон применён',n,`Обновлено аномальных/стенных существ: ${n}. MM не затронут.`,false);
+  buildSidebar();renderFull();
+}
+function showAnomalyPulse(){
+  const bg=getActiveAnomalyBackground();
+  if(!bg)return;
+  const p=bg.pulse||{};
+  showDiceModal(`Пульс: ${bg.title}`,`СЛ ${bg.dc}`,`${p.name||'Пульс'}: ${p.text||'—'}`,false);
+}
+function renderAnomalyBackgroundPanel(){
+  const bgs=window.ANOMALY_BACKGROUNDS||[];
+  const bg=getActiveAnomalyBackground();
+  const opts='<option value="">Нет активного фона</option>'+bgs.map(b=>`<option value="${escHtml(b.id)}" ${b.id===activeAnomalyBackgroundId?'selected':''}>${escHtml(b.title)}</option>`).join('');
+  let detail='';
+  if(bg&&anomalyBgExpanded){
+    const d=bg.damage||{}, p=bg.pulse||{}, st=bg.spawnTemplate||{};
+    detail=`<div class="anomaly-bg-detail"><b>${escHtml(bg.title)}</b><div class="anomaly-bg-kv"><div><b>СЛ</b><br>${bg.dc}</div><div><b>Ядро</b><br>${escHtml(d.core||'—')} ${escHtml(d.damageType||'')}</div><div><b>Ореол</b><br>${escHtml(d.halo||'—')} ${escHtml(d.damageType||'')}</div><div><b>Рождённые</b><br>+${escHtml((st.addResistances||[]).join(', ')||'—')} / уязв. по форме</div></div><div style="margin-top:6px"><b>Ядро:</b> ${escHtml(bg.coreText)}</div><div style="margin-top:4px"><b>Ореол:</b> ${escHtml(bg.haloText)}</div><div style="margin-top:4px"><b>${escHtml(p.name||'Пульс')}:</b> ${escHtml(p.text||'—')}</div>${bg.waves?`<div style="margin-top:4px"><b>Волны:</b> ${escHtml(bg.waves)}</div>`:''}${bg.loot?`<div style="margin-top:4px"><b>Лут:</b> ${escHtml(bg.loot)}</div>`:''}<div class="anomaly-bg-read">${escHtml(bg.readAloud)}</div></div>`;
+  }
+  return `<div class="anomaly-bg-panel"><div class="anomaly-bg-head"><div class="anomaly-bg-title">Фон аномалии</div><div class="anomaly-bg-status">${bg?escHtml(bg.typeLabel)+` · СЛ ${bg.dc}`:'не выбран'}</div></div><div class="anomaly-bg-controls"><select class="anomaly-bg-select" id="anomaly-bg-select" onchange="setAnomalyBackground()">${opts}</select><button class="anomaly-bg-btn" onclick="toggleAnomalyBgDetails()">${anomalyBgExpanded?'Скрыть':'Описание'}</button><button class="anomaly-bg-btn" onclick="showAnomalyPulse()" ${bg?'':'disabled'}>Пульс</button><button class="anomaly-bg-btn primary" onclick="applyAnomalyBackgroundToCurrent()" ${bg&&cur&&isEditableAnomalyMonster(cur)?'':'disabled'}>К выбранному</button><button class="anomaly-bg-btn primary" onclick="applyAnomalyBackgroundToAll()" ${bg?'':'disabled'}>Ко всем</button><button class="anomaly-bg-btn danger" onclick="clearAnomalyBackground()" ${bg?'':'disabled'}>Снять</button></div>${detail}</div>`;
+}
+
 const DAMAGE_PROFILE_TYPES=['дробящий','колющий','рубящий','дробящий от немагического оружия','колющий от немагического оружия','рубящий от немагического оружия','дробящий/колющий/рубящий от немагического оружия','кислотный','холод','огонь','силовой','молния','некротический','ядовитый','психический','излучение','гром'];
 const CONDITION_PROFILE_TYPES=['ослепление','очарование','оглушение','испуг','схвачен','недееспособен','невидимость','паралич','окаменение','отравление','сбит с ног','опутан','ошеломление','нокдаун','захват'];
 function splitProfileValue(v){return String(v||'').split(/[;,]/).map(x=>x.trim()).filter(x=>x&&x!=='—');}
@@ -1136,7 +1249,7 @@ function renderDamageProfileEditor(m){
 /* ── Render ── */
 function renderFull(){
   const mn=document.getElementById('mn');
-  if(!cur){mn.innerHTML='<div class="placeholder">← Выбери существо слева</div>';return;}
+  if(!cur){mn.innerHTML=renderAnomalyBackgroundPanel()+'<div class="placeholder">← Выбери существо слева</div>';return;}
   const m=cur,s=STATE[keyOf(m)],zc=ZC[m.z]||ZC.yadro;
   const modStr=v=>{const r=Math.floor((v-10)/2);return(r>=0?'+':'')+r};
   const STATS=[['СИЛ','str'],['ЛОВ','dex'],['ТЕЛ','con'],['ИНТ','int'],['МДР','wis'],['ХАР','cha']];
@@ -1243,7 +1356,7 @@ function renderFull(){
 
   const tabContent=tab==='combat'?combatHTML():tab==='traits'?traitsHTML():tab==='km'?kmHTML():defenseHTML();
 
-  mn.innerHTML=`
+  mn.innerHTML=renderAnomalyBackgroundPanel()+`
   <div class="combat-panel" id="cp">
     <div class="cp-name">${m.nm}${m.isClone?' · копия':''}</div>
     <div class="cp-hp-block" onclick="openHpModal()">

@@ -1,1 +1,1 @@
-v81 — anomaly and Wall damage profile audit + editable defenses
+v82 — anomaly backgrounds + R7 temporary anomaly package
