@@ -1,1 +1,1 @@
-v80 — structured Monster Manual statblocks
+v81 — anomaly and Wall damage profile audit + editable defenses
