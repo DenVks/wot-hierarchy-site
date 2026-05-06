@@ -1,1 +1,1 @@
-v85 — integrated R6B/R6C/R7C anomaly monster packs
+v86 — desaturated anomaly style and bleaching mechanics

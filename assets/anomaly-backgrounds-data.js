@@ -1,6 +1,24 @@
 // WoT Hierarchy v82 · anomaly background scene templates.
 // Applies only to anomaly / Wall monsters. Monster Manual 5e is intentionally excluded.
 (function(){
+  const ANOMALY_STYLE_GUIDES={
+    desaturated:{
+      id:'desaturated',
+      title:'Обесцвеченный',
+      concept:'Аномалия не окрашивает пространство, а вычитает из него цвет, звук и плотность. Мир выглядит как старый отпечаток события, которое уже произошло или ещё не должно было произойти.',
+      readAloud:'Цвет уходит из мира. Камень, металл, ткань и кожа становятся пепельно-серыми, будто вы смотрите на старую фотографию. Свет остаётся, но кажется плоским и безжизненным. Звуки звучат глухо, словно их произносят за стеной. Среди этой серости один-два цвета остаются слишком яркими: капля крови, отблеск стали, нить Единой Силы или трещина в воздухе.',
+      markers:['пепельно-серый, костяной, молочно-белый, графитовый и выцветший чёрный','плоский рассеянный свет без тепла и глубоких теней','мягкие угольные тени как пятна на бумаге','неподвижная пыль и приглушённые сухие звуки','бледные afterimage-следы от движения','один значимый цветовой акцент на сцену'],
+      mechanicName:'Обесцвечивание',
+      mechanicText:'Когда существо проваливает спасбросок от эффекта среды этой аномалии, оно получает 1 метку Обесцвечивания, максимум 3. 1 метка: до конца следующего хода следующая проверка Мудрости (Восприятие), Мудрости (Проницательность) или Интеллекта (Расследование) совершается с помехой. 2 метки: при следующем провале спасброска от среды этой аномалии существо также не может совершать реакции до начала своего следующего хода. 3 метки: следующий урон среды от этой аномалии увеличивается на половину количества кубиков базового урона Ореола, округляя вниз; после применения дополнительного урона все метки сбрасываются. Метки исчезают после 1 минуты вне Ореола, короткого/долгого отдыха или стабилизации аномалии.',
+      playerText:'Каждый провал среды даёт 1 метку. 1 — сбивается восприятие. 2 — реакции запаздывают. 3 — следующий урон среды сильнее, затем метки сбрасываются.',
+      promptSuffix:{
+        common:'Desaturated monochrome anomaly style, ash-gray and bone-white palette, drained colors, soft graphite shadows, flat overcast light, pale dust suspended in still air, one restrained accent color only, faded afterimage traces, archival-reality feeling, cinematic realism, 8k, unsettling silence.',
+        A:'Desaturated monochrome energy anomaly, ash-gray force shimmer, bone-white cutting lines, graphite scorch marks, pale charged dust, rare restrained accent sparks, micro-chipping and arc-scorch details, archival-reality feeling, cinematic realism, 8k, unsettling silence.',
+        B:'Desaturated monochrome bio-anomaly nest, pale adhesive slime strings, chalk-gray chitin, translucent bone-white membranes, low ferment mist, subtle spore drift, one restrained accent color only, archival-reality feeling, cinematic realism, 8k, unsettling silence.',
+        C:'Desaturated monochrome dream anomaly, wax-mask faces, faded double-exposure afterimages, pale rectangular dream frames, ink-gray shadows, one restrained accent color only, archival-reality feeling, Tel’aran’rhiod bleed-through, cinematic realism, 8k, unsettling silence.'
+      }
+    }
+  };
   const B=[
     {
       id:'r5-type-a-warm-bg',
@@ -265,6 +283,66 @@
             }
       }
 }
+,
+    {
+      id:'r6-type-a-desaturated-bg',
+      packId:'style-r6-type-a-desaturated',
+      title:'R6 · Type A · Обесцвеченный Контур Стирания',
+      rating:6,type:'A',typeLabel:'Энергия',style:'обесцвеченный',styleGuide:'desaturated',dc:16,
+      damage:{core:'6d8',coreBoosted:'7d8',halo:'3d8',haloBoosted:'4d8',damageType:'силовой'},
+      readAloud:'Цвет уходит из камня, металла и кожи. Силовые линии больше не светятся — они выглядят как костяно-белые надрезы на старой фотографии. В воздухе висит пепельная пыль, а редкие искры кажутся единственным живым цветом в сцене.',
+      coreText:'В конце хода существа в ядре: Ловкость СЛ 16. Провал — 6d8 силового урона, успех — половина. При Рывке, движении 30+ фт по прямой или пересечении обесцвеченной силовой линии — 7d8. При провале существо получает 1 метку Обесцвечивания.',
+      haloText:'В конце хода существа в активной зоне Ореола: Ловкость СЛ 16. Провал — 3d8 силового урона, успех — половина. При усилении условий — 4d8. При провале существо получает 1 метку Обесцвечивания.',
+      pulse:{name:'Костяной срез',text:'В начале каждого раунда Мастер проводит линию 60×5 фт. Первое существо, пересекающее её в ход: Ловкость СЛ 16. Провал — урон Ореола, 1 метка Обесцвечивания и потеря реакции до начала следующего хода.'},
+      styleRule:'desaturated',
+      spawnTemplate:{
+        name:'Рождённый контуром стирания',
+        addResistances:['силовой'],
+        fallbackVulnerability:'гром',
+        possibleVulnerabilitiesByTag:{glass:['дробящий'],crystal:['дробящий'],resonant:['гром'],mirror:['гром'],forceFilm:['рубящий']},
+        trait:{name:'Согласование с обесцвеченным контуром',text:'Существо игнорирует урон среды этой аномалии и не получает метки Обесцвечивания от её среды. Это не защищает его от атак персонажей и плетений.'}
+      }
+    },
+    {
+      id:'r6-type-b-desaturated-bg',
+      packId:'style-r6-type-b-desaturated',
+      title:'R6 · Type B · Бесцветное Гнездо Пустой Слизи',
+      rating:6,type:'B',typeLabel:'Иные измерения',style:'обесцвеченный',styleGuide:'desaturated',dc:16,
+      damage:{core:'6d8',coreBoosted:'7d8',halo:'3d8',haloBoosted:'4d8',damageType:'кислотный'},
+      readAloud:'Гнездо выглядит не мокрым, а выцветшим. Слизь стала молочно-серой, хитин — меловым, мембраны — костяно-белыми. Только один чужой цвет остаётся в глубине коконов, и от этого он кажется сигналом, а не украшением.',
+      coreText:'В конце хода существа в ядре: Ловкость СЛ 16. Провал — 6d8 кислотного урона, успех — половина. Если цель схвачена, опутана или находится в липкой области — 7d8. При провале существо получает 1 метку Обесцвечивания.',
+      haloText:'В конце хода существа в активной зоне Ореола: Ловкость или Телосложение СЛ 16. Провал — 3d8 кислотного урона, успех — половина. При схватывании/липкости/опутывании — 4d8. При провале существо получает 1 метку Обесцвечивания.',
+      pulse:{name:'Меловой фермент',text:'Раз в 2 раунда активный узел испускает бесцветные споры. Телосложение СЛ 16. Провал — отравление до конца следующего хода, потеря реакции и 1 метка Обесцвечивания.'},
+      styleRule:'desaturated',
+      spawnTemplate:{
+        name:'Рождённый пустой слизью',
+        addResistances:['кислотный'],
+        fallbackVulnerability:'огонь',
+        possibleVulnerabilitiesByTag:{dryCocoon:['огонь'],plant:['огонь'],spore:['огонь'],slime:['холод'],chitin:['дробящий'],lacquer:['огонь']},
+        trait:{name:'Бесцветная походка',text:'Существо игнорирует труднопроходимую местность, созданную слизью, коконами или ферментным туманом этой аномалии, и не получает метки Обесцвечивания от её среды.'}
+      }
+    },
+    {
+      id:'r7-type-c-desaturated-bg',
+      packId:'style-r7-type-c-desaturated',
+      title:'R7 · Type C · Архив Неверного Исхода',
+      rating:7,type:'C',typeLabel:'Тел’аран’риод',style:'обесцвеченный',styleGuide:'desaturated',dc:17,
+      damage:{core:'8d6',coreBoosted:'9d6',halo:'4d6',haloBoosted:'5d6',damageType:'психический'},
+      readAloud:'Перед вами не сон и не тень, а выцветшая запись боя. Рамки сна похожи на старые негативы, afterimage-следы почти бесцветны, а лица выглядят как восковые отпечатки людей, которые уже были здесь или ещё не должны были появиться.',
+      coreText:'В конце хода существа в ядре: Мудрость СЛ 17. Провал — 8d6 психического урона, успех — половина. Если цель видела afterimage, теряла реакцию, была испугана/очарована или попала под ложный исход — 9d6. При провале существо получает 1 метку Обесцвечивания.',
+      haloText:'В конце хода существа в активной зоне Ореола: Мудрость СЛ 17. Провал — 4d6 психического урона, успех — половина. При усилении условий — 5d6. При провале существо получает 1 метку Обесцвечивания.',
+      pulse:{name:'Сухая волна узнавания',text:'Раз в 2 раунда: Мудрость СЛ 17. Провал — цель очарована аномалией или теряет реакции до начала следующего хода, получает 1 метку Обесцвечивания и видит бесцветный afterimage собственного действия.'},
+      styleRule:'desaturated',
+      spawnTemplate:{
+        name:'Рождённый архивом сна',
+        addResistances:['психический'],
+        fallbackVulnerability:'излучение',
+        possibleVulnerabilitiesByTag:{shadow:['излучение'],nightmare:['излучение'],wax:['огонь'],mirror:['гром'],echo:['гром'],dream:['излучение'],memory:['излучение']},
+        trait:{name:'Согласование с выцветшим afterimage',text:'Существо игнорирует урон среды этой аномалии, не получает метки Обесцвечивания от её среды и может переместиться на 5 фт без провоцирования атак, когда атака по нему впервые за раунд промахивается.'}
+      }
+    }
+
   ];
+  window.ANOMALY_STYLE_GUIDES=ANOMALY_STYLE_GUIDES;
   window.ANOMALY_BACKGROUNDS=B;
 })();

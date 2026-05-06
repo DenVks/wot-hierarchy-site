@@ -310,7 +310,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .anomaly-bg-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
 .anomaly-bg-title{font-family:'Cinzel',serif;color:var(--gold2);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
 .anomaly-bg-status{font-size:11px;color:var(--text2)}
-.anomaly-bg-controls{display:grid;grid-template-columns:minmax(200px,1fr) repeat(4,auto);gap:6px;align-items:center}
+.anomaly-bg-controls{display:grid;grid-template-columns:minmax(200px,1fr) repeat(5,auto);gap:6px;align-items:center}
 .anomaly-bg-select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:5px 7px;font-size:12px;min-width:0}
 .anomaly-bg-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text);padding:5px 8px;font-size:11px;cursor:pointer;white-space:nowrap}
 .anomaly-bg-btn:hover{border-color:var(--gold);color:var(--gold2)}
@@ -321,6 +321,21 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .anomaly-bg-kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:6px;margin-top:6px}
 .anomaly-bg-kv div{border:1px solid var(--border);border-radius:5px;padding:5px;background:rgba(0,0,0,.12)}
 .anomaly-bg-read{margin-top:8px;color:var(--text);font-style:italic;border-left:3px solid var(--gold);padding-left:8px}
+
+.anomaly-style-rule{margin-top:8px;border:1px solid rgba(190,190,190,.26);border-radius:6px;background:linear-gradient(180deg,rgba(160,160,150,.10),rgba(60,60,58,.10));padding:8px;color:var(--text2)}
+.anomaly-style-rule b{color:#d9d6c8}
+.anomaly-style-rule .style-title{font-family:'Cinzel',serif;color:#d9d6c8;letter-spacing:.06em;text-transform:uppercase;font-size:11px;margin-bottom:5px}
+.bleach-panel{margin:8px 10px 12px;padding:9px;border:1px solid rgba(190,190,190,.30);border-radius:8px;background:linear-gradient(180deg,rgba(120,120,115,.14),rgba(25,25,24,.18));box-shadow:0 8px 22px rgba(0,0,0,.18)}
+.bleach-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.bleach-title{font-family:'Cinzel',serif;color:#d9d6c8;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.bleach-marks{display:flex;gap:5px;align-items:center}
+.bleach-dot{width:16px;height:16px;border-radius:999px;border:1px solid rgba(210,210,200,.35);background:rgba(60,60,58,.35)}
+.bleach-dot.on{background:linear-gradient(135deg,#d8d5c8,#8e8d86);box-shadow:0 0 8px rgba(210,210,200,.22)}
+.bleach-text{font-size:12px;color:var(--text2);line-height:1.45}
+.bleach-controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.bleach-controls button{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text);padding:4px 8px;font-size:11px;cursor:pointer}
+.bleach-controls button:hover{border-color:#d9d6c8;color:#f1eee2}
+.bleach-warning{margin-top:6px;color:#f1d8a6;font-size:12px}
 @media(max-width:900px){.anomaly-bg-controls{grid-template-columns:1fr 1fr}.anomaly-bg-select{grid-column:1/-1}}
 
 @media(max-width:700px){
@@ -369,7 +384,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
   <div class="dice-modal-detail" id="dice-modal-detail"></div>
 </div>
 
-<script src="assets/monster-packs-data.js?v=85"></script><script src="assets/anomaly-backgrounds-data.js?v=85"></script><script src="assets/mm-monsters-data.js?v=80"></script><script src="assets/mm-bestiary-adapter.js?v=80"></script>
+<script src="assets/monster-packs-data.js?v=85"></script><script src="assets/anomaly-backgrounds-data.js?v=86"></script><script src="assets/mm-monsters-data.js?v=80"></script><script src="assets/mm-bestiary-adapter.js?v=80"></script>
 <script>
 const MS=[
 {id:1,z:'oreol',cr:'7',crN:7,xp:'2 900',nm:'Картограф',en:'Cartographer',ly:'Внешняя Тень',sz:'Среднее, аберрация',
@@ -778,7 +793,7 @@ let cloneSeq=1;
 let turnIndex=0;
 let activeAnomalyBackgroundId='';
 let anomalyBgExpanded=false;
-function makeState(m){return{hp:m.hp,conds:{},phase:1,roll:{},ini:null}}
+function makeState(m){return{hp:m.hp,conds:{},phase:1,roll:{},ini:null,bleach:0}}
 MS.forEach(m=>{STATE[String(m.id)]=makeState(m)});
 let cur=null,tab='combat';
 function keyOf(m){return String(m&&m.id)}
@@ -1136,6 +1151,57 @@ function setAnomalyBackground(){
   renderFull();
 }
 function toggleAnomalyBgDetails(){anomalyBgExpanded=!anomalyBgExpanded;renderFull();}
+
+function getAnomalyStyleGuide(bg){
+  if(!bg)return null;
+  const key=bg.styleGuide||bg.styleRule||(String(bg.style||'').toLowerCase().includes('обесцвеч')?'desaturated':'');
+  return key?(window.ANOMALY_STYLE_GUIDES||{})[key]||null:null;
+}
+function activeStyleGuide(){return getAnomalyStyleGuide(getActiveAnomalyBackground());}
+function parseDiceCount(expr){
+  const m=/^(\d+)d(\d+)$/i.exec(String(expr||'').trim());
+  if(!m)return null;
+  return {n:parseInt(m[1],10),s:parseInt(m[2],10)};
+}
+function desaturationExtraDamage(bg){
+  const d=parseDiceCount(bg&&bg.damage&&bg.damage.halo);
+  if(!d)return 'половина кубиков Ореола';
+  return '+'+Math.max(1,Math.floor(d.n/2))+'d'+d.s;
+}
+function isDesaturatedActive(){const g=activeStyleGuide();return !!g&&g.id==='desaturated';}
+function showAnomalyStyleRule(){
+  const bg=getActiveAnomalyBackground(), g=getAnomalyStyleGuide(bg);
+  if(!g)return;
+  const extra=g.id==='desaturated'?`\nДоп. урон при 3 метках для текущего фона: ${desaturationExtraDamage(bg)} ${((bg.damage||{}).damageType||'')}.`:'';
+  showDiceModal(`Стиль: ${g.title}`,g.mechanicName||'Стиль',`${g.playerText||g.mechanicText||''}${extra}`,false);
+}
+function bleachTextFor(n,bg){
+  const extra=desaturationExtraDamage(bg);
+  if(n<=0)return 'Нет меток. При провале спасброска от среды обесцвеченной аномалии существо получает 1 метку.';
+  if(n===1)return '1 метка: до конца следующего хода следующая проверка Восприятия, Проницательности или Расследования совершается с помехой.';
+  if(n===2)return '2 метки: при следующем провале спасброска от среды существо также не может совершать реакции до начала следующего хода.';
+  return `3 метки: следующий урон среды увеличивается на ${extra}; после применения дополнительного урона метки сбрасываются.`;
+}
+function addBleachMark(delta){
+  if(!cur||!isDesaturatedActive())return;
+  const st=STATE[keyOf(cur)];
+  st.bleach=Math.max(0,Math.min(3,(st.bleach||0)+delta));
+  renderFull();
+}
+function resetBleachMarks(){
+  if(!cur)return;
+  STATE[keyOf(cur)].bleach=0;
+  renderFull();
+}
+function renderBleachPanel(m){
+  const bg=getActiveAnomalyBackground(), g=getAnomalyStyleGuide(bg);
+  if(!m||!g||g.id!=='desaturated')return '';
+  const st=STATE[keyOf(m)]||{};
+  const n=st.bleach||0;
+  const dots=[1,2,3].map(i=>`<span class="bleach-dot ${n>=i?'on':''}"></span>`).join('');
+  const warn=n>=3?`<div class="bleach-warning">Следующий урон среды: ${escHtml(desaturationExtraDamage(bg))} ${escHtml((bg.damage||{}).damageType||'')} дополнительно, затем метки сбрасываются.</div>`:'';
+  return `<div class="bleach-panel"><div class="bleach-head"><div class="bleach-title">Обесцвечивание</div><div class="bleach-marks">${dots}</div></div><div class="bleach-text">${escHtml(bleachTextFor(n,bg))}</div>${warn}<div class="bleach-controls"><button onclick="addBleachMark(1)">+ метка</button><button onclick="addBleachMark(-1)">− метка</button><button onclick="resetBleachMarks()">сбросить</button></div></div>`;
+}
 function removeBackgroundProfileValuesFromMonster(m){
   if(!m||!m._profileSources)return 0;
   let removed=0;
@@ -1162,9 +1228,11 @@ function removeAllBackgroundProfileValues(){
 }
 function clearAnomalyBackground(){
   const removed=removeAllBackgroundProfileValues();
+  let marks=0;
+  Object.values(STATE).forEach(st=>{if(st&&st.bleach){marks+=st.bleach;st.bleach=0;}});
   activeAnomalyBackgroundId='';
   anomalyBgExpanded=false;
-  if(removed>0){showDiceModal('Фон снят','✓',`Удалено добавленных фоном элементов защиты: ${removed}`,false);}
+  if(removed>0||marks>0){showDiceModal('Фон снят','✓',`Удалено элементов защиты: ${removed}; сброшено меток Обесцвечивания: ${marks}`,false);}
   buildSidebar();
   renderFull();
 }
@@ -1266,9 +1334,11 @@ function renderAnomalyBackgroundPanel(){
   let detail='';
   if(bg&&anomalyBgExpanded){
     const d=bg.damage||{}, p=bg.pulse||{}, st=bg.spawnTemplate||{};
-    detail=`<div class="anomaly-bg-detail"><b>${escHtml(bg.title)}</b><div class="anomaly-bg-kv"><div><b>СЛ</b><br>${bg.dc}</div><div><b>Ядро</b><br>${escHtml(d.core||'—')} ${escHtml(d.damageType||'')}</div><div><b>Ореол</b><br>${escHtml(d.halo||'—')} ${escHtml(d.damageType||'')}</div><div><b>Рождённые</b><br>+${escHtml((st.addResistances||[]).join(', ')||'—')} / уязв. по форме</div></div><div style="margin-top:6px"><b>Ядро:</b> ${escHtml(bg.coreText)}</div><div style="margin-top:4px"><b>Ореол:</b> ${escHtml(bg.haloText)}</div><div style="margin-top:4px"><b>${escHtml(p.name||'Пульс')}:</b> ${escHtml(p.text||'—')}</div>${bg.waves?`<div style="margin-top:4px"><b>Волны:</b> ${escHtml(bg.waves)}</div>`:''}${bg.loot?`<div style="margin-top:4px"><b>Лут:</b> ${escHtml(bg.loot)}</div>`:''}<div class="anomaly-bg-read">${escHtml(bg.readAloud)}</div></div>`;
+    const guide=getAnomalyStyleGuide(bg);
+    const styleBlock=guide?`<div class="anomaly-style-rule"><div class="style-title">Стиль: ${escHtml(guide.title)}</div><div>${escHtml(guide.concept||'')}</div><div style="margin-top:4px"><b>${escHtml(guide.mechanicName||'Правило стиля')}:</b> ${escHtml(guide.playerText||guide.mechanicText||'')}</div>${guide.id==='desaturated'?`<div style="margin-top:4px"><b>Доп. урон при 3 метках:</b> ${escHtml(desaturationExtraDamage(bg))} ${escHtml(d.damageType||'')}</div>`:''}</div>`:'';
+    detail=`<div class="anomaly-bg-detail"><b>${escHtml(bg.title)}</b><div class="anomaly-bg-kv"><div><b>СЛ</b><br>${bg.dc}</div><div><b>Ядро</b><br>${escHtml(d.core||'—')} ${escHtml(d.damageType||'')}</div><div><b>Ореол</b><br>${escHtml(d.halo||'—')} ${escHtml(d.damageType||'')}</div><div><b>Рождённые</b><br>+${escHtml((st.addResistances||[]).join(', ')||'—')} / уязв. по форме</div></div><div style="margin-top:6px"><b>Ядро:</b> ${escHtml(bg.coreText)}</div><div style="margin-top:4px"><b>Ореол:</b> ${escHtml(bg.haloText)}</div><div style="margin-top:4px"><b>${escHtml(p.name||'Пульс')}:</b> ${escHtml(p.text||'—')}</div>${bg.waves?`<div style="margin-top:4px"><b>Волны:</b> ${escHtml(bg.waves)}</div>`:''}${bg.loot?`<div style="margin-top:4px"><b>Лут:</b> ${escHtml(bg.loot)}</div>`:''}${styleBlock}<div class="anomaly-bg-read">${escHtml(bg.readAloud)}</div></div>`;
   }
-  return `<div class="anomaly-bg-panel"><div class="anomaly-bg-head"><div class="anomaly-bg-title">Фон аномалии</div><div class="anomaly-bg-status">${bg?escHtml(bg.typeLabel)+` · СЛ ${bg.dc}`:'не выбран'}</div></div><div class="anomaly-bg-controls"><select class="anomaly-bg-select" id="anomaly-bg-select" onchange="setAnomalyBackground()">${opts}</select><button class="anomaly-bg-btn" onclick="toggleAnomalyBgDetails()">${anomalyBgExpanded?'Скрыть':'Описание'}</button><button class="anomaly-bg-btn" onclick="showAnomalyPulse()" ${bg?'':'disabled'}>Пульс</button><button class="anomaly-bg-btn primary" onclick="applyAnomalyBackgroundToCurrent()" ${bg&&cur&&isEditableAnomalyMonster(cur)?'':'disabled'}>К выбранному</button><button class="anomaly-bg-btn primary" onclick="applyAnomalyBackgroundToAll()" ${bg?'':'disabled'}>Ко всем</button><button class="anomaly-bg-btn danger" onclick="clearAnomalyBackground()" ${bg?'':'disabled'}>Снять</button></div>${detail}</div>`;
+  return `<div class="anomaly-bg-panel"><div class="anomaly-bg-head"><div class="anomaly-bg-title">Фон аномалии</div><div class="anomaly-bg-status">${bg?escHtml(bg.typeLabel)+` · СЛ ${bg.dc}`:'не выбран'}</div></div><div class="anomaly-bg-controls"><select class="anomaly-bg-select" id="anomaly-bg-select" onchange="setAnomalyBackground()">${opts}</select><button class="anomaly-bg-btn" onclick="toggleAnomalyBgDetails()">${anomalyBgExpanded?'Скрыть':'Описание'}</button><button class="anomaly-bg-btn" onclick="showAnomalyPulse()" ${bg?'':'disabled'}>Пульс</button><button class="anomaly-bg-btn" onclick="showAnomalyStyleRule()" ${bg&&getAnomalyStyleGuide(bg)?'':'disabled'}>Стиль</button><button class="anomaly-bg-btn primary" onclick="applyAnomalyBackgroundToCurrent()" ${bg&&cur&&isEditableAnomalyMonster(cur)?'':'disabled'}>К выбранному</button><button class="anomaly-bg-btn primary" onclick="applyAnomalyBackgroundToAll()" ${bg?'':'disabled'}>Ко всем</button><button class="anomaly-bg-btn danger" onclick="clearAnomalyBackground()" ${bg?'':'disabled'}>Снять</button></div>${detail}</div>`;
 }
 
 const DAMAGE_PROFILE_TYPES=['дробящий','колющий','рубящий','дробящий от немагического оружия','колющий от немагического оружия','рубящий от немагического оружия','дробящий/колющий/рубящий от немагического оружия','кислотный','холод','огонь','силовой','молния','некротический','ядовитый','психический','излучение','гром'];
@@ -1439,7 +1509,7 @@ function renderFull(){
 
   const tabContent=tab==='combat'?combatHTML():tab==='traits'?traitsHTML():tab==='km'?kmHTML():defenseHTML();
 
-  mn.innerHTML=renderAnomalyBackgroundPanel()+`
+  mn.innerHTML=renderAnomalyBackgroundPanel()+renderBleachPanel(m)+`
   <div class="combat-panel" id="cp">
     <div class="cp-name">${m.nm}${m.isClone?' · копия':''}</div>
     <div class="cp-hp-block" onclick="openHpModal()">
