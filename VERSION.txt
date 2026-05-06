@@ -1,1 +1,1 @@
-v86 — desaturated anomaly style and bleaching mechanics
+v87 — R7 desaturated anomaly monster packs integration
