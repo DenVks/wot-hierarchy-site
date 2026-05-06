@@ -1,1 +1,1 @@
-v82 — anomaly backgrounds + R7 temporary anomaly package
+v83 — anomaly background defense highlighting patch
