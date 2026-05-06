@@ -1133,7 +1133,38 @@ function setAnomalyBackground(){
   renderFull();
 }
 function toggleAnomalyBgDetails(){anomalyBgExpanded=!anomalyBgExpanded;renderFull();}
-function clearAnomalyBackground(){activeAnomalyBackgroundId='';anomalyBgExpanded=false;renderFull();}
+function removeBackgroundProfileValuesFromMonster(m){
+  if(!m||!m._profileSources)return 0;
+  let removed=0;
+  ['res','vul','idmg','ics'].forEach(kind=>{
+    const srcMap=m._profileSources&&m._profileSources[kind]?m._profileSources[kind]:{};
+    const vals=splitProfileValue(m[kind]);
+    const kept=[];
+    vals.forEach(v=>{
+      if(srcMap[profileKey(v)]==='background'){
+        removed++;
+        delete srcMap[profileKey(v)];
+      }else{
+        kept.push(v);
+      }
+    });
+    m[kind]=joinProfileValue(kept);
+  });
+  return removed;
+}
+function removeAllBackgroundProfileValues(){
+  let removed=0;
+  allMonsters().forEach(m=>{removed+=removeBackgroundProfileValuesFromMonster(m);});
+  return removed;
+}
+function clearAnomalyBackground(){
+  const removed=removeAllBackgroundProfileValues();
+  activeAnomalyBackgroundId='';
+  anomalyBgExpanded=false;
+  if(removed>0){showDiceModal('Фон снят','✓',`Удалено добавленных фоном элементов защиты: ${removed}`,false);}
+  buildSidebar();
+  renderFull();
+}
 function inferBodyTags(m){
   const txt=String([m.nm,m.en,m.ly,m.sz,m.res,m.vul,m.desc,m.km,(m.tr||[]).map(x=>x.n+' '+x.d).join(' ')].join(' ')).toLowerCase();
   const tags=[];
