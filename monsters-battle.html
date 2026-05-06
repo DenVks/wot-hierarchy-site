@@ -369,7 +369,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
   <div class="dice-modal-detail" id="dice-modal-detail"></div>
 </div>
 
-<script src="assets/monster-packs-data.js?v=82"></script><script src="assets/anomaly-backgrounds-data.js?v=82"></script><script src="assets/mm-monsters-data.js?v=80"></script><script src="assets/mm-bestiary-adapter.js?v=80"></script>
+<script src="assets/monster-packs-data.js?v=85"></script><script src="assets/anomaly-backgrounds-data.js?v=85"></script><script src="assets/mm-monsters-data.js?v=80"></script><script src="assets/mm-bestiary-adapter.js?v=80"></script>
 <script>
 const MS=[
 {id:1,z:'oreol',cr:'7',crN:7,xp:'2 900',nm:'Картограф',en:'Cartographer',ly:'Внешняя Тень',sz:'Среднее, аберрация',
@@ -896,7 +896,7 @@ function longRest(){
 }
 
 /* ── Sidebar ── */
-const ZONES=[{id:'oreol',lb:'Ореол',dot:'#c9a84c'},{id:'greb',lb:'Гребень',dot:'#4c7ac9'},{id:'yadro',lb:'Ядро',dot:'#c94c4c'},{id:'r7',lb:'R7 · Ложные цели',dot:'#b07ae8'},{id:'r5a',lb:'R5 · Type A · Тёплый',dot:'#d99a3d'},{id:'r5b',lb:'R5 · Type B · Тёплый',dot:'#79d0a3'},{id:'r5c',lb:'R5 · Type C · Холодный',dot:'#9fb6d9'},{id:'r6a',lb:'R6 · Type A · Тёплый',dot:'#dda14a'},{id:'mm5e',lb:'Monster Manual 5e',dot:'#8fd0b0'}];
+const ZONES=[{id:'oreol',lb:'Ореол',dot:'#c9a84c'},{id:'greb',lb:'Гребень',dot:'#4c7ac9'},{id:'yadro',lb:'Ядро',dot:'#c94c4c'},{id:'r7',lb:'R7 · Ложные цели',dot:'#b07ae8'},{id:'r5a',lb:'R5 · Type A · Тёплый',dot:'#d99a3d'},{id:'r5b',lb:'R5 · Type B · Тёплый',dot:'#79d0a3'},{id:'r5c',lb:'R5 · Type C · Холодный',dot:'#9fb6d9'},{id:'r6a',lb:'R6 · Type A · Тёплый',dot:'#dda14a'},{id:'r6b',lb:'R6 · Type B · Холодный',dot:'#79b8c8'},{id:'r6c',lb:'R6 · Type C · Холодный',dot:'#8da7e6'},{id:'r7cw',lb:'R7 · Type C · Тёплый',dot:'#d79a48'},{id:'mm5e',lb:'Monster Manual 5e',dot:'#8fd0b0'}];
 function filterSidebar(){
   const q=document.getElementById('sb-search').value.toLowerCase();
   document.querySelectorAll('.mon-btn').forEach(b=>{
@@ -1039,6 +1039,9 @@ const ZC={
   r5b:{main:'#79d0a3',bg:'rgba(121,208,163,.12)',border:'#79d0a3',light:'#b5f0cf',text:'#b5f0cf'},
   r5c:{main:'#9fb6d9',bg:'rgba(159,182,217,.12)',border:'#9fb6d9',light:'#d6e4ff',text:'#d6e4ff'},
   r6a:{main:'#dda14a',bg:'rgba(221,161,74,.13)',border:'#dda14a',light:'#f2c879',text:'#f2c879'},
+  r6b:{main:'#79b8c8',bg:'rgba(121,184,200,.13)',border:'#79b8c8',light:'#b7e4ee',text:'#b7e4ee'},
+  r6c:{main:'#8da7e6',bg:'rgba(141,167,230,.13)',border:'#8da7e6',light:'#c9d7ff',text:'#c9d7ff'},
+  r7cw:{main:'#d79a48',bg:'rgba(215,154,72,.13)',border:'#d79a48',light:'#f1c783',text:'#f1c783'},
   mm5e:{main:'#8fd0b0',bg:'rgba(143,208,176,.12)',border:'#8fd0b0',light:'#c8f5dc',text:'#c8f5dc'}
 };
 
