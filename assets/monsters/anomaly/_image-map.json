@@ -1,0 +1,128 @@
+[
+  {
+    "name": "Медный Лже-Центр",
+    "id": "r5a-copper-false-core",
+    "img": "assets/monsters/anomaly/r5-type-a-warm-8-1-4/r5a-copper-false-core.png",
+    "src": "R5 Type A · Тёплый/Медный лже-центр.png"
+  },
+  {
+    "name": "Искровой Гончий Среза",
+    "id": "r5a-spark-cut-hound",
+    "img": "assets/monsters/anomaly/r5-type-a-warm-8-1-4/r5a-spark-cut-hound.png",
+    "src": "R5 Type A · Тёплый/Искровой гончий среза.png"
+  },
+  {
+    "name": "Янтарный Арбитр Траектории",
+    "id": "r5a-amber-trajectory-arbiter",
+    "img": "assets/monsters/anomaly/r5-type-a-warm-8-1-4/r5a-amber-trajectory-arbiter.png",
+    "src": "R5 Type A · Тёплый/Янтарный Арбитр Траектории.png"
+  },
+  {
+    "name": "Лунный Лже-Победитель",
+    "id": "r5c-moonlit-false-victor",
+    "img": "assets/monsters/anomaly/r5-type-c-cold-8-1-4/r5c-moonlit-false-victor.png",
+    "src": "R5 Type C Холодный/Лунный Лже-Победитель.png"
+  },
+  {
+    "name": "Гончий Запоздалого Образа",
+    "id": "r5c-afterimage-rift-hound",
+    "img": "assets/monsters/anomaly/r5-type-c-cold-8-1-4/r5c-afterimage-rift-hound.png",
+    "src": "R5 Type C Холодный/Гончий Запоздалого Образа.png"
+  },
+  {
+    "name": "Арбитр Неверного Исхода",
+    "id": "r5c-arbiter-of-wrong-outcome",
+    "img": "assets/monsters/anomaly/r5-type-c-cold-8-1-4/r5c-arbiter-of-wrong-outcome.png",
+    "src": "R5 Type C Холодный/Арбитр Неверного Исхода.png"
+  },
+  {
+    "name": "Янтарная Ложная Матка",
+    "id": "r5b-amber-decoy-brood",
+    "img": "assets/monsters/anomaly/r5-type-b-warm-8-1-4/r5b-amber-decoy-brood.png",
+    "src": "R5 Type B теплый/Янтарная Ложная Матка.png"
+  },
+  {
+    "name": "Лаковый Рывковый Потрошитель",
+    "id": "r5b-lacquer-pounce-reaver",
+    "img": "assets/monsters/anomaly/r5-type-b-warm-8-1-4/r5b-lacquer-pounce-reaver.png",
+    "src": "R5 Type B теплый/Лаковый Рывковый Потрошитель.png"
+  },
+  {
+    "name": "Смотритель Ошибок Гнезда",
+    "id": "r5b-hive-proctor-errors",
+    "img": "assets/monsters/anomaly/r5-type-b-warm-8-1-4/r5b-hive-proctor-errors.png",
+    "src": "R5 Type B теплый/Смотритель Ошибок Гнезда.png"
+  },
+  {
+    "name": "Медный Якорь Гребня",
+    "id": "r6a-copper-crest-anchor",
+    "img": "assets/monsters/anomaly/r6-type-a-warm-6-1-2-1/r6a-copper-crest-anchor.png",
+    "src": "R6 Type A теплый/Медный Якорь Гребня.png"
+  },
+  {
+    "name": "Первый Линейный Рассекатель",
+    "id": "r6a-first-line-reaver",
+    "img": "assets/monsters/anomaly/r6-type-a-warm-6-1-2-1/r6a-first-line-reaver.png",
+    "src": "R6 Type A теплый/Первый Линейный Рассекатель.png"
+  },
+  {
+    "name": "Контроллер Медных Плоскостей",
+    "id": "r6a-copper-plane-controller",
+    "img": "assets/monsters/anomaly/r6-type-a-warm-6-1-2-1/r6a-copper-plane-controller.png",
+    "src": "R6 Type A теплый/Контроллер Медных Плоскостей.png"
+  },
+  {
+    "name": "Возвратный Линейный Рассекатель",
+    "id": "r6a-returning-line-reaver",
+    "img": "assets/monsters/anomaly/r6-type-a-warm-6-1-2-1/r6a-returning-line-reaver.png",
+    "src": "R6 Type A теплый/Возвратный Линейный Рассекатель.png"
+  },
+  {
+    "name": "Холодный Якорь Инкубатора",
+    "id": "r6b-cold-incubator-anchor",
+    "img": "assets/monsters/anomaly/r6-type-b-cold-6-1-2-1/r6b-cold-incubator-anchor.png",
+    "src": "R6 Type B холодный/Холодный Якорь Инкубатора.png"
+  },
+  {
+    "name": "Срыватель Связок",
+    "id": "r6b-tether-ripper",
+    "img": "assets/monsters/anomaly/r6-type-b-cold-6-1-2-1/r6b-tether-ripper.png",
+    "src": "R6 Type B холодный/Срыватель Связок.png"
+  },
+  {
+    "name": "Контроллер Ферментных Коридоров",
+    "id": "r6b-ferment-corridor-controller",
+    "img": "assets/monsters/anomaly/r6-type-b-cold-6-1-2-1/r6b-ferment-corridor-controller.png",
+    "src": "R6 Type B холодный/Контроллер Ферментных Коридоров.png"
+  },
+  {
+    "name": "Добиватель Лаковой Тропы",
+    "id": "r6b-lacquer-trail-finisher",
+    "img": "assets/monsters/anomaly/r6-type-b-cold-6-1-2-1/r6b-lacquer-trail-finisher.png",
+    "src": "R6 Type B холодный/Добиватель Лаковой Тропы.png"
+  },
+  {
+    "name": "Лунный Якорь Рамки",
+    "id": "r6c-moon-frame-anchor",
+    "img": "assets/monsters/anomaly/r6-type-c-cold-6-1-2-1/r6c-moon-frame-anchor.png",
+    "src": "R6 Type C холодный/Лунный Якорь Рамки.png"
+  },
+  {
+    "name": "Первый Охотник Послеобраза",
+    "id": "r6c-first-afterimage-hunter",
+    "img": "assets/monsters/anomaly/r6-type-c-cold-6-1-2-1/r6c-first-afterimage-hunter.png",
+    "src": "R6 Type C холодный/Первый Охотник Послеобраза.png"
+  },
+  {
+    "name": "Контроллер Ложных Исходов",
+    "id": "r6c-false-outcome-controller",
+    "img": "assets/monsters/anomaly/r6-type-c-cold-6-1-2-1/r6c-false-outcome-controller.png",
+    "src": "R6 Type C холодный/Контроллер Ложных Исходов.png"
+  },
+  {
+    "name": "Возвратный Охотник Сна",
+    "id": "r6c-returning-dream-hunter",
+    "img": "assets/monsters/anomaly/r6-type-c-cold-6-1-2-1/r6c-returning-dream-hunter.png",
+    "src": "R6 Type C холодный/Возвратный Охотник Сна.png"
+  }
+]

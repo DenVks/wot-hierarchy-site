@@ -1,1 +1,1 @@
-v87 — R7 desaturated anomaly monster packs integration
+v88 — anomaly monster image previews and fullscreen viewer
