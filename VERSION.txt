@@ -1,1 +1,1 @@
-v88 — anomaly monster image previews and fullscreen viewer
+v89 — dm-npc verified NPC export
