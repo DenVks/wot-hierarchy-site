@@ -3129,3 +3129,40 @@ nav.sitenav .inner{overflow:visible;}
   .data-table,.compact-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .data-table th,.data-table td,.compact-table th,.compact-table td{min-width:96px;}
 }
+
+
+/* ==== v91: Shara Unified Will hierarchy page ==== */
+.theme-shara-page{--page-accent:#8fd06a;--page-accent-soft:rgba(143,208,106,.20);--page-accent-deep:#274c23}
+.theme-shara-page .hero{position:relative;max-width:1380px;margin:0 auto 30px;padding:120px 40px 70px;display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:34px;align-items:center}
+.theme-shara-page .hero::before{content:'';position:absolute;inset:25px 18px 0 18px;border:1px solid rgba(201,169,97,.14);background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));pointer-events:none}
+.theme-shara-page .hero .kicker{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.45em;text-transform:uppercase;color:var(--page-accent);margin-bottom:14px}
+.theme-shara-page .hero h1{font-family:'Marcellus',serif;font-size:clamp(42px,6vw,78px);line-height:1.04;margin:0;color:var(--ink-bright);text-shadow:0 0 40px color-mix(in srgb,var(--page-accent) 18%, transparent)}
+.theme-shara-page .hero .lead{max-width:820px;color:var(--ink-soft);font-size:20px;line-height:1.65;margin-top:18px}
+.theme-shara-page .hero .ornament{display:flex;align-items:center;gap:12px;margin:18px 0 6px;color:var(--page-accent)}
+.theme-shara-page .hero .orna-line{width:86px;height:1px;background:linear-gradient(90deg,transparent,currentColor,transparent);opacity:.85}
+.theme-shara-page .hero .orna-gem{width:8px;height:8px;border:1px solid currentColor;transform:rotate(45deg)}
+.theme-shara-page .sigilbox{justify-self:end;align-self:center;color:var(--page-accent);padding:16px;border:1px solid color-mix(in srgb,var(--page-accent) 60%, #000 40%);background:radial-gradient(circle at center,var(--page-accent-soft),rgba(0,0,0,0) 72%)}
+.theme-shara-page .sigilbox svg{display:block}
+.theme-shara-page .hero .content{position:relative;z-index:2}
+.theme-shara-page .toc{max-width:1380px;margin:0 auto 14px;padding:0 40px}
+.theme-shara-page .toc .inner{display:flex;gap:10px;flex-wrap:wrap}
+.theme-shara-page .toc a{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.25em;text-transform:uppercase;text-decoration:none;color:var(--ink-soft);padding:10px 12px;border:1px solid rgba(201,169,97,.16);background:rgba(255,255,255,.02)}
+.theme-shara-page .toc a:hover{border-color:var(--page-accent);color:var(--page-accent)}
+.theme-shara-page .panel h3{color:var(--page-accent)}
+.theme-shara-page .panel{border-color:rgba(201,169,97,.16);box-shadow:var(--shadow-deep),0 0 0 1px rgba(255,255,255,.02) inset}
+.theme-shara-page .panel.prose strong{color:color-mix(in srgb,var(--page-accent) 58%, #fff 42%)}
+.theme-shara-page .section-block h3{position:relative;padding-bottom:12px;margin-bottom:18px}
+.theme-shara-page .section-block h3::after{content:'';position:absolute;left:0;bottom:0;width:90px;height:1px;background:linear-gradient(90deg,var(--page-accent),transparent)}
+.theme-shara-page .path-ayad td{background:rgba(143,208,106,.055)}
+.theme-shara-page .path-warrior td{background:rgba(125,167,255,.055)}
+.theme-shara-page .path-common td{background:rgba(201,169,97,.045)}
+.theme-shara-page .rank-table .path-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.theme-shara-page .ayad-label{color:#8fd06a}.theme-shara-page .warrior-label{color:#7da7ff}.theme-shara-page .common-label{color:#e2c574}
+.theme-shara-page .mechanics-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
+.theme-shara-page .mechanic-card{background:rgba(255,255,255,.025);border:1px solid rgba(201,169,97,.14);border-left:3px solid var(--page-accent);padding:14px 16px;border-radius:6px}
+.theme-shara-page .mechanic-card h4{margin:0 0 8px;color:var(--ink-bright);font-family:'Cinzel',serif;font-size:14px;letter-spacing:.06em}
+.theme-shara-page .mechanic-card p{margin:0;color:var(--ink-soft)}
+.theme-shara-page .callout-shara{border:1px solid rgba(143,208,106,.22);background:linear-gradient(135deg,rgba(143,208,106,.08),rgba(201,169,97,.035));padding:16px 18px;border-radius:8px;margin:16px 0;color:var(--ink-soft)}
+.theme-shara-page .formula-box{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.55;color:var(--ink);background:rgba(0,0,0,.22);border:1px solid rgba(201,169,97,.16);border-radius:6px;padding:12px 14px;margin:10px 0;overflow:auto}
+@media(max-width:900px){.theme-shara-page .mechanics-grid{grid-template-columns:1fr}}
+@media(max-width:720px){.theme-shara-page .hero{grid-template-columns:1fr;padding:110px 18px 48px}.theme-shara-page .sigilbox{justify-self:start}.theme-shara-page .toc{padding:0 18px}}

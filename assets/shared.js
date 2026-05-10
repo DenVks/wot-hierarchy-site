@@ -35,6 +35,7 @@
     {href:'unity.html', label:'Единство'},
     {href:'throne.html', label:'Трон'},
     {href:'madding.html', label:'Хранители'},
+    {href:'shara-will.html', label:'Единая Воля Шары'},
     {href:'hierarchy-wall.html', label:'Иерархия Стены'},
     {href:'order.html', label:'Орден'}
   ];
