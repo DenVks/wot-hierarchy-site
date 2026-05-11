@@ -27,6 +27,8 @@ const FORMS = [
 
 ;
 
+const CS = window.NPC_DATA || [];
+
 // ── Custom NPCs from NPC Generator ─────────────────────────────────────────
 const CUSTOM_NPC_STORAGE_KEY = 'wot_custom_npcs_v1';
 function stableCustomId(raw, index){
@@ -499,6 +501,8 @@ function refreshCombatPanel(id) {
     const fill = document.getElementById('cp-hp-fill');
     if (fill) { fill.style.width = pct+'%'; fill.className = 'cp-hp-fill ' + hpColor(s.curHp, maxHp); }
   }
+  const acEl = document.getElementById('cp-ac-val');
+  if (acEl) acEl.textContent = getDisplayAC(c);
   COND_KEYS.forEach(k => {
     const btn = document.getElementById('ct-'+k);
     if (btn) btn.className = 'cond-toggle' + (s.conditions.includes(k)?' on-'+k:'');
@@ -1011,6 +1015,203 @@ document.addEventListener('click', e => {
 // ── Show NPC ─────────────────────────────────────────────────────────────
 const lvClass = lv => lv<=1?'sp-lv1':lv===2?'sp-lv2':lv===3?'sp-lv3':lv===4?'sp-lv4':lv>=5&&lv<=6?'sp-lv5':lv>=7&&lv<=8?'sp-lv7':'sp-lv9';
 
+// ── Armor selector / AC calculation ───────────────────────────────────────
+function statModNum(v){ return Math.floor(((Number(v)||10)-10)/2); }
+function armorRules(){
+  const eq = window.WOT_NPC_RULES && window.WOT_NPC_RULES.equipment;
+  return eq || {armor:[{name:'Без доспеха',category:'none',base:10,dexMax:null,stealth:false,strReq:0,weight:'—'}], shields:[{name:'Нет',ac:0},{name:'Щит',ac:2}]};
+}
+function armorCategoryLabel(cat){
+  return {none:'без доспеха',light:'лёгкий',medium:'средний',heavy:'тяжёлый'}[cat] || cat || '—';
+}
+function normalizedNpcText(c){
+  return [c && c.sh, c && c.ti, c && c.su, ...((c && c.tags)||[]), ...((c && c.ab)||[]).flatMap(a=>[a.n,a.d]), ...((c && c.eq)||[]).map(e=>e.t)]
+    .filter(Boolean).join(' ').toLowerCase().replace(/ё/g,'е');
+}
+function getNpcArmorProficiencies(c){
+  const txt = normalizedNpcText(c);
+  const prof = {none:true, light:false, medium:false, heavy:false, shield:false, buckler:false, notes:[]};
+  const add = (cats, note) => { cats.forEach(k=>prof[k]=true); if(note) prof.notes.push(note); };
+  if (/мастер по оружию|мечник|воин-|боевой мастер|чемпион|командир/.test(txt)) add(['light','medium','heavy','shield'], 'Класс: Мастер по оружию / Воин — лёгкие, средние, тяжёлые доспехи и щиты.');
+  if (/варвар/.test(txt)) add(['light','medium','shield'], 'Класс: Варвар — лёгкие, средние доспехи и щиты.');
+  if (/лесник|следопыт/.test(txt)) add(['light','medium','shield'], 'Класс: Лесник/Следопыт — лёгкие, средние доспехи и щиты.');
+  if (/скиталец|ассасин|вор|охотник за ворами|менестр/.test(txt)) add(['light'], 'Класс: Скиталец — лёгкие доспехи.');
+  if (/благородн/.test(txt)) add(['light'], 'Класс: Благородный — лёгкие доспехи.');
+  if (/пустынный воин|айильский/.test(txt)) add(['buckler'], 'Класс: Пустынный воин — без доспехов, допускается айильский баклер.');
+  if (/знаток легких доспехов|знаток лёгких доспехов/.test(txt)) add(['light'], 'Черта: Знаток лёгких доспехов.');
+  if (/знаток средних доспехов|мастер средних доспехов/.test(txt)) add(['light','medium','shield'], 'Черта: владение средними доспехами и щитами.');
+  if (/знаток тяжелых доспехов|знаток тяжёлых доспехов|мастер тяжелых доспехов|мастер тяжёлых доспехов/.test(txt)) add(['light','medium','heavy'], 'Черта: владение тяжёлыми доспехами.');
+  if (/щит/.test(txt) && !/посвящ|дичок/.test(txt)) prof.shield = prof.shield || /мастер щитов|щит \(|щит\+|щит «|щит/.test(txt);
+  return prof;
+}
+function getHierarchyAcBonus(c){
+  if(!c || !c.hi) return 0;
+  const text = [c.hi.nm, c.hi.ty, ...((c.hi.items)||[]).flatMap(i=>[i.n,i.d])].filter(Boolean).join(' ').toLowerCase();
+  let bonus = 0;
+  if(c.hi.ty === 'shara'){
+    if(/ранг\s*v|ш['’]?боан|ш['’]?ботай/.test(text)) bonus = Math.max(bonus, 6);
+    else if(/ранг\s*iv|воитель|накша-благосл/.test(text)) bonus = Math.max(bonus, 4);
+    else if(/ранг\s*iii|клинок воли|накша/.test(text)) bonus = Math.max(bonus, 3);
+    else if(/ранг\s*ii|хранитель/.test(text)) bonus = Math.max(bonus, 2);
+  }
+  if(c.hi.ty === 'guild' && /\+2\s*кд|кд\s*\+2|защита хранителя/.test(text)) bonus = Math.max(bonus, 2);
+  const m = text.match(/кд\s*\+\s*(\d+)/) || text.match(/\+(\d+)\s*кд/);
+  if(m) bonus = Math.max(bonus, parseInt(m[1],10)||0);
+  return bonus;
+}
+function hasDefenseStyle(c){
+  return normalizedNpcText(c).includes('стиль: защита') || normalizedNpcText(c).includes('стиль боя: защита') || normalizedNpcText(c).includes('стиль: оборона');
+}
+function hasMediumArmorMaster(c){
+  return normalizedNpcText(c).includes('мастер средних доспехов');
+}
+function hasUnarmoredDefense(c){
+  const txt = normalizedNpcText(c);
+  return /защита без доспехов|варвар/.test(txt) || /пустынный воин/.test(txt);
+}
+function getStoredArmorState(npcId){
+  const st = getState(npcId);
+  st.armor = st.armor && typeof st.armor === 'object' ? st.armor : {active:false, armorName:'Без доспеха', shieldName:'Нет', armorMagic:0, shieldMagic:0, miscBonus:0};
+  st.armor.active = !!st.armor.active;
+  st.armor.armorMagic = Math.max(0, Math.min(3, Number(st.armor.armorMagic)||0));
+  st.armor.shieldMagic = Math.max(0, Math.min(3, Number(st.armor.shieldMagic)||0));
+  st.armor.miscBonus = Math.max(-10, Math.min(20, Number(st.armor.miscBonus)||0));
+  return st.armor;
+}
+function findArmorByName(name){
+  const ar = armorRules().armor || [];
+  return ar.find(a=>a.name === name) || ar[0];
+}
+function findShieldByName(name){
+  const sh = armorRules().shields || [];
+  return sh.find(x=>x.name === name) || sh[0] || {name:'Нет',ac:0};
+}
+function calculateArmorAC(c, armorState){
+  const ar = findArmorByName(armorState && armorState.armorName || 'Без доспеха');
+  const sh = findShieldByName(armorState && armorState.shieldName || 'Нет');
+  const dex = statModNum(c && c.st && c.st.dex);
+  const con = statModNum(c && c.st && c.st.con);
+  const wis = statModNum(c && c.st && c.st.wis);
+  const armorMagic = Number(armorState && armorState.armorMagic)||0;
+  const shieldMagic = Number(armorState && armorState.shieldMagic)||0;
+  const miscBonus = Number(armorState && armorState.miscBonus)||0;
+  let dexPart = dex;
+  if(ar.category === 'medium') dexPart = Math.min(dex, hasMediumArmorMaster(c) ? 3 : 2);
+  if(ar.category === 'heavy') dexPart = Number(ar.dexMax || 0) > 0 ? Math.min(dex, Number(ar.dexMax)) : 0;
+  let base = Number(ar.base)||10;
+  let formula = `${base}`;
+  if(ar.category !== 'heavy' || Number(ar.dexMax||0) > 0){ formula += ` + ЛОВ ${dexPart>=0?'+':''}${dexPart}`; }
+  let ac = base + dexPart + armorMagic;
+  if(ar.category === 'none' && hasUnarmoredDefense(c)){
+    const options = [];
+    if(/пустынный воин/.test(normalizedNpcText(c))) options.push({name:'Пустынный воин', ac:10+dex+con, formula:`10 + ЛОВ ${dex>=0?'+':''}${dex} + ТЕЛ ${con>=0?'+':''}${con}`});
+    if(/варвар/.test(normalizedNpcText(c))) options.push({name:'Варвар', ac:10+dex+con, formula:`10 + ЛОВ ${dex>=0?'+':''}${dex} + ТЕЛ ${con>=0?'+':''}${con}`});
+    // fallback for custom unarmored features that use Wisdom.
+    if(/мудр/.test(normalizedNpcText(c)) && /защита без доспехов/.test(normalizedNpcText(c))) options.push({name:'Без доспехов', ac:10+dex+wis, formula:`10 + ЛОВ ${dex>=0?'+':''}${dex} + МДР ${wis>=0?'+':''}${wis}`});
+    if(options.length){
+      const best = options.sort((a,b)=>b.ac-a.ac)[0];
+      ac = best.ac; formula = best.formula + ` [${best.name}]`;
+    }
+  }
+  if(armorMagic){ ac += 0; formula += ` + маг.досп. ${armorMagic}`; }
+  const shieldBase = Number(sh.ac)||0;
+  if(shieldBase || shieldMagic){ ac += shieldBase + shieldMagic; formula += ` + ${sh.name} ${shieldBase}${shieldMagic?` + маг.щит ${shieldMagic}`:''}`; }
+  const def = (ar.category !== 'none' && hasDefenseStyle(c)) ? 1 : 0;
+  if(def){ ac += 1; formula += ' + стиль Защита 1'; }
+  const hi = getHierarchyAcBonus(c);
+  if(hi){ ac += hi; formula += ` + иерархия ${hi}`; }
+  if(miscBonus){ ac += miscBonus; formula += ` + прочее ${miscBonus>=0?'+':''}${miscBonus}`; }
+  return {ac, formula, armor:ar, shield:sh, dexPart, armorMagic, shieldMagic, miscBonus};
+}
+function validateArmorChoice(c, armorState){
+  const calc = calculateArmorAC(c, armorState);
+  const ar = calc.armor, sh = calc.shield;
+  const prof = getNpcArmorProficiencies(c);
+  const warnings = [], ok = [];
+  if(ar.category !== 'none'){
+    if(!prof[ar.category]) warnings.push(`Нет подтверждённого владения категорией: ${armorCategoryLabel(ar.category)} доспех.`);
+    else ok.push(`Владение категорией «${armorCategoryLabel(ar.category)} доспех» подтверждено.`);
+    if(Number(ar.strReq||0) && Number(c.st && c.st.str || 10) < Number(ar.strReq)) warnings.push(`Недостаточно Силы: требуется ${ar.strReq}, у NPC ${c.st.str}. В D&D 5e это обычно снижает скорость на 10 фт.`);
+    if(ar.stealth) warnings.push('Доспех даёт помеху на проверки Ловкости (Скрытность), если её не отменяет черта/класс/предмет.');
+  } else ok.push('Без доспеха: владение не требуется.');
+  if(sh && sh.name !== 'Нет'){
+    const isBuckler = /баклер/i.test(sh.name);
+    if(isBuckler && prof.buckler) ok.push('Айильский баклер допустим для этого персонажа.');
+    else if(!prof.shield) warnings.push(`Нет подтверждённого владения щитами: ${sh.name}.`);
+    else ok.push(`Владение щитом подтверждено: ${sh.name}.`);
+  }
+  const txt = normalizedNpcText(c);
+  if(/пустынный воин/.test(txt) && ar.category !== 'none') warnings.push('Пустынный воин теряет ключевые классовые бонусы при ношении доспеха: скорость, Танец Копий, доп. атаки/Уклонение по описанию класса.');
+  if(/пустынный воин/.test(txt) && sh && sh.name !== 'Нет' && !/баклер/i.test(sh.name)) warnings.push('Пустынный воин использует только баклер без потери части айильских преимуществ; обычный щит спорен и требует решения Мастера.');
+  if(/варвар/.test(txt) && ar.category === 'heavy') warnings.push('Варвар в тяжёлом доспехе теряет преимущества Ярости, завязанные на отсутствие тяжёлой брони, и Быстрый шаг.');
+  if(/дичок|посвящ|направляющ/.test(txt) && ar.category !== 'none') warnings.push('Направляющие/посвящённые обычно не владеют доспехами; проверьте предмет, архетип или отдельную черту.');
+  return {calc, ok, warnings, prof};
+}
+function getDisplayAC(c){
+  const st = c ? getStoredArmorState(c.id) : null;
+  if(st && st.active) return calculateArmorAC(c, st).ac;
+  return Number(c && c.co && c.co.ac) || 10;
+}
+function renderArmorSelector(c){
+  const st = getStoredArmorState(c.id);
+  const rules = armorRules();
+  const active = !!st.active;
+  const val = active ? st : {active:false, armorName:'Без доспеха', shieldName:'Нет', armorMagic:0, shieldMagic:0, miscBonus:0};
+  const validation = validateArmorChoice(c, val);
+  const calc = validation.calc;
+  const armorOptions = (rules.armor||[]).map(a=>`<option value="${escHtml(a.name)}" ${a.name===val.armorName?'selected':''}>${escHtml(a.name)} · ${armorCategoryLabel(a.category)} · КД ${a.base}${a.dexMax===null?'+ЛОВ':a.dexMax>0?'+ЛОВ max '+a.dexMax:''}${a.strReq?` · СИЛ ${a.strReq}`:''}${a.stealth?' · скрытн. помеха':''}</option>`).join('');
+  const shieldOptions = (rules.shields||[]).map(s=>`<option value="${escHtml(s.name)}" ${s.name===val.shieldName?'selected':''}>${escHtml(s.name)} · КД +${s.ac}</option>`).join('');
+  return `<div class="armor-tool">
+    <div class="armor-tool-head">
+      <div><strong>Выбор брони и расчёт КД</strong><span>Использует БД снаряжения сайта: <code>WOT_NPC_RULES.equipment.armor</code>.</span></div>
+      <label class="armor-active"><input type="checkbox" ${active?'checked':''} onchange="toggleArmorOverride(${c.id},this.checked)"> применить override КД</label>
+    </div>
+    <div class="armor-form">
+      <label>Доспех<select onchange="setNpcArmor(${c.id},'armorName',this.value)">${armorOptions}</select></label>
+      <label>Щит<select onchange="setNpcArmor(${c.id},'shieldName',this.value)">${shieldOptions}</select></label>
+      <label>Маг. бонус доспеха<select onchange="setNpcArmor(${c.id},'armorMagic',this.value)">${[0,1,2,3].map(n=>`<option value="${n}" ${n===Number(val.armorMagic)?'selected':''}>+${n}</option>`).join('')}</select></label>
+      <label>Маг. бонус щита<select onchange="setNpcArmor(${c.id},'shieldMagic',this.value)">${[0,1,2,3].map(n=>`<option value="${n}" ${n===Number(val.shieldMagic)?'selected':''}>+${n}</option>`).join('')}</select></label>
+      <label>Прочий бонус КД<input type="number" min="-10" max="20" value="${Number(val.miscBonus)||0}" onchange="setNpcArmor(${c.id},'miscBonus',this.value)"></label>
+    </div>
+    <div class="armor-result ${validation.warnings.length?'warn':'ok'}">
+      <div><b>Текущий КД карточки:</b> ${c.co.ac} · <b>Расчётный КД:</b> ${calc.ac} ${active?'<span class="armor-pill applied">применён</span>':'<span class="armor-pill">не применён</span>'}</div>
+      <div class="armor-formula">${escHtml(calc.formula)}</div>
+    </div>
+    <div class="armor-checks">
+      ${validation.ok.map(x=>`<div class="armor-ok">✓ ${escHtml(x)}</div>`).join('')}
+      ${validation.warnings.map(x=>`<div class="armor-warn">⚠ ${escHtml(x)}</div>`).join('')}
+      ${validation.prof.notes.slice(0,3).map(x=>`<div class="armor-note">• ${escHtml(x)}</div>`).join('')}
+    </div>
+    <div class="armor-actions"><button onclick="resetNpcArmor(${c.id})">Сбросить выбор брони</button></div>
+  </div>`;
+}
+function setNpcArmor(id, key, value){
+  const st = getStoredArmorState(id);
+  if(['armorMagic','shieldMagic','miscBonus'].includes(key)) st[key] = Number(value)||0;
+  else st[key] = String(value||'');
+  st.active = true;
+  savePersistedState();
+  showNPC(id);
+}
+function toggleArmorOverride(id, enabled){
+  const st = getStoredArmorState(id);
+  st.active = !!enabled;
+  savePersistedState();
+  showNPC(id);
+}
+function resetNpcArmor(id){
+  const st = getStoredArmorState(id);
+  st.active = false;
+  st.armorName = 'Без доспеха';
+  st.shieldName = 'Нет';
+  st.armorMagic = 0;
+  st.shieldMagic = 0;
+  st.miscBonus = 0;
+  savePersistedState();
+  showNPC(id);
+}
+
+
 function parseSignedBonus(v){
   const m = String(v || '').match(/[+\-]?\d+/);
   return m ? parseInt(m[0], 10) : 0;
@@ -1074,7 +1275,7 @@ function showNPC(id) {
   <button class="cp-reset-btn" onclick="resetHP(${c.id})" title="Восстановить полные ОЗ">↺</button>
   ${c.isClone ? `<button class="cp-reset-btn cp-clone-remove" onclick="removeEncounterClone(${c.id})" title="Удалить эту копию из сцены">× копия</button>` : `<button class="cp-reset-btn cp-clone-add" onclick="addEncounterClone(${c.id})" title="Создать ещё одну копию этого NPC">＋ копия</button>`}
   ${c.custom && !c.isClone ? `<button class="cp-reset-btn cp-custom-remove" onclick="deleteCustomNpcFromBrowser(${c.id})" title="Удалить пользовательского NPC из этого браузера">× удалить NPC</button>` : ``}
-  <div class="cp-ac-box"><div class="cp-ac-val">${c.co.ac}</div><div class="cp-ac-lbl">КД</div></div>
+  <div class="cp-ac-box"><div class="cp-ac-val" id="cp-ac-val">${getDisplayAC(c)}</div><div class="cp-ac-lbl">КД</div></div>
   <div class="cp-ini-box" onclick="addToIni(${c.id})" title="Добавить в трекер инициативы"><div class="cp-ini-val">${c.co.ini}</div><div class="cp-ini-lbl">Иниц.</div></div>
   <div class="cp-sp-box"><div class="cp-sp-val">${c.co.sp} фт</div><div class="cp-sp-lbl">Скор.</div></div>
   <div class="cp-pass-box" title="Пассивное восприятие"><div class="cp-pass-val">${c.co.pp}</div><div class="cp-pass-lbl">Пасс ВСПР</div></div>
@@ -1235,6 +1436,7 @@ ${c.tactics.map(t=>`<div class="tact-phase"><div class="tact-phase-name">${t.ph}
 
   // ── TAB: EQUIPMENT ────────────────────────────────────────────────────
   html += `<div class="tab-content" id="tab_${id}_equipment">
+${renderArmorSelector(c)}
 <div class="sec"><div class="sec-h">Снаряжение</div>
 <div class="eq-list">${c.eq.map(e=>`<div class="eq-item${e.r?' rare':''}">${e.r?'⭐ ':''}${e.t}</div>`).join('')}
 </div></div></div>`;
