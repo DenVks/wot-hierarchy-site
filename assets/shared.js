@@ -152,7 +152,8 @@
     {href:'arafel.html', label:'Арафел'},
     {href:'kandor.html', label:'Кандор'},
     {href:'shienar.html', label:'Шайнар'},
-    {href:'tar-valon.html', label:'Тар Валон'}
+    {href:'tar-valon.html', label:'Тар Валон'},
+    {href:'shara.html', label:'Шара'}
   ];
   window.WOT_NATION_ITEMS = nationItems.slice();
   const nationPages = new Set(nationItems.map(i => i.href.split('#')[0]));
