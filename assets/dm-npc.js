@@ -27,7 +27,10 @@ const FORMS = [
 
 ;
 
-const CS = window.NPC_DATA || [];
+const CS = Array.isArray(window.NPC_DATA) ? window.NPC_DATA : [];
+if (!Array.isArray(window.NPC_DATA) || !window.NPC_DATA.length) {
+  console.error('[dm-npc] NPC data was not loaded. Check assets/npc-data.js script order/path/cache.');
+}
 
 // ── Custom NPCs from NPC Generator ─────────────────────────────────────────
 const CUSTOM_NPC_STORAGE_KEY = 'wot_custom_npcs_v1';
@@ -576,7 +579,15 @@ function renderSidebarNpcButton(c, mode){
 function buildSidebar() {
   loadCustomNpcsFromStorage();
   const sb = document.getElementById('sb');
-  const search = document.getElementById('sb-search').value.toLowerCase();
+  if (!sb) return;
+  if (!CS.length) {
+    const cnt = document.getElementById('sb-count');
+    if (cnt) cnt.textContent = '0 персонажей — NPC data не загружена';
+    sb.innerHTML = '<div class="sb-load-error"><b>NPC_DATA не загружена.</b><br>Проверьте наличие <code>assets/npc-data.js</code> и порядок подключения скриптов в <code>dm-npc.html</code>.</div>';
+    return;
+  }
+  const searchEl = document.getElementById('sb-search');
+  const search = (searchEl ? searchEl.value : '').toLowerCase();
   const baseList = CS.filter(c => !c.isClone);
   const customList = baseList.filter(c => c.custom);
   const normalBaseList = baseList.filter(c => !c.custom);

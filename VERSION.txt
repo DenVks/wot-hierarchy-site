@@ -1,1 +1,1 @@
-v96 — NPC armor selector and AC recalculation patch
+v97 — DM NPC list load fix and cache-busted data dependencies
