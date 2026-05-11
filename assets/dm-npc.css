@@ -71,6 +71,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .hi-badge.throne{color:#c94c4c;border:1px solid #5a2020;background:var(--danger-bg)}
 .hi-badge.unity{color:#8a7ae8;border:1px solid #3a2a7a;background:var(--purple-bg)}
 .hi-badge.guild{color:#4ac9b0;border:1px solid #1a5a4a;background:#0a1e1a}
+.hi-badge.shara{color:#8fd06a;border:1px solid #315c2d;background:#0f2412}
 
 /* ── Main ── */
 .main{flex:1;overflow-y:auto;background:var(--bg);display:flex;flex-direction:column}
@@ -250,16 +251,19 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .hi-box.shonchan{background:var(--danger-bg);border:1px solid var(--danger-border)}
 .hi-box.unity{background:var(--purple-bg);border:1px solid var(--purple-border)}
 .hi-box.guild{background:#0a1e1a;border:1px solid #1a5a4a}
+.hi-box.shara{background:#0d1f10;border:1px solid #315c2d}
 .hi-name{font-family:'Cinzel',serif;font-size:12px;font-weight:700;margin-bottom:6px}
 .hi-box.shonchan .hi-name{color:var(--red2)}
 .hi-box.unity .hi-name{color:var(--purple2)}
 .hi-box.guild .hi-name{color:var(--teal2)}
+.hi-box.shara .hi-name{color:#8fd06a}
 .hi-items{display:grid;grid-template-columns:1fr 1fr;gap:4px}
 .hi-item{background:rgba(0,0,0,.25);border-radius:3px;padding:4px 7px}
 .hi-item-name{font-size:10px;font-weight:600;margin-bottom:1px}
 .hi-box.shonchan .hi-item-name{color:var(--red2)}
 .hi-box.unity .hi-item-name{color:var(--purple2)}
 .hi-box.guild .hi-item-name{color:var(--teal2)}
+.hi-box.shara .hi-item-name{color:#8fd06a}
 .hi-item-desc{font-size:10px;color:var(--text2);line-height:1.3}
 
 /* ── Spell table ── */

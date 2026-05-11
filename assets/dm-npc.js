@@ -75,7 +75,7 @@ function normalizeCustomNpc(raw, index){
   npc.verify = Array.isArray(npc.verify) ? npc.verify : [];
   npc.tactics = Array.isArray(npc.tactics) ? npc.tactics : [{ph:'Проверка ГМ',d:'Пользовательский NPC. Проверьте тактику перед боем.'}];
   npc.dm = npc.dm || 'Создано генератором. Требует утверждения ГМ.';
-  npc.hiIcon = npc.hiIcon || (npc.hi && npc.hi.ty === 'guild' ? 'guild' : npc.hi && npc.hi.ty === 'shonchan' ? 'throne' : npc.hi ? 'unity' : '');
+  npc.hiIcon = npc.hiIcon || (npc.hi && npc.hi.ty === 'guild' ? 'guild' : npc.hi && npc.hi.ty === 'shonchan' ? 'throne' : npc.hi && npc.hi.ty === 'shara' ? 'shara' : npc.hi ? 'unity' : '');
   return npc;
 }
 function npcIdEquals(a,b){ return String(a) === String(b); }
@@ -545,7 +545,8 @@ function renderSidebarNpcButton(c, mode){
   const s = getState(c.id);
   const hiHtml = c.hiIcon==='throne'?'<span class="hi-badge throne">△</span>':
     c.hiIcon==='unity'?'<span class="hi-badge unity">⊙</span>':
-    c.hiIcon==='guild'?'<span class="hi-badge guild">◇</span>':'';
+    c.hiIcon==='guild'?'<span class="hi-badge guild">◇</span>':
+    c.hiIcon==='shara'?'<span class="hi-badge shara">◎</span>':'';
   const btn = document.createElement('div');
   btn.className = 'npc-btn ty-' + c.ty + (npcIdEquals(c.id,curNPC)?' active':'') + (c.isClone?' npc-btn-clone':'');
   btn.dataset.npcid = c.id;
@@ -849,16 +850,38 @@ function findExtraFeatForNpc(c, abilityName){
   candidates.sort((a,b)=>String(a.book||'').localeCompare(String(b.book||''),'ru'));
   return candidates[0];
 }
+function findHierarchyFeatureForNpc(c, abilityName){
+  const db = window.WOT_HIERARCHY_DB || {hierarchies:[]};
+  const key = normalizeFeatureName(abilityName);
+  if(!key) return null;
+  const hiText = String((c.hi && c.hi.nm) || '') + ' ' + String(c.hiIcon || '') + ' ' + String((c.tags||[]).join(' '));
+  const candidates = [];
+  (db.hierarchies || []).forEach(h => {
+    const hKey = normalizeFeatureName(h.name || '');
+    const idKey = normalizeFeatureName(h.id || '');
+    const relevant = !hKey || normalizeFeatureName(hiText).includes(hKey) || normalizeFeatureName(hiText).includes(idKey) || (h.id === 'shara-will' && /шара|единая воля/i.test(hiText));
+    if(!relevant) return;
+    (h.abilities || []).forEach(a => {
+      const names = [a.name].concat(a.aliases || []);
+      if(names.some(n => { const nk = normalizeFeatureName(n); return nk && (nk === key || nk.includes(key) || key.includes(nk)); })) {
+        candidates.push({hierarchy:h, ability:a});
+      }
+    });
+  });
+  return candidates[0] || null;
+}
 function findFeatureInfoForNpc(c, abilityName){
   const cls = findClassFeatureForNpc(c, abilityName);
   if(cls) return {source:'classes.html', type:'class', data:cls};
   const feat = findExtraFeatForNpc(c, abilityName);
   if(feat) return {source:'feats.html', type:'feat', data:feat};
+  const hi = findHierarchyFeatureForNpc(c, abilityName);
+  if(hi) return {source:hi.ability.source || hi.hierarchy.source || 'hierarchies.html', type:'hierarchy', data:hi.ability, hierarchy:hi.hierarchy};
   return null;
 }
 
 function classFeatureInfoButton(npcId, abilityName){
-  return '<button class="sp-info-btn feature-info-btn" title="Показать полное описание черты из classes.html / feats.html" type="button" '+
+  return '<button class="sp-info-btn feature-info-btn" title="Показать полное описание из базы классов / черт / иерархий" type="button" '+
     'data-npc-id="'+escHtml(npcId)+'" data-feature-name="'+escHtml(abilityName)+'">i</button>';
 }
 
@@ -908,10 +931,21 @@ function renderClassFeatureModalContent(found, c, abilityName){
       '<div class="weave-pop-meta"><div><b>Требование</b><em>'+escHtml(f.req || '—')+'</em></div><div><b>Класс</b><em>'+escHtml(f.cls || '—')+'</em></div><div><b>Источник</b><em>feats.html</em></div></div>'+
       '<div class="weave-pop-desc">'+desc+'</div>';
   }
+
+  if(found && found.type === 'hierarchy'){
+    const a = found.data;
+    const h = found.hierarchy || {};
+    const desc = String(a.description || '').split(/\n+/).filter(Boolean).map(p=>'<p>'+escHtml(p)+'</p>').join('');
+    return '<button class="weave-pop-close" onclick="hideClassFeatureModal()">×</button>'+
+      '<div class="weave-pop-kicker">'+escHtml(h.name || 'Иерархия')+' · '+escHtml(a.rank || '—')+' · '+escHtml(a.path || '—')+'</div>'+
+      '<h3>'+escHtml(a.name)+'</h3>'+
+      '<div class="weave-pop-meta"><div><b>Тип</b><em>'+escHtml(a.type || 'Способность')+'</em></div><div><b>Источник</b><em>'+escHtml(a.source || h.source || 'hierarchies.html')+'</em></div></div>'+
+      '<div class="weave-pop-desc">'+desc+'</div>';
+  }
   const fallback = (c.ab||[]).find(a => normalizeFeatureName(a.n) === normalizeFeatureName(abilityName));
   const fallbackDesc = fallback ? fallback.d : 'Для этой записи нет точного совпадения в базе классов или дополнительных черт.';
   return '<button class="weave-pop-close" onclick="hideClassFeatureModal()">×</button>'+
-    '<div class="weave-pop-kicker">Описание не найдено в classes.html / feats.html</div>'+
+    '<div class="weave-pop-kicker">Описание не найдено в classes.html / feats.html / базы Иерархий</div>'+
     '<h3>'+escHtml(abilityName)+'</h3>'+
     '<div class="weave-pop-desc">'+String(fallbackDesc || '').split(/\n+/).filter(Boolean).map(p=>'<p>'+escHtml(p)+'</p>').join('')+'</div>';
 }
@@ -1183,7 +1217,7 @@ ${['СИЛ','ТЕЛ','ЛОВ','ИНТ','МДР','ХАР'].map((name,si)=>{
   <div class="core-box passive-core"><span class="core-label">Пасс ПРН<br><em>пассивная проницательность</em></span><span class="core-val big">${getPassiveInsight(c)}</span></div>
   <div class="core-box core-wide"><span style="font-size:10px;color:var(--text3)">Особенности</span><span class="core-val" style="font-size:10px;color:var(--gold2)">${c.co.cr}</span></div>
 </div>
-${c.hi ? renderHi(c.hi) : ''}
+${c.hi ? renderHi(c.hi, id) : ''}
 ${c.angrial ? renderAngrial(c.angrial) : ''}
 <div class="sec"><div class="sec-h">Навыки</div>
 <div class="sk-grid">${c.sk.map(sk=>`<div class="sk-item${sk.e?' expert':''}"><span class="sk-name">${sk.e?'<span class="sk-star">★</span>':''}${sk.n}<span style="font-size:9px;color:var(--text3);margin-left:3px">${sk.note||''}</span></span><span class="sk-val">${sk.v}</span></div>`).join('')}</div></div>
@@ -1428,11 +1462,11 @@ function refreshIniTracker() {
 }
 
 // ── Helper renderers ──────────────────────────────────────────────────────
-function renderHi(hi) {
+function renderHi(hi, npcId) {
   if (!hi) return '';
   return `<div class="hi-box ${hi.ty||'unity'}" style="margin-bottom:8px">
 <div class="hi-name">${hi.nm}</div>
-<div class="hi-items">${hi.items.map(it=>`<div class="hi-item"><div class="hi-item-name">${it.n}</div><div class="hi-item-desc">${it.d}</div></div>`).join('')}</div>
+<div class="hi-items">${hi.items.map(it=>`<div class="hi-item"><div class="hi-item-name">${it.n} ${npcId ? classFeatureInfoButton(npcId, it.n) : ''}</div><div class="hi-item-desc">${it.d}</div></div>`).join('')}</div>
 </div>`;
 }
 
