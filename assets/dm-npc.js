@@ -766,18 +766,28 @@ document.addEventListener('click', function(e){
 });
 document.addEventListener('keydown', function(e){ if(e.key === 'Escape') { hideWeaveModal(); hideClassFeatureModal(); } });
 
-// ── Class feature modal / lookup from classes.html data ─────────────────────
+// ── Class feature modal / lookup from classes.html / feats / hierarchy data ─────────────────────
 function normalizeFeatureName(name){
   let s = String(name || '')
     .replace(/[⚡⛔✅❌⭐★]/g,'')
-    .replace(/\([^)]*(?:ур\.|НЕДОСТУП|крит|слот)[^)]*\)/gi,'')
+    .replace(/&nbsp;/g,' ')
+    .replace(/[«»]/g,'')
+    .replace(/ё/g,'е').replace(/Ё/g,'Е')
+    .replace(/\([^)]*(?:ур\.|НЕДОСТУП|крит|слот|преив|преим|исправ|ошибка)[^)]*\)/gi,'')
     .replace(/\([^)]*\)/g,'')
     .replace(/\d+\s*[кkдd]\s*\d+/gi,'')
     .replace(/\d+\s*[кkдd]\b/gi,'')
-    .replace(/×\d+/g,'')
+    .replace(/×\s*\d+(?:[.,]\d+)?/g,'')
+    .replace(/x\s*\d+(?:[.,]\d+)?/gi,'')
     .replace(/\bур\.?\s*\d+\b/gi,'')
-    .replace(/:.*/,'')
-    .replace(/ё/g,'е').replace(/Ё/g,'Е')
+    .replace(/ранг\s+[ivx]+/gi,'')
+    .replace(/ранг\s*\d+/gi,'')
+    .replace(/[→=]/g,' ')
+    .replace(/[—–].*$/,'')
+    .replace(/[:·;,/]+/g,' ')
+    .replace(/[+]/g,' плюс ')
+    .replace(/[-−]/g,' минус ')
+    .replace(/[()\[\]{}]/g,' ')
     .replace(/\s+/g,' ')
     .trim()
     .toLowerCase();
@@ -789,9 +799,43 @@ function normalizeFeatureName(name){
        .replace(/всплеск действий/g,'всплеск действия')
        .replace(/безмозглая ярость/g,'бездумная ярость')
        .replace(/инстинктивная ловкость/g,'дикий инстинкт')
+       .replace(/\s+\d+$/g,'')
        .replace(/\s+/g,' ')
        .trim();
   return s;
+}
+function featureLookupKeys(name){
+  const raw = String(name || '');
+  const base = normalizeFeatureName(raw);
+  const keys = new Set([base]);
+  const b = base;
+  // Explicit fighting-style aliases. This prevents the old bug where "Стиль: ..." matched the first generic "Стиль" row.
+  if (/^стиль\s+оборона/.test(b) || /^стиль\s+защита/.test(b)) { keys.add('защита'); keys.add('защита defense'); }
+  if (/^стиль\s+стрельб/.test(b)) { keys.add('стрельба из лука'); keys.add('стрельба из лука archery'); keys.add('стиль боя'); }
+  if (/^стиль\s+дуэль/.test(b)) { keys.add('дуэль'); keys.add('дуэль dueling'); }
+  if (/^стиль\s+бой с большим оружием/.test(b)) { keys.add('бой с большим оружием'); keys.add('бой с большим оружием great weapon fighting'); }
+  if (/^стиль\s+бой двумя оружиями/.test(b)) { keys.add('бой двумя оружиями'); keys.add('бой двумя оружиями two weapon fighting'); }
+  if (/^стиль боя/.test(b)) keys.add('стиль боя');
+  // Common abbreviated labels used in NPC cards.
+  if (b === 'крит') keys.add('улучшенный критический удар');
+  if (b === 'дополнительная атака') keys.add('дополнительная атака extra attack');
+  if (b === 'мастер бо') keys.add('мастер большого оружия');
+  return Array.from(keys).filter(Boolean);
+}
+function keyMatchesRecord(queryKeys, recordKeys){
+  const q = queryKeys.filter(Boolean);
+  const r = recordKeys.filter(Boolean);
+  if (!q.length || !r.length) return false;
+  if (q.some(k => r.includes(k))) return true;
+  // Controlled broad match only for long, specific titles. No first-word matching.
+  for (const qk of q){
+    if (qk.length < 14) continue;
+    for (const rk of r){
+      if (rk.length < 14) continue;
+      if (qk.startsWith(rk + ' ') || rk.startsWith(qk + ' ')) return true;
+    }
+  }
+  return false;
 }
 function escHtml(v){
   return String(v ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
@@ -809,7 +853,7 @@ function npcClassContexts(c){
   else if (text.includes('командир') || text.includes('мастер по оружию') || text.includes('мечник')) add('Мастер по оружию',null);
   if (text.includes('дичок')) add('Дичок', null);
   if (text.includes('посвящ') || text.includes('аша') || text.includes('айз седай') || text.includes('ищущ')) add('Посвящённый', text.includes('аша') ? "Аша'ман (Asha'man)" : text.includes('айз седай') ? 'Айз Седай' : null);
-  if (text.includes('лесник')) {
+  if (text.includes('лесник') || text.includes('следопыт')) {
     const a = text.includes('разведчик') ? 'Разведчик' : text.includes('охотник') ? 'Охотник' : text.includes('мастер зверей') ? 'Мастер зверей' : null;
     add('Лесник', a);
   }
@@ -819,14 +863,12 @@ function npcClassContexts(c){
 }
 function findClassFeatureForNpc(c, abilityName){
   const db = window.WOT_CLASSES_DB || {features:[]};
-  const key = normalizeFeatureName(abilityName);
-  if (!key) return null;
+  const qKeys = featureLookupKeys(abilityName);
+  if (!qKeys.length) return null;
   const contexts = npcClassContexts(c);
   const candidates = db.features.filter(f => {
-    const fKey = normalizeFeatureName(f.feature);
-    if (!fKey) return false;
-    const nameMatch = fKey === key || fKey.includes(key) || key.includes(fKey);
-    if (!nameMatch) return false;
+    const rKeys = featureLookupKeys(f.feature);
+    if (!keyMatchesRecord(qKeys, rKeys)) return false;
     if (!contexts.length) return true;
     return contexts.some(ctx => {
       if (ctx.className && f.className !== ctx.className) return false;
@@ -836,9 +878,11 @@ function findClassFeatureForNpc(c, abilityName){
   });
   if (candidates.length) {
     candidates.sort((a,b) => {
+      const aExact = keyMatchesRecord(qKeys, featureLookupKeys(a.feature)) ? 0 : 1;
+      const bExact = keyMatchesRecord(qKeys, featureLookupKeys(b.feature)) ? 0 : 1;
       const aBase = /базов/i.test(a.archetype||'') ? 0 : 1;
       const bBase = /базов/i.test(b.archetype||'') ? 0 : 1;
-      return aBase - bBase || (Number(a.levelSort||999)-Number(b.levelSort||999));
+      return aExact - bExact || aBase - bBase || (Number(a.levelSort||999)-Number(b.levelSort||999));
     });
     return candidates[0];
   }
@@ -847,14 +891,12 @@ function findClassFeatureForNpc(c, abilityName){
 
 function findExtraFeatForNpc(c, abilityName){
   const db = window.WOT_FEATS_DB || {feats:[]};
-  const key = normalizeFeatureName(abilityName);
-  if(!key) return null;
+  const qKeys = featureLookupKeys(abilityName);
+  if(!qKeys.length) return null;
   const text = [c.sh, c.ti].concat(c.tags || []).join(' ').toLowerCase();
   const candidates = (db.feats || []).filter(f => {
-    const fKey = normalizeFeatureName(f.name);
-    if(!fKey) return false;
-    const nameMatch = fKey === key || fKey.includes(key) || key.includes(fKey);
-    if(!nameMatch) return false;
+    const rKeys = featureLookupKeys(f.name);
+    if(!keyMatchesRecord(qKeys, rKeys)) return false;
     const cls = String(f.cls || '').toLowerCase();
     if(!cls || cls === '—' || cls === '-' || cls === 'любой') return true;
     if(cls.includes('направля')) return text.includes('направля') || text.includes('дичок') || text.includes('ашаман') || text.includes('айз седай');
@@ -865,27 +907,37 @@ function findExtraFeatForNpc(c, abilityName){
   candidates.sort((a,b)=>String(a.book||'').localeCompare(String(b.book||''),'ru'));
   return candidates[0];
 }
+function hierarchyIsRelevantToNpc(h, c){
+  const hiText = normalizeFeatureName(String((c.hi && c.hi.nm) || '') + ' ' + String(c.hiIcon || '') + ' ' + String((c.tags||[]).join(' ')));
+  const id = String(h.id || '');
+  const name = normalizeFeatureName(h.name || '');
+  if (id === 'shara-will') return /шара|единая воля|shara/.test(hiText);
+  if (id === 'unity') return /единств|unity/.test(hiText);
+  if (id === 'crystal-throne') return /хрустальн|трон|шончан|shonchan|throne/.test(hiText);
+  if (id === 'far-madding-keepers') return /фар мэддинг|хранител|гильд|guild/.test(hiText);
+  return name && hiText.includes(name);
+}
 function findHierarchyFeatureForNpc(c, abilityName){
   const db = window.WOT_HIERARCHY_DB || {hierarchies:[]};
-  const key = normalizeFeatureName(abilityName);
-  if(!key) return null;
-  const hiText = String((c.hi && c.hi.nm) || '') + ' ' + String(c.hiIcon || '') + ' ' + String((c.tags||[]).join(' '));
+  const qKeys = featureLookupKeys(abilityName);
+  if(!qKeys.length) return null;
   const candidates = [];
   (db.hierarchies || []).forEach(h => {
-    const hKey = normalizeFeatureName(h.name || '');
-    const idKey = normalizeFeatureName(h.id || '');
-    const relevant = !hKey || normalizeFeatureName(hiText).includes(hKey) || normalizeFeatureName(hiText).includes(idKey) || (h.id === 'shara-will' && /шара|единая воля/i.test(hiText));
-    if(!relevant) return;
+    if(!hierarchyIsRelevantToNpc(h, c)) return;
     (h.abilities || []).forEach(a => {
-      const names = [a.name].concat(a.aliases || []);
-      if(names.some(n => { const nk = normalizeFeatureName(n); return nk && (nk === key || nk.includes(key) || key.includes(nk)); })) {
-        candidates.push({hierarchy:h, ability:a});
-      }
+      const rKeys = [a.name].concat(a.aliases || []).flatMap(featureLookupKeys);
+      if(keyMatchesRecord(qKeys, rKeys)) candidates.push({hierarchy:h, ability:a});
     });
   });
   return candidates[0] || null;
 }
 function findFeatureInfoForNpc(c, abilityName){
+  // Hierarchy blocks should resolve to hierarchy data first, not to a coincidentally similar class feature.
+  const isHiItem = !!(c.hi && (c.hi.items || []).some(it => normalizeFeatureName(it.n) === normalizeFeatureName(abilityName)));
+  if (isHiItem) {
+    const hiFirst = findHierarchyFeatureForNpc(c, abilityName);
+    if(hiFirst) return {source:hiFirst.ability.source || hiFirst.hierarchy.source || 'hierarchies.html', type:'hierarchy', data:hiFirst.ability, hierarchy:hiFirst.hierarchy};
+  }
   const cls = findClassFeatureForNpc(c, abilityName);
   if(cls) return {source:'classes.html', type:'class', data:cls};
   const feat = findExtraFeatForNpc(c, abilityName);
