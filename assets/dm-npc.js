@@ -817,9 +817,18 @@ function featureLookupKeys(name){
   if (/^стиль\s+бой двумя оружиями/.test(b)) { keys.add('бой двумя оружиями'); keys.add('бой двумя оружиями two weapon fighting'); }
   if (/^стиль боя/.test(b)) keys.add('стиль боя');
   // Common abbreviated labels used in NPC cards.
-  if (b === 'крит') keys.add('улучшенный критический удар');
+  if (b === 'крит') { keys.add('улучшенный критический удар'); keys.add('улучшенные критические попадания'); }
+  if (/улучш.*крит/.test(b)) { keys.add('улучшенный критический удар'); keys.add('улучшенные критические попадания'); }
+  if (/превосход.*крит/.test(b)) keys.add('превосходные критические попадания');
   if (b === 'дополнительная атака') keys.add('дополнительная атака extra attack');
   if (b === 'мастер бо') keys.add('мастер большого оружия');
+  if (/кости превосходства/.test(b)) keys.add('боевое превосходство');
+  if (/защитный удар/.test(b)) keys.add('парирование');
+  if (/отталк/.test(b)) keys.add('толкающая атака');
+  if (/командирский удар/.test(b)) keys.add('удар командующего');
+  if (/угрожающ/.test(b)) keys.add('атака с угрозой');
+  if (/ответн/.test(b)) keys.add('ответный удар');
+  if (/познай врага/.test(b) || /познай своего врага/.test(b)) keys.add('познай своего врага');
   return Array.from(keys).filter(Boolean);
 }
 function keyMatchesRecord(queryKeys, recordKeys){
@@ -842,15 +851,22 @@ function escHtml(v){
 }
 function npcClassContexts(c){
   const text = [c.sh, c.ti].concat(c.tags || []).join(' ').toLowerCase();
+  const tags = (c.tags || []).map(x => String(x).toLowerCase());
+  const title = String(c.ti || '').toLowerCase();
   const ctx = [];
   const add = (className, archetype) => ctx.push({className, archetype});
+  const isPlainFighter = tags.includes('воин') || /(?:^|[—\s])воин\s*\(/i.test(c.ti || '') || /^воин[-\s]/i.test(c.sh || '');
+  if (isPlainFighter && !/мастер по оружию|пустынный воин/i.test(c.ti || '')) {
+    const a = /боевой мастер/i.test(text) ? 'Мастер боевых искусств' : /чемпион|champion/i.test(text) ? 'Чемпион' : null;
+    add('Воин', a);
+  }
   if (text.includes('скиталец')) {
     let a = text.includes('ассасин') ? 'Ассасин (Assassin)' : text.includes('охотник за ворами') ? 'Охотник за ворами (Thief Taker)' : text.includes('вор') ? 'Вор (Thief)' : text.includes('менестр') ? 'Менестрель (Gleeman)' : null;
     add('Скиталец', a);
   }
   if (text.includes('мастер меча')) add('Мастер по оружию','Мастер Меча (Blademaster)');
-  else if (text.includes('чемпион')) add('Мастер по оружию','Архетип: Чемпион (Champion)');
-  else if (text.includes('командир') || text.includes('мастер по оружию') || text.includes('мечник')) add('Мастер по оружию',null);
+  else if (!isPlainFighter && text.includes('чемпион')) add('Мастер по оружию','Архетип: Чемпион (Champion)');
+  else if (!isPlainFighter && (text.includes('командир') || text.includes('мастер по оружию') || text.includes('мечник'))) add('Мастер по оружию',null);
   if (text.includes('дичок')) add('Дичок', null);
   if (text.includes('посвящ') || text.includes('аша') || text.includes('айз седай') || text.includes('ищущ')) add('Посвящённый', text.includes('аша') ? "Аша'ман (Asha'man)" : text.includes('айз седай') ? 'Айз Седай' : null);
   if (text.includes('лесник') || text.includes('следопыт')) {
