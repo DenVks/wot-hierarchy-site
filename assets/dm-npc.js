@@ -933,6 +933,25 @@ function hierarchyIsRelevantToNpc(h, c){
   if (id === 'far-madding-keepers') return /фар мэддинг|хранител|гильд|guild/.test(hiText);
   return name && hiText.includes(name);
 }
+function hierarchyFeatureSpecificityScore(abilityName, candidate){
+  const raw = String(abilityName || '').toLowerCase().replace(/,/g,'.').replace(/ё/g,'е');
+  const a = candidate && candidate.ability ? candidate.ability : {};
+  const hay = [a.name, a.rank, a.path].concat(a.aliases || []).join(' ').toLowerCase().replace(/,/g,'.').replace(/ё/g,'е');
+  let score = 0;
+  // Disambiguate numeric hierarchy growth rows that normalize to short keys like "оз".
+  ['×1.5','x1.5','×2.0','×2','x2.0','x2','×2.5','x2.5','×3.5','x3.5'].forEach(tok => {
+    if(raw.includes(tok)) score += hay.includes(tok) ? 40 : -20;
+  });
+  ['кд +2','кд плюс 2','кд +3','кд плюс 3','кд +4','кд плюс 4','кд +6','кд плюс 6'].forEach(tok => {
+    if(raw.includes(tok)) score += hay.includes(tok.replace(' плюс ',' +')) || hay.includes(tok) ? 30 : -8;
+  });
+  if(/ранг\s*iii|ранг\s*3|клинок воли|накша/.test(raw)) score += /iii|клинок воли|накша/.test(hay) ? 16 : -6;
+  if(/ранг\s*ii|ранг\s*2|хранител/.test(raw)) score += /ii|хранител/.test(hay) ? 16 : -6;
+  if(/преим/.test(raw) && /преим/.test(hay)) score += 8;
+  // Prefer unique abilities over generic growth only when the names are otherwise equally broad.
+  if(String(a.type || '').toLowerCase().includes('уник')) score += 2;
+  return score;
+}
 function findHierarchyFeatureForNpc(c, abilityName){
   const db = window.WOT_HIERARCHY_DB || {hierarchies:[]};
   const qKeys = featureLookupKeys(abilityName);
@@ -945,6 +964,9 @@ function findHierarchyFeatureForNpc(c, abilityName){
       if(keyMatchesRecord(qKeys, rKeys)) candidates.push({hierarchy:h, ability:a});
     });
   });
+  if(candidates.length > 1){
+    candidates.sort((a,b)=>hierarchyFeatureSpecificityScore(abilityName,b)-hierarchyFeatureSpecificityScore(abilityName,a));
+  }
   return candidates[0] || null;
 }
 function findFeatureInfoForNpc(c, abilityName){
