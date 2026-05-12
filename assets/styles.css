@@ -3166,3 +3166,90 @@ nav.sitenav .inner{overflow:visible;}
 .theme-shara-page .formula-box{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.55;color:var(--ink);background:rgba(0,0,0,.22);border:1px solid rgba(201,169,97,.16);border-radius:6px;padding:12px 14px;margin:10px 0;overflow:auto}
 @media(max-width:900px){.theme-shara-page .mechanics-grid{grid-template-columns:1fr}}
 @media(max-width:720px){.theme-shara-page .hero{grid-template-columns:1fr;padding:110px 18px 48px}.theme-shara-page .sigilbox{justify-self:start}.theme-shara-page .toc{padding:0 18px}}
+
+
+/* v101 — hierarchy overview: fourth system and nation-style hierarchy pages */
+:root{--c-shara:#8fd06a;--c-shara-soft:rgba(143,208,106,.16);}
+.detail-panel.shara{border-color:rgba(143,208,106,.34);background:linear-gradient(180deg,rgba(143,208,106,.075),rgba(0,0,0,.20));}
+.detail-panel.shara .symbol{color:var(--c-shara);background:radial-gradient(circle at center,rgba(143,208,106,.16),transparent 70%);}
+.detail-panel.shara h3,.detail-panel.shara h4,.detail-panel.shara .rung-tier,.detail-panel.shara .ab-rank{color:var(--c-shara);}
+.detail-panel.shara .rung{border-color:rgba(143,208,106,.20);}
+.detail-panel.shara .rung-tier{border-color:rgba(143,208,106,.30);background:rgba(143,208,106,.08);}
+.detail-panel.shara .ability-item{border-color:rgba(143,208,106,.18);}
+.detail-panel.shara a{color:#bdf0a6;}
+
+.theme-unity-page .hero,
+.theme-throne-page .hero,
+.theme-keepers-page .hero,
+.theme-shara-page .hero{max-width:1040px;margin:22px auto 24px;padding:86px 28px 52px;border-radius:24px;overflow:hidden;}
+.theme-unity-page .toc,
+.theme-throne-page .toc,
+.theme-keepers-page .toc,
+.theme-shara-page .toc{max-width:1040px;margin:0 auto 22px;padding:0 28px;}
+.theme-unity-page .toc .inner,
+.theme-throne-page .toc .inner,
+.theme-keepers-page .toc .inner,
+.theme-shara-page .toc .inner{justify-content:flex-start;}
+.theme-unity-page section .wrap,
+.theme-throne-page section .wrap,
+.theme-keepers-page section .wrap,
+.theme-shara-page section .wrap{max-width:1040px;margin:0 auto;padding:0 28px;}
+.theme-unity-page .section-block,
+.theme-throne-page .section-block,
+.theme-keepers-page .section-block,
+.theme-shara-page .section-block{margin:0 0 28px;padding:26px 28px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.032),rgba(0,0,0,.18));}
+.theme-unity-page .section-block h3,
+.theme-throne-page .section-block h3,
+.theme-keepers-page .section-block h3,
+.theme-shara-page .section-block h3{font-size:clamp(22px,3vw,30px);line-height:1.2;letter-spacing:.03em;}
+.theme-unity-page .section-block h4,
+.theme-throne-page .section-block h4,
+.theme-keepers-page .section-block h4,
+.theme-shara-page .section-block h4{font-family:'Cinzel',serif;color:var(--gold-bright);font-size:15px;letter-spacing:.10em;text-transform:uppercase;margin:22px 0 12px;}
+.theme-unity-page .panel.prose p,
+.theme-throne-page .panel.prose p,
+.theme-keepers-page .panel.prose p,
+.theme-shara-page .panel.prose p{font-size:16.5px;line-height:1.82;margin-bottom:14px;}
+.theme-unity-page .rank-table-wrap,
+.theme-throne-page .rank-table-wrap,
+.theme-keepers-page .rank-table-wrap,
+.theme-shara-page .rank-table-wrap{border-radius:18px;margin:18px 0 28px;}
+.theme-unity-page .rank-table,
+.theme-throne-page .rank-table,
+.theme-keepers-page .rank-table,
+.theme-shara-page .rank-table{min-width:860px;}
+.theme-unity-page footer.footer,
+.theme-throne-page footer.footer,
+.theme-keepers-page footer.footer,
+.theme-shara-page footer.footer{max-width:1040px;margin:40px auto 0;padding-left:28px;padding-right:28px;}
+@media(max-width:760px){
+  .theme-unity-page .hero,
+  .theme-throne-page .hero,
+  .theme-keepers-page .hero,
+  .theme-shara-page .hero{margin:16px 14px 18px;padding:64px 18px 36px;border-radius:18px;grid-template-columns:1fr;}
+  .theme-unity-page .sigilbox,
+  .theme-throne-page .sigilbox,
+  .theme-keepers-page .sigilbox,
+  .theme-shara-page .sigilbox{justify-self:start;max-width:120px;}
+  .theme-unity-page .toc,
+  .theme-throne-page .toc,
+  .theme-keepers-page .toc,
+  .theme-shara-page .toc{padding:0 16px;}
+  .theme-unity-page .toc a,
+  .theme-throne-page .toc a,
+  .theme-keepers-page .toc a,
+  .theme-shara-page .toc a{font-size:9px;letter-spacing:.14em;padding:9px 10px;}
+  .theme-unity-page section .wrap,
+  .theme-throne-page section .wrap,
+  .theme-keepers-page section .wrap,
+  .theme-shara-page section .wrap{padding:0 16px;}
+  .theme-unity-page .section-block,
+  .theme-throne-page .section-block,
+  .theme-keepers-page .section-block,
+  .theme-shara-page .section-block{padding:20px 16px;border-radius:16px;}
+  .theme-unity-page .panel.prose p,
+  .theme-throne-page .panel.prose p,
+  .theme-keepers-page .panel.prose p,
+  .theme-shara-page .panel.prose p{font-size:15.8px;line-height:1.72;}
+  .detail-panel.shara .rank-ladder,.detail-panel.shara .ability-grid{grid-template-columns:1fr;}
+}
