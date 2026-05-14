@@ -1,1 +1,1 @@
-v106 — spell composite damage dice fix
+v107 — canonical chronicles, uploaded artwork, navigation labels fix

@@ -3282,3 +3282,16 @@ nav.sitenav .inner{overflow:visible;}
   .ritual-hero-art{padding:0 14px;margin-bottom:26px;}
   .ritual-hero-art img{max-height:300px;}
 }
+
+
+/* ==== v107 canonical fixes: chronicles polish, uploaded artwork, navigation consistency ==== */
+.theme-chronicle-page .page-body{max-width:1180px;margin:0 auto;padding-left:22px;padding-right:22px;}
+.theme-chronicle-page .page-header{max-width:1040px;margin-left:auto;margin-right:auto;}
+.theme-chronicle-page .chapter-nav{max-width:1040px;margin-left:auto;margin-right:auto;}
+.theme-chronicle-page .chapter.narrow{max-width:1040px;margin-left:auto;margin-right:auto;}
+.theme-chronicle-page .chapter-head{border:1px solid rgba(201,169,97,.16);border-radius:24px;background:linear-gradient(180deg,rgba(24,19,17,.72),rgba(12,10,12,.72));padding:24px 26px;margin-bottom:20px;box-shadow:0 18px 46px rgba(0,0,0,.22);}
+.theme-chronicle-page .chapter-roman{color:var(--gold);}
+.theme-chronicle-page .nation-quote{max-width:1040px;border-left:3px solid var(--gold);}
+.lore-side-art--contain img[src$="pattern-sphere.png"]{object-fit:contain;object-position:center;background:radial-gradient(circle at 50% 45%,rgba(180,180,190,.12),rgba(10,9,12,.88) 62%,rgba(5,4,6,.96));padding:0;}
+.ritual-hero-art img[src$="seanchan-obelisk.png"]{object-position:center center;max-height:520px;}
+@media(max-width:760px){.theme-chronicle-page .page-body{padding-left:14px;padding-right:14px}.theme-chronicle-page .chapter-head{padding:18px 16px;border-radius:18px}.ritual-hero-art img[src$="seanchan-obelisk.png"]{max-height:320px}}

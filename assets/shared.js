@@ -21,7 +21,7 @@
 (function(){const path=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.nav-links a').forEach(a=>{const href=a.getAttribute('href');a.classList.toggle('active',href===path);});})();
 
 
-/* ==== v52: Правила dropdown after Главная; stable hover bridge ==== */
+/* ==== v107: Правила dropdown after Главная; stable hover bridge; rituals included ==== */
 (function(){
   'use strict';
   const navLinks = document.querySelector('.nav-links');
@@ -37,7 +37,8 @@
     {href:'madding.html', label:'Хранители'},
     {href:'shara-will.html', label:'Единая Воля Шары'},
     {href:'hierarchy-wall.html', label:'Иерархия Стены'},
-    {href:'order.html', label:'Орден'}
+    {href:'order.html', label:'Орден'},
+    {href:'rituals.html', label:'Ритуалы'}
   ];
   window.WOT_RULE_ITEMS = ruleItems.slice();
   const groupedPages = new Set(ruleItems.map(i => i.href.split('#')[0]));
