@@ -1,1 +1,1 @@
-v105 — general style polish, hierarchy title fix, citadel sphere image fix, rituals seanchan art
+v106 — spell composite damage dice fix

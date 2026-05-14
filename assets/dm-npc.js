@@ -329,8 +329,10 @@ function extractSpellDamageExpr(dmgExpr) {
     raw = variants.length ? variants[variants.length - 1] : raw;
   }
   raw = normalizeDamageExpr(raw).replace(/^\+/, '').trim();
-  const parts = raw.match(/\d+к\d+(?:[+-]\d+)?(?:\+\d+к\d+(?:[+-]\d+)?)*/);
-  return parts ? parts[0] : '';
+  // v106: не позволяем модификатору вида +3 поглощать начало dice-term +3к8.
+  // Поддерживаем составные формулы: 2к8+3к8, 3к8+3к8, 5к6+3к6, а также плоские модификаторы: 2к8+3.
+  const parts = raw.match(/\d+к\d+(?:(?:\s*[+-]\s*)(?:\d+к\d+|\d+(?!\s*к)))*/);
+  return parts ? parts[0].replace(/\s+/g, '') : '';
 }
 
 function resetSpellDamageButton(btn) {
@@ -350,8 +352,8 @@ function rollSpellDamage(dmgExpr, label, resultTarget) {
   if (!cleanExpr) return;
 
   const diceParts = (cleanExpr.match(/\d+к\d+/g) || []);
-  const flatBonusMatches = cleanExpr.match(/\+\d+(?!к)/g) || [];
-  const flatBonus = flatBonusMatches.reduce((s,b) => s + parseInt(b.replace('+',''), 10), 0);
+  const flatBonusMatches = cleanExpr.match(/[+-]\d+(?!к)/g) || [];
+  const flatBonus = flatBonusMatches.reduce((s,b) => s + parseInt(b, 10), 0);
   let sum = 0;
   const detailParts = [];
 
