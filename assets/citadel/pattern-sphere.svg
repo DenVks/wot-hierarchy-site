@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1400" role="img" aria-labelledby="title desc">
+  <title id="title">Сфера Узора — Сердце Цитадели</title>
+  <desc id="desc">Тёмная парящая сфера с треугольными углублениями и красноватыми линиями Узора.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="43%" r="68%"><stop offset="0" stop-color="#30213a"/><stop offset="0.38" stop-color="#130f19"/><stop offset="1" stop-color="#050407"/></radialGradient>
+    <radialGradient id="sphere" cx="42%" cy="34%" r="63%"><stop offset="0" stop-color="#4d4457"/><stop offset="0.32" stop-color="#221b28"/><stop offset="0.72" stop-color="#09070c"/><stop offset="1" stop-color="#020104"/></radialGradient>
+    <radialGradient id="rim" cx="50%" cy="50%" r="50%"><stop offset="0.78" stop-color="#000" stop-opacity="0"/><stop offset="0.91" stop-color="#8b5cf6" stop-opacity="0.18"/><stop offset="1" stop-color="#f87171" stop-opacity="0.45"/></radialGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="16"/></filter>
+    <clipPath id="orbClip"><circle cx="700" cy="700" r="430"/></clipPath>
+  </defs>
+  <rect width="1400" height="1400" fill="url(#bg)"/>
+  <circle cx="700" cy="700" r="540" fill="#8b5cf6" opacity=".11" filter="url(#soft)"/>
+  <circle cx="700" cy="700" r="452" fill="#000" opacity=".62" filter="url(#soft)"/>
+  <g clip-path="url(#orbClip)">
+    <circle cx="700" cy="700" r="430" fill="url(#sphere)"/>
+    <g stroke="#ef4444" stroke-width="3" opacity=".62" filter="url(#glow)">
+      <path d="M330 620 C515 530 730 560 1068 482" fill="none"/>
+      <path d="M345 760 C566 690 790 720 1080 635" fill="none"/>
+      <path d="M395 910 C560 820 830 842 1032 805" fill="none"/>
+      <path d="M500 318 C560 520 555 760 438 1028" fill="none"/>
+      <path d="M704 272 C650 530 682 780 790 1120" fill="none"/>
+      <path d="M908 330 C835 568 876 802 1018 1000" fill="none"/>
+    </g>
+    <g fill="#050407" stroke="#b45353" stroke-width="2" opacity=".74">
+      <path d="M612 466 l82 -42 l71 62 l-42 86 l-94 -6z"/>
+      <path d="M850 560 l92 -26 l55 76 l-52 80 l-94 -18z"/>
+      <path d="M477 678 l90 -36 l68 62 l-33 92 l-102 10z"/>
+      <path d="M704 735 l96 -46 l84 76 l-50 104 l-114 -14z"/>
+      <path d="M552 916 l84 -28 l68 72 l-52 72 l-90 -14z"/>
+      <path d="M902 882 l76 -26 l60 62 l-40 70 l-86 -8z"/>
+      <path d="M588 292 l58 -20 l42 38 l-24 54 l-64 -4z" opacity=".55"/>
+      <path d="M966 376 l58 -14 l34 48 l-34 50 l-62 -8z" opacity=".55"/>
+    </g>
+    <g fill="none" stroke="#fca5a5" stroke-width="1.2" opacity=".36">
+      <path d="M418 493 C548 382 737 365 985 410"/>
+      <path d="M376 836 C572 755 808 768 1052 710"/>
+      <path d="M495 1057 C650 970 850 1000 978 926"/>
+    </g>
+    <circle cx="560" cy="430" r="95" fill="#f3e8ff" opacity=".065" filter="url(#soft)"/>
+    <circle cx="700" cy="700" r="430" fill="url(#rim)"/>
+  </g>
+  <circle cx="700" cy="700" r="430" fill="none" stroke="#e879f9" stroke-width="2" opacity=".22"/>
+  <circle cx="700" cy="700" r="458" fill="none" stroke="#f87171" stroke-width="1.5" opacity=".22"/>
+  <g opacity=".48" stroke="#d8b4fe" stroke-width="1" fill="none">
+    <path d="M175 700 C420 600 980 600 1225 700"/>
+    <path d="M700 175 C600 430 600 970 700 1225"/>
+  </g>
+  <g opacity=".42" fill="#fef3c7">
+    <circle cx="322" cy="356" r="2"/><circle cx="1098" cy="416" r="2"/><circle cx="1170" cy="880" r="2"/><circle cx="250" cy="936" r="1.7"/><circle cx="836" cy="188" r="1.6"/><circle cx="518" cy="1200" r="1.6"/>
+  </g>
+</svg>

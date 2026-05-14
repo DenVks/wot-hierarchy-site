@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Город Шончан и Обелиск Воли</title>
+  <desc id="desc">Стилизованный тёмно-фэнтезийный вид шончанского города с высоким обелиском в центре церемониальной площади.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#10131d"/><stop offset="0.45" stop-color="#1b1719"/><stop offset="1" stop-color="#09080b"/></linearGradient>
+    <radialGradient id="glow" cx="50%" cy="43%" r="50%"><stop offset="0" stop-color="#d4b46a" stop-opacity="0.75"/><stop offset="0.32" stop-color="#a45a3a" stop-opacity="0.24"/><stop offset="1" stop-color="#000000" stop-opacity="0"/></radialGradient>
+    <linearGradient id="obelisk" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a2226"/><stop offset="0.22" stop-color="#5b4a41"/><stop offset="0.5" stop-color="#d1b775"/><stop offset="0.78" stop-color="#4b3333"/><stop offset="1" stop-color="#17151a"/></linearGradient>
+    <linearGradient id="goldline" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9f7440"/><stop offset="0.5" stop-color="#f1d58b"/><stop offset="1" stop-color="#8a5333"/></linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="8"/></filter>
+    <filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#000" flood-opacity="0.55"/></filter>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect width="1600" height="900" fill="url(#glow)"/>
+  <g opacity="0.45" filter="url(#soft)">
+    <path d="M0 260 C240 210 330 275 520 235 C735 190 910 155 1135 220 C1325 275 1460 215 1600 245 L1600 0 L0 0 Z" fill="#272436"/>
+    <path d="M0 392 C280 340 480 384 650 345 C900 288 1110 330 1600 305 L1600 0 L0 0 Z" fill="#12131d" opacity=".8"/>
+  </g>
+  <g opacity="0.22" stroke="#d6b978" stroke-width="1">
+    <path d="M170 175 L210 690"/><path d="M310 120 L340 705"/><path d="M1270 125 L1230 710"/><path d="M1430 185 L1388 695"/>
+  </g>
+  <g id="city" filter="url(#shadow)">
+    <path d="M0 600 L120 560 L210 598 L300 520 L420 595 L525 540 L640 596 L745 525 L850 598 L950 552 L1060 595 L1165 510 L1280 590 L1390 545 L1600 610 L1600 900 L0 900 Z" fill="#09080b"/>
+    <g fill="#161116" stroke="#3d3027" stroke-width="2" opacity="0.98">
+      <path d="M80 585 h92 v214 h-92z"/><path d="M210 550 h130 v250 h-130z"/><path d="M373 600 h88 v200 h-88z"/><path d="M500 570 h120 v230 h-120z"/><path d="M965 573 h118 v227 h-118z"/><path d="M1122 545 h132 v255 h-132z"/><path d="M1295 585 h96 v215 h-96z"/><path d="M1430 560 h130 v240 h-130z"/>
+      <path d="M210 550 l65-70 l65 70"/><path d="M1122 545 l66-86 l66 86"/><path d="M1430 560 l64-72 l66 72"/>
+    </g>
+    <g fill="none" stroke="#7a5a36" stroke-width="2" opacity="0.58">
+      <path d="M96 630 h58M96 682 h58M96 734 h58"/><path d="M232 610 h86M232 664 h86M232 720 h86"/><path d="M522 620 h76M522 674 h76M522 728 h76"/><path d="M1148 610 h82M1148 665 h82M1148 725 h82"/><path d="M1454 620 h82M1454 676 h82M1454 735 h82"/>
+    </g>
+  </g>
+  <g id="obelisk-group" filter="url(#shadow)">
+    <path d="M742 118 L800 36 L858 118 L890 735 L710 735 Z" fill="url(#obelisk)" stroke="url(#goldline)" stroke-width="4"/>
+    <path d="M800 36 L802 735" stroke="#ffe3a0" stroke-width="2" opacity=".7"/>
+    <path d="M743 121 L858 121" stroke="#f0d58b" stroke-width="3" opacity=".5"/>
+    <path d="M725 735 h150 l55 90 h-260z" fill="#151014" stroke="#8a653b" stroke-width="4"/>
+    <path d="M760 250 C785 236 815 236 840 250" fill="none" stroke="#d6b978" stroke-width="3" opacity=".6"/>
+    <path d="M752 330 C782 312 818 312 848 330" fill="none" stroke="#d6b978" stroke-width="3" opacity=".45"/>
+    <path d="M742 433 C780 410 820 410 858 433" fill="none" stroke="#d6b978" stroke-width="3" opacity=".35"/>
+    <circle cx="800" cy="154" r="12" fill="#f1d58b" opacity=".75"/>
+    <circle cx="800" cy="154" r="42" fill="#d4b46a" opacity=".18" filter="url(#soft)"/>
+  </g>
+  <g id="plaza" opacity=".9">
+    <path d="M0 805 C320 740 600 734 800 735 C1060 735 1300 750 1600 810 L1600 900 L0 900 Z" fill="#120d0f"/>
+    <path d="M800 745 L460 900 M800 745 L610 900 M800 745 L800 900 M800 745 L990 900 M800 745 L1140 900" stroke="#6a5032" stroke-width="2" opacity=".42"/>
+    <path d="M120 833 C460 784 1140 784 1480 835" fill="none" stroke="#9f7440" stroke-width="3" opacity=".25"/>
+  </g>
+  <g id="figures" fill="#050405" opacity=".72">
+    <ellipse cx="545" cy="820" rx="18" ry="44"/><ellipse cx="585" cy="832" rx="13" ry="32"/><ellipse cx="1028" cy="818" rx="18" ry="43"/><ellipse cx="1072" cy="834" rx="13" ry="31"/><ellipse cx="704" cy="854" rx="10" ry="25"/><ellipse cx="896" cy="854" rx="10" ry="25"/>
+  </g>
+  <g opacity=".33" fill="#f1d58b">
+    <circle cx="248" cy="590" r="2"/><circle cx="318" cy="608" r="2"/><circle cx="1210" cy="600" r="2"/><circle cx="1450" cy="615" r="2"/><circle cx="522" cy="640" r="1.6"/><circle cx="1085" cy="638" r="1.6"/>
+  </g>
+  <rect x="0" y="0" width="1600" height="900" fill="none" stroke="#3b2b1d" stroke-width="18" opacity=".35"/>
+</svg>

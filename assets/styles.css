@@ -3253,3 +3253,32 @@ nav.sitenav .inner{overflow:visible;}
   .theme-shara-page .panel.prose p{font-size:15.8px;line-height:1.72;}
   .detail-panel.shara .rank-ladder,.detail-panel.shara .ability-grid{grid-template-columns:1fr;}
 }
+
+/* ==== v105 canonical polish: chronicles, contained artwork, ritual image ==== */
+.chronicle-layout{max-width:1040px;margin:0 auto 70px;padding:0 22px;}
+.chronicle-header{max-width:1040px;margin-left:auto;margin-right:auto;}
+.chronicle-nav{max-width:1040px;margin-left:auto;margin-right:auto;}
+.canonical-timeline{position:relative;margin:28px 0 14px;display:grid;gap:16px;}
+.canonical-timeline::before{content:"";position:absolute;left:108px;top:8px;bottom:8px;width:1px;background:linear-gradient(180deg,transparent,rgba(201,169,97,.45),transparent);}
+.canonical-timeline .chronicle-item{position:relative;display:grid;grid-template-columns:180px minmax(0,1fr);gap:22px;border:1px solid rgba(201,169,97,.18);background:linear-gradient(180deg,rgba(24,19,17,.74),rgba(12,10,12,.78));border-radius:22px;padding:18px 20px;box-shadow:0 18px 46px rgba(0,0,0,.24);}
+.canonical-timeline .chronicle-year{font-family:'Cinzel',serif;color:var(--gold-bright);font-size:14px;letter-spacing:.08em;text-transform:uppercase;align-self:start;position:relative;}
+.canonical-timeline .chronicle-year::after{content:"";position:absolute;right:-34px;top:4px;width:11px;height:11px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 5px rgba(201,169,97,.12),0 0 20px rgba(201,169,97,.38);}
+.canonical-timeline .chronicle-body h4{margin:0 0 8px;font-family:'Cinzel',serif;font-size:18px;color:var(--ink);letter-spacing:.02em;}
+.canonical-timeline .chronicle-body p{margin:0;color:var(--ink-soft);font-size:16px;line-height:1.74;}
+.chronicle-cards{max-width:none;margin-top:22px;}
+.lore-side-art--contain img{object-fit:contain;background:radial-gradient(circle at 50% 42%,rgba(167,139,250,.13),rgba(10,9,12,.86) 58%,rgba(5,4,6,.96));padding:10px;}
+.cit-hero .lore-side-art--contain img{object-fit:contain;max-height:420px;}
+.ritual-hero-art{max-width:1040px;margin:0 auto 34px;padding:0 22px;}
+.ritual-hero-art figure{margin:0;border:1px solid rgba(201,169,97,.20);border-radius:24px;overflow:hidden;background:linear-gradient(180deg,rgba(23,18,16,.92),rgba(8,7,10,.96));box-shadow:0 22px 60px rgba(0,0,0,.34);}
+.ritual-hero-art img{display:block;width:100%;max-height:430px;object-fit:cover;object-position:center;filter:saturate(.92) contrast(1.04) brightness(.9);}
+.ritual-hero-art figcaption{padding:10px 16px 12px;font-family:'Cinzel',serif;font-size:11px;line-height:1.4;letter-spacing:.11em;text-transform:uppercase;color:rgba(232,200,120,.56);background:rgba(0,0,0,.18);}
+@media (max-width:760px){
+  .chronicle-layout{padding:0 14px;}
+  .canonical-timeline::before{left:26px;}
+  .canonical-timeline .chronicle-item{grid-template-columns:1fr;gap:8px;padding:16px 16px 16px 48px;border-radius:18px;}
+  .canonical-timeline .chronicle-year::after{left:-27px;right:auto;top:3px;}
+  .canonical-timeline .chronicle-body h4{font-size:16px;}
+  .canonical-timeline .chronicle-body p{font-size:15.5px;line-height:1.66;}
+  .ritual-hero-art{padding:0 14px;margin-bottom:26px;}
+  .ritual-hero-art img{max-height:300px;}
+}
