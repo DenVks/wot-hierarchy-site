@@ -335,39 +335,52 @@ function extractSpellDamageExpr(dmgExpr) {
 
 function resetSpellDamageButton(btn) {
   if (!btn) return;
+  const cleanExpr = extractSpellDamageExpr(btn.getAttribute('data-dmg') || '');
   btn.textContent = '🎲';
   btn.classList.remove('rolled');
   btn.removeAttribute('data-last-result');
-  btn.title = 'ЛКМ — бросить урон; ПКМ или Shift+ЛКМ — сбросить результат';
+  btn.removeAttribute('data-last-detail');
+  btn.title = cleanExpr
+    ? 'ЛКМ — бросить весь урон: ' + cleanExpr + '; ПКМ или Shift+ЛКМ — сбросить результат'
+    : 'ЛКМ — бросить урон; ПКМ или Shift+ЛКМ — сбросить результат';
 }
 
 function rollSpellDamage(dmgExpr, label, resultTarget) {
   const cleanExpr = extractSpellDamageExpr(dmgExpr);
   if (!cleanExpr) return;
 
-  const parts = (cleanExpr.match(/\d+к\d+/g) || []);
-  const bonusM = cleanExpr.match(/\+\d+(?!к)/g) || [];
-  const bonus = bonusM.reduce((s,b) => s + parseInt(b.replace('+','')), 0);
+  const diceParts = (cleanExpr.match(/\d+к\d+/g) || []);
+  const flatBonusMatches = cleanExpr.match(/\+\d+(?!к)/g) || [];
+  const flatBonus = flatBonusMatches.reduce((s,b) => s + parseInt(b.replace('+',''), 10), 0);
   let sum = 0;
-  parts.forEach(p => {
-    const pm = p.match(/(\d+)к(\d+)/);
-    if (!pm) return;
-    const rr = roll(parseInt(pm[1]), parseInt(pm[2]));
-    sum += rr.sum;
-  });
-  sum += bonus;
+  const detailParts = [];
 
-  // v49: без модального окна и без соседнего результата.
-  // Итог виден только в самой кнопке: "🎲 37".
+  diceParts.forEach(part => {
+    const pm = part.match(/(\d+)к(\d+)/);
+    if (!pm) return;
+    const rr = roll(parseInt(pm[1], 10), parseInt(pm[2], 10));
+    sum += rr.sum;
+    detailParts.push(part + '[' + rr.results.join('+') + ']');
+  });
+  if (flatBonus) {
+    sum += flatBonus;
+    detailParts.push((flatBonus > 0 ? '+' : '') + flatBonus);
+  }
+
+  const detail = detailParts.join(' + ').replace(/ \+ \+/g, ' + ');
+
+  // v104: составной урон плетения показывается явно.
+  // Например: 2к8+3к8 бросается целиком, а не только первая группа костей.
   let btn = null;
   if (resultTarget && resultTarget.nodeType === 1) {
     btn = resultTarget.tagName === 'BUTTON' ? resultTarget : resultTarget.closest('button');
   }
   if (btn) {
-    btn.textContent = '🎲 ' + sum;
+    btn.textContent = '🎲 ' + sum + ' [' + cleanExpr + ']';
     btn.classList.add('rolled');
     btn.setAttribute('data-last-result', String(sum));
-    btn.title = (label || 'Урон плетения') + ': ' + sum + '. ПКМ или Shift+ЛКМ — сбросить.';
+    btn.setAttribute('data-last-detail', detail);
+    btn.title = (label || 'Урон плетения') + ': ' + sum + ' = ' + detail + '. ПКМ или Shift+ЛКМ — сбросить.';
   }
 }
 
@@ -378,7 +391,7 @@ function escAttr(v) {
 function spellDamageButton(dmgExpr, label) {
   const cleanExpr = extractSpellDamageExpr(dmgExpr);
   if (!cleanExpr) return '';
-  return ' <button class="sp-dmg-roll" type="button" title="ЛКМ — бросить урон; ПКМ или Shift+ЛКМ — сбросить результат" data-dmg="' + escAttr(dmgExpr) + '" data-label="' + escAttr(label || 'Урон плетения') + '">🎲</button>';
+  return ' <button class="sp-dmg-roll" type="button" title="ЛКМ — бросить весь урон: ' + escAttr(cleanExpr) + '; ПКМ или Shift+ЛКМ — сбросить результат" data-dmg="' + escAttr(dmgExpr) + '" data-label="' + escAttr(label || 'Урон плетения') + '">🎲</button>';
 }
 
 // Делегированный обработчик кнопок урона плетений.

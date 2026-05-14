@@ -1,1 +1,1 @@
-v103 — shara will NPC export
+v104 — channeler talents and spell damage roll fix
