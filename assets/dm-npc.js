@@ -813,7 +813,7 @@ function featureLookupKeys(name){
   if (/^стиль\s+оборона/.test(b) || /^стиль\s+защита/.test(b)) { keys.add('защита'); keys.add('защита defense'); }
   if (/^стиль\s+стрельб/.test(b)) { keys.add('стрельба из лука'); keys.add('стрельба из лука archery'); keys.add('стиль боя'); }
   if (/^стиль\s+дуэль/.test(b)) { keys.add('дуэль'); keys.add('дуэль dueling'); }
-  if (/^стиль\s+бой с большим оружием/.test(b)) { keys.add('бой с большим оружием'); keys.add('бой с большим оружием great weapon fighting'); }
+  if (/^стиль\s+бой с большим оружием/.test(b) || /^стиль\s+великий воин/.test(b) || /^стиль\s+сражение большим оружием/.test(b)) { keys.add('бой с большим оружием'); keys.add('бой с большим оружием great weapon fighting'); keys.add('сражение большим оружием'); }
   if (/^стиль\s+бой двумя оружиями/.test(b)) { keys.add('бой двумя оружиями'); keys.add('бой двумя оружиями two weapon fighting'); }
   if (/^стиль боя/.test(b)) keys.add('стиль боя');
   // Common abbreviated labels used in NPC cards.
@@ -821,7 +821,7 @@ function featureLookupKeys(name){
   if (/улучш.*крит/.test(b)) { keys.add('улучшенный критический удар'); keys.add('улучшенные критические попадания'); }
   if (/превосход.*крит/.test(b)) keys.add('превосходные критические попадания');
   if (b === 'дополнительная атака') keys.add('дополнительная атака extra attack');
-  if (b === 'мастер бо') keys.add('мастер большого оружия');
+  if (b === 'мастер бо' || /\bмбо\b/.test(b)) keys.add('мастер большого оружия');
   if (/кости превосходства/.test(b)) keys.add('боевое превосходство');
   if (/защитный удар/.test(b)) keys.add('парирование');
   if (/отталк/.test(b)) keys.add('толкающая атака');
@@ -829,6 +829,12 @@ function featureLookupKeys(name){
   if (/угрожающ/.test(b)) keys.add('атака с угрозой');
   if (/ответн/.test(b)) keys.add('ответный удар');
   if (/познай врага/.test(b) || /познай своего врага/.test(b)) keys.add('познай своего врага');
+
+  // Channeler / Wilder shorthand aliases used in NPC cards.
+  if (/^блок\b/.test(b)) keys.add('блокировка');
+  if (/исключ.*элементализм/.test(b)) keys.add('чувствительность к элементализму');
+  if (/исключ.*иллюз/.test(b)) keys.add('чувствительность к иллюзиям');
+  if (/дополнительн.*талант/.test(b) && /соедин/.test(b)) { keys.add('дополнительный талант'); keys.add('склонность к соединению'); }
   return Array.from(keys).filter(Boolean);
 }
 function keyMatchesRecord(queryKeys, recordKeys){
