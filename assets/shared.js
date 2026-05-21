@@ -140,7 +140,7 @@
 })();
 
 
-/* ==== v108: Государства и народы dropdown ==== */
+/* ==== v109: Государства и народы dropdown ==== */
 (function(){
   'use strict';
   const navLinks = document.querySelector('.nav-links');
@@ -151,6 +151,7 @@
     {href:'aiel.html', label:'Айил'},
     {href:'tuataan.html', label:'Туата’ан'},
     {href:'sea-folk.html', label:'Морской народ'},
+    {href:'tremalkin.html', label:'Тремалкин'},
     {href:'daaltian.html', label:"Дааль'тиан"},
     {href:'arafel.html', label:'Арафел'},
     {href:'kandor.html', label:'Кандор'},
