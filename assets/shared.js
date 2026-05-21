@@ -21,7 +21,7 @@
 (function(){const path=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.nav-links a').forEach(a=>{const href=a.getAttribute('href');a.classList.toggle('active',href===path);});})();
 
 
-/* ==== v107: Правила dropdown after Главная; stable hover bridge; rituals included ==== */
+/* ==== v108: Правила dropdown after Главная; stable hover bridge; rituals included ==== */
 (function(){
   'use strict';
   const navLinks = document.querySelector('.nav-links');
@@ -140,7 +140,7 @@
 })();
 
 
-/* ==== v74: Государства и народы dropdown ==== */
+/* ==== v108: Государства и народы dropdown ==== */
 (function(){
   'use strict';
   const navLinks = document.querySelector('.nav-links');
@@ -150,6 +150,8 @@
   const nationItems = [
     {href:'aiel.html', label:'Айил'},
     {href:'tuataan.html', label:'Туата’ан'},
+    {href:'sea-folk.html', label:'Морской народ'},
+    {href:'daaltian.html', label:"Дааль'тиан"},
     {href:'arafel.html', label:'Арафел'},
     {href:'kandor.html', label:'Кандор'},
     {href:'shienar.html', label:'Шайнар'},
