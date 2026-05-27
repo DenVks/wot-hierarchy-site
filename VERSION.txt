@@ -1,1 +1,1 @@
-v111 — NPC hierarchy hit dice formula recalculation
+v112 — shara will rank progression correction

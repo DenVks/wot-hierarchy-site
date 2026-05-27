@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Единая Воля Шары</title>
-  <link href="assets/styles.css?v=109" rel="stylesheet"/>
+  <link href="assets/styles.css?v=112" rel="stylesheet"/>
 </head>
 <body class="theme-shara-page">
 <div class="page">
@@ -53,16 +53,16 @@
 
   <section id="s3"><div class="wrap"><div class="panel prose feature reveal section-block">
     <h3>III. Таблица прогрессии рангов</h3>
-    <p>Строки с зелёным оттенком — <strong>Путь Айяд</strong>. Строки с синим оттенком — <strong>Путь Воина</strong>. На рангах I, II и V пути единые. Коэффициент Hit Dice означает: максимум ХП персонажа пересчитывается как базовые Hit Dice с учётом модификатора Телосложения × коэффициент ранга, плюс фиксированный бонус сверху, если он указан. Бонус КД — натуральная броня от накопленной Воли; суммируется с доспехами, но не с другими источниками натуральной брони.</p>
-    <div class="formula-box">Пример: Воительница, Воин 10-го уровня, Тел 20 (+5). Базовые Hit Dice: 10к10 → среднее 55 + 50 от Телосложения = 105 ХП. Ранг IV: коэффициент ×2.5 → 105 × 2.5 = 262 ХП максимум.</div>
-    <div class="table-wrap"><table class="rank-table"><thead><tr><th>Ранг</th><th>Путь / титул</th><th>Характеристики</th><th>Скорость</th><th>Инициатива</th><th>Спасброски</th><th>КД</th><th>ХП</th><th>Направляющие / воин</th></tr></thead><tbody>
-      <tr class="path-common"><td>I</td><td><span class="path-label common-label">О / Отдающие</span></td><td>−1 Тел. <br><small>штраф дара</small></td><td>30 фт</td><td>—</td><td>—</td><td>—</td><td>−5 макс. ХП<br><small>поток уходит вверх</small></td><td>—</td></tr>
-      <tr class="path-common"><td>II</td><td><span class="path-label common-label">Хранители Предначертания</span></td><td>+2 Тел, +2 Муд</td><td>30 фт</td><td>+2</td><td>+1 ко всем</td><td>+2</td><td>×1.5 Hit Dice</td><td>+1 к DC<br>+2 доп. плетения</td></tr>
-      <tr class="path-ayad"><td>III</td><td><span class="path-label ayad-label">Накша / Путь Айяд</span></td><td>+2 Тел, +2 Сил</td><td>30 фт</td><td>+2, преимущество</td><td>Преим. на Тел</td><td>+3</td><td>×2.0 Hit Dice</td><td>+2 к DC<br>+3 доп. плетения</td></tr>
-      <tr class="path-warrior"><td>III</td><td><span class="path-label warrior-label">Клинок Воли / Путь Воина</span></td><td>+2 Тел, +2 Сил</td><td>30 фт</td><td>+2, преимущество</td><td>Преим. на Тел</td><td>+3</td><td>×2.0 Hit Dice</td><td>+2 к атаке<br>+1к6 силового урона</td></tr>
-      <tr class="path-ayad"><td>IV</td><td><span class="path-label ayad-label">Накша-благословенная / Путь Айяд</span></td><td>+2 Тел, +2 Хар</td><td>35 фт <small>(+5)</small></td><td>+3, преимущество</td><td>Иммунитет к Испугу</td><td>+4</td><td>×2.5 Hit Dice</td><td>+3 к DC<br>+4 доп. плетения</td></tr>
-      <tr class="path-warrior"><td>IV</td><td><span class="path-label warrior-label">Воитель Предначертания / Путь Воина</span></td><td>+2 Тел, +2 Хар</td><td>35 фт <small>(+5)</small></td><td>+3, преимущество</td><td>Иммунитет к Испугу</td><td>+4</td><td>×2.5 Hit Dice</td><td>+3 к атаке<br>+1к8 силового урона<br>Аура Воина</td></tr>
-      <tr class="path-common"><td>V</td><td><span class="path-label common-label">Ш’боан / Ш’ботай</span><br><small>Двойной Сосуд</small></td><td>+2 Тел, +2 Муд</td><td>40 фт <small>(+10)</small></td><td>+6, преимущество</td><td>Легендарная устойчивость 3/день</td><td>+6</td><td>×3.5 Hit Dice<br>+80 ХП<br>Реген. 20/раунд</td><td>+5 к DC<br>+5 доп. плетений</td></tr>
+    <p>Строки с зелёным оттенком — <strong>Путь Айяд</strong>. Строки с синим оттенком — <strong>Путь Воина</strong>. На рангах I, II и V пути единые. Значения бонусов в таблице являются <strong>накопительными</strong>: если на предыдущем ранге было +2, а на новом стало +3, это означает, что при переходе значение увеличилось ещё на +1. Бонус КД — натуральная броня от накопленной Воли; суммируется с доспехами, но не с другими источниками натуральной брони.</p>
+    <div class="formula-box">Формула ХП для рангов с коэффициентом Hit Dice: <strong>((HD_макс + (N−1) × HD_округл) × коэффициент) + N × модификатор Телосложения + другие модификаторы</strong>. Коэффициент применяется только к части Hit Dice; модификатор Телосложения не умножается.</div>
+    <div class="table-wrap"><table class="rank-table shara-rank-progression"><thead><tr><th>Ранг</th><th>Путь / титул</th><th>+Характеристики<br><small>(накопительно)</small></th><th>Скорость</th><th>Инициатива</th><th>Спасброски</th><th>Бонус КД</th><th>ХП:<br><small>коэффициент + бонус</small></th><th>Направляющие:<br><small>DC / урон / плетения</small></th></tr></thead><tbody>
+      <tr class="path-common"><td>I</td><td><span class="path-label common-label">О / Отдающие</span></td><td>−1 к Тел.<br><small>штраф дара</small></td><td>30 фт</td><td>—</td><td>—</td><td>—</td><td>−5 макс. ХП<br><small>поток уходит вверх</small></td><td>—</td></tr>
+      <tr class="path-common"><td>II</td><td><span class="path-label common-label">Хранители Предначертания</span></td><td>+2 к двум характеристикам</td><td>—<br><small>30 фт</small></td><td>+2</td><td>+1 ко всем</td><td>+2 КД</td><td>×1.5 Hit Dice</td><td>+1 к DC<br>+2 доп. плетения</td></tr>
+      <tr class="path-ayad"><td>III</td><td><span class="path-label ayad-label">Накша</span><br><small>Путь Айяд</small></td><td>+2 к двум характеристикам</td><td>—<br><small>30 фт</small></td><td>+2, преимущество</td><td>Преим. на Тел</td><td>+3 КД</td><td>×2.0 Hit Dice</td><td>+2 к DC<br>+3 доп. плетения</td></tr>
+      <tr class="path-warrior"><td>III</td><td><span class="path-label warrior-label">Клинок Воли</span><br><small>Путь Воина</small></td><td>+2 к двум характеристикам</td><td>—<br><small>30 фт</small></td><td>+2, преимущество</td><td>Преим. на Тел</td><td>+3 КД</td><td>×2.0 Hit Dice</td><td>+2 к атаке<br>+1к6 к урону<br><small>вместо магии</small></td></tr>
+      <tr class="path-ayad"><td>IV</td><td><span class="path-label ayad-label">Накша-благословенная</span><br><small>Путь Айяд</small></td><td>+2 к двум характеристикам</td><td>—<br><small>30 фт</small></td><td>+3, преимущество</td><td>Имм. к Испугу</td><td>+4 КД</td><td>×2.5 Hit Dice</td><td>+3 к DC<br>+4 доп. плетения</td></tr>
+      <tr class="path-warrior"><td>IV</td><td><span class="path-label warrior-label">Воитель Предначертания</span><br><small>Путь Воина</small></td><td>+2 к двум характеристикам</td><td>+5 фт<br><small>35 фт</small></td><td>+3, преимущество</td><td>Имм. к Испугу</td><td>+4 КД</td><td>×2.5 Hit Dice</td><td>+3 к атаке<br>+1к8 к урону<br>Аура Воина</td></tr>
+      <tr class="path-common"><td>V</td><td><span class="path-label common-label">Ш’боан / Ш’ботай</span><br><small>Двойной Сосуд</small></td><td>+2 к двум характеристикам</td><td>+10 фт<br><small>40 фт</small></td><td>+6, преимущество</td><td>Легенд. устойч.<br>3/день</td><td>+6 КД</td><td>×3.5 Hit Dice<br>+80 ХП бонус<br>Регенер. 20/раунд</td><td>+5 к DC<br>+5 доп. плетений</td></tr>
     </tbody></table></div>
   </div></div></section>
 
