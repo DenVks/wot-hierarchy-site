@@ -153,6 +153,7 @@
     {href:'sea-folk.html', label:'Морской народ'},
     {href:'tremalkin.html', label:'Тремалкин'},
     {href:'daaltian.html', label:"Дааль'тиан"},
+    {href:'land-madmen.html', label:'Земля Безумцев'},
     {href:'arafel.html', label:'Арафел'},
     {href:'kandor.html', label:'Кандор'},
     {href:'shienar.html', label:'Шайнар'},
