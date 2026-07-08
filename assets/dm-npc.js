@@ -824,6 +824,18 @@ function featureLookupKeys(name){
   const base = normalizeFeatureName(raw);
   const keys = new Set([base]);
   const b = base;
+  const rawLow = String(raw || '').toLowerCase().replace(/ё/g,'е');
+  // v120: exact aliases for NPC cards that include a stage marker before an em dash.
+  // normalizeFeatureName intentionally strips text after dash, so keep these raw-string checks.
+  if (/грохочущее\s+пламя/.test(rawLow)) keys.add('грохочущее пламя');
+  if (/прочные\s+плетения/.test(rawLow)) keys.add('прочные плетения');
+  if (/чувствительность\s+к\s+элементализм/.test(rawLow)) keys.add('чувствительность к элементализму');
+  if (/склонность\s+к\s+защит/.test(rawLow)) keys.add('склонность к защите');
+  if (/сопротивление\s+плетениям/.test(rawLow)) keys.add('сопротивление плетениям');
+  if (/\bщит\b/.test(rawLow) && /защит/.test(rawLow)) keys.add('щит');
+  if (/склонность\s+к\s+соедин/.test(rawLow)) keys.add('склонность к соединению');
+  if (/манипуляция\s+разумом/.test(rawLow)) keys.add('манипуляция разумом');
+  if (/эксперт\s+в\s+соедин/.test(rawLow)) keys.add('эксперт в соединении');
   // Explicit fighting-style aliases. This prevents the old bug where "Стиль: ..." matched the first generic "Стиль" row.
   if (/^стиль\s+оборона/.test(b) || /^стиль\s+защита/.test(b)) { keys.add('защита'); keys.add('защита defense'); }
   if (/^стиль\s+стрельб/.test(b)) { keys.add('стрельба из лука'); keys.add('стрельба из лука archery'); keys.add('стиль боя'); }
@@ -1799,7 +1811,7 @@ function renderAngrial(a) {
 <div class="angrial-title">🔮 Ангриал (Уровень ${a.lv})</div>
 <div class="angrial-grid">
 <div class="angrial-stat"><div class="angrial-label">Атака</div><div class="angrial-val">${a.atk}</div></div>
-<div class="angrial-stat"><div class="angrial-label">Доп. урон</div><div class="angrial-val">${a.dmgd}</div></div>
+<div class="angrial-stat"><div class="angrial-label">Доп. кубики</div><div class="angrial-val">${a.dmgd}</div></div>
 <div class="angrial-stat"><div class="angrial-label">Дистанция</div><div class="angrial-val">${a.range}</div></div>
 <div class="angrial-stat"><div class="angrial-label">Площадь</div><div class="angrial-val">${a.area}</div></div>
 </div>

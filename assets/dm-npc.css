@@ -761,3 +761,66 @@ html.auth-lock body > *:not(.auth-overlay){filter:blur(5px);pointer-events:none;
   font-family:'JetBrains Mono',monospace;
   font-size:11px;
 }
+
+/* v124: NPC spell table readability — prevent narrow final description column */
+.sp-table{
+  width:100%;
+  min-width:1120px;
+  table-layout:fixed;
+  border-collapse:collapse;
+}
+.sp-table th,
+.sp-table td{
+  overflow-wrap:break-word;
+  word-break:normal;
+}
+.sp-table th:nth-child(1), .sp-table td:nth-child(1){width:12%;}
+.sp-table th:nth-child(2), .sp-table td:nth-child(2){width:4%;}
+.sp-table th:nth-child(3), .sp-table td:nth-child(3){width:5%;}
+.sp-table th:nth-child(4), .sp-table td:nth-child(4){width:7%;}
+.sp-table th:nth-child(5), .sp-table td:nth-child(5){width:7%;}
+.sp-table th:nth-child(6), .sp-table td:nth-child(6){width:7%;}
+.sp-table th:nth-child(7), .sp-table td:nth-child(7){width:10%;}
+.sp-table th:nth-child(8), .sp-table td:nth-child(8){width:8%;}
+.sp-table th:nth-child(9), .sp-table td:nth-child(9){width:15%;}
+.sp-table th:nth-child(10), .sp-table td:nth-child(10){width:25%;}
+.sp-table .sp-dc{
+  white-space:normal;
+  line-height:1.32;
+  font-size:9px;
+}
+.sp-table .sp-name{
+  line-height:1.32;
+}
+.sp-table .sp-title{
+  display:inline;
+}
+.sp-table .sp-el{
+  display:inline-block;
+  white-space:normal;
+  line-height:1.25;
+  padding:2px 4px;
+}
+.sp-table .sp-dmg{
+  white-space:normal;
+  line-height:1.35;
+  min-width:0;
+}
+.sp-table .sp-dmg-roll{
+  margin-left:4px;
+  vertical-align:middle;
+}
+.sp-table .sp-note{
+  white-space:normal;
+  line-height:1.45;
+  font-size:11px;
+  color:var(--text2);
+}
+@media(max-width:1180px){
+  .sp-table{min-width:1040px;}
+  .sp-table .sp-note{font-size:10px;}
+}
+@media(max-width:760px){
+  .sp-table{min-width:960px;}
+  .sp-table th,.sp-table td{padding:4px 5px;}
+}
