@@ -264,7 +264,10 @@
     {href:'monsters-battle.html', label:'Monsters / Бой'},
     {href:'encounter-generator.html', label:'Генератор энкаунтеров'},
     {href:'npc-generator.html', label:'NPC Generator'},
-    {href:'dm-npc.html', label:'NPC / Бой'}
+    {href:'dm-npc.html', label:'NPC / Бой'},
+    {href:'dm-npc.html#npc-41', label:"NPC 41 · Кар'ас Ган'эй"},
+    {href:'warlock-land-madmen.html', label:'Класс · Колдун ЗБ'},
+    {href:'keeper-poi-catalog.html', label:'Гильдия Хранителей · PoI R9–R10'}
   ];
   const dmPages = new Set(dmItems.map(i => i.href));
 

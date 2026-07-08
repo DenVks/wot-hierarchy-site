@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Колдун Земли Безумцев · v1.5</title>
+<script src="assets/auth.js?v=116"></script>
+<link rel="stylesheet" href="assets/styles.css?v=116">
+<style>
+.v116-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.v116-card{border:1px solid rgba(201,169,97,.22);background:rgba(15,13,22,.72);border-radius:16px;padding:16px}.v116-card h3{margin-top:0}.v116-kv{display:grid;grid-template-columns:180px 1fr;gap:8px;font-size:14px}.v116-kv div{padding:8px;border-bottom:1px solid rgba(255,255,255,.08)}.v116-badge{display:inline-block;border:1px solid rgba(192,132,252,.5);border-radius:999px;padding:3px 9px;margin:2px 4px 2px 0;color:#d8b4fe;background:rgba(88,28,135,.18);font-size:12px}.v116-warn{border-left:3px solid #f59e0b;padding:12px 14px;background:rgba(245,158,11,.08);border-radius:12px}.v116-ok{border-left:3px solid #22c55e;padding:12px 14px;background:rgba(34,197,94,.08);border-radius:12px}
+</style>
+</head>
+<body>
+<div class="pattern-bg"></div><div class="thread-layer"></div>
+<nav class="sitenav"><div class="inner"><a href="index.html" class="nav-brand"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="wg" cx="50%" cy="50%"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/></radialGradient></defs><g stroke="url(#wg)" fill="none" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"/><circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/><circle cx="40" cy="40" r="18" stroke-width=".5" opacity=".55"/><circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/><g stroke-width=".55" opacity=".7"><line x1="40" y1="4" x2="40" y2="76"/><line x1="4" y1="40" x2="76" y2="40"/><line x1="14.8" y1="14.8" x2="65.2" y2="65.2"/><line x1="65.2" y1="14.8" x2="14.8" y2="65.2"/><line x1="40" y1="4" x2="52" y2="76"/><line x1="40" y1="4" x2="28" y2="76"/><line x1="4" y1="40" x2="76" y2="52"/></g><circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="epoch.html">Эпоха</a><a href="hierarchies.html">Иерархии</a><a href="unity.html">Единство</a><a href="throne.html">Трон</a><a href="madding.html">Хранители</a><a href="hierarchy-wall.html">Иерархия Стены</a><a href="order.html">Орден</a><a href="wall.html">Стена</a><a href="chronicles.html">Хроника</a><a href="anomalies.html">Аномалии</a><a href="rituals.html">Ритуалы</a><a href="classes.html">Классы</a><a href="weaves.html">Плетения</a><a href="ingredients.html">Ингредиенты</a><a href="loot-generator.html">Генератор</a><a href="encounter-generator.html">Энкаунтеры</a><a href="monsters.html">Монстры</a><a href="dm-npc.html">NPC / Бой</a></div></div></nav>
+<div class="page-body">
+<header class="page-header classes-reader-header">
+  <div class="eyebrow">DM Toolkit · класс v1.5</div>
+  <h1>Колдун Земли Безумцев</h1>
+  <p>Закрытый лист правил для кампании. Эта версия фиксирует совместимость класса с NPC 41 и устраняет двусмысленность вокруг Запретной матрицы, ячеек Договора и Якоря Знака.</p>
+</header>
+<main class="classes-reader-page">
+<section class="chapter classes-reader-shell">
+  <div class="class-panel reveal-target">
+    <div class="class-panel-head"><div><span class="panel-kicker">I · принцип класса</span><h3>Договор, а не стандартное направляние</h3></div></div>
+    <p>Колдун Земли Безумцев работает не как обычный Посвящённый и не как дичок. Его ресурс — договор с Покровителем, закреплённый через якорь: знак, клинок, шрам, татуировку, кристалл или иной носитель. Обычные плетения, если они не переписаны классом, используют стандартные описания WoT 5e.</p>
+    <div class="v116-grid">
+      <article class="v116-card"><h3>Ячейки Договора</h3><p>Это основной ресурс класса. На 12 уровне: <strong>3 ячейки Договора 5-го уровня</strong>. Именно фактический уровень этих ячеек повышает обычные плетения, если конкретное плетение допускает повышение.</p></article>
+      <article class="v116-card"><h3>Запретная матрица</h3><p><strong>Не является ячейкой Договора</strong>. Это отдельный заранее выбранный эффект/плетение соответствующего уровня, обычно 1/долгий отдых.</p></article>
+      <article class="v116-card"><h3>Резонансный откат</h3><p>Запретная матрица не запускает стандартный резонансный откат автоматически, если DM не вводит отдельный триггер сцены.</p></article>
+    </div>
+  </div>
+
+  <div class="class-panel reveal-target">
+    <div class="class-panel-head"><div><span class="panel-kicker">II · правка v1.5</span><h3>Запретная матрица</h3></div></div>
+    <div class="v116-kv">
+      <div><strong>Статус</strong></div><div>Отдельный ресурс, не Pact slot / не «ячейка Договора».</div>
+      <div><strong>Пример 12 уровня</strong></div><div>3 ячейки Договора 5-го уровня + Запретная матрица 6-го уровня 1/долгий отдых.</div>
+      <div><strong>Повышение плетений</strong></div><div>Обычные плетения повышаются только фактическим уровнем использованной ячейки Договора.</div>
+      <div><strong>Известные плетения</strong></div><div>Запретная матрица не считается известным плетением по умолчанию.</div>
+      <div><strong>Откат</strong></div><div>Не вызывает стандартный Resonant Backlash автоматически, если DM не решит иначе.</div>
+    </div>
+  </div>
+
+  <div class="class-panel reveal-target">
+    <div class="class-panel-head"><div><span class="panel-kicker">III · якоря</span><h3>Якорь Знака и легальные матрицы</h3></div></div>
+    <p>Для <strong>Якоря Знака</strong> в v1.5 добавлены две легальные Тайные матрицы:</p>
+    <p><span class="v116-badge">Знак держит нить</span><span class="v116-badge">Шрам помнит боль</span></p>
+    <div class="v116-warn"><strong>Клинок ведёт руку</strong> работает только с <strong>Якорем Клинка</strong>. Шрам, татуировка, подкожный кристалл и Якорь Знака не считаются оружейной якорной атакой.</div>
+    <p>Если для выбранного якоря не хватает легальных матриц, DM выбирает ближайшую тематическую замену или разрешает одну матрицу общего доступа, но обязан явно зафиксировать это в листе персонажа.</p>
+  </div>
+
+  <div class="class-panel reveal-target">
+    <div class="class-panel-head"><div><span class="panel-kicker">IV · NPC 41</span><h3>Совместимость с Кар'асом Ган'эем</h3></div><p><a href="dm-npc.html#npc-41">Открыть NPC 41 в боевом листе</a></p></div>
+    <div class="v116-ok"><strong>NPC 41 использует v1.5:</strong> Якорь Знака, Покровитель Ишамаэль, 3 ячейки Договора 5 уровня, Запретная матрица 6 уровня — <em>Огненные цветки</em> 1/долгий отдых, резонансный откат СЛ 15.</div>
+    <p>Нелегальная матрица <em>Клинок ведёт руку</em> удалена. Временные пометки «требует выбора» и «уточнить у DM» не используются.</p>
+  </div>
+</section>
+</main>
+<footer class="footer"><div class="kicker">v116 · DM Rules</div><p>Интеграция класса Колдун Земли Безумцев v1.5.</p></footer>
+</div>
+<script src="assets/shared.js?v=116"></script>
+</body></html>

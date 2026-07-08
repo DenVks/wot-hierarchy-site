@@ -1927,6 +1927,18 @@ function filterForms(btn, npcId, filter) {
 loadPersistedState();
 buildSidebar();
 
+// v116: open NPC from URL hash/search, e.g. dm-npc.html#npc-41 or dm-npc.html?npc=41
+(function(){
+  try {
+    const params = new URLSearchParams(window.location.search || '');
+    const fromQuery = params.get('npc') || params.get('id');
+    const hash = String(window.location.hash || '');
+    const fromHash = (hash.match(/npc[-_=]?(\d+)/i) || [])[1];
+    const target = Number(fromQuery || fromHash);
+    if (target && getNpcById(target)) window.setTimeout(() => showNPC(target), 0);
+  } catch(e) {}
+})();
+
 // ── Custom NPC deletion helper (v61) ──────────────────────────────────────
 function deleteCustomNpcFromBrowser(id){
   const npc = getNpcById(id);
