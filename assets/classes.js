@@ -14,11 +14,24 @@
     'Воин',
     'Мастер по оружию',
     'Посвящённый',
+    'Дичок',
+    'Носитель Договора',
     'Благородный',
     'Скиталец',
-    'Дичок',
     'Лесник'
   ].filter(c => db.features.some(f => f.className === c));
+
+  function classSlugFor(name){
+    const f = db.features.find(x => x.className === name && x.classSlug);
+    return f ? String(f.classSlug) : norm(name).replace(/\s+/g,'-');
+  }
+
+  function classFromHash(){
+    const h = decodeURIComponent(String(location.hash || ''));
+    if(!h.startsWith('#class-')) return '';
+    const slug = h.slice(7);
+    return classOrder.find(c => classSlugFor(c) === slug) || '';
+  }
 
   const classBlurbs = {
     'Пустынный воин': 'Айильский боевой путь: скорость, выносливость, бой без тяжёлой брони и общественные традиции воинов Пустоши.',
@@ -29,11 +42,12 @@
     'Благородный': 'Социальный класс власти, ресурсов и влияния. Приказы, связи, поддержка союзников и дворянские пути.',
     'Скиталец': 'Гибкий класс разведчиков, воров, информаторов и убийц. Скрытность, точечный урон и городская тактика.',
     'Дичок': 'Дикий направляющий, в котором Сила проявилась вне башенных школ. Инстинкт, талант и опасная спонтанность.',
+    'Носитель Договора': 'Посткатаклизменный путь Земли Безумцев: договор с Покровителем, Якорь, ячейки Договора, Запретные и Тайные матрицы.',
     'Лесник': 'Следопыт, охотник и проводник. Выживание, местность, звери, разведка и дальняя война.'
   };
 
   const state = {
-    className: classOrder[0] || (db.meta.classes || [])[0] || '',
+    className: classFromHash() || classOrder[0] || (db.meta.classes || [])[0] || '',
     archetype: 'all',
     level: 'all',
     q: '',
@@ -88,6 +102,7 @@
         state.level = 'all';
         state.q = '';
         state.section = 'class-progression-section';
+        history.replaceState(null, '', '#class-' + classSlugFor(state.className));
         renderAll();
         document.getElementById('class-hero')?.scrollIntoView({behavior:'smooth', block:'start'});
       });

@@ -1,1 +1,1 @@
-v116 — NPC 41, Warlock Land of Madmen v1.5, Keeper PoI DM integration patch
+v117 — Pact Bearer rename, classes integration, DM Keeper full module and PoI catalog

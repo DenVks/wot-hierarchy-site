@@ -1,10 +1,10 @@
 window.WOT_CLASSES_DB = {
   "meta": {
     "sourceFile": "wot5e_classes_archetypes_features_db.xlsx",
-    "classesCount": 9,
-    "featuresCount": 359,
-    "archetypesCount": 42,
-    "progressionRows": 180,
+    "classesCount": 10,
+    "featuresCount": 372,
+    "archetypesCount": 47,
+    "progressionRows": 185,
     "classes": [
       "Благородный",
       "Дичок",
@@ -14,7 +14,8 @@ window.WOT_CLASSES_DB = {
       "Пустынный воин",
       "Скиталец",
       "Варвар",
-      "Воин"
+      "Воин",
+      "Носитель Договора"
     ]
   },
   "features": [
@@ -5761,6 +5762,214 @@ window.WOT_CLASSES_DB = {
       "parent": "",
       "description": "К 18 уровню вы достигаете вершин стойкости в бою. В начале каждого своего хода вы восстанавливаете количество хитов, равное 5 + ваш модификатор Телосложения, если количество ваших хитов не превышает половины от максимума. Эта способность не работает, если у вас 0 хитов.",
       "source": "ВОИН.docx"
+    },
+    {
+      "id": "360",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Базовый класс",
+      "archetypeSlug": "bazovyj-klass",
+      "category": "Параметры класса",
+      "categorySlug": "parametry-klassa",
+      "levels": "1",
+      "levelSort": 1,
+      "feature": "Договор, а не стандартное направляние",
+      "featureSlug": "dogovor-a-ne-standartnoe-napravlanie",
+      "parent": "",
+      "description": "Носитель Договора Земли Безумцев работает не как обычный Посвящённый и не как дичок. Его сила оформлена как договор с Покровителем и закреплена через Якорь: знак, клинок, шрам, татуировку, подкожный кристалл или иной носитель.\n\nОбычные плетения, если они не переписаны правилами класса, используют стандартные описания WoT 5e. Термин «колдун» заменён на «Носитель Договора», чтобы класс не звучал как внешний D&D-warlock, а был привязан к лору договора, покровителя и якоря.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "id": "361",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Базовый класс",
+      "archetypeSlug": "bazovyj-klass",
+      "category": "Ресурс класса",
+      "categorySlug": "resurs-klassa",
+      "levels": "1",
+      "levelSort": 1,
+      "feature": "Ячейки Договора",
+      "featureSlug": "acejki-dogovora",
+      "parent": "",
+      "description": "Ячейки Договора — основной ресурс класса. Они работают отдельно от Запретной матрицы. На 12 уровне зафиксирован пример: 3 ячейки Договора 5-го уровня.\n\nИменно фактический уровень использованной ячейки Договора повышает обычные плетения, если конкретное плетение допускает повышение.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "id": "362",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Базовый класс",
+      "archetypeSlug": "bazovyj-klass",
+      "category": "Ресурс класса",
+      "categorySlug": "resurs-klassa",
+      "levels": "—",
+      "levelSort": 0,
+      "feature": "Запретная матрица",
+      "featureSlug": "zapretnaa-matrica",
+      "parent": "",
+      "description": "Запретная матрица не является ячейкой Договора и не считается Pact slot. Это отдельный заранее выбранный эффект или плетение соответствующего уровня, обычно 1/долгий отдых.\n\nОдна Запретная матрица = один заранее выбранный эффект/плетение соответствующего уровня. Она не считается известным плетением по умолчанию.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "id": "363",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Базовый класс",
+      "archetypeSlug": "bazovyj-klass",
+      "category": "Ресурс класса",
+      "categorySlug": "resurs-klassa",
+      "levels": "—",
+      "levelSort": 0,
+      "feature": "Повышение плетений",
+      "featureSlug": "povysenie-pletenij",
+      "parent": "",
+      "description": "Запретная матрица не повышает автоматически все плетения класса. Обычное повышение работает только от фактического уровня ячейки Договора, потраченной на конкретное плетение.\n\nПример 12 уровня: 3 ячейки Договора 5-го уровня + Запретная матрица 6-го уровня 1/долгий отдых.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "id": "364",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Базовый класс",
+      "archetypeSlug": "bazovyj-klass",
+      "category": "Риск класса",
+      "categorySlug": "risk-klassa",
+      "levels": "—",
+      "levelSort": 0,
+      "feature": "Резонансный откат",
+      "featureSlug": "rezonansnyj-otkat",
+      "parent": "",
+      "description": "Запретная матрица не запускает стандартный Resonant Backlash автоматически, если DM не вводит отдельный триггер сцены или не указывает это в конкретной способности.\n\nДля NPC 41 финально используется Резонансный откат СЛ 15.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "id": "365",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Базовый класс",
+      "archetypeSlug": "bazovyj-klass",
+      "category": "Якорь",
+      "categorySlug": "akor_",
+      "levels": "1",
+      "levelSort": 1,
+      "feature": "Якорь Договора",
+      "featureSlug": "akor_-dogovora",
+      "parent": "",
+      "description": "Договор закрепляется через Якорь. Якорь определяет, как договор проявляется в теле, оружии, знаке, шраме, татуировке, кристалле или ином носителе.\n\nЕсли для выбранного Якоря не хватает легальных матриц, DM выбирает ближайшую тематическую замену или разрешает одну матрицу общего доступа, но обязан явно зафиксировать это в листе персонажа.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "id": "366",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Якорь Знака",
+      "archetypeSlug": "akor_-znaka",
+      "category": "Якорь",
+      "categorySlug": "akor_",
+      "levels": "—",
+      "levelSort": 0,
+      "feature": "Якорь Знака",
+      "featureSlug": "akor_-znaka",
+      "parent": "",
+      "description": "Якорь Знака использует телесную или символическую метку договора: знак, шрам, татуировку, подкожный кристалл или сходный носитель. Он не считается оружейной якорной атакой и не может использовать способности, требующие Якорь Клинка.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "id": "367",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Якорь Знака",
+      "archetypeSlug": "akor_-znaka",
+      "category": "Тайная матрица",
+      "categorySlug": "tajnaa-matrica",
+      "levels": "—",
+      "levelSort": 0,
+      "feature": "Знак держит нить",
+      "featureSlug": "znak-derjit-nit_",
+      "parent": "Якорь Знака",
+      "description": "Легальная Тайная матрица для Якоря Знака. Матрица фиксирует нить договора через знак и позволяет удерживать выбранный эффект договора в рамках правил класса.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "id": "368",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Якорь Знака",
+      "archetypeSlug": "akor_-znaka",
+      "category": "Тайная матрица",
+      "categorySlug": "tajnaa-matrica",
+      "levels": "—",
+      "levelSort": 0,
+      "feature": "Шрам помнит боль",
+      "featureSlug": "sram-pomnit-bol_",
+      "parent": "Якорь Знака",
+      "description": "Легальная Тайная матрица для Якоря Знака. Матрица связывает телесную память, боль и договорный отклик, не превращая знак в оружейную якорную атаку.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "id": "369",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Якорь Клинка",
+      "archetypeSlug": "akor_-klinka",
+      "category": "Ограничение",
+      "categorySlug": "ogranicenie",
+      "levels": "—",
+      "levelSort": 0,
+      "feature": "Клинок ведёт руку",
+      "featureSlug": "klinok-vedet-ruku",
+      "parent": "Якорь Клинка",
+      "description": "Эта матрица работает только с Якорем Клинка. Якорь Знака, шрам, татуировка или подкожный кристалл не считаются оружейной якорной атакой и не дают права использовать «Клинок ведёт руку».",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "id": "370",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Покровители Договора",
+      "archetypeSlug": "pokroviteli-dogovora",
+      "category": "Покровитель",
+      "categorySlug": "pokrovitel_",
+      "levels": "1",
+      "levelSort": 1,
+      "feature": "Покровитель Договора",
+      "featureSlug": "pokrovitel_-dogovora",
+      "parent": "",
+      "description": "Покровитель задаёт источник договора, тон силы и допустимые матрицы. Для NPC 41 финально выбран Ишамаэль: интеллектуальная, холодная и почти спокойная бездна, а не хаотический демон.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "id": "371",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Покровители Узора",
+      "archetypeSlug": "pokroviteli-uzora",
+      "category": "Покровитель",
+      "categorySlug": "pokrovitel_",
+      "levels": "1",
+      "levelSort": 1,
+      "feature": "Покровители Узора",
+      "featureSlug": "pokroviteli-uzora",
+      "parent": "",
+      "description": "Отдельная ветка покровителей, отличная от обычных Покровителей Договора. Её смысл — связь не с внешней сущностью, а с фигурой, легендой или силой, вплетённой в Узор. Выбор между Покровителем Договора и Покровителем Узора должен фиксироваться один раз.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "id": "372",
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "NPC-пример",
+      "archetypeSlug": "npc-primer",
+      "category": "Пример",
+      "categorySlug": "primer",
+      "levels": "12",
+      "levelSort": 12,
+      "feature": "Кар'ас Ган'эй",
+      "featureSlug": "karas-ganej",
+      "parent": "",
+      "description": "NPC 41 использует правила v1.5: Носитель Договора 12, Якорь Знака, Покровитель Ишамаэль, 3 ячейки Договора 5-го уровня, Запретная матрица 6-го уровня — Огненные цветки 1/долгий отдых, Резонансный откат СЛ 15.\n\nНелегальная матрица «Клинок ведёт руку» удалена. Временные пометки «требует выбора» и «уточнить у DM» не используются.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
     }
   ],
   "progression": [
@@ -7383,6 +7592,51 @@ window.WOT_CLASSES_DB = {
       "reputation": "—",
       "features": "Дополнительная атака (3)",
       "extra": "—"
+    },
+    {
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "level": 1,
+      "profBonus": "+2",
+      "reputation": "—",
+      "features": "Договор, Покровитель, Якорь, Ячейки Договора",
+      "extra": "Классовая рамка v1.5"
+    },
+    {
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "level": 3,
+      "profBonus": "+2",
+      "reputation": "—",
+      "features": "Тайные матрицы",
+      "extra": "Конкретный список зависит от Якоря"
+    },
+    {
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "level": 5,
+      "profBonus": "+3",
+      "reputation": "—",
+      "features": "Резонансный откат",
+      "extra": "Базовый риск договора; для NPC 41 СЛ 15"
+    },
+    {
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "level": 9,
+      "profBonus": "+4",
+      "reputation": "—",
+      "features": "Матрицы Якоря",
+      "extra": "Для Якоря Знака легальны «Знак держит нить» и «Шрам помнит боль»"
+    },
+    {
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "level": 12,
+      "profBonus": "+4",
+      "reputation": "—",
+      "features": "Пример v1.5",
+      "extra": "3 ячейки Договора 5-го уровня + Запретная матрица 6-го уровня 1/долгий отдых"
     }
   ],
   "archetypes": [
@@ -7721,6 +7975,46 @@ window.WOT_CLASSES_DB = {
       "archetypeSlug": "чемпион",
       "description": "Обычно чемпионы фокусируются на использовании чистой физической силы, отточенной до смертельного совершенства. Архетип чемпиона сочетает суровые тренировки с физическим совершенством, позволяющим наносить смертоносные удары.",
       "source": "ВОИН.docx"
+    },
+    {
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Якорь Знака",
+      "archetypeSlug": "akor_-znaka",
+      "description": "Вариант Якоря, в котором договор закреплён через знак, шрам, татуировку, подкожный кристалл или сходную метку. Не считается оружейным Якорем Клинка.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Якорь Клинка",
+      "archetypeSlug": "akor_-klinka",
+      "description": "Вариант Якоря для оружейных договорных атак. Только он может использовать матрицу «Клинок ведёт руку».",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Покровители Договора",
+      "archetypeSlug": "pokroviteli-dogovora",
+      "description": "Обычная ветка покровителей договора: источник силы задаёт тон, ограничения и допустимые матрицы.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "Покровители Узора",
+      "archetypeSlug": "pokroviteli-uzora",
+      "description": "Отдельная ветка покровителей, основанная на связи с фигурой, легендой или силой, вплетённой в Узор.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
+    },
+    {
+      "className": "Носитель Договора",
+      "classSlug": "nositel-dogovora",
+      "archetype": "NPC-пример",
+      "archetypeSlug": "npc-primer",
+      "description": "Кар'ас Ган'эй как проверенный пример применения класса v1.5 на 12 уровне.",
+      "source": "Носитель Договора v1.5 · интеграция v117"
     }
   ]
 };

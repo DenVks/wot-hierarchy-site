@@ -3,59 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Гильдия Хранителей · PoI R9–R10</title>
-<script src="assets/auth.js?v=116"></script>
-<link rel="stylesheet" href="assets/styles.css?v=116">
+<title>Гильдия Хранителей · DM-модуль</title>
+<script src="assets/auth.js?v=117"></script>
+<link rel="stylesheet" href="assets/styles.css?v=117">
 <style>
-.poi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}.poi-card{border:1px solid rgba(163,244,224,.24);background:rgba(8,20,24,.72);border-radius:16px;padding:16px}.poi-card h3{margin-top:0}.poi-tag{display:inline-block;border:1px solid rgba(163,244,224,.45);border-radius:999px;padding:3px 9px;margin:2px 4px 2px 0;color:#a3f4e0;background:rgba(20,184,166,.10);font-size:12px}.poi-danger{border-left:3px solid #ef4444;padding:12px 14px;background:rgba(239,68,68,.08);border-radius:12px}.poi-table td,.poi-table th{vertical-align:top}
+.keeper-module-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.keeper-module-tab{border:1px solid rgba(201,169,97,.28);background:rgba(18,16,25,.78);color:#e8d8aa;border-radius:999px;padding:10px 16px;cursor:pointer;font:inherit}.keeper-module-tab.active{background:rgba(201,169,97,.18);border-color:rgba(232,200,120,.62);color:#fff}.keeper-module-panel{display:none}.keeper-module-panel.active{display:block}.keeper-frame{width:100%;height:78vh;border:1px solid rgba(201,169,97,.24);border-radius:18px;background:#f7f3eb;box-shadow:0 18px 52px rgba(0,0,0,.32)}.keeper-actions{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 18px}.keeper-actions a{border:1px solid rgba(201,169,97,.24);border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.04)}.keeper-note{border-left:3px solid var(--gold);padding:14px 16px;border-radius:14px;background:rgba(201,169,97,.08);color:rgba(255,255,255,.82);line-height:1.65}@media(max-width:760px){.keeper-frame{height:72vh}}
 </style>
 </head>
-<body class="theme-keepers-page">
+<body>
 <div class="pattern-bg"></div><div class="thread-layer"></div>
-<nav class="sitenav"><div class="inner"><a href="index.html" class="nav-brand"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="wg" cx="50%" cy="50%"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/></radialGradient></defs><g stroke="url(#wg)" fill="none" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"/><circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/><circle cx="40" cy="40" r="18" stroke-width=".5" opacity=".55"/><circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/><g stroke-width=".55" opacity=".7"><line x1="40" y1="4" x2="40" y2="76"/><line x1="4" y1="40" x2="76" y2="40"/><line x1="14.8" y1="14.8" x2="65.2" y2="65.2"/><line x1="65.2" y1="14.8" x2="14.8" y2="65.2"/><line x1="40" y1="4" x2="52" y2="76"/><line x1="40" y1="4" x2="28" y2="76"/><line x1="4" y1="40" x2="76" y2="52"/></g><circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="epoch.html">Эпоха</a><a href="hierarchies.html">Иерархии</a><a href="unity.html">Единство</a><a href="throne.html">Трон</a><a href="madding.html">Хранители</a><a href="hierarchy-wall.html">Иерархия Стены</a><a href="order.html">Орден</a><a href="wall.html">Стена</a><a href="chronicles.html">Хроника</a><a href="anomalies.html">Аномалии</a><a href="rituals.html">Ритуалы</a><a href="classes.html">Классы</a><a href="weaves.html">Плетения</a><a href="ingredients.html">Ингредиенты</a><a href="loot-generator.html">Генератор</a><a href="encounter-generator.html">Энкаунтеры</a><a href="monsters.html">Монстры</a><a href="dm-npc.html">NPC / Бой</a></div></div></nav>
+<nav class="sitenav"><div class="inner"><a href="index.html" class="nav-brand"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="wg" cx="50%" cy="50%"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"/><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"/></radialGradient></defs><g stroke="url(#wg)" fill="none" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"/><circle cx="40" cy="40" r="28" stroke-width=".7" opacity=".75"/><circle cx="40" cy="40" r="18" stroke-width=".5" opacity=".55"/><circle cx="40" cy="40" r="8" stroke-width=".6" opacity=".85"/><g stroke-width=".55" opacity=".7"><line x1="40" y1="4" x2="40" y2="76"/><line x1="4" y1="40" x2="76" y2="40"/><line x1="14.8" y1="14.8" x2="65.2" y2="65.2"/><line x1="65.2" y1="14.8" x2="14.8" y2="65.2"/><line x1="40" y1="4" x2="52" y2="76"/><line x1="40" y1="4" x2="28" y2="76"/><line x1="4" y1="40" x2="76" y2="52"/></g><circle cx="40" cy="40" r="3" fill="#e8c878" stroke="none"/></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="epoch.html">Эпоха</a><a href="hierarchies.html">Иерархии</a><a href="classes.html">Классы</a><a href="dm-npc.html">NPC / Бой</a></div></div></nav>
 <div class="page-body">
 <header class="page-header classes-reader-header">
-  <div class="eyebrow">DM Toolkit · закрытый каталог</div>
-  <h1>Гильдия Хранителей · PoI R9–R10</h1>
-  <p>Закрытая точка входа для каталога объектов интереса вокруг Фар Мэддинга. Раздел не выводится на главную страницу и доступен только через DM Toolkit.</p>
+  <div class="eyebrow">DM Toolkit · закрытый раздел</div>
+  <h1>Гильдия Хранителей</h1>
+  <p>Расширенный DM-модуль по Фар Мэддингу: структура Гильдии, Совет, ранги, отделы, протоколы, социальные группы, внешние связи, тайны и полный каталог PoI R7–R10 / AR в радиусе 2000 миль.</p>
 </header>
 <main class="classes-reader-page">
 <section class="chapter classes-reader-shell">
-  <div class="class-panel reveal-target">
-    <div class="class-panel-head"><div><span class="panel-kicker">I · режим доступа</span><h3>Почему каталог закрыт</h3></div></div>
-    <div class="poi-danger"><strong>GM-only:</strong> каталог содержит точные PoI, рейтинги R9–R10, внутренние механики, протоколы, миссионные крючки и политические тайны Гильдии. Не публиковать в публичных разделах и не добавлять карточку на главную.</div>
-    <p>Эта страница интегрирована как защищённая DM-страница <code>keeper-poi-catalog.html</code>. Навигационная ссылка находится только в выпадающем меню <strong>DM Toolkit</strong>.</p>
+  <div class="keeper-note"><strong>Статус:</strong> закрытый мастерский материал. Страница не выводится на главную и доступна через DM Toolkit. Внутри два самостоятельных интерактивных модуля из вложенных HTML.</div>
+  <div class="keeper-module-tabs" role="tablist">
+    <button class="keeper-module-tab active" type="button" data-keeper-tab="module">Расширенный модуль Гильдии</button>
+    <button class="keeper-module-tab" type="button" data-keeper-tab="poi">Каталог PoI / археонаходок</button>
   </div>
-
-  <div class="class-panel reveal-target">
-    <div class="class-panel-head"><div><span class="panel-kicker">II · структура каталога</span><h3>Рабочая модель PoI</h3></div></div>
-    <div class="poi-grid">
-      <article class="poi-card"><h3>Зона 0–500 м</h3><p><span class="poi-tag">внутренний периметр</span><span class="poi-tag">кристаллы</span><span class="poi-tag">Страж</span></p><p>Объекты, связанные с центральной матрицей, протоколами доступа, техно-антимагической инфраструктурой и зонами прямой реакции Совета.</p></article>
-      <article class="poi-card"><h3>Зона 500–1200 м</h3><p><span class="poi-tag">служебные узлы</span><span class="poi-tag">логистика</span></p><p>Склады, лаборатории, каналы передачи энергии, карантинные камеры и обходные маршруты Хранителей.</p></article>
-      <article class="poi-card"><h3>Зона 1200–2000 м</h3><p><span class="poi-tag">аномальные следы</span><span class="poi-tag">политика</span></p><p>Пограничные объекты, где влияние Гильдии соприкасается с внешними агентами, контрабандой, шпионажем и нестабильными полями.</p></article>
-    </div>
-  </div>
-
-  <div class="class-panel reveal-target">
-    <div class="class-panel-head"><div><span class="panel-kicker">III · карточка объекта</span><h3>Единый формат PoI</h3></div></div>
-    <div class="table-wrap"><table class="rank-table poi-table"><thead><tr><th>Поле</th><th>Назначение</th></tr></thead><tbody>
-      <tr><td><strong>Название / код</strong></td><td>Публичное название, внутренний код Гильдии и альтернативные прозвища.</td></tr>
-      <tr><td><strong>Рейтинг</strong></td><td>R9 или R10, СЛ взаимодействия, уровень допуска, ожидаемый ущерб при ошибке.</td></tr>
-      <tr><td><strong>Описание для игроков</strong></td><td>Что можно зачитать за столом без раскрытия служебных тайн.</td></tr>
-      <tr><td><strong>DM-механика</strong></td><td>Проверки, триггеры, урон, последствия, таймеры, условия стабилизации.</td></tr>
-      <tr><td><strong>Протоколы Гильдии</strong></td><td>Как реагируют Хранители: блокада, эвакуация, зачистка, отрицание, переговоры.</td></tr>
-      <tr><td><strong>Секрет</strong></td><td>Политическая, техническая или аномальная правда, которую не должны знать игроки заранее.</td></tr>
-    </tbody></table></div>
-  </div>
-
-  <div class="class-panel reveal-target">
-    <div class="class-panel-head"><div><span class="panel-kicker">IV · статус v116</span><h3>Интеграционный статус</h3></div></div>
-    <p>Текущий архив сайта не содержал исходный standalone-файл <code>guild_keepers_r9_r10_poi_catalog_2000m_mechanics.html</code>. Поэтому v116 создаёт защищённую страницу, навигационный вход и структуру под каталог, но не подменяет отсутствующий точный PoI-реестр вымышленными данными.</p>
-    <p>Когда исходный HTML будет добавлен в репозиторий, его можно заменить поверх этого файла без изменения навигации.</p>
-  </div>
+  <section class="keeper-module-panel active" data-keeper-panel="module">
+    <div class="keeper-actions"><a href="guild-keepers-expanded.html" target="_blank" rel="noopener">Открыть модуль отдельно</a></div>
+    <iframe class="keeper-frame" data-src="guild-keepers-expanded.html" title="Гильдия Хранителей · расширенный модуль"></iframe>
+  </section>
+  <section class="keeper-module-panel" data-keeper-panel="poi">
+    <div class="keeper-actions"><a href="guild-keepers-poi-catalog.html" target="_blank" rel="noopener">Открыть каталог отдельно</a></div>
+    <iframe class="keeper-frame" data-src="guild-keepers-poi-catalog.html" title="Гильдия Хранителей · каталог PoI"></iframe>
+  </section>
 </section>
 </main>
-<footer class="footer"><div class="kicker">v116 · DM Toolkit</div><p>Закрытый вход для PoI каталога Гильдии Хранителей.</p></footer>
 </div>
-<script src="assets/shared.js?v=116"></script>
+<script>
+function keeperUnlocked(){return localStorage.getItem('wot_dm_toolkit_access')==='1'||localStorage.getItem('wot_access')==='WOT-ANOMALY-773';}
+function loadKeeperFrames(){document.querySelectorAll('iframe.keeper-frame[data-src]').forEach(f=>{if(!f.getAttribute('src')) f.setAttribute('src', f.dataset.src);});}
+document.querySelectorAll('.keeper-module-tab').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.keeperTab;document.querySelectorAll('.keeper-module-tab').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('.keeper-module-panel').forEach(p=>p.classList.toggle('active',p.dataset.keeperPanel===id));if(keeperUnlocked()) loadKeeperFrames();}));
+if(keeperUnlocked()) loadKeeperFrames(); else {const waiter=setInterval(()=>{if(keeperUnlocked()){clearInterval(waiter);loadKeeperFrames();}},300);}
+</script>
+<script src="assets/shared.js?v=117"></script>
 </body></html>
