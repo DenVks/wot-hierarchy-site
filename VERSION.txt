@@ -1,1 +1,1 @@
-v118 — full Pact Bearer class chapter and native Keeper Guild DM integration
+v119 — Keeper Guild DM readability and layout polish

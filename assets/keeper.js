@@ -16,13 +16,31 @@
     if(v === true) return 'да'; if(v === false) return 'нет'; if(v === null || v === undefined) return '—';
     return esc(v);
   }
+
+  const longFields = new Set(['publicScope','hiddenScope','instruments','limits','scene','stance','desc','goal','secret','hooks','lever','tension','use','role','hook','hidden','security','failure','play','pressure','official','real','npc','who','crystal','receives','energyCost','serviceObligation','risks','permissions','gameUse','public','sign','symptoms','lore','known','outside','inside','checks','value','threats','protocol','competitors','find','extractionCost','threatPassport','countermeasures','evacuation','siteClassDesc','body','motive','knows']);
+  const compactFields = new Set(['code','zone','ring','status','rating','type','access','curator','dangerRating','isAnomaly','anomalyRating','archDanger','difficultyLevel','difficultyScale','siteClass','siteClassLabel','level','age','gender','rank','superior','size','leader','year','range','authority','risk','class','meaning','guildUse','title','post','faction']);
+  const accentFields = new Set(['secret','hidden','threats','failure','risk','risks','evacuation','threatPassport']);
+  const goodFields = new Set(['protocol','countermeasures','value','find','receives','permissions','gameUse']);
+  function kvClass(k, v){
+    const raw = Array.isArray(v) ? v.join(' ') : (v && typeof v === 'object' ? JSON.stringify(v) : String(v ?? ''));
+    const parts = ['keeper-kv','keeper-kv-' + String(k).replace(/[^a-zA-Z0-9_-]/g,'-')];
+    if(longFields.has(k) || raw.length > 210) parts.push('keeper-kv-long');
+    else if(raw.length > 90) parts.push('keeper-kv-wide');
+    else if(compactFields.has(k)) parts.push('keeper-kv-compact');
+    if(accentFields.has(k)) parts.push('keeper-kv-danger');
+    if(goodFields.has(k)) parts.push('keeper-kv-good');
+    return parts.join(' ');
+  }
+  function kvBlock(k, v){
+    return '<div class="'+esc(kvClass(k,v))+'"><b>'+esc(label(k))+'</b><span>'+valueHtml(v)+'</span></div>';
+  }
   function titleOf(o, fallback){ return o.name || o.title || o.pair || o.group || o.force || o.domain || o.ring || o.level || o.type || o.code || fallback || 'Запись'; }
   function subOf(o){ return o.post || o.tag || o.status || o.range || o.distance || o.role || o.faction || o.rating || o.type || ''; }
   function card(o, idx, kind){
     const entries = Object.entries(o).filter(([k]) => !['color','key'].includes(k));
     return '<article class="keeper-card '+esc(kind||'')+'">' +
       '<div class="keeper-card-head"><div><span class="panel-kicker">'+esc(kind || 'Запись')+'</span><h4>'+esc(titleOf(o, 'Запись '+(idx+1)))+'</h4>'+(subOf(o)?'<p>'+esc(subOf(o))+'</p>':'')+'</div></div>' +
-      '<div class="keeper-kv-grid">' + entries.map(([k,v]) => '<div class="keeper-kv"><b>'+esc(label(k))+'</b><span>'+valueHtml(v)+'</span></div>').join('') + '</div></article>';
+      '<div class="keeper-kv-grid">' + entries.map(([k,v]) => kvBlock(k,v)).join('') + '</div></article>';
   }
   function tableFromRows(rows){
     if(!rows.length) return '';
@@ -84,7 +102,7 @@
       return true;
     });
     count.textContent = rows.length + ' из ' + POIS.length + ' объектов';
-    list.innerHTML = rows.map((p,idx)=>'<details class="keeper-poi-card"><summary><span class="keeper-poi-code">'+esc(p.code)+'</span><span><b>'+esc(p.name)+'</b><small>'+esc([p.ring,p.rating,p.siteClassLabel].filter(Boolean).join(' · '))+'</small></span></summary><div class="keeper-kv-grid">'+Object.entries(p).map(([k,v])=>'<div class="keeper-kv"><b>'+esc(label(k))+'</b><span>'+valueHtml(v)+'</span></div>').join('')+'</div></details>').join('');
+    list.innerHTML = rows.map((p,idx)=>'<details class="keeper-poi-card"><summary><span class="keeper-poi-code">'+esc(p.code)+'</span><span class="keeper-poi-summary-text"><b>'+esc(p.name)+'</b><small>'+esc([p.ring,p.rating,p.siteClassLabel].filter(Boolean).join(' · '))+'</small></span><span class="keeper-poi-chevron" aria-hidden="true">⌄</span></summary><div class="keeper-kv-grid">'+Object.entries(p).map(([k,v])=>kvBlock(k,v)).join('')+'</div></details>').join('');
   }
   renderOverview(); renderDataSections();
 })();
