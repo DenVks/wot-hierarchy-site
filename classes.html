@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css?v=117">
+  <link rel="stylesheet" href="assets/styles.css?v=118">
 </head>
 <body>
   <div class="pattern-bg"></div>
@@ -49,7 +49,7 @@
     <div class="class-tabs-wrap reveal-target">
       <div class="class-tabs-head">
         <span>Выбор класса</span>
-        <small id="classes-total-note">9 классов · 359 черт</small>
+        <small id="classes-total-note">10 классов · обновляемая база</small>
       </div>
       <div id="class-tabs" class="class-tabs"></div>
     </div>
@@ -80,6 +80,7 @@
       <aside class="class-local-nav reveal-target">
         <div class="class-local-title">Разделы</div>
         <a href="#class-progression-section">Прогрессия</a>
+        <a href="#class-full-chapter-section">Полная глава</a>
         <a href="#class-base-section">Базовые черты</a>
         <a href="#class-archetypes-section">Архетипы</a>
         <a href="#class-all-features-section">Все черты</a>
@@ -97,10 +98,23 @@
           <div id="class-progression" class="class-progression-table-wrap"></div>
         </section>
 
+
+
+        <section class="class-panel reveal-target anchor-nav" id="class-full-chapter-section">
+          <div class="class-panel-head">
+            <div>
+              <span class="panel-kicker">II · полная глава</span>
+              <h3>Полный текст класса</h3>
+            </div>
+            <p>Для Носителя Договора здесь выводится полный текст v1.5 без рекомендаций для DM.</p>
+          </div>
+          <div id="class-full-chapter" class="class-full-chapter"></div>
+        </section>
+
         <section class="class-panel reveal-target anchor-nav" id="class-base-section">
           <div class="class-panel-head">
             <div>
-              <span class="panel-kicker">II · ядро</span>
+              <span class="panel-kicker">III · ядро</span>
               <h3>Базовые черты класса</h3>
             </div>
             <p>Параметры, владения и основные черты, не зависящие от архетипа.</p>
@@ -111,7 +125,7 @@
         <section class="class-panel reveal-target anchor-nav" id="class-archetypes-section">
           <div class="class-panel-head">
             <div>
-              <span class="panel-kicker">III · пути</span>
+              <span class="panel-kicker">IV · пути</span>
               <h3>Архетипы</h3>
             </div>
             <p>Краткое описание архетипов и их черты. Фильтр выше может оставить только выбранный путь.</p>
@@ -123,7 +137,7 @@
         <section class="class-panel reveal-target anchor-nav" id="class-all-features-section">
           <div class="class-panel-head">
             <div>
-              <span class="panel-kicker">IV · индекс</span>
+              <span class="panel-kicker">V · индекс</span>
               <h3>Полный список черт</h3>
             </div>
             <p><span id="feature-count">0</span> записей после фильтрации.</p>
@@ -164,8 +178,9 @@
   <p>Четвёртая Эпоха · 270 лет после Последней Битвы</p>
   <p style="margin-top:10px;font-size:14px;opacity:.55">Полевые материалы кампании · Колесо Времени</p>
 </footer>
-<script src="assets/shared.js?v=117"></script>
-<script src="assets/classes-data.js?v=117"></script>
-<script src="assets/classes.js?v=117"></script>
+<script src="assets/shared.js?v=118"></script>
+<script src="assets/classes-data.js?v=118"></script>
+<script src="assets/classes-nositel-dogovora.js?v=118"></script>
+<script src="assets/classes.js?v=118"></script>
 </body>
 </html>

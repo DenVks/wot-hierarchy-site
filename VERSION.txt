@@ -1,1 +1,1 @@
-v117 — Pact Bearer rename, classes integration, DM Keeper full module and PoI catalog
+v118 — full Pact Bearer class chapter and native Keeper Guild DM integration

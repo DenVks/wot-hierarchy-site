@@ -88,6 +88,8 @@
   function renderClassTabs(){
     const host = $('class-tabs');
     if(!host) return;
+    const totalNote = $('classes-total-note');
+    if(totalNote) totalNote.textContent = classOrder.length + ' классов · ' + db.features.length + ' черт';
     host.innerHTML = classOrder.map(c => {
       const count = db.features.filter(f => f.className === c).length;
       const active = c === state.className ? ' active' : '';
@@ -153,6 +155,19 @@
         <td>${esc(r.extra || '—')}</td>
       </tr>`).join('')}</tbody>
     </table>`;
+  }
+
+
+  function renderFullChapter(){
+    const host = $('class-full-chapter');
+    if(!host) return;
+    const chapters = window.WOT_CLASS_FULL_CHAPTERS || {};
+    const html = chapters[state.className];
+    if(!html){
+      host.innerHTML = '<p class="class-empty">Для этого класса пока нет отдельной полной главы. Используйте прогрессию, базовые черты и архетипы ниже.</p>';
+      return;
+    }
+    host.innerHTML = html;
   }
 
   function shortDesc(text){
@@ -311,6 +326,7 @@
     renderHero();
     renderFilters();
     renderProgression();
+    renderFullChapter();
     renderContentOnly();
     renderSectionTabs();
   }
