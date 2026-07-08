@@ -1,1 +1,1 @@
-v121 — NPC 42 checklist re-audit and correction patch
+v123 — NPC42 affinity slot/damage recalculation patch
