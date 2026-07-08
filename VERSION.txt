@@ -1,1 +1,1 @@
-v119 — Keeper Guild DM readability and layout polish
+v121 — NPC 42 checklist re-audit and correction patch
