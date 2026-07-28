@@ -1,1 +1,1 @@
-v124 — NPC42 spell table readability + cumulative v122 dm-npc.js fix
+v125 — Носитель Договора v2 full chapter + ND-01–ND-14 illustrations

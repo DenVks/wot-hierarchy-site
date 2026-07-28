@@ -3440,3 +3440,120 @@ nav.sitenav .inner{overflow:visible;}
 /* v119 specificity guard for PoI summary chips after span reset */
 .keeper-native-page .keeper-poi-card .keeper-poi-code{display:inline-flex;align-items:center;justify-content:center;height:auto;min-width:112px;border:1px solid rgba(201,169,97,.36);border-radius:12px;background:rgba(201,169,97,.12);padding:7px 9px;color:var(--gold-bright);font-family:Cinzel,serif;font-size:10px;line-height:1.2;letter-spacing:.12em;text-align:center;}
 .keeper-native-page .keeper-poi-card .keeper-poi-summary-text{display:block;height:auto;min-width:0;border:0;background:transparent;padding:0;margin:0;}
+
+
+/* v125 · Nоситель Договора v2 full chapter and illustration layout */
+.wot-class-chapter.nd-v2{
+  gap:18px;
+  font-size:17px;
+  line-height:1.74;
+}
+.wot-class-chapter.nd-v2 .nd-hero{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(260px,360px);
+  gap:24px;
+  align-items:center;
+  border:1px solid rgba(201,169,97,.18);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 92% 12%,rgba(127,97,255,.12),transparent 34%),
+    radial-gradient(circle at 12% 8%,rgba(232,200,120,.10),transparent 28%),
+    linear-gradient(135deg,rgba(19,16,25,.92),rgba(7,7,12,.72));
+  padding:24px;
+  box-shadow:0 20px 52px rgba(0,0,0,.32);
+  overflow:hidden;
+}
+.wot-class-chapter.nd-v2 .nd-hero-text{min-width:0;}
+.wot-class-chapter.nd-v2 .nd-subtitle{font-size:20px;color:var(--gold-pale);margin:8px 0 14px;}
+.wot-class-chapter.nd-v2 .nd-lead{font-size:18px;max-width:850px;color:var(--ink-soft);}
+.wot-class-chapter.nd-v2 .nd-section{
+  border:1px solid rgba(201,169,97,.14);
+  border-radius:20px;
+  background:linear-gradient(135deg,rgba(16,14,23,.70),rgba(0,0,0,.18));
+  padding:18px 20px;
+  box-shadow:0 14px 34px rgba(0,0,0,.18);
+}
+.wot-class-chapter.nd-v2 .nd-section h2:first-child{margin-top:0;}
+.wot-class-chapter.nd-v2 h2{
+  scroll-margin-top:110px;
+  letter-spacing:.01em;
+}
+.wot-class-chapter.nd-v2 h3{
+  scroll-margin-top:110px;
+  padding-top:4px;
+}
+.wot-class-chapter.nd-v2 .nd-divider{
+  border:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,169,97,.34),transparent);
+  margin:22px 0;
+}
+.wot-class-chapter.nd-v2 .nd-list li{margin:6px 0;}
+.wot-class-chapter.nd-v2 .nd-callout,
+.wot-class-chapter.nd-v2 .nd-example{
+  border-left:2px solid rgba(232,200,120,.50);
+  background:rgba(201,169,97,.055);
+  border-radius:0 14px 14px 0;
+  padding:10px 14px;
+}
+.wot-class-chapter.nd-v2 .nd-example{font-style:italic;color:var(--gold-pale);}
+.wot-class-chapter.nd-v2 .nd-table-wrap{
+  overflow-x:auto;
+  margin:14px 0 22px;
+  border:1px solid rgba(201,169,97,.10);
+  border-radius:16px;
+  background:rgba(0,0,0,.12);
+}
+.wot-class-chapter.nd-v2 .nd-table{
+  min-width:640px;
+  margin:0;
+}
+.wot-class-chapter.nd-v2 .nd-table--wide{min-width:980px;}
+.wot-class-chapter.nd-v2 .nd-table th{
+  background:rgba(16,14,23,.86);
+  padding:10px 12px;
+  position:sticky;
+  top:0;
+  z-index:1;
+}
+.wot-class-chapter.nd-v2 .nd-table td{
+  padding:11px 12px;
+  line-height:1.48;
+}
+.wot-class-chapter.nd-v2 .nd-table td:first-child,
+.wot-class-chapter.nd-v2 .nd-table td:last-child{border-radius:0;}
+.wot-class-chapter.nd-v2 .nd-figure{
+  margin:18px auto 24px;
+  border-radius:20px;
+  overflow:hidden;
+  border:1px solid rgba(201,169,97,.16);
+  background:linear-gradient(180deg,rgba(18,15,20,.72),rgba(5,5,8,.42));
+  box-shadow:0 18px 48px rgba(0,0,0,.30);
+}
+.wot-class-chapter.nd-v2 .nd-figure img{
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:contain;
+}
+.wot-class-chapter.nd-v2 .nd-figure--hero{max-width:360px;margin:0;align-self:center;}
+.wot-class-chapter.nd-v2 .nd-figure--hero img{max-height:520px;}
+.wot-class-chapter.nd-v2 .nd-figure--seal{max-width:190px;border-radius:999px;background:radial-gradient(circle,rgba(232,200,120,.10),rgba(0,0,0,.20));}
+.wot-class-chapter.nd-v2 .nd-figure--seal img{aspect-ratio:1/1;object-fit:cover;}
+.wot-class-chapter.nd-v2 .nd-figure--anchor{max-width:520px;}
+.wot-class-chapter.nd-v2 .nd-figure--wide{max-width:920px;}
+.wot-class-chapter.nd-v2 .nd-figure--banner{max-width:1040px;}
+.wot-class-chapter.nd-v2 .nd-figure--panorama{max-width:1120px;}
+.wot-class-chapter.nd-v2 .nd-figure--banner img,
+.wot-class-chapter.nd-v2 .nd-figure--panorama img{max-height:460px;object-fit:cover;object-position:center;}
+@media(max-width:900px){
+  .wot-class-chapter.nd-v2 .nd-hero{grid-template-columns:1fr;padding:18px;}
+  .wot-class-chapter.nd-v2 .nd-figure--hero{max-width:360px;margin:10px auto 0;}
+}
+@media(max-width:640px){
+  .wot-class-chapter.nd-v2{font-size:16px;}
+  .wot-class-chapter.nd-v2 .nd-section{padding:15px 14px;border-radius:16px;}
+  .wot-class-chapter.nd-v2 h2{font-size:26px;}
+  .wot-class-chapter.nd-v2 h3{font-size:21px;}
+  .wot-class-chapter.nd-v2 .nd-figure--seal{max-width:150px;}
+}
