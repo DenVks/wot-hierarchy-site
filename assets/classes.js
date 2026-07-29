@@ -42,7 +42,7 @@
     'Благородный': 'Социальный класс власти, ресурсов и влияния. Приказы, связи, поддержка союзников и дворянские пути.',
     'Скиталец': 'Гибкий класс разведчиков, воров, информаторов и убийц. Скрытность, точечный урон и городская тактика.',
     'Дичок': 'Дикий направляющий, в котором Сила проявилась вне башенных школ. Инстинкт, талант и опасная спонтанность.',
-    'Носитель Договора': 'Посткатаклизменный путь Земли Безумцев: договор с Покровителем, Якорь, ячейки Договора, Запретные и Тайные матрицы.',
+    'Носитель Договора': 'Класс направляющего, чья сила оформлена через Покровителя, Профиль Договора, Якорь, ячейки Договора, Тайные и Запретные матрицы.',
     'Лесник': 'Следопыт, охотник и проводник. Выживание, местность, звери, разведка и дальняя война.'
   };
 
@@ -145,6 +145,23 @@
     const rows = db.progression.filter(p => p.className === state.className).sort((a,b)=>a.level-b.level);
     const host = $('class-progression');
     if(!rows.length){ host.innerHTML = '<p class="class-empty">Нет данных прогрессии.</p>'; return; }
+    if(state.className === 'Носитель Договора'){
+      host.innerHTML = `<table class="class-progression-table class-progression-table--pact">
+        <thead><tr><th>Ур.</th><th>БМ</th><th>Умения класса</th><th>Кантрипы</th><th>Плетения</th><th>Ячейки</th><th>Ур. ячеек</th><th>Тайные матрицы</th><th>Запретные матрицы</th></tr></thead>
+        <tbody>${rows.map(r => `<tr>
+          <td>${esc(r.level)}</td>
+          <td>${esc(r.profBonus || '—')}</td>
+          <td>${esc(r.features || '—')}</td>
+          <td>${esc(r.cantrips ?? '—')}</td>
+          <td>${esc(r.weaves ?? '—')}</td>
+          <td>${esc(r.pactSlots ?? '—')}</td>
+          <td>${esc(r.slotLevel ?? '—')}</td>
+          <td>${esc(r.secretMatrices ?? '—')}</td>
+          <td>${esc(r.forbiddenMatrix || '—')}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+      return;
+    }
     host.innerHTML = `<table class="class-progression-table">
       <thead><tr><th>Ур.</th><th>БМ</th><th>Реп.</th><th>Черты</th><th>Доп.</th></tr></thead>
       <tbody>${rows.map(r => `<tr>

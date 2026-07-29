@@ -3442,13 +3442,13 @@ nav.sitenav .inner{overflow:visible;}
 .keeper-native-page .keeper-poi-card .keeper-poi-summary-text{display:block;height:auto;min-width:0;border:0;background:transparent;padding:0;margin:0;}
 
 
-/* v125 · Nоситель Договора v2 full chapter and illustration layout */
-.wot-class-chapter.nd-v2{
+/* v125/v126 · Носитель Договора full chapter and illustration layout */
+.wot-class-chapter.nd-pact{
   gap:18px;
   font-size:17px;
   line-height:1.74;
 }
-.wot-class-chapter.nd-v2 .nd-hero{
+.wot-class-chapter.nd-pact .nd-hero{
   display:grid;
   grid-template-columns:minmax(0,1fr) minmax(260px,360px);
   gap:24px;
@@ -3463,66 +3463,66 @@ nav.sitenav .inner{overflow:visible;}
   box-shadow:0 20px 52px rgba(0,0,0,.32);
   overflow:hidden;
 }
-.wot-class-chapter.nd-v2 .nd-hero-text{min-width:0;}
-.wot-class-chapter.nd-v2 .nd-subtitle{font-size:20px;color:var(--gold-pale);margin:8px 0 14px;}
-.wot-class-chapter.nd-v2 .nd-lead{font-size:18px;max-width:850px;color:var(--ink-soft);}
-.wot-class-chapter.nd-v2 .nd-section{
+.wot-class-chapter.nd-pact .nd-hero-text{min-width:0;}
+.wot-class-chapter.nd-pact .nd-subtitle{font-size:20px;color:var(--gold-pale);margin:8px 0 14px;}
+.wot-class-chapter.nd-pact .nd-lead{font-size:18px;max-width:850px;color:var(--ink-soft);}
+.wot-class-chapter.nd-pact .nd-section{
   border:1px solid rgba(201,169,97,.14);
   border-radius:20px;
   background:linear-gradient(135deg,rgba(16,14,23,.70),rgba(0,0,0,.18));
   padding:18px 20px;
   box-shadow:0 14px 34px rgba(0,0,0,.18);
 }
-.wot-class-chapter.nd-v2 .nd-section h2:first-child{margin-top:0;}
-.wot-class-chapter.nd-v2 h2{
+.wot-class-chapter.nd-pact .nd-section h2:first-child{margin-top:0;}
+.wot-class-chapter.nd-pact h2{
   scroll-margin-top:110px;
   letter-spacing:.01em;
 }
-.wot-class-chapter.nd-v2 h3{
+.wot-class-chapter.nd-pact h3{
   scroll-margin-top:110px;
   padding-top:4px;
 }
-.wot-class-chapter.nd-v2 .nd-divider{
+.wot-class-chapter.nd-pact .nd-divider{
   border:0;
   height:1px;
   background:linear-gradient(90deg,transparent,rgba(201,169,97,.34),transparent);
   margin:22px 0;
 }
-.wot-class-chapter.nd-v2 .nd-list li{margin:6px 0;}
-.wot-class-chapter.nd-v2 .nd-callout,
-.wot-class-chapter.nd-v2 .nd-example{
+.wot-class-chapter.nd-pact .nd-list li{margin:6px 0;}
+.wot-class-chapter.nd-pact .nd-callout,
+.wot-class-chapter.nd-pact .nd-example{
   border-left:2px solid rgba(232,200,120,.50);
   background:rgba(201,169,97,.055);
   border-radius:0 14px 14px 0;
   padding:10px 14px;
 }
-.wot-class-chapter.nd-v2 .nd-example{font-style:italic;color:var(--gold-pale);}
-.wot-class-chapter.nd-v2 .nd-table-wrap{
+.wot-class-chapter.nd-pact .nd-example{font-style:italic;color:var(--gold-pale);}
+.wot-class-chapter.nd-pact .nd-table-wrap{
   overflow-x:auto;
   margin:14px 0 22px;
   border:1px solid rgba(201,169,97,.10);
   border-radius:16px;
   background:rgba(0,0,0,.12);
 }
-.wot-class-chapter.nd-v2 .nd-table{
+.wot-class-chapter.nd-pact .nd-table{
   min-width:640px;
   margin:0;
 }
-.wot-class-chapter.nd-v2 .nd-table--wide{min-width:980px;}
-.wot-class-chapter.nd-v2 .nd-table th{
+.wot-class-chapter.nd-pact .nd-table--wide{min-width:980px;}
+.wot-class-chapter.nd-pact .nd-table th{
   background:rgba(16,14,23,.86);
   padding:10px 12px;
   position:sticky;
   top:0;
   z-index:1;
 }
-.wot-class-chapter.nd-v2 .nd-table td{
+.wot-class-chapter.nd-pact .nd-table td{
   padding:11px 12px;
   line-height:1.48;
 }
-.wot-class-chapter.nd-v2 .nd-table td:first-child,
-.wot-class-chapter.nd-v2 .nd-table td:last-child{border-radius:0;}
-.wot-class-chapter.nd-v2 .nd-figure{
+.wot-class-chapter.nd-pact .nd-table td:first-child,
+.wot-class-chapter.nd-pact .nd-table td:last-child{border-radius:0;}
+.wot-class-chapter.nd-pact .nd-figure{
   margin:18px auto 24px;
   border-radius:20px;
   overflow:hidden;
@@ -3530,30 +3530,103 @@ nav.sitenav .inner{overflow:visible;}
   background:linear-gradient(180deg,rgba(18,15,20,.72),rgba(5,5,8,.42));
   box-shadow:0 18px 48px rgba(0,0,0,.30);
 }
-.wot-class-chapter.nd-v2 .nd-figure img{
+.wot-class-chapter.nd-pact .nd-figure img{
   display:block;
   width:100%;
   height:auto;
   object-fit:contain;
 }
-.wot-class-chapter.nd-v2 .nd-figure--hero{max-width:360px;margin:0;align-self:center;}
-.wot-class-chapter.nd-v2 .nd-figure--hero img{max-height:520px;}
-.wot-class-chapter.nd-v2 .nd-figure--seal{max-width:190px;border-radius:999px;background:radial-gradient(circle,rgba(232,200,120,.10),rgba(0,0,0,.20));}
-.wot-class-chapter.nd-v2 .nd-figure--seal img{aspect-ratio:1/1;object-fit:cover;}
-.wot-class-chapter.nd-v2 .nd-figure--anchor{max-width:520px;}
-.wot-class-chapter.nd-v2 .nd-figure--wide{max-width:920px;}
-.wot-class-chapter.nd-v2 .nd-figure--banner{max-width:1040px;}
-.wot-class-chapter.nd-v2 .nd-figure--panorama{max-width:1120px;}
-.wot-class-chapter.nd-v2 .nd-figure--banner img,
-.wot-class-chapter.nd-v2 .nd-figure--panorama img{max-height:460px;object-fit:cover;object-position:center;}
+.wot-class-chapter.nd-pact .nd-figure--hero{max-width:360px;margin:0;align-self:center;}
+.wot-class-chapter.nd-pact .nd-figure--hero img{max-height:520px;}
+.wot-class-chapter.nd-pact .nd-figure--seal{max-width:190px;border-radius:999px;background:radial-gradient(circle,rgba(232,200,120,.10),rgba(0,0,0,.20));}
+.wot-class-chapter.nd-pact .nd-figure--seal img{aspect-ratio:1/1;object-fit:cover;}
+.wot-class-chapter.nd-pact .nd-figure--anchor{max-width:520px;}
+.wot-class-chapter.nd-pact .nd-figure--wide{max-width:920px;}
+.wot-class-chapter.nd-pact .nd-figure--banner{max-width:1040px;}
+.wot-class-chapter.nd-pact .nd-figure--panorama{max-width:1120px;}
+.wot-class-chapter.nd-pact .nd-figure--banner img,
+.wot-class-chapter.nd-pact .nd-figure--panorama img{max-height:460px;object-fit:cover;object-position:center;}
 @media(max-width:900px){
-  .wot-class-chapter.nd-v2 .nd-hero{grid-template-columns:1fr;padding:18px;}
-  .wot-class-chapter.nd-v2 .nd-figure--hero{max-width:360px;margin:10px auto 0;}
+  .wot-class-chapter.nd-pact .nd-hero{grid-template-columns:1fr;padding:18px;}
+  .wot-class-chapter.nd-pact .nd-figure--hero{max-width:360px;margin:10px auto 0;}
 }
 @media(max-width:640px){
-  .wot-class-chapter.nd-v2{font-size:16px;}
-  .wot-class-chapter.nd-v2 .nd-section{padding:15px 14px;border-radius:16px;}
-  .wot-class-chapter.nd-v2 h2{font-size:26px;}
-  .wot-class-chapter.nd-v2 h3{font-size:21px;}
-  .wot-class-chapter.nd-v2 .nd-figure--seal{max-width:150px;}
+  .wot-class-chapter.nd-pact{font-size:16px;}
+  .wot-class-chapter.nd-pact .nd-section{padding:15px 14px;border-radius:16px;}
+  .wot-class-chapter.nd-pact h2{font-size:26px;}
+  .wot-class-chapter.nd-pact h3{font-size:21px;}
+  .wot-class-chapter.nd-pact .nd-figure--seal{max-width:150px;}
 }
+
+
+/* v126: native Pact Bearer class layout cleanup */
+.wot-class-chapter.nd-pact .nd-key-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:10px;
+  margin-top:18px;
+}
+.wot-class-chapter.nd-pact .nd-key-grid div{
+  border:1px solid rgba(201,169,97,.16);
+  border-radius:14px;
+  background:rgba(0,0,0,.18);
+  padding:10px 12px;
+}
+.wot-class-chapter.nd-pact .nd-key-grid strong{
+  display:block;
+  font-family:Cinzel,serif;
+  font-size:10px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:rgba(232,200,120,.78);
+  margin-bottom:4px;
+}
+.wot-class-chapter.nd-pact .nd-key-grid span{color:var(--ink-soft);line-height:1.35;}
+.wot-class-chapter.nd-pact .nd-section--nav{
+  background:linear-gradient(135deg,rgba(16,14,23,.72),rgba(0,0,0,.18));
+}
+.wot-class-chapter.nd-pact .nd-nav-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:10px;
+  margin-top:14px;
+}
+.wot-class-chapter.nd-pact .nd-nav-grid a{
+  border:1px solid rgba(201,169,97,.14);
+  border-radius:14px;
+  background:rgba(0,0,0,.18);
+  padding:12px 13px;
+  color:var(--ink-soft);
+  text-decoration:none;
+  transition:.18s ease;
+}
+.wot-class-chapter.nd-pact .nd-nav-grid a:hover{
+  transform:translateY(-1px);
+  border-color:rgba(232,200,120,.38);
+  color:var(--gold-bright);
+}
+.wot-class-chapter.nd-pact .nd-nav-grid strong{
+  display:block;
+  font-family:Cinzel,serif;
+  color:var(--gold-pale);
+  letter-spacing:.04em;
+  margin-bottom:4px;
+}
+.wot-class-chapter.nd-pact .nd-nav-grid span{display:block;font-size:13px;line-height:1.35;color:rgba(217,207,184,.78);}
+.wot-class-chapter.nd-pact .nd-table--progression{min-width:1180px;}
+.wot-class-chapter.nd-pact .nd-table--progression th:nth-child(1),
+.wot-class-chapter.nd-pact .nd-table--progression td:nth-child(1){width:44px;text-align:center;}
+.wot-class-chapter.nd-pact .nd-table--progression th:nth-child(2),
+.wot-class-chapter.nd-pact .nd-table--progression td:nth-child(2){width:54px;text-align:center;}
+.wot-class-chapter.nd-pact .nd-table--progression th:nth-child(3),
+.wot-class-chapter.nd-pact .nd-table--progression td:nth-child(3){min-width:330px;}
+.wot-class-chapter.nd-pact .nd-table--progression th:nth-child(n+4),
+.wot-class-chapter.nd-pact .nd-table--progression td:nth-child(n+4){text-align:center;white-space:normal;}
+.wot-class-chapter.nd-pact .nd-table--progression th:nth-child(9),
+.wot-class-chapter.nd-pact .nd-table--progression td:nth-child(9){min-width:145px;}
+.class-progression-table--pact{min-width:1160px;}
+.class-progression-table--pact th:nth-child(1),.class-progression-table--pact td:nth-child(1),
+.class-progression-table--pact th:nth-child(2),.class-progression-table--pact td:nth-child(2){width:52px;text-align:center;}
+.class-progression-table--pact th:nth-child(3),.class-progression-table--pact td:nth-child(3){min-width:320px;}
+.class-progression-table--pact th:nth-child(n+4),.class-progression-table--pact td:nth-child(n+4){text-align:center;}
+.wot-class-chapter.nd-pact .nd-system-note{margin:16px 0 6px;}
