@@ -1370,6 +1370,111 @@ function getSneakAttackExpr(c){
   return m ? m[1] : null;
 }
 
+
+// ── v127: Combat dashboard / table-use summary ───────────────────────────
+function cleanNpcText(v){
+  return String(v || '')
+    .replace(/[✅❌⚠⛔]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function clipNpcText(v, limit){
+  const s = cleanNpcText(v);
+  const n = limit || 220;
+  return s.length > n ? s.slice(0, n - 1).trim() + '…' : s;
+}
+function npcTextRecords(c){
+  const rec=[];
+  const add=(source,name,text,rank)=>{
+    const t=cleanNpcText(text);
+    if(!t) return;
+    rec.push({source:source||'', name:name||'', text:t, rank:rank||0});
+  };
+  if(c && c.co){ add('Бой','Кратко',c.co.cr,4); add('Спасброски','СБ',c.co.sv,2); }
+  (c.ab||[]).forEach(a=>add('Черта',a.n,a.d,a.hi?5:3));
+  (c.hi && c.hi.items || []).forEach(it=>add('Иерархия',it.n,it.d,6));
+  (c.eq||[]).forEach(e=>add('Снаряжение',e.r?'⭐ предмет':'предмет',e.t,e.r?4:1));
+  (c.at||[]).forEach(a=>add('Атака',a.n,a.no,2));
+  (c.tactics||[]).forEach(t=>add('Тактика',t.ph,t.d,1));
+  if(c.angrial) add('Ангриал','Ангриал',c.angrial.desc,4);
+  return rec;
+}
+function briefMatches(text, patterns){ return patterns.some(p=>p.test(text)); }
+function uniqueBriefItems(items){
+  const seen = new Set();
+  return items.filter(it=>{
+    const key = (it.name+'|'+it.text).toLowerCase().replace(/\s+/g,' ');
+    if(seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+function combatBrief(c){
+  const records = npcTextRecords(c);
+  const cats = [
+    {key:'turn', title:'Начало / конец хода', icon:'⟳', cls:'turn', patterns:[/\bрегенерац|регенер/i,/в начале[^.]{0,180}ход/i,/в конце[^.]{0,180}ход/i,/кажд(?:ый|ого) раунд/i,/восстанавливает[^.]{0,120}(?:хит|ОЗ)/i]},
+    {key:'defense', title:'Защита / стойкость', icon:'🛡', cls:'defense', patterns:[/сопротивлен/i,/иммун/i,/уязв/i,/преим[^.]{0,90}спас/i,/снижает? урон|уменьшает? урон|поглотить|половин/i,/немагич[^.]{0,80}урон/i]},
+    {key:'reaction', title:'Реакции', icon:'↩', cls:'reaction', patterns:[/реакц/i]},
+    {key:'bonus', title:'Бонусные действия', icon:'⚡', cls:'bonus', patterns:[/бон\.д|бонусн/i]},
+    {key:'aura', title:'Ауры / союзники', icon:'◎', cls:'aura', patterns:[/\bаура/i,/союзник/i,/союзн/i,/в пределах \d+\s?фт/i,/энергетическая связь/i]},
+    {key:'resource', title:'Ограниченные ресурсы', icon:'◆', cls:'resource', patterns:[/1\/день|1\/долг|1\/корот|1\/отдых|раз за|число раз|бонусу мастерства|восстанавливается/i,/коротк(?:им|ого)|продолжительн(?:ым|ого)|долг(?:им|ого) отдых/i]}
+  ];
+  const out = {};
+  cats.forEach(cat=>{
+    const found = records
+      .filter(r=>briefMatches(r.name+' '+r.text, cat.patterns))
+      .sort((a,b)=>(b.rank||0)-(a.rank||0));
+    out[cat.key] = uniqueBriefItems(found).slice(0,4).map(r=>({source:r.source, name:r.name, text:clipNpcText(r.text, 210)}));
+    out[cat.key].meta = cat;
+  });
+  return {records, cats, out};
+}
+function getSpellLine(c){
+  const cr = String(c && c.co && c.co.cr || '');
+  const parts = [];
+  const dc = cr.match(/(?:DC|СЛ)\s*([0-9]+(?:\/[0-9]+)?)/i) || cr.match(/Плетения[^·]*?([0-9]{2})(?:\s*\/\s*([0-9]{2}))?/i);
+  const atk = cr.match(/(?:атака плетени(?:й|ем)|плетени(?:й|ем)\s*\+)(?:[^+\-]{0,20})([+\-]\d+)/i) || cr.match(/\+\d+(?=\s*\(?ангриал|\s*·|$)/i);
+  if(dc) parts.push('СЛ ' + (dc[2] ? dc[1] + '/' + dc[2] : dc[1]));
+  if(atk) parts.push('атака ' + (atk[1] || atk[0]));
+  return parts.length ? parts.join(' · ') : (cr ? clipNpcText(cr, 65) : '—');
+}
+function renderBriefGroup(meta, items){
+  if(!items || !items.length) return '';
+  return `<div class="battle-brief-card ${meta.cls}">
+    <div class="battle-brief-title"><span>${meta.icon}</span>${meta.title}</div>
+    <div class="battle-brief-list">${items.map(it=>`<div class="battle-brief-item"><b>${escHtml(it.name)}</b><em>${escHtml(it.source)}</em><span>${escHtml(it.text)}</span></div>`).join('')}</div>
+  </div>`;
+}
+function renderCombatDashboard(id, c, s){
+  const brief = combatBrief(c);
+  const coreCr = c && c.co && c.co.cr ? clipNpcText(c.co.cr, 115) : '—';
+  const spellLine = getSpellLine(c);
+  const slotLine = c.slots && c.slots.length ? c.slots.map(sl=>`${escHtml(sl.lv)}:${sl.n}`).join(' · ') : '';
+  const criticalGroups = ['turn','defense','reaction','bonus','aura','resource']
+    .map(k=>renderBriefGroup(brief.out[k].meta, brief.out[k]))
+    .join('');
+  const emptyLine = criticalGroups ? '' : '<div class="battle-brief-empty">Автоматических напоминаний не найдено. Проверьте вкладки «Черты» и «Иерархия» перед боем.</div>';
+  return `<section class="battle-dashboard" id="battle-dashboard-${id}">
+    <div class="battle-dashboard-head">
+      <div>
+        <div class="bd-kicker">Боевой пульт</div>
+        <div class="bd-title">Что нужно видеть во время сцены</div>
+      </div>
+      <div class="bd-status-line">${escHtml(coreCr)}</div>
+    </div>
+    <div class="bd-metrics">
+      <div class="bd-metric ac"><span>КД</span><b>${getDisplayAC(c)}</b></div>
+      <div class="bd-metric hp"><span>ОЗ</span><b>${s.curHp}/${c.co.hp}</b></div>
+      <div class="bd-metric"><span>Иниц.</span><b>${escHtml(c.co.ini)}</b></div>
+      <div class="bd-metric"><span>Скор.</span><b>${escHtml(c.co.sp)} фт</b></div>
+      <div class="bd-metric"><span>Пасс. ВСПР</span><b>${escHtml(c.co.pp)}</b></div>
+      <div class="bd-metric"><span>Плетения</span><b>${escHtml(spellLine)}</b></div>
+    </div>
+    ${slotLine || c.angrial ? `<div class="bd-resource-line">${slotLine ? `<span><b>Ячейки:</b> ${slotLine}</span>` : ''}${c.angrial ? `<span><b>Ангриал:</b> ур.${escHtml(c.angrial.lv)} · ${escHtml(c.angrial.dmgd)} · ${escHtml(c.angrial.range)}</span>` : ''}</div>` : ''}
+    <div class="battle-brief-grid">${criticalGroups}${emptyLine}</div>
+  </section>`;
+}
+
 function showNPC(id) {
   loadCustomNpcsFromStorage();
   const c = getNpcById(id);
@@ -1437,6 +1542,7 @@ function showNPC(id) {
   </div></div>
   <div class="sh-tags">${c.tags.map(t=>`<span class="tag tag-${c.ty}">${t}</span>`).join('')}</div>
 </div>
+${renderCombatDashboard(id, c, s)}
 <div class="tabs" id="tabs_${id}">
   ${tabs.map((t,ti)=>`<button class="tab-btn${ti===0?' active':''}" onclick="switchTab(${id},'${t}')">${tabLabels[t]}</button>`).join('')}
 </div>`;
