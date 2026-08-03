@@ -1,1 +1,1 @@
-v129 — Scream hierarchy integration into Rules and Hierarchies
+v130 — Scream hierarchy visibility hotfix on hierarchies page

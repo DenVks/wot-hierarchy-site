@@ -452,6 +452,7 @@ h2.chapter-title::after{left:calc(100% + 28px);background:linear-gradient(90deg,
 .detail-panel.farm{--accent-color:var(--c-farm)}
 .detail-panel.order{--accent-color:var(--c-order)}
 .detail-panel.wall{--accent-color:var(--c-wall)}
+.detail-panel.scream{--accent-color:var(--c-scream)}
 .detail-panel.monster{--accent-color:var(--c-monster)}
 .detail-panel.aiel{--accent-color:var(--c-aiel)}
 
@@ -3679,3 +3680,9 @@ nav.sitenav .inner{overflow:visible;}
 .theme-scream-page strong{color:var(--ink-bright);}
 .theme-scream-page .full,.theme-scream-page .wide{width:100%;}
 @media(max-width:760px){.theme-scream-page .scream-seal{width:82px;height:82px;right:12px;top:12px}.theme-scream-page .book h2{margin-top:38px}.theme-scream-page .part-banner{align-items:flex-start;flex-direction:column}.theme-scream-page .art-plate{padding:8px}}
+
+/* ==== v130: Крик на странице Иерархий ==== */
+.detail-panel.scream{border-color:rgba(56,189,248,.34);background:linear-gradient(180deg,rgba(56,189,248,.075),rgba(0,0,0,.20));}
+.detail-panel.scream .symbol{color:var(--c-scream);background:radial-gradient(circle at center,rgba(56,189,248,.16),transparent 70%);}
+.detail-panel.scream h3,.detail-panel.scream h4,.detail-panel.scream .rung-tier,.detail-panel.scream .ab-rank{color:var(--c-scream);}
+.detail-panel.scream a{color:#7dd3fc;}
