@@ -836,6 +836,13 @@ function featureLookupKeys(name){
   if (/склонность\s+к\s+соедин/.test(rawLow)) keys.add('склонность к соединению');
   if (/манипуляция\s+разумом/.test(rawLow)) keys.add('манипуляция разумом');
   if (/эксперт\s+в\s+соедин/.test(rawLow)) keys.add('эксперт в соединении');
+  // Pact Bearer v2 aliases: NPC cards usually omit the level prefix from class feature titles.
+  [
+    'слова конца', 'пустота между ударами', 'разум на краю', 'нить которой не должно быть',
+    'знак держит нить', 'кровь как печать', 'шрам помнит силу', 'двойная печать',
+    'резерв договора', 'отводящая грань', 'кровь как чернила', 'печать против вторжения',
+    'последнее эхо', 'видение нитей', 'ячейки договора', 'запретная матрица'
+  ].forEach(k => { if (rawLow.includes(k)) keys.add(k); });
   // Explicit fighting-style aliases. This prevents the old bug where "Стиль: ..." matched the first generic "Стиль" row.
   if (/^стиль\s+оборона/.test(b) || /^стиль\s+защита/.test(b)) { keys.add('защита'); keys.add('защита defense'); }
   if (/^стиль\s+стрельб/.test(b)) { keys.add('стрельба из лука'); keys.add('стрельба из лука archery'); keys.add('стиль боя'); }
@@ -908,6 +915,15 @@ function npcClassContexts(c){
   }
   if (text.includes('варвар') || text.includes('берсерк')) add('Варвар', text.includes('берсерк') ? 'Путь Берсерка' : null);
   if (text.includes('благород')) add('Благородный', null);
+  if (text.includes('носитель договора')) {
+    const a = text.includes('ишамаэль') ? 'Ишамаэль, Голос Конца' :
+      text.includes('ланфир') ? 'Ланфир, Госпожа Снов' :
+      text.includes('семираг') ? 'Семираг, Госпожа Боли' :
+      text.includes('могидин') ? 'Могидин, Паучиха' :
+      text.includes('дракон') ? 'Дракон Возрождённый, След огня в Узоре' :
+      text.includes('великая') || text.includes('аномал') ? 'Великая Мигрирующая Аномалия' : null;
+    add('Носитель Договора', a);
+  }
   return ctx;
 }
 function findClassFeatureForNpc(c, abilityName){
