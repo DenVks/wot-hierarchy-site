@@ -1,1 +1,1 @@
-v128 — NPC 41 Pact Bearer v2 audit and correction patch
+v129 — Scream hierarchy integration into Rules and Hierarchies

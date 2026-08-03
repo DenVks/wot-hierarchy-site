@@ -37,6 +37,7 @@
     {href:'madding.html', label:'Хранители'},
     {href:'shara-will.html', label:'Единая Воля Шары'},
     {href:'hierarchy-wall.html', label:'Иерархия Стены'},
+    {href:'scream.html', label:'Крик'},
     {href:'order.html', label:'Орден'},
     {href:'rituals.html', label:'Ритуалы'}
   ];
