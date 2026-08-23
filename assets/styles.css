@@ -3729,3 +3729,152 @@ nav.sitenav .inner{overflow:visible;}
 .throne-v12-reader .section-lead{font-size:19px;line-height:1.72;color:rgba(243,232,209,.88);}
 .throne-v12-reader .rules-callout,.throne-v12-reader .callout,.throne-v12-reader .sidebar,.throne-v12-reader .example{border:1px solid rgba(201,169,97,.18);background:linear-gradient(180deg,rgba(201,169,97,.06),rgba(0,0,0,.14));padding:18px 20px;margin:22px 0;}
 @media(max-width:900px){.throne-v12-hero{grid-template-columns:1fr;}.throne-hero-image{justify-self:start;width:min(360px,100%);}.throne-v12-reader p,.throne-v12-reader li{font-size:16px;line-height:1.68;}.throne-v12-reader th,.throne-v12-reader td{font-size:14px;padding:10px;}.throne-v12-reader .art-plate{padding:8px;margin:22px auto;}}
+
+/* ==== v132: Crystal Throne page typography and emblem normalization ==== */
+.theme-throne-v12-page .throne-v12-section,
+.theme-throne-v12-page .throne-v12-reader{
+  max-width:1040px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.theme-throne-v12-page .throne-v12-section{padding:0 28px 58px;}
+.theme-throne-v12-page .throne-v12-reader{padding:0;}
+.theme-throne-v12-page .throne-v12-hero{
+  max-width:1040px;
+  min-height:unset;
+  margin:22px auto 24px;
+  padding:86px 28px 52px;
+  border-radius:24px;
+  overflow:hidden;
+  grid-template-columns:minmax(0,1fr) minmax(260px,350px);
+  gap:28px;
+}
+.theme-throne-v12-page .throne-v12-hero h1{margin-bottom:0;}
+.theme-throne-v12-page .throne-single-emblem{
+  width:94px;
+  height:94px;
+  margin:18px 0 8px;
+  padding:11px;
+  border:1px solid color-mix(in srgb,var(--page-accent) 54%, #000 46%);
+  background:radial-gradient(circle at center,var(--page-accent-soft),rgba(0,0,0,0) 72%);
+  color:var(--page-accent);
+  border-radius:4px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.025) inset,0 16px 42px rgba(0,0,0,.28);
+}
+.theme-throne-v12-page .throne-single-emblem svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 16px color-mix(in srgb,var(--page-accent) 22%, transparent));}
+.theme-throne-v12-page .throne-hero-image{width:min(300px,30vw);border-radius:16px;}
+.theme-throne-v12-page .throne-v12-reader .book{
+  margin:0 0 28px;
+  padding:26px 28px;
+  border:1px solid rgba(201,169,97,.14);
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.032),rgba(0,0,0,.18));
+  box-shadow:var(--shadow-deep),0 0 0 1px rgba(255,255,255,.018) inset;
+}
+.theme-throne-v12-page .throne-v12-reader .book.art-page,
+.theme-throne-v12-page .throne-v12-reader .book.one-col.art-page{
+  padding-top:22px;
+  padding-bottom:22px;
+}
+.theme-throne-v12-page .throne-v12-reader h2{
+  font-size:clamp(22px,3vw,30px);
+  line-height:1.2;
+  letter-spacing:.03em;
+  margin:22px 0 18px;
+  padding:0 0 12px;
+}
+.theme-throne-v12-page .throne-v12-reader h2:first-child{margin-top:0;}
+.theme-throne-v12-page .throne-v12-reader h2::after{width:90px;}
+.theme-throne-v12-page .throne-v12-reader h3{
+  font-family:'Cinzel',serif;
+  font-size:clamp(18px,2.1vw,23px);
+  line-height:1.22;
+  letter-spacing:.06em;
+  margin:24px 0 12px;
+}
+.theme-throne-v12-page .throne-v12-reader h4{
+  font-family:'Cinzel',serif;
+  color:var(--gold-bright);
+  font-size:14px;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  margin:20px 0 10px;
+}
+.theme-throne-v12-page .throne-v12-reader p,
+.theme-throne-v12-page .throne-v12-reader li{
+  font-size:16.5px;
+  line-height:1.82;
+}
+.theme-throne-v12-page .throne-v12-reader p{margin:0 0 14px;}
+.theme-throne-v12-page .throne-v12-reader p.lead,
+.theme-throne-v12-page .throne-v12-reader .section-lead{
+  font-size:16.8px;
+  line-height:1.76;
+  color:var(--ink-bright);
+}
+.theme-throne-v12-page .throne-v12-reader .part-banner{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:4px 0 22px;
+  padding:12px 16px;
+  border:1px solid rgba(201,169,97,.18);
+  border-left:3px solid var(--page-accent);
+  background:linear-gradient(90deg,rgba(220,38,38,.08),rgba(0,0,0,.12));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.018);
+}
+.theme-throne-v12-page .throne-v12-reader .part-banner .part-label{
+  font-family:'Cinzel',serif;
+  font-size:11px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--page-accent);
+  white-space:nowrap;
+}
+.theme-throne-v12-page .throne-v12-reader .part-banner span:last-child{
+  font-family:'Cinzel',serif;
+  font-size:13px;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--gold-bright);
+}
+.theme-throne-v12-page .throne-v12-reader .art-plate{
+  margin:22px auto 28px;
+  padding:10px;
+  border-color:rgba(201,169,97,.18);
+  box-shadow:0 16px 44px rgba(0,0,0,.28);
+}
+.theme-throne-v12-page .throne-v12-reader .art-column{max-width:560px;}
+.theme-throne-v12-page .throne-v12-reader .art-tall{max-width:430px;}
+.theme-throne-v12-page .throne-v12-reader .art-wide{max-width:860px;}
+.theme-throne-v12-page .throne-v12-reader .art-full-page{max-width:620px;}
+.theme-throne-v12-page .throne-v12-reader .art-panorama{max-width:940px;}
+.theme-throne-v12-page .throne-v12-reader figcaption{font-size:13.5px;line-height:1.5;}
+.theme-throne-v12-page .throne-v12-reader th,
+.theme-throne-v12-page .throne-v12-reader td{
+  font-size:14.5px;
+  line-height:1.55;
+  padding:10px 11px;
+}
+.theme-throne-v12-page .throne-v12-reader th{font-size:11px;}
+.theme-throne-v12-page .throne-v12-reader .rules-callout,
+.theme-throne-v12-page .throne-v12-reader .callout,
+.theme-throne-v12-page .throne-v12-reader .sidebar,
+.theme-throne-v12-page .throne-v12-reader .example,
+.theme-throne-v12-page .throne-v12-reader blockquote,
+.theme-throne-v12-page .throne-v12-reader .note,
+.theme-throne-v12-page .throne-v12-reader .warning{
+  padding:14px 16px;
+  margin:18px 0;
+  border-radius:12px;
+}
+@media(max-width:900px){
+  .theme-throne-v12-page .throne-v12-section{padding:0 18px 44px;}
+  .theme-throne-v12-page .throne-v12-hero{grid-template-columns:1fr;margin:16px 14px 18px;padding:64px 18px 36px;border-radius:18px;}
+  .theme-throne-v12-page .throne-single-emblem{width:82px;height:82px;}
+  .theme-throne-v12-page .throne-hero-image{justify-self:start;width:min(320px,100%);}
+  .theme-throne-v12-page .throne-v12-reader .book{padding:20px 16px;border-radius:16px;}
+  .theme-throne-v12-page .throne-v12-reader p,
+  .theme-throne-v12-page .throne-v12-reader li{font-size:15.8px;line-height:1.72;}
+  .theme-throne-v12-page .throne-v12-reader .part-banner{align-items:flex-start;flex-direction:column;gap:6px;}
+}
