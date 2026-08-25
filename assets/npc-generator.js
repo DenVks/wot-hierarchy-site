@@ -193,14 +193,14 @@ function applyStatBlock(base,ctx){
   h.steps.forEach(x=>steps.push(x));
   return {stats,steps,hierarchy:h,asiEvents,asiPointsUsed:asiPoints,featPenalty,nationBonus:nb,featNotes:fnotes};
 }
-function rankOrder(rank){return {'I':1,'II':2,'III':3,'IV':4,'V':5}[rank]||0}
+function rankOrder(rank){return {'I':1,'II':2,'III':3,'IV':4,'V':5,'VI':6,'VII':7,'VIII':8}[rank]||0}
 function applyHierarchy(stats,ctx){
   const out={name:'',type:'',color:'#b07ae8',items:[],traits:[],hpBonus:0,hpMult:null,acBonus:0,attackBonus:0,damageBonus:0,speedBonus:0,initiativeBonus:0,initiativeAdv:false,saveBonus:0,dcBonus:0,weavePower:0,extraSlots:0,cap:24,steps:[]};
   const hdb=rules.hierarchies&&rules.hierarchies[ctx.faction]; const rn=rankOrder(ctx.rank);
   if(!hdb||!rn) return out;
   out.name=hdb.name+', Ранг '+ctx.rank; out.type=hdb.type||ctx.faction; out.color=hdb.color||out.color;
   // inherit lower ranks
-  ['I','II','III','IV','V'].slice(0,rn).forEach(rk=>{
+  ['I','II','III','IV','V','VI','VII','VIII'].slice(0,rn).forEach(rk=>{
     const r=hdb.ranks&&hdb.ranks[rk]; if(!r) return;
     const max=r.cap||out.cap||24;
     if(r.stats){
