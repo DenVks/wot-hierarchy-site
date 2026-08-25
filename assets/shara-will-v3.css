@@ -1,0 +1,25 @@
+/* Shara Will Revision III — additive site styles. Loaded after assets/styles.css. */
+.theme-shara-page .sprite{position:absolute;width:0;height:0;overflow:hidden}
+.theme-shara-page .shara-v3-site-hero .lead{max-width:760px}
+.shara-v3-cover-section{padding-top:18px}
+.shara-v3-cover-art{margin:0 auto;max-width:1120px;border:1px solid rgba(202,164,86,.42);border-radius:16px;overflow:hidden;background:rgba(18,23,31,.58);box-shadow:0 18px 45px rgba(0,0,0,.22)}
+.shara-v3-cover-art img{display:block;width:100%;height:auto;object-fit:contain}
+.shara-v3-cover-art figcaption,.shara-art figcaption{padding:10px 14px;color:#d9cda7;background:rgba(12,16,24,.82);font-size:.94rem;font-style:italic}
+.shara-v3-doc{overflow:visible}
+.shara-v3-doc .shara-v3-section-title{margin-top:0;color:#e4c879}
+.shara-v3-doc .shara-v3-subtitle{margin-top:1.45rem;color:#d7bd78}
+.shara-v3-doc .shara-v3-subtitle.ayad{color:#91cbb4}.shara-v3-doc .shara-v3-subtitle.warrior{color:#a9bedb}
+.shara-v3-doc .shara-v3-ability{margin:.95rem 0 .4rem;color:#efe2bd;font-size:1.03rem}
+.shara-rule-line{margin:.42rem 0;padding:.58rem .75rem;border-left:3px solid rgba(210,171,84,.55);background:rgba(255,255,255,.028);border-radius:0 8px 8px 0}
+.shara-v3-callout{margin:1rem 0}.shara-v3-callout .icon{width:1.1em;height:1.1em;vertical-align:-.18em;margin-right:.35em;fill:#caa854}.shara-v3-callout .icon .cut{fill:#171b24}
+.shara-path-banner{margin:1.4rem 0 .45rem;padding:.65rem .9rem;border-radius:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.shara-path-banner.ayad{background:linear-gradient(90deg,rgba(33,89,72,.55),rgba(33,89,72,.14));border:1px solid rgba(104,190,157,.35);color:#a9d9c7}
+.shara-path-banner.warrior{background:linear-gradient(90deg,rgba(42,59,92,.6),rgba(42,59,92,.14));border:1px solid rgba(123,153,202,.35);color:#b7c9e2}
+.shara-art{margin:1.1rem auto;max-width:100%;border:1px solid rgba(202,164,86,.38);border-radius:12px;overflow:hidden;background:rgba(12,16,24,.72)}
+.shara-art img{display:block;width:100%;height:auto;max-height:none;object-fit:contain;background:#d9c99f}
+.shara-v3-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1rem 0}
+.shara-v3-table{min-width:720px}
+.shara-v3-table caption{caption-side:top;text-align:left;color:#d7bd78;font-weight:700;padding:0 0 .5rem}
+.shara-v3-doc .path-ayad td{background:rgba(41,91,75,.12)}.shara-v3-doc .path-warrior td{background:rgba(48,67,103,.13)}.shara-v3-doc .path-common td{background:rgba(123,97,44,.08)}
+.shara-v3-quote{margin-top:1.35rem;text-align:center;font-style:italic}.shara-v3-quote-source{text-align:center;color:#9d9788;font-size:.9rem;margin-top:-.5rem}
+@media(max-width:850px){.shara-v3-cover-section{padding-top:10px}.shara-v3-doc{padding-left:14px!important;padding-right:14px!important}.shara-v3-table{min-width:650px}.shara-art,.shara-v3-cover-art{border-radius:10px}.shara-v3-doc .shara-v3-section-title{font-size:1.45rem}.shara-v3-doc .shara-v3-subtitle{font-size:1.15rem}}

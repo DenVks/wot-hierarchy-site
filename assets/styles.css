@@ -3919,3 +3919,25 @@ nav.sitenav .inner{overflow:visible;}
 .order-v11-page .heading-glyph,.order-v11-page .part-mark{display:none!important;}
 @media (max-width:760px){.hierarchy-emblem.order-single-emblem{width:96px;height:96px}.hierarchy-emblem.order-single-emblem img{width:64px;height:64px}.order-v11-page{font-size:16.5px}.order-v11-page table{font-size:14px;min-width:620px}.order-page-shell .compact-hero h1{font-size:42px}.order-hero-art img{max-height:420px}}
 
+
+/* v135 · Order page image downsizing for OU-01, OU-02, OU-03 */
+.order-v11-page figure[data-code="OU01"],
+.order-v11-page figure[data-code="OU02"],
+.order-v11-page figure[data-code="OU03"]{max-width:220px;margin:18px auto 22px;}
+.order-v11-page figure[data-code="OU01"] img,
+.order-v11-page figure[data-code="OU02"] img,
+.order-v11-page figure[data-code="OU03"] img{width:100%;max-width:220px;}
+.order-v11-page figure[data-code="OU01"] figcaption,
+.order-v11-page figure[data-code="OU02"] figcaption,
+.order-v11-page figure[data-code="OU03"] figcaption{max-width:300px;margin:10px auto 0;font-size:14px;line-height:1.45;}
+@media (max-width:760px){
+  .order-v11-page figure[data-code="OU01"],
+  .order-v11-page figure[data-code="OU02"],
+  .order-v11-page figure[data-code="OU03"]{max-width:180px;}
+  .order-v11-page figure[data-code="OU01"] img,
+  .order-v11-page figure[data-code="OU02"] img,
+  .order-v11-page figure[data-code="OU03"] img{max-width:180px;}
+  .order-v11-page figure[data-code="OU01"] figcaption,
+  .order-v11-page figure[data-code="OU02"] figcaption,
+  .order-v11-page figure[data-code="OU03"] figcaption{max-width:220px;font-size:13px;}
+}
