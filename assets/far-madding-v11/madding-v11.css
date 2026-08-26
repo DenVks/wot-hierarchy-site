@@ -1,0 +1,54 @@
+
+:root {
+  --ink:#292b29; --muted:#626966; --gold:#a58445; --oxblood:#6c2f31;
+  --forest:#29483e; --forest-dark:#162d28; --mint:#78b8a3;
+  --parchment:#e9e2cf; --paper:#f5efdf; --paper-light:#fbf7ea;
+  --graphite:#252a2b; --shadow:rgba(31,35,34,.28);
+}
+*{box-sizing:border-box}
+html{background:#202423}
+body{margin:0 auto;color:var(--ink);background:var(--parchment);font:9.25pt/1.3 Georgia,"Times New Roman",serif;hyphens:auto;text-rendering:optimizeLegibility;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+a{color:var(--oxblood);text-decoration:none}
+.cover{position:relative;width:8.5in;height:11in;margin:0 auto;overflow:hidden;color:#f4eddc;background:radial-gradient(circle at 70% 34%,rgba(120,184,163,.22),transparent 30%),linear-gradient(145deg,#151a19 0%,#26312d 52%,#152c27 100%);break-after:page;page-break-after:always}
+.cover:before,.cover:after{content:"";position:absolute;inset:.25in;border:2px solid rgba(165,132,69,.82);pointer-events:none}.cover:after{inset:.34in;border-width:1px;border-color:rgba(233,226,207,.35)}
+.cover-grid{position:absolute;inset:0;opacity:.13;background:repeating-linear-gradient(45deg,transparent 0 38px,rgba(120,184,163,.28) 39px 40px),repeating-linear-gradient(-45deg,transparent 0 38px,rgba(165,132,69,.18) 39px 40px)}
+.cover-kicker{position:absolute;top:.7in;width:100%;text-align:center;color:#c9b57f;font:700 9pt Arial,sans-serif;letter-spacing:.23em;text-transform:uppercase}
+.cover-title{position:absolute;top:1.3in;width:100%;padding:0 .65in;text-align:center;font-size:34pt;line-height:.93;font-variant:small-caps;letter-spacing:.035em;text-shadow:0 3px 9px #000}.cover-title span{display:block;margin-top:.16in;color:#cbb785;font-size:17pt;letter-spacing:.08em}
+.guild-seal{position:absolute;top:3.85in;left:50%;width:2.7in;height:2.7in;transform:translateX(-50%);overflow:hidden;border:1px solid rgba(165,132,69,.72);background:rgba(10,18,16,.48);box-shadow:0 0 0 8px rgba(120,184,163,.08),0 0 44px rgba(120,184,163,.22)}.guild-seal img{display:block;width:100%;height:100%;object-fit:contain}
+.diamond{position:absolute;left:50%;top:50%;border:3px solid #d3c08f;transform:translate(-50%,-50%) rotate(45deg)}.diamond.outer{width:1.12in;height:1.12in}.diamond.inner{width:.65in;height:.65in;border-width:2px;border-color:var(--mint)}.seal-dot{position:absolute;left:50%;top:50%;width:.13in;height:.13in;border-radius:50%;background:#d3c08f;transform:translate(-50%,-50%);box-shadow:0 0 12px var(--mint)}
+.cover-subtitle{position:absolute;top:6.75in;width:100%;text-align:center;color:#c9d5cc;font:700 10pt Arial,sans-serif;letter-spacing:.13em;text-transform:uppercase}.cover-quote{position:absolute;left:1.05in;right:1.05in;top:8.05in;padding:.24in .35in;border-top:1px solid rgba(165,132,69,.75);border-bottom:1px solid rgba(165,132,69,.45);text-align:center;color:#e2d9c3;font-size:13pt;font-style:italic}.cover-edition{position:absolute;bottom:.65in;width:100%;text-align:center;color:#b9ad91;font:700 7.5pt Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase}
+.frontispiece{width:8.5in;height:11in;margin:0 auto;padding:.42in .6in .45in;background:var(--paper);break-after:page;page-break-after:always;display:flex;flex-direction:column;align-items:center;justify-content:center}.frontispiece figure{margin:0;width:5.7in;max-height:9.9in}.frontispiece img{display:block;width:100%;max-height:9.25in;object-fit:contain}.frontispiece figcaption{margin-top:.12in;color:var(--muted);text-align:center;font:italic 8.3pt Arial,sans-serif}
+.frontmatter{width:8.5in;min-height:11in;margin:0 auto;padding:.52in .58in;background:radial-gradient(circle at 15% 8%,rgba(255,255,255,.55),transparent 38%),var(--paper);break-after:page;page-break-after:always}.frontmatter h1{margin:0;color:var(--forest-dark);font-size:25pt;border-bottom:3px double var(--gold);font-variant:small-caps}.deck{margin:.08in 0 .22in;color:var(--muted);font-style:italic}.reader-note{margin:0 0 .24in;padding:.13in .17in;border:1px solid var(--mint);border-left:5px solid var(--oxblood);background:linear-gradient(90deg,rgba(120,184,163,.13),rgba(255,255,255,.38))}.toc{columns:2;column-gap:.34in;column-rule:1px solid rgba(98,105,102,.28)}.toc-entry{display:flex;gap:.07in;align-items:baseline;padding:.035in 0;color:var(--ink);border-bottom:1px dotted rgba(41,43,41,.3);break-inside:avoid}.toc-no{color:var(--oxblood);font:700 7pt Arial,sans-serif;min-width:.25in}
+.book{width:8.5in;min-height:11in;margin:0 auto;padding:.49in .52in .55in;columns:2;column-gap:.32in;column-rule:1px solid rgba(98,105,102,.26);background:linear-gradient(rgba(245,239,223,.95),rgba(233,226,207,.96)),repeating-linear-gradient(90deg,rgba(41,72,62,.015) 0,rgba(41,72,62,.015) 1px,transparent 1px,transparent 28px)}
+.part-banner{column-span:all;display:flex;align-items:center;gap:.12in;margin:.16in 0 .14in;padding:.12in .18in;color:#f6edd9;background:linear-gradient(95deg,var(--graphite),var(--forest) 72%,#4f796b);border:1px solid var(--gold);box-shadow:inset 0 0 0 2px rgba(233,226,207,.18);font-size:14pt;font-variant:small-caps;letter-spacing:.04em;break-inside:avoid;break-before:auto}.part-mark{color:var(--mint)}
+h2{column-span:all;position:relative;margin:.16in 0 .1in;padding:0 0 .055in;color:var(--oxblood);border-bottom:3px double var(--gold);font-size:14.6pt;font-variant:small-caps;letter-spacing:.02em;break-after:avoid;page-break-after:avoid}h2:after{content:"";position:absolute;left:0;bottom:-5px;width:1.18in;border-bottom:1px solid var(--forest)}.heading-glyph{margin-right:.08in;color:var(--forest)}
+h3{margin:.13in 0 .055in;padding-bottom:.025in;color:var(--forest-dark);border-bottom:1px solid rgba(41,72,62,.55);font-size:11.1pt;break-after:avoid;page-break-after:avoid}
+p{margin:0 0 .075in;text-align:justify;orphans:3;widows:3}.dropcap:first-letter{float:left;margin:-.03in .04in -.02in 0;color:var(--oxblood);font-size:30pt;font-weight:700;line-height:.92;text-shadow:1px 1px 0 rgba(165,132,69,.35)}strong{color:#4b2728}ul,ol{margin:.045in 0 .1in;padding-left:.22in}li{margin-bottom:.03in}
+.sidebar{column-span:all;position:relative;margin:.11in 0 .13in;padding:.12in .18in .1in .34in;border:1px solid var(--mint);border-left:5px solid var(--oxblood);background:linear-gradient(100deg,rgba(120,184,163,.14),rgba(251,247,234,.88));break-inside:avoid}.sidebar p{margin:0;text-align:left}.sidebar-glyph{position:absolute;left:.12in;top:.11in;color:var(--oxblood)}
+.table-wrap{column-span:all;margin:.1in 0 .14in;break-inside:auto;page-break-inside:auto}.rules-table{width:100%;border-collapse:collapse;border:1px solid #786646;background:rgba(251,247,234,.76);font-size:7.2pt;line-height:1.18}.rules-table th{padding:.052in .058in;color:#f8efd9;background:linear-gradient(#34443e,#202a27);border-right:1px solid rgba(248,239,217,.2);font:700 7pt Arial,sans-serif;text-align:left}.rules-table td{padding:.046in .058in;vertical-align:top;border-right:1px solid rgba(120,102,70,.28);border-top:1px solid rgba(120,102,70,.28)}.rules-table tbody tr:nth-child(even){background:rgba(120,184,163,.08)}.rules-table tr{break-inside:avoid;page-break-inside:avoid}
+.art-plate{column-span:all;position:relative;margin:.14in auto .16in;overflow:hidden;border:1px solid #786646;background:#d9d1bd;box-shadow:inset 0 0 0 3px rgba(245,239,223,.55),0 3px 8px var(--shadow);break-inside:avoid;page-break-inside:avoid}.art-wide,.art-panorama{width:100%}.art-portrait{width:4.25in}.art-plate img{display:block;width:100%;height:auto;object-fit:contain;object-position:center;background:#ded7c6;filter:saturate(.9) contrast(1.03)}.art-plate figcaption{position:absolute;left:.1in;bottom:.08in;max-width:82%;padding:.045in .08in;color:#f6edd9;background:rgba(31,36,34,.88);border-left:3px solid var(--oxblood);font:italic 7.3pt/1.2 Arial,sans-serif}.art-portrait figcaption{position:static;max-width:none;border-left:0;border-top:2px solid var(--oxblood)}
+.closing{column-span:all;margin:.2in .5in;text-align:center;color:var(--forest-dark);font-size:13pt;font-weight:bold;letter-spacing:.12em;break-inside:avoid}
+@page{size:Letter;margin:.49in .52in .55in;background:var(--parchment)}@page:first{margin:0;background:none}
+@media screen{body{width:min(8.5in,100%);box-shadow:0 0 32px #000}.cover,.frontmatter,.frontispiece,.book{max-width:100%}.frontmatter,.frontispiece,.book{margin-top:.2in}}
+@media print{html,body{width:auto;background:var(--parchment)}.cover{margin:0}.frontispiece{width:auto;height:10in;margin:-.49in -.52in -.55in;padding:.42in .6in}.frontmatter{width:auto;min-height:9.96in;margin:-.49in -.52in -.55in;padding:.52in .58in}.book{width:auto;margin:0;padding:0;column-fill:auto}.part-banner:not(.first){break-before:auto;page-break-before:auto}.art-plate{page-break-before:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+.rules-table caption{caption-side:top;padding:.045in .06in;color:var(--forest-dark);font:700 7.4pt Arial,sans-serif;text-align:left;background:rgba(120,184,163,.10);border:1px solid #786646;border-bottom:0}
+
+@media screen and (max-width:720px){
+html{background:var(--parchment)}body{width:100%;box-shadow:none;font-size:10.5pt;line-height:1.38}
+.cover,.frontispiece,.frontmatter,.book{width:100%;max-width:100%;margin:0}.cover{height:11in;overflow:hidden}.cover-title{font-size:27pt;padding:0 .28in}.cover-quote{left:.35in;right:.35in}.guild-seal{width:2.25in;height:2.25in}
+.frontispiece{height:auto;min-height:100vh;padding:24px 18px}.frontispiece figure{width:100%;max-width:5.7in}.frontmatter{min-height:0;padding:28px 20px}.toc{columns:1}
+.book{padding:28px 18px;columns:1;column-rule:0}.part-banner,h2,.sidebar,.table-wrap,.art-plate,.closing{column-span:none}.art-portrait{width:100%}.art-plate figcaption{position:static;max-width:none;border-left:0;border-top:2px solid var(--oxblood)}
+.table-wrap{overflow-x:auto}.rules-table{min-width:680px;font-size:9.5pt;line-height:1.25}.rules-table th{font-size:9pt}.rules-table caption{font-size:9pt}
+}
+
+
+/* === WoT site bridge: Guild Keepers v1.1 === */
+.sitepatch-nav-spacer{height:76px}
+body.guild-v11-site{padding:0;margin:0}
+body.guild-v11-site nav.sitenav{position:fixed;top:0;left:0;right:0;z-index:1000}
+body.guild-v11-site .sitepatch-homebar{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;padding:10px 18px;background:#0a0d12;border-bottom:1px solid rgba(127,220,213,.2);font:600 12px/1.2 Georgia,serif;letter-spacing:.05em}
+body.guild-v11-site .sitepatch-homebar a{color:#a7d8d4;text-decoration:none}
+body.guild-v11-site .sitepatch-homebar a:hover{text-decoration:underline}
+@media(max-width:900px){.sitepatch-nav-spacer{height:70px}}
+@media print{body.guild-v11-site nav.sitenav,.sitepatch-nav-spacer,.sitepatch-homebar{display:none!important}}
