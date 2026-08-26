@@ -3941,3 +3941,44 @@ nav.sitenav .inner{overflow:visible;}
   .order-v11-page figure[data-code="OU02"] figcaption,
   .order-v11-page figure[data-code="OU03"] figcaption{max-width:220px;font-size:13px;}
 }
+
+/* v138 · Native site layout for Guild Keepers v1.1 page */
+.theme-keepers-v11-page{--page-accent:#76d8c5;--page-accent-soft:rgba(118,216,197,.22);--page-accent-deep:#1b5d53;}
+.keepers-page-shell{max-width:1280px;margin:0 auto;padding-left:22px;padding-right:22px;}
+.keepers-page-shell .compact-hero{position:relative;overflow:hidden;border:1px solid rgba(118,216,197,.20);border-radius:30px;background:radial-gradient(circle at 50% 18%,rgba(118,216,197,.16),transparent 34%),linear-gradient(180deg,rgba(18,28,29,.92),rgba(9,12,16,.84));box-shadow:0 28px 80px rgba(0,0,0,.30);}
+.keepers-page-shell .compact-hero h1{font-size:clamp(48px,7vw,90px);line-height:.98;margin-top:10px;margin-bottom:20px;}
+.keepers-page-shell .compact-hero .lead{max-width:840px;margin-left:auto;margin-right:auto;font-size:clamp(18px,2.1vw,24px);line-height:1.55;}
+.hierarchy-emblem.keepers-single-emblem{width:132px;height:132px;margin:4px auto 16px;border-color:rgba(118,216,197,.35);background:radial-gradient(circle at center,rgba(118,216,197,.18),rgba(0,0,0,.18) 68%);box-shadow:0 0 0 1px rgba(201,169,97,.14) inset,0 18px 46px rgba(0,0,0,.30);}
+.hierarchy-emblem.keepers-single-emblem img{width:94px;height:94px;object-fit:contain;filter:drop-shadow(0 0 14px rgba(118,216,197,.25));}
+.keepers-intro-plate{padding-top:36px;padding-bottom:22px;}
+.keepers-hero-art{max-width:980px;margin:0 auto 30px;border:1px solid rgba(118,216,197,.22);border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.16));padding:12px;box-shadow:0 22px 56px rgba(0,0,0,.26);}
+.keepers-hero-art img{display:block;width:100%;max-height:560px;object-fit:contain;border-radius:16px;}
+.keepers-hero-art figcaption{font-size:15px;color:var(--ink-muted);text-align:center;margin:10px 8px 2px;font-style:italic;}
+.keepers-anchor-nav{max-width:1080px;margin-left:auto;margin-right:auto;}
+.keepers-content-wrap{padding-top:14px;}
+.keepers-v11-reader{max-width:1040px;margin:0 auto;color:var(--ink-soft);}
+.keepers-v11-reader h2{font-family:'Cinzel',serif;color:var(--gold-pale);font-size:clamp(26px,3.2vw,42px);line-height:1.12;margin:52px 0 22px;padding-bottom:14px;border-bottom:1px solid rgba(201,169,97,.22);letter-spacing:.025em;}
+.keepers-v11-reader h2::after{content:'';display:block;width:120px;height:1px;margin-top:13px;background:linear-gradient(90deg,var(--page-accent),transparent);}
+.keepers-v11-reader h3{font-family:'Cinzel',serif;color:color-mix(in srgb,var(--page-accent) 70%, #fff 30%);font-size:clamp(20px,2vw,26px);margin:32px 0 14px;}
+.keepers-v11-reader p,.keepers-v11-reader li{font-size:17px;line-height:1.78;}
+.keepers-v11-reader p{margin:0 0 18px;}
+.keepers-v11-reader ul,.keepers-v11-reader ol{margin:0 0 24px;padding-left:1.35em;}
+.keepers-v11-reader li{margin-bottom:9px;}
+.keepers-v11-reader .dropcap:first-letter{float:left;font-family:'Cinzel',serif;color:var(--page-accent);font-size:3.2em;line-height:.85;margin:.08em .12em 0 0;text-shadow:0 0 18px rgba(118,216,197,.18);}
+.keepers-v11-reader .sidebar,.keepers-v11-reader .reader-note{position:relative;margin:22px 0 26px;padding:18px 22px;border:1px solid rgba(118,216,197,.25);border-left:4px solid var(--page-accent);border-radius:18px;background:linear-gradient(180deg,rgba(118,216,197,.08),rgba(0,0,0,.12));box-shadow:inset 0 0 22px rgba(0,0,0,.10);}
+.keepers-v11-reader .sidebar p{margin:0;}
+.keepers-v11-reader .sidebar-glyph{display:none;}
+.keepers-v11-reader .table-wrap{margin:24px 0 32px;overflow-x:auto;border-radius:16px;}
+.keepers-v11-reader table.rules-table{width:100%;min-width:760px;border-collapse:collapse;border:1px solid rgba(201,169,97,.18);background:rgba(10,12,18,.35);}
+.keepers-v11-reader .rules-table caption{caption-side:top;text-align:left;color:var(--gold-pale);font-family:'Cinzel',serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:11px 12px;background:rgba(118,216,197,.07);border:1px solid rgba(201,169,97,.18);border-bottom:0;}
+.keepers-v11-reader .rules-table th{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--gold-pale);background:rgba(118,216,197,.10);padding:11px 12px;border-bottom:1px solid rgba(201,169,97,.18);text-align:left;vertical-align:top;}
+.keepers-v11-reader .rules-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.06);color:var(--ink-soft);vertical-align:top;}
+.keepers-v11-reader .rules-table tr:hover td{background:rgba(118,216,197,.045);color:var(--ink-bright);}
+.keepers-v11-reader .art-plate{margin:30px auto 34px;border:1px solid rgba(118,216,197,.22);border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.20));padding:12px;box-shadow:0 22px 60px rgba(0,0,0,.30);text-align:center;}
+.keepers-v11-reader .art-wide,.keepers-v11-reader .art-panorama{max-width:980px;}
+.keepers-v11-reader .art-portrait{max-width:560px;}
+.keepers-v11-reader .art-plate img{display:block;width:100%;height:auto;max-height:640px;object-fit:contain;border-radius:14px;border:1px solid rgba(255,255,255,.06);background:#0b1012;}
+.keepers-v11-reader .art-contain img{max-height:520px;}
+.keepers-v11-reader .art-plate figcaption{font-size:15px;color:var(--ink-muted);text-align:center;margin:10px 8px 2px;font-style:italic;line-height:1.45;}
+.keepers-v11-reader .closing{text-align:center;color:var(--gold-pale);font-family:'Cinzel',serif;letter-spacing:.18em;text-transform:uppercase;margin:44px 0 20px;}
+@media(max-width:760px){.keepers-page-shell{padding-left:14px;padding-right:14px}.hierarchy-emblem.keepers-single-emblem{width:96px;height:96px}.hierarchy-emblem.keepers-single-emblem img{width:68px;height:68px}.keepers-page-shell .compact-hero h1{font-size:42px}.keepers-v11-reader p,.keepers-v11-reader li{font-size:16px;line-height:1.68}.keepers-v11-reader table.rules-table{font-size:14px;min-width:640px}.keepers-v11-reader .art-plate{padding:8px;margin:22px auto}.keepers-hero-art img{max-height:420px}}
