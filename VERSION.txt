@@ -1,1 +1,1 @@
-v140 — Scream v2.4 manifest fix: include KR-06 and KR-structure assets
+v141 — Complete illustrated Anomalous Wall hierarchy rebuild
