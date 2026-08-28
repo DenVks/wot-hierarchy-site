@@ -125,6 +125,7 @@ body.theme-wall-dm-page{background:var(--wdm-bg);color:var(--wdm-ink)}
 .wdm-director-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(216,185,104,.1)}
 .wdm-scene-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .wdm-enemy-builder>small{color:var(--wdm-muted);font-size:12px;line-height:1.35}
+.wdm-enemy-builder>small a{color:var(--wdm-gold);text-decoration-color:rgba(232,200,120,.45);text-underline-offset:2px}
 .wdm-enemy-roster{display:grid;gap:7px}
 .wdm-enemy-row{display:grid;grid-template-columns:minmax(0,1fr) 104px 34px;gap:7px;align-items:end}
 .wdm-enemy-row>select,.wdm-enemy-row input{width:100%;box-sizing:border-box;border:1px solid var(--wdm-line);border-radius:10px;background:rgba(0,0,0,.25);color:var(--wdm-ink);padding:8px 9px}

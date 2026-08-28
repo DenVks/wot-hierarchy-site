@@ -1,8 +1,8 @@
 (function(){
   'use strict';
 
-  const STORAGE_KEY = 'wot.wallDmToolkit.v146';
-  const LEGACY_STORAGE_KEYS = ['wot.wallDmToolkit.v145','wot.wallDmToolkit.v144','wot.wallDmToolkit.v142'];
+  const STORAGE_KEY = 'wot.wallDmToolkit.v147';
+  const LEGACY_STORAGE_KEYS = ['wot.wallDmToolkit.v146','wot.wallDmToolkit.v145','wot.wallDmToolkit.v144','wot.wallDmToolkit.v142'];
   const $ = (selector) => document.querySelector(selector);
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const roll = (sides) => Math.floor(Math.random() * sides) + 1;
@@ -80,8 +80,42 @@
     {id:'loop-master', name:'Магистр Внутренней Петли', cr:'10', group:'inner'},
     {id:'rift-swarm', name:'Трещинная Тень-Рой', cr:'1/2', group:'minor'},
     {id:'false-steps', name:'Хор Ложных Шагов', cr:'1', group:'minor'},
-    {id:'rift-link', name:'Сцепка Трещин', cr:'2', group:'minor'}
+    {id:'rift-link', name:'Сцепка Трещин', cr:'2', group:'minor'},
+    {id:'temporal:r5a-copper-false-core', name:'Медный Лже-Центр', cr:'8', group:'temporal', rating:5, anomalyType:'A'},
+    {id:'temporal:r5a-spark-cut-hound', name:'Искровой Гончий Среза', cr:'9', group:'temporal', rating:5, anomalyType:'A'},
+    {id:'temporal:r5a-amber-trajectory-arbiter', name:'Янтарный Арбитр Траектории', cr:'10', group:'temporal', rating:5, anomalyType:'A'},
+    {id:'temporal:r5b-amber-decoy-brood', name:'Янтарная Ложная Матка', cr:'8', group:'temporal', rating:5, anomalyType:'B'},
+    {id:'temporal:r5b-lacquer-pounce-reaver', name:'Лаковый Рывковый Потрошитель', cr:'9', group:'temporal', rating:5, anomalyType:'B'},
+    {id:'temporal:r5b-hive-proctor-errors', name:'Смотритель Ошибок Гнезда', cr:'10', group:'temporal', rating:5, anomalyType:'B'},
+    {id:'temporal:r5c-moonlit-false-victor', name:'Лунный Лже-Победитель', cr:'8', group:'temporal', rating:5, anomalyType:'C'},
+    {id:'temporal:r5c-afterimage-rift-hound', name:'Гончий Запоздалого Образа', cr:'9', group:'temporal', rating:5, anomalyType:'C'},
+    {id:'temporal:r5c-arbiter-of-wrong-outcome', name:'Арбитр Неверного Исхода', cr:'10', group:'temporal', rating:5, anomalyType:'C'},
+    {id:'temporal:r6a-copper-crest-anchor', name:'Медный Якорь Гребня', cr:'9', group:'temporal', rating:6, anomalyType:'A'},
+    {id:'temporal:r6a-first-line-reaver', name:'Первый Линейный Рассекатель', cr:'10', group:'temporal', rating:6, anomalyType:'A'},
+    {id:'temporal:r6a-copper-plane-controller', name:'Контроллер Медных Плоскостей', cr:'11', group:'temporal', rating:6, anomalyType:'A'},
+    {id:'temporal:r6a-returning-line-reaver', name:'Возвратный Линейный Рассекатель', cr:'10', group:'temporal', rating:6, anomalyType:'A'},
+    {id:'temporal:r6b-cold-incubator-anchor', name:'Холодный Якорь Инкубатора', cr:'9', group:'temporal', rating:6, anomalyType:'B'},
+    {id:'temporal:r6b-tether-ripper', name:'Срыватель Связок', cr:'10', group:'temporal', rating:6, anomalyType:'B'},
+    {id:'temporal:r6b-ferment-corridor-controller', name:'Контроллер Ферментных Коридоров', cr:'11', group:'temporal', rating:6, anomalyType:'B'},
+    {id:'temporal:r6b-lacquer-trail-finisher', name:'Добиватель Лаковой Тропы', cr:'10', group:'temporal', rating:6, anomalyType:'B'},
+    {id:'temporal:r6c-moon-frame-anchor', name:'Лунный Якорь Рамки', cr:'9', group:'temporal', rating:6, anomalyType:'C'},
+    {id:'temporal:r6c-first-afterimage-hunter', name:'Первый Охотник Послеобраза', cr:'10', group:'temporal', rating:6, anomalyType:'C'},
+    {id:'temporal:r6c-false-outcome-controller', name:'Контроллер Ложных Исходов', cr:'11', group:'temporal', rating:6, anomalyType:'C'},
+    {id:'temporal:r6c-returning-dream-hunter', name:'Возвратный Охотник Сна', cr:'10', group:'temporal', rating:6, anomalyType:'C'},
+    {id:'temporal:r7ad-pustoy-lozhnyy-razlom', name:'Пустой Ложный Разлом', cr:'11', group:'temporal', rating:7, anomalyType:'A'},
+    {id:'temporal:r7ad-pepelnyy-rassekatel-linii', name:'Пепельный Рассекатель Линии', cr:'12', group:'temporal', rating:7, anomalyType:'A'},
+    {id:'temporal:r7ad-yakor-sedennogo-impulsa', name:'Якорь Съеденного Импульса', cr:'13', group:'temporal', rating:7, anomalyType:'A'},
+    {id:'temporal:r7ad-kontroller-seryh-ploskostey', name:'Контроллер Серых Плоскостей', cr:'14', group:'temporal', rating:7, anomalyType:'A'},
+    {id:'temporal:r7bd-pustaya-lozhnaya-matka', name:'Пустая Ложная Матка', cr:'11', group:'temporal', rating:7, anomalyType:'B'},
+    {id:'temporal:r7bd-pepelnyy-sryvatel-cveta', name:'Пепельный Срыватель Цвета', cr:'12', group:'temporal', rating:7, anomalyType:'B'},
+    {id:'temporal:r7bd-yakor-pustogo-inkubatora', name:'Якорь Пустого Инкубатора', cr:'13', group:'temporal', rating:7, anomalyType:'B'},
+    {id:'temporal:r7bd-kontroller-seryh-koridorov', name:'Контроллер Серых Коридоров', cr:'14', group:'temporal', rating:7, anomalyType:'B'},
+    {id:'temporal:r7cw-amber-mask-ending', name:'Янтарная Маска Финала', cr:'11', group:'temporal', rating:7, anomalyType:'C'},
+    {id:'temporal:r7cw-warm-afterimage-hunter', name:'Охотник Тёплого Послеобраза', cr:'12', group:'temporal', rating:7, anomalyType:'C'},
+    {id:'temporal:r7cw-witness-ending', name:'Якорь Сна «Свидетель Финала»', cr:'13', group:'temporal', rating:7, anomalyType:'C'},
+    {id:'temporal:r7cw-amber-outcome-controller', name:'Контроллер Янтарных Исходов', cr:'14', group:'temporal', rating:7, anomalyType:'C'}
   ];
+  const ANOMALY_TYPE_NAMES = {A:'Энергия', B:'Иные измерения', C:'Тел’аран’риод'};
   const THEMES = ['Ложная дистанция','Невозможность быстро отступить','Потеря реакций','Петля движения','Помеха дальнему бою','Метка на одном герое','Зона без обычного выхода','Движущийся караван','Нестабильный выход','Защита NPC'];
   const ENDINGS = ['Группа достигла точки','Окно закрылось','Пирамидка завершила работу','Караван вышел','Группа отступила','STAB сорвался','Противник уничтожен','Противник прекратил преследование','Петля разрушена или покинута'];
   const STRIKES = [
@@ -115,7 +149,7 @@
 
   function freshState(){
     return {
-      version: 146, sceneName: '', mode: 'halo', zone: 'outer', rank: 0,
+      version: 147, sceneName: '', mode: 'halo', zone: 'outer', rank: 0,
       prof: 3, stabBase: 13, stab: 13, elapsedMinutes: 0, combat: false, round: 0,
       routeIndex: 0, routeStatuses: [], extraSteps: 0, failures: 0, dreamFailures: 0,
       tunnelDuration: 0, postBattle: false, completedChecks: {}, alerts: [],
@@ -147,7 +181,7 @@
   }
 
   function normalizeState(data){
-    const merged = Object.assign(freshState(), data || {}, {version:146});
+    const merged = Object.assign(freshState(), data || {}, {version:147});
     merged.party = (merged.party || []).map(normalizeMember);
     merged.enemies = normalizeEnemies(data || merged);
     return merged;
@@ -156,10 +190,10 @@
   function loadState(){
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved && saved.version === 146) return normalizeState(saved);
+      if (saved && saved.version === 147) return normalizeState(saved);
       for (const key of LEGACY_STORAGE_KEYS) {
         const legacy = JSON.parse(localStorage.getItem(key));
-        if (legacy && [142,144,145].includes(legacy.version)) {
+        if (legacy && [142,144,145,146].includes(legacy.version)) {
           return normalizeState(Object.assign({}, legacy, {scenePhase:legacy.scenePhase || (legacy.combat?'roundStart':legacy.postBattle?'sceneEnd':'prep')}));
         }
       }
@@ -170,7 +204,11 @@
   let state = loadState();
 
   function monsterById(id){ return MONSTERS.find((monster) => monster.id === id) || MONSTERS[0]; }
-  function monsterLabel(monster){ return monster.id === 'none' ? monster.name : `${monster.name} · CR ${monster.cr}`; }
+  function monsterLabel(monster){
+    if (monster.id === 'none') return monster.name;
+    const source = monster.group === 'temporal' ? ` · R${monster.rating} · Type ${monster.anomalyType}` : '';
+    return `${monster.name} · CR ${monster.cr}${source}`;
+  }
   function enemySummary(){
     const rows = state.enemies.filter((item) => item.monsterId !== 'none' && item.count > 0);
     return rows.length ? rows.map((item) => `${item.count}× ${monsterLabel(monsterById(item.monsterId))}`).join('; ') : 'Без противников';
@@ -644,13 +682,20 @@
   }
 
   function monsterOptions(selected){
-    const groups = [
+    const wallGroups = [
       ['none','Без боя'],
       ['outer','Основные · Внешняя Тень'],
       ['inner','Основные · Внутренняя Тень'],
       ['minor','Мелкие существа / поддержка']
     ];
-    return groups.map(([group,label]) => `<optgroup label="${label}">${MONSTERS.filter((monster)=>monster.group===group).map((monster)=>`<option value="${monster.id}" ${monster.id===selected?'selected':''}>${esc(monsterLabel(monster))}</option>`).join('')}</optgroup>`).join('');
+    const wallOptions = wallGroups.map(([group,label]) => `<optgroup label="${label}">${MONSTERS.filter((monster)=>monster.group===group).map((monster)=>`<option value="${monster.id}" ${monster.id===selected?'selected':''}>${esc(monsterLabel(monster))}</option>`).join('')}</optgroup>`).join('');
+    const temporalOptions = [5,6,7].flatMap((rating) => ['A','B','C'].map((anomalyType) => {
+      const monsters = MONSTERS.filter((monster) => monster.group === 'temporal' && monster.rating === rating && monster.anomalyType === anomalyType);
+      if (!monsters.length) return '';
+      const label = `Временные · R${rating} · Type ${anomalyType} · ${ANOMALY_TYPE_NAMES[anomalyType]}`;
+      return `<optgroup label="${label}">${monsters.map((monster)=>`<option value="${monster.id}" ${monster.id===selected?'selected':''}>${esc(monsterLabel(monster))}</option>`).join('')}</optgroup>`;
+    })).join('');
+    return wallOptions + temporalOptions;
   }
 
   function renderScene(){
