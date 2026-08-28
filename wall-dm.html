@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="Интерактивный пульт Мастера для переходов и энкаунтеров в Аномальной Стене: STAB, маршрут, проверки, события и журнал."/>
+<title>Аномальная Стена · DM Toolkit · 270 ПБ</title>
+<script src="assets/auth.js?v=117"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Pro:ital,wght@0,400;0,500;0,600&display=swap" rel="stylesheet"/>
+<link href="assets/styles.css?v=142" rel="stylesheet"/>
+<link href="assets/wall-dm.css?v=142" rel="stylesheet"/>
+</head>
+<body class="theme-wall-dm-page">
+<div class="pattern-bg"></div>
+<div aria-hidden="true" class="thread-layer"><svg preserveAspectRatio="none" viewBox="0 0 1800 1200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="wdm-thread" x1="0" x2="1"><stop offset="0" stop-color="#c9a961" stop-opacity="0"/><stop offset=".5" stop-color="#c9a961" stop-opacity=".42"/><stop offset="1" stop-color="#c9a961" stop-opacity="0"/></linearGradient></defs><path d="M-50,180 Q400,60 850,240 Q1200,380 1850,180" fill="none" stroke="url(#wdm-thread)" stroke-width="1"/></svg></div>
+<nav class="sitenav"><div class="inner"><a class="nav-brand" href="index.html"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient cx="50%" cy="50%" id="wg"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"></stop><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"></stop></radialGradient></defs><g fill="none" stroke="url(#wg)" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"></circle><circle cx="40" cy="40" opacity=".75" r="28" stroke-width=".7"></circle><circle cx="40" cy="40" opacity=".55" r="18" stroke-width=".5"></circle><circle cx="40" cy="40" opacity=".85" r="8" stroke-width=".6"></circle><g opacity=".7" stroke-width=".55"><line x1="40" x2="40" y1="4" y2="76"></line><line x1="4" x2="76" y1="40" y2="40"></line><line x1="14.8" x2="65.2" y1="14.8" y2="65.2"></line><line x1="65.2" x2="14.8" y1="14.8" y2="65.2"></line><line x1="40" x2="52" y1="4" y2="76"></line><line x1="40" x2="28" y1="4" y2="76"></line><line x1="4" x2="76" y1="40" y2="52"></line></g><circle cx="40" cy="40" fill="#e8c878" r="3" stroke="none"></circle></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="epoch.html">Эпоха</a><a href="hierarchies.html">Иерархии</a><a href="unity.html">Единство</a><a href="throne.html">Трон</a><a href="madding.html">Хранители</a><a href="hierarchy-wall.html">Иерархия Стены</a><a class="active" href="wall-dm.html">Стена: DM</a><a href="scream.html">Крик</a><a href="order.html">Орден</a><a href="wall.html">Стена</a><a href="chronicles.html">Хроника</a><a href="anomalies.html">Аномалии</a><a href="aiel.html">Айил</a><a href="tuataan.html">Туата’ан</a><a href="freefolk.html">Вольные</a><a href="rituals.html">Ритуалы</a><a href="classes.html">Классы</a><a href="weaves.html">Плетения</a><a href="ingredients.html">Ингредиенты</a><a href="loot-generator.html">Генератор</a><a href="encounter-generator.html">Энкаунтеры</a><a href="tsitadel.html">Цитадель</a><a href="monsters.html">Монстры</a><a href="dm-npc.html">NPC / Бой</a></div></div></nav>
+<main class="wall-dm-page" id="wallDmApp">
+  <header class="wdm-hero">
+    <div class="wdm-kicker">DM Toolkit · полевая консоль</div>
+    <h1>Аномальная Стена</h1>
+    <p>Один экран для всего перехода: состояние группы, пройденный путь, текущая проверка, пороги STAB, события среды и последствия сцены.</p>
+    <nav class="wdm-tabs" aria-label="Разделы Аномальной Стены">
+      <a href="hierarchy-wall.html">Правила игрока</a>
+      <a class="active" href="wall-dm.html" aria-current="page">Пульт мастера</a>
+    </nav>
+  </header>
+
+  <section class="wdm-command" aria-label="Управление сценой">
+    <div class="wdm-field"><label for="sceneName">Название сцены</label><input id="sceneName" placeholder="Например: Окно у мёртвого плато"/></div>
+    <button class="wdm-btn" id="copySummary" type="button">Копировать сводку</button>
+    <button class="wdm-btn danger" id="resetExpedition" type="button">Новая экспедиция</button>
+  </section>
+
+  <section class="wdm-status-grid" aria-label="Состояние экспедиции">
+    <article class="wdm-status wdm-stab">
+      <div><span class="wdm-label">STAB группы</span><strong class="wdm-stab-value" id="stabValue">13</strong><small id="stabBand">Стабильный маршрут</small><small class="wdm-base-line">Исходный: 10 + средний БМ <select id="profSelect" class="wdm-mini-select" aria-label="Средний бонус мастерства"><option value="2">+2</option><option value="3" selected>+3</option><option value="4">+4</option><option value="5">+5</option><option value="6">+6</option></select> = <b id="baseValue">13</b></small></div>
+      <div class="wdm-stab-controls"><button class="wdm-btn" id="stabPlus" type="button" aria-label="Увеличить STAB">+</button><button class="wdm-btn" id="stabMinus" type="button" aria-label="Уменьшить STAB">−</button><button class="wdm-btn small" id="stabReset" type="button" aria-label="Вернуть исходный STAB">↺</button></div>
+    </article>
+    <article class="wdm-status"><span class="wdm-label">Тип перехода</span><select id="modeSelect"><option value="halo">Экспедиция в Ореоле</option><option value="window">Окно дрейфа · 6 сегментов</option><option value="dream">Сквозь Сон · 3 проверки</option><option value="tunnel">Тоннель согласованности</option><option value="caravan">Караванный переход</option><option value="core">Авария в Ядре</option><option value="crest">Метод Гребня</option></select><small id="modeHint"></small></article>
+    <article class="wdm-status"><span class="wdm-label">Зона</span><select id="zoneSelect"><option value="outer">Внешняя Тень</option><option value="inner">Внутренняя Тень</option><option value="core">Ядро / Гребень</option><option value="dream">Тел’аран’риод</option></select><small id="zoneHint">Держать маршрут · СЛ 14</small></article>
+    <article class="wdm-status"><span class="wdm-label">Проводник</span><select id="rankSelect"><option value="0">Нет иерарха</option><option value="1">I · Помеченный Швом</option><option value="2">II · Страж Узла</option><option value="3">III · Ведущий Каравана</option><option value="4">IV · Хранитель Окна</option><option value="5">V · Страж Дрейфа</option><option value="6">VI · Голос Гребня</option><option value="7">VII · Архистраж</option><option value="8">VIII · Проводник</option></select><small id="rankHint">Навигация без специальных средств защиты</small></article>
+    <article class="wdm-status"><span class="wdm-label">Время / бой</span><strong id="clockValue">0 ч · вне боя</strong><small><button class="wdm-btn small" id="toggleCombat" type="button">Начать бой</button></small></article>
+  </section>
+
+  <div class="wdm-alerts" id="alerts" aria-live="polite"></div>
+
+  <div class="wdm-grid">
+    <div class="wdm-stack">
+      <section class="wdm-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">Маршрут</span><h2 id="routeTitle">Экспедиция в Ореоле</h2></div><button class="wdm-btn small" id="addRouteStep" type="button">+ сегмент</button></div>
+        <div class="wdm-route-track" id="routeTrack" aria-label="Путь экспедиции"></div>
+        <div class="wdm-route-actions" id="routeActions"></div>
+        <div class="wdm-inline-checks" id="routeOptions"></div>
+      </section>
+
+      <section class="wdm-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">Каркас энкаунтера</span><h2>Сцена без долгого выбора</h2></div></div>
+        <div class="wdm-scene-grid">
+          <div class="wdm-field"><label for="objectiveSelect">Цель группы</label><select id="objectiveSelect"></select></div>
+          <div class="wdm-field"><label for="enemySelect">Главный противник</label><select id="enemySelect"></select></div>
+          <div class="wdm-field"><label for="themeSelect">Одна тема поля</label><select id="themeSelect"></select></div>
+          <div class="wdm-field"><label for="endingSelect">Окончание сцены</label><select id="endingSelect"></select></div>
+          <div class="wdm-field"><label for="timeLimit">Ограничение времени</label><input id="timeLimit" placeholder="Например: окно закроется через 4 раунда"/></div>
+          <div class="wdm-field"><label for="telegraph">Признак опасности</label><input id="telegraph" placeholder="Например: карта перестала совпадать с горизонтом"/></div>
+        </div>
+        <div class="wdm-scene-summary" id="sceneSummary"></div>
+      </section>
+
+      <section class="wdm-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">Группа</span><h2>Люди, истощение и Метки</h2></div><button class="wdm-btn small" id="addPartyMember" type="button">+ участник</button></div>
+        <div class="wdm-party-row wdm-party-head"><span>Имя</span><span>Истощение</span><span>Метки / состояние</span><span></span></div>
+        <div class="wdm-party-list" id="partyList"></div>
+      </section>
+
+      <section class="wdm-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">События</span><h2>Быстрый бросок</h2></div></div>
+        <div class="wdm-event-buttons"><button class="wdm-btn primary" id="rollStrike" type="button">Удар среды · 1d8</button><button class="wdm-btn" id="rollMark" type="button">Метка Узора · 1d6</button><button class="wdm-btn" id="rollDrift" type="button">Дрейф · 1d6</button></div>
+        <div class="wdm-roll-result" id="rollResult"><p>Результат броска появится здесь и автоматически попадёт в журнал.</p></div>
+      </section>
+    </div>
+
+    <aside class="wdm-stack side">
+      <section class="wdm-card wdm-now">
+        <div class="wdm-card-head"><div><span class="wdm-label">Сейчас</span><h2 id="nowTitle">Что проверить</h2></div></div>
+        <div class="wdm-now-list" id="nowChecklist"></div>
+        <div class="wdm-rule-note" id="cadenceNote"></div>
+      </section>
+
+      <section class="wdm-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">Ранг проводника</span><h2>Рабочие напоминания</h2></div></div>
+        <div class="wdm-rank-reminders" id="rankReminders"></div>
+      </section>
+
+      <section class="wdm-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">Хронология</span><h2>Журнал экспедиции</h2></div><button class="wdm-btn small" id="clearLog" type="button">Очистить</button></div>
+        <div class="wdm-log" id="eventLog"></div>
+      </section>
+
+      <section class="wdm-card wdm-reference">
+        <span class="wdm-label">Правила под рукой</span>
+        <details><summary>Пороги STAB</summary><ul><li>9–7: случайный персонаж, Мдр СЛ 14; провал — истощение или Сбой восприятия.</li><li>6–4: потеря 1d4 часов и Удар среды.</li><li>3–1: все, Тел СЛ 15; 2/1 истощения, затем обязательная встреча.</li><li>0: срыв в Ядро или локальный карман Ядра.</li></ul></details>
+        <details><summary>После боя</summary><ul><li>Уточнить, прошёл ли час.</li><li>Проверить STAB, окно и Метки.</li><li>Зафиксировать потерю времени и истощение.</li><li>Решить, маршрут всё ещё пригоден или сцена проиграна экспедиционно.</li></ul></details>
+        <details><summary>Что не делать</summary><ul><li>Не снижать STAB «за атмосферу».</li><li>Не бросать Удар среды каждый раунд без причины.</li><li>Не складывать больше двух дополнительных осложнений.</li><li>Не превращать Ядро в обычный данж.</li></ul></details>
+      </section>
+    </aside>
+  </div>
+
+  <div class="wdm-footer-actions"><button class="wdm-btn" id="advanceBeat" type="button">Следующий такт</button><button class="wdm-btn primary" id="nextRound" type="button">Следующий раунд</button><button class="wdm-btn" id="finishCombat" type="button">Завершить бой</button></div>
+</main>
+<footer><svg class="mini-wheel-ft" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient cx="50%" cy="50%" id="wg-ft"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"></stop><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"></stop></radialGradient></defs><g fill="none" stroke="url(#wg-ft)" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"></circle><circle cx="40" cy="40" opacity=".75" r="28" stroke-width=".7"></circle><circle cx="40" cy="40" opacity=".55" r="18" stroke-width=".5"></circle><circle cx="40" cy="40" opacity=".85" r="8" stroke-width=".6"></circle><g opacity=".7" stroke-width=".55"><line x1="40" x2="40" y1="4" y2="76"></line><line x1="4" x2="76" y1="40" y2="40"></line><line x1="14.8" x2="65.2" y1="14.8" y2="65.2"></line><line x1="65.2" x2="14.8" y1="14.8" y2="65.2"></line></g><circle cx="40" cy="40" fill="#e8c878" r="3" stroke="none"></circle></g></svg><div class="ft-quote">❖&nbsp;&nbsp;И нет ни начала, ни конца вращению Колеса Времени&nbsp;&nbsp;❖</div><p>Четвёртая Эпоха · 270 лет после Последней Битвы</p></footer>
+<div class="wdm-toast" id="toast" role="status"></div>
+<script src="assets/shared.js?v=142"></script>
+<script src="assets/wall-dm.js?v=142"></script>
+</body>
+</html>
