@@ -1,8 +1,8 @@
 (function(){
   'use strict';
 
-  const STORAGE_KEY = 'wot.wallDmToolkit.v144';
-  const LEGACY_STORAGE_KEY = 'wot.wallDmToolkit.v142';
+  const STORAGE_KEY = 'wot.wallDmToolkit.v145';
+  const LEGACY_STORAGE_KEYS = ['wot.wallDmToolkit.v144','wot.wallDmToolkit.v142'];
   const $ = (selector) => document.querySelector(selector);
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const roll = (sides) => Math.floor(Math.random() * sides) + 1;
@@ -104,7 +104,7 @@
 
   function freshState(){
     return {
-      version: 144, sceneName: '', mode: 'halo', zone: 'outer', rank: 0,
+      version: 145, sceneName: '', mode: 'halo', zone: 'outer', rank: 0,
       prof: 3, stabBase: 13, stab: 13, elapsedMinutes: 0, combat: false, round: 0,
       routeIndex: 0, routeStatuses: [], extraSteps: 0, failures: 0, dreamFailures: 0,
       tunnelDuration: 0, postBattle: false, completedChecks: {}, alerts: [],
@@ -119,11 +119,12 @@
   function loadState(){
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved && saved.version === 144) return Object.assign(freshState(), saved);
-      const legacy = JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY));
-      if (legacy && legacy.version === 142) {
-        const migrated = Object.assign(freshState(), legacy, {version:144, scenePhase:legacy.combat?'roundStart':legacy.postBattle?'sceneEnd':'prep'});
-        return migrated;
+      if (saved && saved.version === 145) return Object.assign(freshState(), saved);
+      for (const key of LEGACY_STORAGE_KEYS) {
+        const legacy = JSON.parse(localStorage.getItem(key));
+        if (legacy && [142,144].includes(legacy.version)) {
+          return Object.assign(freshState(), legacy, {version:145, scenePhase:legacy.scenePhase || (legacy.combat?'roundStart':legacy.postBattle?'sceneEnd':'prep')});
+        }
       }
     } catch (error) {}
     return freshState();
@@ -326,8 +327,11 @@
   function dutyItems(){
     const step = routeSteps()[state.routeIndex] || 'Маршрут завершён';
     const items = [];
-    if (['halo','window','caravan'].includes(state.mode)) items.push({key:`route-${state.routeIndex}`, title:`Держать маршрут · СЛ ${state.mode==='window'?17:zoneDc()||17}`, text:`${step}. Выберите содержательный подход; тяжёлый провал начинается при результате на 5 ниже СЛ.`, urgent:!state.routeStatuses[state.routeIndex]});
-    if (state.mode === 'dream') items.push({key:`dream-${state.routeIndex}`,title:`Проводник сна · Проницательность СЛ ${currentDreamDc()}`,text:step,urgent:!state.routeStatuses[state.routeIndex]});
+    if (['halo','window','caravan'].includes(state.mode)) {
+      const moment = state.mode === 'window' ? 'когда группа завершила этот сегмент Окна' : 'когда закончился очередной час пути';
+      items.push({key:`route-${state.routeIndex}`, title:`После отрезка: «Держать маршрут» · СЛ ${state.mode==='window'?17:zoneDc()||17}`, text:`Бросьте один раз, ${moment}, а не каждый раунд. Текущий отрезок: ${step}. Тяжёлый провал — результат на 5 ниже СЛ.`, urgent:!state.routeStatuses[state.routeIndex]});
+    }
+    if (state.mode === 'dream') items.push({key:`dream-${state.routeIndex}`,title:`После этапа сна: Проницательность СЛ ${currentDreamDc()}`,text:`Бросьте один раз при завершении этапа «${step}», не в каждом раунде сцены.`,urgent:!state.routeStatuses[state.routeIndex]});
     if (state.mode === 'tunnel' && state.routeIndex < state.tunnelDuration) items.push({key:`tunnel-${state.routeIndex}`,title:`Минута ${state.routeIndex+1} из ${state.tunnelDuration}`,text:'Проверьте, кто уже вышел и кто задержан. Таймер не приостанавливается.',urgent:true});
     if (state.mode === 'tunnel' && state.routeIndex >= state.tunnelDuration) items.push({key:'tunnel-closed',title:'Тоннель закрыт',text:'Оставшиеся внутри выброшены во Внутреннюю Тень с STAB 3.',urgent:true});
     if (state.mode === 'core') {
@@ -395,12 +399,12 @@
     const phase = state.scenePhase;
     const zoneName = state.zone === 'outer' ? 'Внешняя Тень' : state.zone === 'inner' ? 'Внутренняя Тень' : state.zone === 'core' ? 'Ядро / Гребень' : 'Тел’аран’риод';
     if (phase === 'prep') return [
-      {key:'expedition', title:'1. Экспедиция', text:`${MODES[state.mode].title} · ${zoneName} · STAB ${state.stab}/${state.stabBase} · текущий такт: ${routeSteps()[state.routeIndex] || 'маршрут завершён'}.`},
-      {key:'party', title:'2. Группа', text:`Проверьте Метки и истощение ${state.party.length ? `у ${state.party.length} участников` : 'после добавления участников'}.`},
-      {key:'goal', title:'3. Цель кроме убийства', text:state.objective},
-      {key:'threat', title:'4. Одна угроза и одна тема', text:`${state.enemy}. Поле: ${state.theme}.`},
-      {key:'ending', title:'5. Победа, поражение и время', text:`Финал: ${state.ending}. ${state.timeLimit || 'Отдельный таймер не задан.'} (${TIMER_CADENCE[state.timerCadence]}).`},
-      {key:'telegraph', title:'6. Что заметят заранее', text:state.telegraph || 'Признак опасности пока не записан — задайте его в каркасе энкаунтера.', urgent:!state.telegraph}
+      {key:'expedition', title:'1. Где и когда происходит сцена?', text:`Сверьте верхние карточки. Сейчас: ${MODES[state.mode].title}, ${zoneName}, STAB ${state.stab}/${state.stabBase}, отрезок «${routeSteps()[state.routeIndex] || 'маршрут завершён'}». Здесь ничего не бросайте.`, why:'Режим и зона определяют, какая проверка пути понадобится после сцены или по окончании отрезка.'},
+      {key:'party', title:'2. Кто входит в сцену и в каком состоянии?', text:`Откройте список группы ниже и прочитайте Метки и истощение ${state.party.length ? `у всех ${state.party.length} участников` : 'после добавления участников'}. Отметьте эффекты, которые сработают в их ход.`, why:'Чтобы не вспоминать Метки уже после того, как ход персонажа закончился.'},
+      {key:'goal', title:'3. Что должны сделать игроки?', text:`Сформулируйте одной фразой и озвучьте игрокам: «${state.objective}». Убийство врага само по себе не считается целью, если вы не выбрали это явно.`, why:'Цель подсказывает, что двигать в окне «Цель / NPC» каждый раунд.'},
+      {key:'threat', title:'4. Что мешает выполнить цель?', text:`Используйте одну главную угрозу: ${state.enemy}. Повторяющаяся особенность поля: ${state.theme}. Не добавляйте новую тему каждый раунд.`, why:'Одна угроза и одна тема сохраняют сцену читаемой и снимают необходимость выбирать осложнение на каждом ходу.'},
+      {key:'ending', title:'5. Когда сцена закончится?', text:`Запишите точный момент: «${state.ending}». ${state.timeLimit || 'Отдельного таймера нет.'} Периодичность: ${TIMER_CADENCE[state.timerCadence]}.`, why:'Мастер заранее понимает, когда остановить инициативу и не ведёт бой до последнего хита по привычке.'},
+      {key:'telegraph', title:'6. Что игроки заметят до инициативы?', text:state.telegraph ? `Озвучьте признак: «${state.telegraph}».` : 'Признак пока не задан. Ниже, в каркасе энкаунтера, запишите один звук, образ или изменение среды и сообщите его игрокам.', why:'У игроков появляется основание принять решение, а опасность не выглядит внезапным наказанием.', urgent:!state.telegraph}
     ];
     if (phase === 'opening') return [
       {key:'describe', title:'Показать опасность', text:state.telegraph || 'Опишите наблюдаемый признак опасности до инициативы.', urgent:!state.telegraph},
@@ -510,7 +514,8 @@
     $('#phaseRule').textContent = current.rule;
     $('#sceneRoundBadge').textContent = state.scenePhase === 'prep' ? 'Сцена не начата' : state.scenePhase === 'opening' ? 'Открытие сцены' : state.scenePhase === 'sceneEnd' ? 'Сцена завершена' : `Раунд ${state.round || 1}`;
     const items = phaseItems();
-    $('#phaseChecklist').innerHTML = items.map((item) => {const key=phaseCheckKey(item.key);return `<label class="wdm-phase-duty${item.urgent?' urgent':''}"><input type="checkbox" data-phase-check="${esc(key)}" ${state.phaseChecks[key]?'checked':''}/><span><b>${esc(item.title)}</b><small>${esc(item.text)}</small></span></label>`;}).join('');
+    $('#phaseChecklist').innerHTML = items.map((item) => {const key=phaseCheckKey(item.key);return `<label class="wdm-phase-duty${item.urgent?' urgent':''}"><input type="checkbox" data-phase-check="${esc(key)}" ${state.phaseChecks[key]?'checked':''}/><span><b>${esc(item.title)}</b><small><i>Что сделать:</i> ${esc(item.text)}</small>${item.why?`<em><i>Зачем:</i> ${esc(item.why)}</em>`:''}</span></label>`;}).join('');
+    $('#phaseCheckHint').textContent = state.scenePhase === 'prep' ? 'Галочка означает: решение принято и записано. Бросок кубика для этих шести пунктов не требуется.' : state.scenePhase === 'turns' ? 'Галочка означает: действие или эффект этого участника полностью разрешён.' : 'Галочка означает: указанное действие выполнено; это не отдельная проверка, если в тексте прямо не названы бросок и СЛ.';
 
     const turnFocus = $('#turnFocus'); turnFocus.hidden = state.scenePhase !== 'turns';
     if (actor) {
@@ -571,7 +576,7 @@
   }
 
   function renderNow(){
-    $('#nowTitle').textContent = state.postBattle ? 'Итоги такта' : 'Проверки такта';
+    $('#nowTitle').textContent = state.postBattle ? 'Сначала определите прошедшее время' : state.mode === 'window' ? 'Бросок после завершения сегмента' : state.mode === 'tunnel' ? 'Отметка после каждой минуты' : state.mode === 'core' ? 'Броски после каждых 10 минут' : state.mode === 'crest' ? 'Один раз за весь переход' : 'Бросок после окончания часа';
     const duties = dutyItems();
     $('#nowChecklist').innerHTML = duties.length ? duties.map((item) => `<label class="wdm-duty${item.urgent?' urgent':''}"><input type="checkbox" data-duty="${esc(item.key)}" ${state.completedChecks[item.key]?'checked':''}/><span><b>${esc(item.title)}</b><small>${esc(item.text)}</small></span></label>`).join('') : '<div class="wdm-empty">На текущем такте обязательных проверок нет.</div>';
     $('#cadenceNote').textContent = MODES[state.mode].cadence;
