@@ -1,7 +1,8 @@
 (function(){
   'use strict';
 
-  const STORAGE_KEY = 'wot.wallDmToolkit.v142';
+  const STORAGE_KEY = 'wot.wallDmToolkit.v144';
+  const LEGACY_STORAGE_KEY = 'wot.wallDmToolkit.v142';
   const $ = (selector) => document.querySelector(selector);
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const roll = (sides) => Math.floor(Math.random() * sides) + 1;
@@ -52,6 +53,22 @@
     }
   };
 
+  const PHASES = [
+    {key:'prep', short:'0 · До сцены', title:'До сцены', lead:'Зафиксируйте шесть опор. После этого во время боя не придётся заново придумывать, что происходит.', rule:'Это единственный этап, где Мастер принимает основные решения о конструкции сцены.'},
+    {key:'opening', short:'1 · Открытие', title:'Открытие сцены', lead:'Дайте игрокам картину, цель и цену промедления до броска инициативы.', rule:'Опасность должна иметь наблюдаемый признак. V ранг чувствует связанную аномалию за 5 минут, и встреча не застаёт группу врасплох.'},
+    {key:'roundStart', short:'2 · Старт раунда', title:'Начало раунда', lead:'Сверьте номер раунда и только те эффекты, которые действительно срабатывают сейчас.', rule:'Маршрутная проверка не является действием каждого раунда: она происходит по такту выбранного режима.'},
+    {key:'turns', short:'3 · Ходы', title:'Ходы всех сторон', lead:'Идите по очереди участников. Отдельные окна ниже подскажут действия героев, угрозы, цели и самой Стены.', rule:'Новый Удар среды не возникает каждый ход или раунд. Он нужен только по правилу, способности существа или заранее заявленному событию.'},
+    {key:'roundEnd', short:'4 · Конец раунда', title:'Конец раунда', lead:'Сведите последствия раунда в одном месте и решите: следующий раунд или финал сцены.', rule:'STAB не уменьшается «за атмосферу». Меняйте его только по действующему правилу или конкретному эффекту.'},
+    {key:'sceneEnd', short:'5 · После сцены', title:'После сцены', lead:'Перенесите результат боя обратно в экспедицию: время, маршрут, STAB, Метки и истощение.', rule:'Победа над противником может быть поражением экспедиции, если окно закрылось или маршрут перестал быть пригодным.'}
+  ];
+
+  const TIMER_CADENCE = {
+    none:'таймера нет',
+    round:'двигать в конце каждого раунда',
+    minute:'двигать раз в 10 раундов (1 минута)',
+    event:'двигать только по заявленному событию'
+  };
+
   const OBJECTIVES = ['Провести караван через поле','Удержать точку маршрута','Добраться до метки выхода','Не дать сорвать маяк','Пережить закрытие окна','Вынести раненого','Завершить установку Пирамидки','Удерживать коридор для остальных','Не дать закрепить Метку','Вырваться из петли'];
   const ENEMIES = ['Без главного противника','Картограф-Разломщик · CR 7','Пиявка Стабильности · CR 8','Арбитр Петли · CR 9','Сборщик Слепых Углов · CR 8','Клеймовщик Узора · CR 9','Магистр Внутренней Петли · CR 10','Трещинная Тень-Рой · CR 1/2','Хор Ложных Шагов · CR 1','Сцепка Трещин · CR 2'];
   const THEMES = ['Ложная дистанция','Невозможность быстро отступить','Потеря реакций','Петля движения','Помеха дальнему бою','Метка на одном герое','Зона без обычного выхода','Движущийся караван','Нестабильный выход','Защита NPC'];
@@ -87,12 +104,13 @@
 
   function freshState(){
     return {
-      version: 142, sceneName: '', mode: 'halo', zone: 'outer', rank: 0,
+      version: 144, sceneName: '', mode: 'halo', zone: 'outer', rank: 0,
       prof: 3, stabBase: 13, stab: 13, elapsedMinutes: 0, combat: false, round: 0,
       routeIndex: 0, routeStatuses: [], extraSteps: 0, failures: 0, dreamFailures: 0,
       tunnelDuration: 0, postBattle: false, completedChecks: {}, alerts: [],
       objective: OBJECTIVES[0], enemy: ENEMIES[1], theme: THEMES[0], ending: ENDINGS[0],
-      timeLimit: '', telegraph: '', approach: 'Мудрость (Выживание)',
+      timeLimit: '', timerCadence: 'none', telegraph: '', approach: 'Мудрость (Выживание)',
+      scenePhase: 'prep', activeActorIndex: 0, phaseChecks: {},
       party: [1,2,3,4].map((n) => ({id: Date.now()+n, name:`Участник ${n}`, exhaustion:0, marks:''})),
       log: []
     };
@@ -101,7 +119,12 @@
   function loadState(){
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved && saved.version === 142) return Object.assign(freshState(), saved);
+      if (saved && saved.version === 144) return Object.assign(freshState(), saved);
+      const legacy = JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY));
+      if (legacy && legacy.version === 142) {
+        const migrated = Object.assign(freshState(), legacy, {version:144, scenePhase:legacy.combat?'roundStart':legacy.postBattle?'sceneEnd':'prep'});
+        return migrated;
+      }
     } catch (error) {}
     return freshState();
   }
@@ -315,20 +338,199 @@
       items.push({key:'crest-con',title:'Один раз за переход: Телосложение СЛ 18',text:'Обычные последствия Ядра сохраняются.',urgent:true});
       items.push({key:'crest-wis',title:'Один раз за переход: Мудрость СЛ 18',text:'Не повторять каждые 10 минут.',urgent:true});
     }
-    if (state.combat) {
-      items.push({key:`combat-effects-${state.round}`,title:'Начало и конец раунда',text:'Разрешите эффекты существ, сроки состояний, реакции и легендарные действия.'});
-      items.push({key:`combat-theme-${state.round}`,title:`Тема поля: ${state.theme}`,text:'Разрешите только заявленную пространственную тему и эффекты существ.'});
-      if (state.timeLimit) items.push({key:`combat-timer-${state.round}`,title:'Обновить таймер сцены',text:state.timeLimit,urgent:true});
-      items.push({key:`combat-goal-${state.round}`,title:'Проверить цель, а не только хиты',text:state.objective});
-      const timeHole = state.party.filter((member) => /дыра во времени/i.test(member.marks));
-      if (timeHole.length) items.push({key:`combat-time-hole-${state.round}`,title:'Метка «Дыра во времени»',text:`В начале хода проверьте носителей: ${timeHole.map((item)=>item.name).join(', ')}. Не чаще 1 раза за 24 часа.`,urgent:true});
-    }
     if (state.postBattle) {
       items.push({key:'post-time',title:'Прошёл ли час?',text:'Если да — разрешите часовую маршрутную проверку.'});
       items.push({key:'post-state',title:'STAB · окно · Метки · истощение',text:'Зафиксируйте последствия до следующей сцены.',urgent:true});
       items.push({key:'post-route',title:'Маршрут всё ещё пригоден?',text:'Победа в бою может быть поражением экспедиции.'});
     }
     return items;
+  }
+
+  function turnActors(){
+    const people = state.party.map((member) => ({key:`pc-${member.id}`, kind:'pc', label:member.name || 'Безымянный герой', member}));
+    return people.concat([
+      {key:'enemies', kind:'enemies', label:'Противники'},
+      {key:'objective', kind:'objective', label:'Цель / NPC'},
+      {key:'wall', kind:'wall', label:'Стена / таймер'}
+    ]);
+  }
+
+  function activeActor(){
+    const actors = turnActors();
+    state.activeActorIndex = clamp(state.activeActorIndex || 0, 0, Math.max(0, actors.length - 1));
+    return actors[state.activeActorIndex];
+  }
+
+  function actorItems(actor){
+    if (!actor) return [];
+    if (actor.kind === 'pc') {
+      const member = actor.member;
+      const items = [
+        {key:'start', title:'Начало хода', text:`Состояния, текущие эффекты и Метки. Истощение: ${member.exhaustion || 0}; ${member.marks || 'активных Меток не записано'}.`},
+        {key:'act', title:'Действие героя', text:`Атака, защита, перемещение или шаг к цели: ${state.objective}.`},
+        {key:'end', title:'Конец хода', text:'Концентрация, длительности «до конца хода» и созданные персонажем триггеры.'}
+      ];
+      if (/дыра во времени/i.test(member.marks || '')) items.unshift({key:'time-hole', title:'Дыра во времени · начало хода', text:'Если способность ещё не использована за 24 часа, Мастер может лишить героя действия. Перемещение, бонусное действие и реакции остаются.', urgent:true});
+      return items;
+    }
+    if (actor.kind === 'enemies') return [
+      {key:'enemy-start', title:'Эффекты начала хода', text:'Только эффекты статблока и уже наложенные состояния.'},
+      {key:'enemy-target', title:'Цель и движение', text:'Выберите цель по логике существа. «Запах шва» решает только между равноценными целями.'},
+      {key:'enemy-act', title:'Действия угрозы', text:`${state.enemy}. После действий отметьте реакции и эффекты до следующего хода.`}
+    ];
+    if (actor.kind === 'objective') return [
+      {key:'objective-progress', title:'Сдвинуть цель сцены', text:state.objective},
+      {key:'objective-pressure', title:'Проверить уязвимое', text:'NPC, маяк, караван, выход или другой объект: движение, повреждение, задержка.'},
+      {key:'objective-end', title:'Проверить финал', text:`Сцена заканчивается, когда: ${state.ending}.`}
+    ];
+    const cadence = state.mode === 'tunnel' ? 'В Тоннеле 1 минута проходит за 10 раундов; таймер не останавливается.' : `Таймер: ${TIMER_CADENCE[state.timerCadence]}.`;
+    return [
+      {key:'wall-trigger', title:`Тема поля: ${state.theme}`, text:'Разрешите только заранее заявленный триггер или эффект конкретного существа.'},
+      {key:'wall-timer', title:'Время и выход', text:`${state.timeLimit || 'Отдельного ограничения времени нет.'} ${cadence}`, urgent:state.timerCadence !== 'none' || state.mode === 'tunnel'},
+      {key:'wall-strike', title:'Нужен ли Удар среды?', text:'Только если его вызвал тяжёлый провал, порог STAB, способность, существо или заранее объявленное событие. Иначе — нет.'}
+    ];
+  }
+
+  function phaseItems(){
+    const phase = state.scenePhase;
+    const zoneName = state.zone === 'outer' ? 'Внешняя Тень' : state.zone === 'inner' ? 'Внутренняя Тень' : state.zone === 'core' ? 'Ядро / Гребень' : 'Тел’аран’риод';
+    if (phase === 'prep') return [
+      {key:'expedition', title:'1. Экспедиция', text:`${MODES[state.mode].title} · ${zoneName} · STAB ${state.stab}/${state.stabBase} · текущий такт: ${routeSteps()[state.routeIndex] || 'маршрут завершён'}.`},
+      {key:'party', title:'2. Группа', text:`Проверьте Метки и истощение ${state.party.length ? `у ${state.party.length} участников` : 'после добавления участников'}.`},
+      {key:'goal', title:'3. Цель кроме убийства', text:state.objective},
+      {key:'threat', title:'4. Одна угроза и одна тема', text:`${state.enemy}. Поле: ${state.theme}.`},
+      {key:'ending', title:'5. Победа, поражение и время', text:`Финал: ${state.ending}. ${state.timeLimit || 'Отдельный таймер не задан.'} (${TIMER_CADENCE[state.timerCadence]}).`},
+      {key:'telegraph', title:'6. Что заметят заранее', text:state.telegraph || 'Признак опасности пока не записан — задайте его в каркасе энкаунтера.', urgent:!state.telegraph}
+    ];
+    if (phase === 'opening') return [
+      {key:'describe', title:'Показать опасность', text:state.telegraph || 'Опишите наблюдаемый признак опасности до инициативы.', urgent:!state.telegraph},
+      {key:'goal', title:'Назвать цель', text:state.objective},
+      {key:'stakes', title:'Назвать цену промедления', text:`${state.timeLimit || 'Таймера нет'}; окончание: ${state.ending}.`},
+      {key:'place', title:'Поставить на поле', text:'Противники, выходы, цель/NPC, укрытия и одну тему поля.'},
+      {key:'initiative', title:'Определить порядок', text:'Бросьте инициативу и расположите имена героев в списке группы в удобном порядке.'}
+    ];
+    if (phase === 'roundStart') {
+      const items = [
+        {key:'number', title:`Раунд ${state.round || 1}`, text:'Объявите номер раунда и кратко повторите цель сцены.'},
+        {key:'start-effects', title:'Общие эффекты начала раунда', text:'Разрешайте только те эффекты, у которых прямо указан этот момент.'},
+        {key:'state', title:'Поле и выход', text:`Тема: ${state.theme}. Выход/финал: ${state.ending}.`}
+      ];
+      if (state.timeLimit) items.push({key:'timer-read', title:'Озвучить остаток времени', text:`${state.timeLimit}; ${TIMER_CADENCE[state.timerCadence]}.`, urgent:true});
+      return items;
+    }
+    if (phase === 'turns') return actorItems(activeActor());
+    if (phase === 'roundEnd') {
+      const items = [
+        {key:'end-effects', title:'Эффекты конца раунда', text:'Разрешите только эффекты с этой периодичностью; не добавляйте новый Удар среды без причины.'},
+        {key:'goal', title:'Прогресс цели и уязвимых объектов', text:`${state.objective}. Финал: ${state.ending}.`},
+        {key:'decision', title:'Сцена продолжается?', text:'Если условие победы или поражения выполнено — завершите сцену. Иначе начните следующий раунд.'}
+      ];
+      if (state.timerCadence === 'round') items.splice(1,0,{key:'timer', title:'Сдвинуть таймер', text:state.timeLimit || 'Обновите заявленный счётчик.', urgent:true});
+      if (state.timerCadence === 'minute' || state.mode === 'tunnel') {
+        const due = state.round > 0 && state.round % 10 === 0;
+        items.splice(1,0,{key:'timer-minute', title:due?'Прошла 1 минута':'Минутный таймер ещё не двигается', text:due?'Сдвиньте минутный таймер и проверьте закрытие Тоннеля.':`До следующей минуты: ${10 - (state.round % 10)} раунд(а/ов).`, urgent:due});
+      }
+      if (state.timerCadence === 'event') items.splice(1,0,{key:'timer-event', title:'Было заявленное событие?', text:'Сдвиньте таймер только если его триггер действительно произошёл.'});
+      return items;
+    }
+    return [
+      {key:'time', title:'Сколько времени реально прошло?', text:'Час Ореола, минута Тоннеля или 10 минут Ядра считаются по своему ритму, не по факту победы в бою.'},
+      {key:'route', title:'Нужна ли маршрутная проверка?', text:'Если завершился час или сегмент — разрешите её в блоке «Маршрут».'},
+      {key:'stab', title:'STAB и новый порог', text:`Текущий STAB ${state.stab}. Порог срабатывает только при входе в более низкий диапазон.`},
+      {key:'window', title:'Окно / Тоннель / выход', text:'Проверьте, открыт ли путь и кто успел выйти.'},
+      {key:'party', title:'Метки и истощение', text:'Запишите новые последствия у конкретных участников.'},
+      {key:'viable', title:'Экспедиция может продолжаться?', text:'Зафиксируйте, пригоден ли маршрут и достигнута ли цель сцены.', urgent:true}
+    ];
+  }
+
+  function phaseCheckKey(itemKey){
+    const actor = state.scenePhase === 'turns' ? activeActor() : null;
+    return `${state.scenePhase}-${state.round || 0}-${actor ? actor.key : 'all'}-${itemKey}`;
+  }
+
+  function phaseIndex(){ return Math.max(0, PHASES.findIndex((phase) => phase.key === state.scenePhase)); }
+
+  function activatePhase(key, logChange=true){
+    const next = PHASES.find((phase) => phase.key === key) || PHASES[0];
+    state.scenePhase = next.key;
+    if (next.key === 'prep') { state.combat = false; state.postBattle = false; }
+    if (next.key === 'opening') { state.combat = true; state.postBattle = false; }
+    if (next.key === 'roundStart') { state.combat = true; state.postBattle = false; if (state.round < 1) state.round = 1; }
+    if (next.key === 'turns') { state.combat = true; if (state.round < 1) state.round = 1; state.activeActorIndex = clamp(state.activeActorIndex || 0, 0, Math.max(0, turnActors().length - 1)); }
+    if (next.key === 'sceneEnd') { state.combat = false; state.postBattle = true; }
+    if (logChange) addLog(`Этап сцены: ${next.title}.`);
+    save(); render();
+  }
+
+  function finishScene(){
+    if (state.scenePhase !== 'sceneEnd') addLog(`Сцена завершена${state.round ? ` после раунда ${state.round}` : ''}.`);
+    activatePhase('sceneEnd', false);
+  }
+
+  function nextPhase(){
+    if (state.scenePhase === 'prep') return activatePhase('opening');
+    if (state.scenePhase === 'opening') { state.round = 1; addLog('Начат раунд 1.'); return activatePhase('roundStart', false); }
+    if (state.scenePhase === 'roundStart') { state.activeActorIndex = 0; return activatePhase('turns'); }
+    if (state.scenePhase === 'turns') {
+      const actors = turnActors();
+      if (state.activeActorIndex < actors.length - 1) { state.activeActorIndex += 1; save(); render(); return; }
+      return activatePhase('roundEnd');
+    }
+    if (state.scenePhase === 'roundEnd') { state.round += 1; addLog(`Начат раунд ${state.round}.`); return activatePhase('roundStart', false); }
+    state.scenePhase = 'prep'; state.round = 0; state.combat = false; state.postBattle = false; state.activeActorIndex = 0; state.phaseChecks = {};
+    addLog('Подготовка новой сцены.'); save(); render();
+  }
+
+  function previousPhase(){
+    if (state.scenePhase === 'turns' && state.activeActorIndex > 0) { state.activeActorIndex -= 1; save(); render(); return; }
+    if (state.scenePhase === 'roundEnd') { state.activeActorIndex = Math.max(0, turnActors().length - 1); return activatePhase('turns', false); }
+    const index = phaseIndex();
+    if (index > 0) activatePhase(PHASES[index - 1].key, false);
+  }
+
+  function phaseNextLabel(){
+    if (state.scenePhase === 'prep') return 'Перейти к открытию';
+    if (state.scenePhase === 'opening') return 'Начать раунд 1';
+    if (state.scenePhase === 'roundStart') return 'К ходам участников';
+    if (state.scenePhase === 'turns') {
+      const actors = turnActors(); const next = actors[state.activeActorIndex + 1];
+      return next ? `Дальше: ${next.label}` : 'К концу раунда';
+    }
+    if (state.scenePhase === 'roundEnd') return `Начать раунд ${(state.round || 0) + 1}`;
+    return 'Подготовить новую сцену';
+  }
+
+  function renderDirector(){
+    const current = PHASES[phaseIndex()]; const index = phaseIndex();
+    $('#scenePhaseRail').innerHTML = PHASES.map((phase, phaseNumber) => `<button class="wdm-phase-step${phase.key===state.scenePhase?' active':''}${phaseNumber<index?' passed':''}" data-phase="${phase.key}" type="button"><span>${phaseNumber}</span><b>${esc(phase.short.replace(/^\d+ · /,''))}</b></button>`).join('');
+    $('#phaseKicker').textContent = `Этап ${index} из ${PHASES.length - 1}`;
+    const actor = state.scenePhase === 'turns' ? activeActor() : null;
+    $('#phaseTitle').textContent = actor ? `Ход: ${actor.label}` : current.title;
+    $('#phaseLead').textContent = current.lead;
+    $('#phaseRule').textContent = current.rule;
+    $('#sceneRoundBadge').textContent = state.scenePhase === 'prep' ? 'Сцена не начата' : state.scenePhase === 'opening' ? 'Открытие сцены' : state.scenePhase === 'sceneEnd' ? 'Сцена завершена' : `Раунд ${state.round || 1}`;
+    const items = phaseItems();
+    $('#phaseChecklist').innerHTML = items.map((item) => {const key=phaseCheckKey(item.key);return `<label class="wdm-phase-duty${item.urgent?' urgent':''}"><input type="checkbox" data-phase-check="${esc(key)}" ${state.phaseChecks[key]?'checked':''}/><span><b>${esc(item.title)}</b><small>${esc(item.text)}</small></span></label>`;}).join('');
+
+    const turnFocus = $('#turnFocus'); turnFocus.hidden = state.scenePhase !== 'turns';
+    if (actor) {
+      const actors = turnActors();
+      $('#actorStrip').innerHTML = actors.map((item, actorIndex) => `<button class="wdm-actor-chip${actorIndex===state.activeActorIndex?' active':''}" data-actor-index="${actorIndex}" type="button"><span>${actorIndex+1}</span>${esc(item.label)}</button>`).join('');
+      const context = actor.kind === 'pc' ? `Истощение ${actor.member.exhaustion || 0} · ${actor.member.marks || 'без записанных Меток'}` : actor.kind === 'enemies' ? state.enemy : actor.kind === 'objective' ? state.objective : `${state.theme} · ${state.timeLimit || 'без отдельного таймера'}`;
+      $('#activeActor').innerHTML = `<strong>${esc(actor.label)}</strong><p>${esc(context)}</p><small>${state.activeActorIndex + 1} из ${actors.length}</small>`;
+    }
+
+    const responsibilities = [
+      {kind:'pc', title:'Герои', when:'Каждый ход', text:'Состояние → действие → шаг к цели → конец хода.'},
+      {kind:'enemies', title:'Противники', when:'По инициативе', text:'Эффекты → цель → движение → действия и реакции.'},
+      {kind:'objective', title:'Цель / NPC', when:'В назначенный момент', text:'Прогресс, движение, повреждение и условие финала.'},
+      {kind:'wall', title:'Стена / таймер', when:'Только по триггеру', text:'Тема поля, заявленное событие и реальная периодичность.'}
+    ];
+    $('#responsibilityGrid').innerHTML = responsibilities.map((item) => `<article class="wdm-responsibility${actor&&actor.kind===item.kind?' active':''}"><span>${esc(item.when)}</span><b>${esc(item.title)}</b><p>${esc(item.text)}</p></article>`).join('');
+    const label = phaseNextLabel(); $('#phaseNext').textContent = label; $('#footerPhaseNext').textContent = label;
+    $('#phaseBack').disabled = state.scenePhase === 'prep';
+    $('#phaseFinish').style.visibility = state.scenePhase === 'sceneEnd' || state.scenePhase === 'prep' ? 'hidden' : 'visible';
+    $('#footerSceneFinish').style.display = state.scenePhase === 'sceneEnd' || state.scenePhase === 'prep' ? 'none' : '';
   }
 
   function renderStatus(){
@@ -342,7 +544,8 @@
     let clock = `${Math.floor(state.elapsedMinutes/60)} ч ${state.elapsedMinutes%60} мин`;
     if (state.mode === 'tunnel') clock = `${Math.max(0,state.tunnelDuration-state.routeIndex)} мин осталось`;
     $('#clockValue').textContent = `${clock} · ${state.combat ? `раунд ${state.round||1}` : 'вне боя'}`;
-    $('#toggleCombat').textContent = state.combat ? 'Бой идёт' : 'Начать бой';
+    $('#toggleCombat').textContent = state.combat ? 'Сцена идёт' : state.postBattle ? 'После сцены' : 'Начать сцену';
+    $('#toggleCombat').disabled = state.combat || state.postBattle;
   }
 
   function renderRoute(){
@@ -368,7 +571,7 @@
   }
 
   function renderNow(){
-    $('#nowTitle').textContent = state.combat ? `Раунд ${state.round || 1}` : 'Что проверить';
+    $('#nowTitle').textContent = state.postBattle ? 'Итоги такта' : 'Проверки такта';
     const duties = dutyItems();
     $('#nowChecklist').innerHTML = duties.length ? duties.map((item) => `<label class="wdm-duty${item.urgent?' urgent':''}"><input type="checkbox" data-duty="${esc(item.key)}" ${state.completedChecks[item.key]?'checked':''}/><span><b>${esc(item.title)}</b><small>${esc(item.text)}</small></span></label>`).join('') : '<div class="wdm-empty">На текущем такте обязательных проверок нет.</div>';
     $('#cadenceNote').textContent = MODES[state.mode].cadence;
@@ -379,9 +582,9 @@
   }
 
   function renderScene(){
-    $('#sceneName').value = state.sceneName; $('#objectiveSelect').value = state.objective; $('#enemySelect').value = state.enemy; $('#themeSelect').value = state.theme; $('#endingSelect').value = state.ending; $('#timeLimit').value = state.timeLimit; $('#telegraph').value = state.telegraph;
+    $('#sceneName').value = state.sceneName; $('#objectiveSelect').value = state.objective; $('#enemySelect').value = state.enemy; $('#themeSelect').value = state.theme; $('#endingSelect').value = state.ending; $('#timeLimit').value = state.timeLimit; $('#timerCadence').value = state.timerCadence; $('#telegraph').value = state.telegraph;
     const warning = state.telegraph ? ` Игроки замечают заранее: ${state.telegraph}.` : ' Добавьте один заметный заранее признак опасности.';
-    $('#sceneSummary').textContent = `${state.objective}. Главная угроза: ${state.enemy}. Поле: ${state.theme}. Сцена заканчивается, когда: ${state.ending}.${warning}`;
+    $('#sceneSummary').textContent = `${state.objective}. Главная угроза: ${state.enemy}. Поле: ${state.theme}. Сцена заканчивается, когда: ${state.ending}. Таймер: ${TIMER_CADENCE[state.timerCadence]}.${warning}`;
   }
 
   function renderParty(){
@@ -402,7 +605,7 @@
     $('#rollResult').innerHTML = state.lastRoll ? `<strong>${esc(state.lastRoll.title)}</strong><p>${esc(state.lastRoll.text)}</p>` : '<p>Результат броска появится здесь и автоматически попадёт в журнал.</p>';
   }
 
-  function render(){ renderStatus(); renderAlerts(); renderRoute(); renderNow(); renderScene(); renderParty(); renderRanks(); renderLog(); renderRoll(); }
+  function render(){ renderStatus(); renderAlerts(); renderDirector(); renderRoute(); renderNow(); renderScene(); renderParty(); renderRanks(); renderLog(); renderRoll(); }
 
   function fillSelect(id, values){ $(id).innerHTML = values.map((value) => `<option value="${esc(value)}">${esc(value)}</option>`).join(''); }
   fillSelect('#objectiveSelect', OBJECTIVES); fillSelect('#enemySelect', ENEMIES); fillSelect('#themeSelect', THEMES); fillSelect('#endingSelect', ENDINGS);
@@ -414,9 +617,12 @@
   $('#modeSelect').addEventListener('change', (event) => changeMode(event.target.value));
   $('#zoneSelect').addEventListener('change', (event) => {state.zone=event.target.value; addLog(`Зона: ${event.target.options[event.target.selectedIndex].text}.`); save(); render();});
   $('#rankSelect').addEventListener('change', (event) => {state.rank=Number(event.target.value); save(); render();});
-  $('#toggleCombat').addEventListener('click', () => {if(!state.combat){state.combat=true;state.round=1;state.postBattle=false;addLog('Бой начат.');} save();render();});
-  $('#nextRound').addEventListener('click', () => {if(!state.combat){state.combat=true;state.round=1;addLog('Бой начат: раунд 1.');}else{state.round+=1;addLog(`Начат раунд ${state.round}.`);} save();render();});
-  $('#finishCombat').addEventListener('click', () => {if(state.combat)addLog(`Бой завершён после раунда ${state.round}.`);state.combat=false;state.round=0;state.postBattle=true;save();render();});
+  $('#toggleCombat').addEventListener('click', () => {if(state.scenePhase==='sceneEnd'){state.scenePhase='prep';state.round=0;state.postBattle=false;}activatePhase(state.scenePhase==='prep'?'opening':state.scenePhase);});
+  $('#phaseNext').addEventListener('click', nextPhase);
+  $('#footerPhaseNext').addEventListener('click', nextPhase);
+  $('#phaseBack').addEventListener('click', previousPhase);
+  $('#phaseFinish').addEventListener('click', finishScene);
+  $('#footerSceneFinish').addEventListener('click', finishScene);
   $('#advanceBeat').addEventListener('click', advanceBeat);
   $('#addRouteStep').addEventListener('click', () => {state.extraSteps+=1;save();render();});
   $('#rollStrike').addEventListener('click', () => rollStrike()); $('#rollMark').addEventListener('click', () => rollMark()); $('#rollDrift').addEventListener('click', rollDrift);
@@ -427,6 +633,9 @@
   $('#routeActions').addEventListener('click', (event) => {const button=event.target.closest('[data-outcome]');if(button)resolveRoute(button.dataset.outcome);});
   $('#routeActions').addEventListener('change', (event) => {if(event.target.id==='approachSelect'){state.approach=event.target.value;save();}});
   $('#nowChecklist').addEventListener('change', (event) => {if(!event.target.dataset.duty)return;state.completedChecks[event.target.dataset.duty]=event.target.checked;save();});
+  $('#phaseChecklist').addEventListener('change', (event) => {if(!event.target.dataset.phaseCheck)return;state.phaseChecks[event.target.dataset.phaseCheck]=event.target.checked;save();});
+  $('#scenePhaseRail').addEventListener('click', (event) => {const button=event.target.closest('[data-phase]');if(!button)return;if(button.dataset.phase==='sceneEnd')finishScene();else activatePhase(button.dataset.phase);});
+  $('#actorStrip').addEventListener('click', (event) => {const button=event.target.closest('[data-actor-index]');if(!button)return;state.activeActorIndex=Number(button.dataset.actorIndex);save();render();});
   $('#alerts').addEventListener('click', (event) => {const button=event.target.closest('[data-dismiss-alert]');if(!button)return;state.alerts=state.alerts.filter((item)=>String(item.id)!==button.dataset.dismissAlert);save();render();});
 
   $('#partyList').addEventListener('input', (event) => {
@@ -438,14 +647,14 @@
   $('#partyList').addEventListener('change', (event) => {const row=event.target.closest('[data-member]');if(!row)return;const member=state.party.find((item)=>String(item.id)===row.dataset.member);if(member&&event.target.classList.contains('party-exhaustion')){member.exhaustion=Number(event.target.value);save();}});
   $('#partyList').addEventListener('click', (event) => {const button=event.target.closest('[data-remove-member]');if(!button)return;state.party=state.party.filter((item)=>String(item.id)!==button.dataset.removeMember);save();render();});
 
-  const boundFields = {sceneName:'sceneName',objectiveSelect:'objective',enemySelect:'enemy',themeSelect:'theme',endingSelect:'ending',timeLimit:'timeLimit',telegraph:'telegraph'};
+  const boundFields = {sceneName:'sceneName',objectiveSelect:'objective',enemySelect:'enemy',themeSelect:'theme',endingSelect:'ending',timeLimit:'timeLimit',timerCadence:'timerCadence',telegraph:'telegraph'};
   Object.keys(boundFields).forEach((id) => {
-    $(`#${id}`).addEventListener(id==='sceneName'||id==='timeLimit'||id==='telegraph'?'input':'change', (event) => {state[boundFields[id]]=event.target.value;save();renderScene();});
+    $(`#${id}`).addEventListener(id==='sceneName'||id==='timeLimit'||id==='telegraph'?'input':'change', (event) => {state[boundFields[id]]=event.target.value;save();renderScene();renderDirector();});
   });
 
   function summaryText(){
     const steps=routeSteps(); const party=state.party.map((member)=>`— ${member.name}: истощение ${member.exhaustion}; ${member.marks||'без Меток'}`).join('\n');
-    return `${state.sceneName||'Экспедиция в Аномальной Стене'}\n${MODES[state.mode].title} · ${$('#zoneSelect').options[$('#zoneSelect').selectedIndex].text}\nSTAB ${state.stab}/${state.stabBase} · ${bandFor(state.stab).name}\nПуть: ${steps.map((step,index)=>`${step} [${state.routeStatuses[index]||'ожидает'}]`).join(' → ')}\nЦель: ${state.objective}\nПротивник: ${state.enemy}\nТема: ${state.theme}\nФинал: ${state.ending}\nТаймер: ${state.timeLimit||'нет'}\nТелеграф: ${state.telegraph||'не задан'}\n\nГруппа:\n${party||'— не указана'}\n\nПоследние события:\n${state.log.slice(0,10).map((item)=>`[${item.time}] ${item.text}`).join('\n')||'— нет'}`;
+    return `${state.sceneName||'Экспедиция в Аномальной Стене'}\n${MODES[state.mode].title} · ${$('#zoneSelect').options[$('#zoneSelect').selectedIndex].text}\nЭтап сцены: ${PHASES[phaseIndex()].title}${state.round?` · раунд ${state.round}`:''}\nSTAB ${state.stab}/${state.stabBase} · ${bandFor(state.stab).name}\nПуть: ${steps.map((step,index)=>`${step} [${state.routeStatuses[index]||'ожидает'}]`).join(' → ')}\nЦель: ${state.objective}\nПротивник: ${state.enemy}\nТема: ${state.theme}\nФинал: ${state.ending}\nТаймер: ${state.timeLimit||'нет'}; ${TIMER_CADENCE[state.timerCadence]}\nТелеграф: ${state.telegraph||'не задан'}\n\nГруппа:\n${party||'— не указана'}\n\nПоследние события:\n${state.log.slice(0,10).map((item)=>`[${item.time}] ${item.text}`).join('\n')||'— нет'}`;
   }
   $('#copySummary').addEventListener('click', async () => {
     const text=summaryText();
