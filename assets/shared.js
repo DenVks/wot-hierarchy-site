@@ -250,7 +250,7 @@
 })();
 
 
-/* ==== v58: DM Toolkit dropdown at the right edge + password-gated links ==== */
+/* ==== v149: DM Toolkit dropdown + featured field consoles ==== */
 (function(){
   'use strict';
   const navLinks = document.querySelector('.nav-links');
@@ -261,6 +261,8 @@
   const LEGACY_KEY = 'wot_access';
   const path = (location.pathname.split('/').pop() || 'index.html');
   const dmItems = [
+    {href:'wall-dm.html', label:'Аномальная Стена', meta:'Полевая консоль перехода', featured:true},
+    {href:'anomaly-dm.html', label:'Временные аномалии', meta:'Пульт узловой операции', featured:true},
     {href:'monsters.html', label:'Монстры'},
     {href:'monsters-battle.html', label:'Monsters / Бой'},
     {href:'encounter-generator.html', label:'Генератор энкаунтеров'},
@@ -299,10 +301,20 @@
   menu.className = 'nav-dm-menu nav-rule-menu nav-rule-menu-floating';
   menu.setAttribute('role','menu');
 
-  dmItems.forEach(item => {
+  dmItems.forEach((item, index) => {
     const a = document.createElement('a');
     a.href = item.href;
-    a.textContent = item.label;
+    if(item.featured){
+      a.classList.add('nav-dm-console-card');
+      const title = document.createElement('span');
+      title.textContent = item.label;
+      const meta = document.createElement('small');
+      meta.textContent = item.meta;
+      a.append(title, meta);
+    } else {
+      a.textContent = item.label;
+      if(index === 2) a.classList.add('nav-dm-tools-start');
+    }
     a.setAttribute('role','menuitem');
     a.dataset.protectedHref = item.href;
     if(item.href === path) a.classList.add('active');
