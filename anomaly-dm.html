@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="Пошаговый пульт Мастера для разведки, прохождения и схлопывания временных аномалий: Ядро, Ореол, пульсации, волны существ и Пирамидка Узора."/>
+<title>Временные аномалии · DM Toolkit · 270 ПБ</title>
+<script src="assets/auth.js?v=117"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Pro:ital,wght@0,400;0,500;0,600&display=swap" rel="stylesheet"/>
+<link href="assets/styles.css?v=148" rel="stylesheet"/>
+<link href="assets/wall-dm.css?v=148" rel="stylesheet"/>
+<link href="assets/anomaly-dm.css?v=148" rel="stylesheet"/>
+</head>
+<body class="theme-wall-dm-page theme-anomaly-dm-page">
+<div class="pattern-bg"></div>
+<div aria-hidden="true" class="thread-layer"><svg preserveAspectRatio="none" viewBox="0 0 1800 1200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="adm-thread-a" x1="0" x2="1"><stop offset="0" stop-color="#68d8c7" stop-opacity="0"/><stop offset=".5" stop-color="#68d8c7" stop-opacity=".35"/><stop offset="1" stop-color="#68d8c7" stop-opacity="0"/></linearGradient><linearGradient id="adm-thread-b" x1="0" x2="1"><stop offset="0" stop-color="#c084fc" stop-opacity="0"/><stop offset=".5" stop-color="#c084fc" stop-opacity=".28"/><stop offset="1" stop-color="#c084fc" stop-opacity="0"/></linearGradient></defs><path d="M-80,170 Q380,40 850,250 Q1250,410 1880,170" fill="none" stroke="url(#adm-thread-a)"/><path d="M-60,860 Q420,650 880,870 Q1300,1040 1880,770" fill="none" stroke="url(#adm-thread-b)"/></svg></div>
+<nav class="sitenav"><div class="inner"><a class="nav-brand" href="index.html"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient cx="50%" cy="50%" id="adm-wg"><stop offset="0%" stop-color="#e8c878" stop-opacity=".9"/><stop offset="100%" stop-color="#c9a961" stop-opacity=".5"/></radialGradient></defs><g fill="none" stroke="url(#adm-wg)" stroke-linecap="round"><circle cx="40" cy="40" r="36"/><circle cx="40" cy="40" opacity=".75" r="28"/><circle cx="40" cy="40" opacity=".55" r="18"/><circle cx="40" cy="40" opacity=".85" r="8"/><line x1="40" x2="40" y1="4" y2="76"/><line x1="4" x2="76" y1="40" y2="40"/><line x1="14.8" x2="65.2" y1="14.8" y2="65.2"/><line x1="65.2" x2="14.8" y1="14.8" y2="65.2"/><circle cx="40" cy="40" fill="#e8c878" r="3" stroke="none"/></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="epoch.html">Эпоха</a><a href="hierarchies.html">Иерархии</a><a href="hierarchy-wall.html">Стена</a><a href="wall-dm.html">Стена: DM</a><a href="order.html">Орден</a><a href="anomalies.html">Аномалии</a><a class="active" href="anomaly-dm.html">Аномалии: DM</a><a href="loot-generator.html">Добыча</a><a href="monsters.html">Монстры</a><a href="encounter-generator.html">Энкаунтеры</a><a href="dm-npc.html">NPC / Бой</a></div></div></nav>
+
+<main class="wall-dm-page anomaly-dm-page" id="anomalyDmApp">
+  <header class="wdm-hero adm-hero">
+    <div class="wdm-kicker">DM Toolkit · узловая операция</div>
+    <h1>Временная аномалия</h1>
+    <p>Один экран для всей операции: что определить до входа, кого проверить в Ядре, когда приходит пульс, когда выходит следующая волна и что делать с Пирамидкой.</p>
+    <nav class="wdm-tabs" aria-label="Разделы временных аномалий">
+      <a href="anomalies.html">Правила</a><a class="active" href="anomaly-dm.html" aria-current="page">Пульт мастера</a><a href="loot-generator.html">Добыча</a><a href="monsters.html#anomaly-monsters">Бестиарий</a>
+    </nav>
+  </header>
+
+  <section class="wdm-command" aria-label="Управление операцией">
+    <div class="wdm-field"><label for="sceneName">Название операции</label><input id="sceneName" placeholder="Например: Медный разлом у северных ворот"/></div>
+    <button class="wdm-btn" id="generateAnomaly" type="button">Собрать паспорт</button>
+    <button class="wdm-btn" id="copySummary" type="button">Копировать сводку</button>
+    <button class="wdm-btn danger" id="resetOperation" type="button">Новая операция</button>
+  </section>
+
+  <section class="wdm-status-grid adm-status-grid" aria-label="Паспорт аномалии">
+    <article class="wdm-status adm-rating"><span class="wdm-label">Рейтинг</span><select id="ratingSelect"></select><strong id="dcValue">СЛ 15</strong><small id="ratingName"></small></article>
+    <article class="wdm-status"><span class="wdm-label">Ведущий тип</span><select id="typeSelect"><option value="A">Type A · Энергия</option><option value="B">Type B · Иные измерения</option><option value="C">Type C · Тел’аран’риод</option></select><small id="typeHint"></small></article>
+    <article class="wdm-status"><span class="wdm-label">Размер</span><select id="sizeSelect"></select><small id="sizeHint"></small></article>
+    <article class="wdm-status"><span class="wdm-label">Подвижность</span><select id="mobilitySelect"></select><small id="mobilityHint"></small></article>
+    <article class="wdm-status"><span class="wdm-label">Оператор</span><select id="rankSelect"></select><small id="rankHint"></small></article>
+    <article class="wdm-status"><span class="wdm-label">Время сцены</span><strong id="roundValue">До входа</strong><small><button class="wdm-btn small" id="toggleCombat" type="button">Начать сцену</button></small></article>
+  </section>
+
+  <div class="wdm-alerts" id="alerts" aria-live="polite"></div>
+
+  <section class="wdm-card wdm-director adm-director" aria-label="Пошаговое проведение операции">
+    <div class="wdm-card-head wdm-director-head"><div><span class="wdm-label">Цикл операции</span><h2>Ведите разрыв слева направо</h2></div><div class="wdm-director-status"><span id="phaseBadge">Операция не начата</span><small>Пульс, волна и извлечение — три разных счётчика</small></div></div>
+    <div class="wdm-phase-rail" id="phaseRail" aria-label="Этапы операции"></div>
+    <div class="wdm-director-work">
+      <div class="wdm-phase-focus"><span class="wdm-label" id="phaseKicker">Этап 0</span><h3 id="phaseTitle">До входа</h3><p id="phaseLead"></p><div class="wdm-phase-checklist" id="phaseChecklist"></div><p class="wdm-check-hint">Галочка означает, что решение принято или действие разрешено. Она сама не требует броска.</p><div class="wdm-rule-note" id="phaseRule"></div></div>
+    </div>
+    <div class="wdm-responsibility-grid" id="responsibilityGrid"></div>
+    <div class="wdm-director-actions"><button class="wdm-btn" id="phaseBack" type="button">Назад</button><button class="wdm-btn primary" id="phaseNext" type="button">К разведке</button><button class="wdm-btn" id="finishOperation" type="button">Завершить операцию</button></div>
+  </section>
+
+  <div class="wdm-grid adm-main-grid">
+    <div class="wdm-stack">
+      <section class="wdm-card" id="passportPanel">
+        <div class="wdm-card-head"><div><span class="wdm-label">Паспорт сцены</span><h2>Одна логика вместо случайностей</h2></div><button class="wdm-btn small" id="randomizePassport" type="button">Случайный паспорт</button></div>
+        <div class="wdm-scene-grid adm-passport-grid">
+          <div class="wdm-field"><label for="missionSelect">Задача группы</label><select id="missionSelect"></select></div>
+          <div class="wdm-field"><label for="secondaryType">Вторичный тип</label><select id="secondaryType"><option value="none">Нет</option><option value="A">Type A · Энергия</option><option value="B">Type B · Иные измерения</option><option value="C">Type C · Тел’аран’риод</option></select></div>
+          <div class="wdm-field"><label for="signatureSelect">Один почерк сцены</label><select id="signatureSelect"></select></div>
+          <div class="wdm-field"><label for="damageType">Урон Ядра</label><select id="damageType"></select></div>
+          <div class="wdm-field"><label for="telegraph">Что видно до входа</label><input id="telegraph" placeholder="Наблюдаемый признак опасности"/></div>
+          <div class="wdm-field"><label for="nodeSign">Как узнать узловую точку</label><input id="nodeSign" placeholder="Повторяющийся звук, тень, пыль или ритм"/></div>
+        </div>
+        <div class="adm-passport-summary" id="passportSummary"></div>
+      </section>
+
+      <section class="wdm-card adm-timers-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">Три независимых ритма</span><h2>Что проверять сейчас</h2></div><button class="wdm-btn primary" id="nextRound" type="button">Следующий раунд</button></div>
+        <div class="adm-timer-grid">
+          <article class="adm-timer"><span>Ядро</span><strong id="coreTimer">Каждый раунд</strong><p id="coreRule"></p><button class="wdm-btn small" id="resolveCore" type="button">Проверить находящихся в Ядре</button></article>
+          <article class="adm-timer"><span>Пульс среды</span><strong id="pulseTimer">—</strong><p id="pulseRule"></p><button class="wdm-btn small" id="triggerPulse" type="button">Разрешить пульс сейчас</button></article>
+          <article class="adm-timer"><span>Волна существ</span><strong id="waveTimer">—</strong><p id="waveRule"></p><button class="wdm-btn small" id="triggerWave" type="button">Выпустить волну сейчас</button></article>
+          <article class="adm-timer extraction"><span>Пирамидка</span><strong id="extractionTimer">Не установлена</strong><p id="extractionRule">Счётчик уменьшается только в конце хода оператора.</p><button class="wdm-btn small" id="operatorTurnEnd" type="button">Конец хода оператора</button></article>
+        </div>
+        <div class="wdm-roll-result adm-event-result" id="eventResult"><p>Здесь появится следующий обязательный эффект и его полная механика.</p></div>
+      </section>
+
+      <section class="wdm-card" id="nodePanel">
+        <div class="wdm-card-head"><div><span class="wdm-label">Узловая точка и Пирамидка</span><h2>Ритуал без пропущенных шагов</h2></div><span class="adm-state-pill" id="channelState">Канал не начат</span></div>
+        <div class="adm-node-grid">
+          <article class="adm-step-box"><span>1 · Найти узел</span><p><b>1 минута</b>, проверка ключевой характеристики через Исследование, Восприятие или Магию против <b id="nodeDc">СЛ 15</b>. При повторном поиске Мастер может вызвать выброс.</p><div class="adm-step-actions"><button class="wdm-btn" id="nodeCheck" type="button">Проверка поиска</button><button class="wdm-btn" id="advanceMinute" type="button">+ 1 минута</button></div><label class="adm-check"><input id="nodeObvious" type="checkbox"/> Точка очевидна — без проверки</label></article>
+          <article class="adm-step-box"><span>2 · Призвать и поставить</span><p id="summonRule"></p><button class="wdm-btn" id="installPyramid" type="button">Установить Пирамидку</button></article>
+          <article class="adm-step-box"><span>3 · Удерживать</span><p>Оператор в сознании, на том же плане и не дальше 60 фт. Руки свободны; концентрация не требуется.</p><div class="adm-channel-checks"><label><input id="operatorConscious" type="checkbox" checked/> В сознании</label><label><input id="operatorPlane" type="checkbox" checked/> Тот же план</label><label><input id="operatorRange" type="checkbox" checked/> В 60 фт</label></div></article>
+          <article class="adm-step-box"><span>4 · Замок Узора</span><p>Когда счётчик достигнет нуля: спасбросок ключевой характеристики против <b id="finalDc">СЛ 15</b>.</p><div class="adm-inline-roll"><label>Бонус <input id="operatorBonus" type="number" min="-5" max="30" value="0"/></label><button class="wdm-btn primary" id="finalSave" type="button">Финальный бросок</button></div></article>
+        </div>
+        <details class="adm-pyramid-details"><summary>Если Пирамидку сдвинули, опрокинули или повредили</summary><div class="adm-pyramid-actions"><button class="wdm-btn" id="shiftFive" type="button">Сдвиг 5 фт</button><button class="wdm-btn danger" id="shiftTen" type="button">Сдвиг 10+ фт</button><button class="wdm-btn danger" id="topple" type="button">Опрокидывание</button><label>Хиты <input id="pyramidHp" type="number" min="0"/></label><span id="pyramidStats"></span></div><p>КД 18. Попытка сдвига: действие и Атлетика против СЛ 12 + R; при провале 3d6 силового урона и отбрасывание на 5 фт.</p></details>
+      </section>
+
+      <section class="wdm-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">Группа</span><h2>Кого проверять в Ядре</h2></div><button class="wdm-btn small" id="addPartyMember" type="button">+ участник</button></div>
+        <div class="adm-party-head"><span>Имя</span><span>Зона сейчас</span><span>Спасбросок</span><span>Эффекты / заметки</span><span></span></div>
+        <div class="adm-party-list" id="partyList"></div>
+      </section>
+
+      <section class="wdm-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">Волна существ</span><h2>Состав без долгого поиска</h2></div><button class="wdm-btn small" id="suggestWave" type="button">Подставить доступный пакет</button></div>
+        <p class="adm-help" id="waveHelp"></p>
+        <div class="wdm-enemy-roster" id="enemyRoster"></div>
+        <button class="wdm-btn small" id="addEnemy" type="button">+ тип существа</button>
+        <p class="adm-help">Для R5–R7 список фильтруется по выбранным рейтингу и типу. Для других рейтингов показан рекомендуемый CR: готовых карточек этого набора пока нет.</p>
+      </section>
+
+      <section class="wdm-card adm-aftermath" id="aftermathPanel">
+        <div class="wdm-card-head"><div><span class="wdm-label">После схлопывания</span><h2>Заряд, последствия и один бросок лута</h2></div><button class="wdm-btn" id="rollLoot" type="button">Бросить остаток</button></div>
+        <div class="adm-aftermath-grid"><div><span>Шанс</span><strong id="lootChance">65%</strong><small id="lootBonusHint">+10% при Пирамидке</small></div><div><span>Заряд</span><strong id="chargeState">Нет</strong><small>Заполненную Пирамидку нельзя отозвать</small></div><div><span>Доставка</span><strong>Физически к Сфере</strong><small>1 минута на синхронизацию</small></div></div>
+        <div class="wdm-roll-result" id="lootResult"><p>Артефактный остаток появляется только после схлопывания или естественного затухания. Бросок — один на аномалию.</p></div>
+        <a class="wdm-btn adm-link-btn" href="loot-generator.html#temporal">Перейти к генератору ингредиентов</a>
+      </section>
+    </div>
+
+    <aside class="wdm-stack side">
+      <section class="wdm-card adm-now-card"><div class="wdm-card-head"><div><span class="wdm-label">Прямо сейчас</span><h2 id="nowTitle">До входа</h2></div></div><div class="adm-now-list" id="nowList"></div></section>
+      <section class="wdm-card"><div class="wdm-card-head"><div><span class="wdm-label">Паспорт рейтинга</span><h2 id="ratingReferenceTitle">R5 · Срыв реальности</h2></div></div><div class="adm-rating-reference" id="ratingReference"></div></section>
+      <section class="wdm-card"><div class="wdm-card-head"><div><span class="wdm-label">Памятка Мастера</span><h2>Не превратить сцену в мясорубку</h2></div></div><div class="adm-master-rule"><p>Опасность = Ядро + Ореол + пульс + существа. Если усилили частоту волн, уменьшите количество или CR. Не повышайте всё одновременно.</p><p>Победа — это удержанный узел или выполненная задача, а не обязательно смерть последнего монстра.</p></div></section>
+      <section class="wdm-card"><div class="wdm-card-head"><div><span class="wdm-label">Хронология</span><h2>Журнал операции</h2></div><button class="wdm-btn small" id="clearLog" type="button">Очистить</button></div><div class="wdm-log" id="eventLog"></div></section>
+    </aside>
+  </div>
+
+  <div class="wdm-footer-actions"><button class="wdm-btn" id="footerPhaseNext" type="button">К разведке</button><button class="wdm-btn primary" id="footerNextRound" type="button">Следующий раунд</button><button class="wdm-btn" id="footerOperatorTurn" type="button">Конец хода оператора</button></div>
+</main>
+
+<footer><svg class="mini-wheel-ft" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#c9a961" stroke-linecap="round"><circle cx="40" cy="40" r="36"/><circle cx="40" cy="40" opacity=".65" r="28"/><circle cx="40" cy="40" opacity=".45" r="18"/><circle cx="40" cy="40" fill="#e8c878" r="3" stroke="none"/></g></svg><div class="ft-quote">❖&nbsp;&nbsp;Сначала найди ритм разрыва. Потом удерживай узел.&nbsp;&nbsp;❖</div><p>Четвёртая Эпоха · 270 лет после Последней Битвы</p></footer>
+<div class="wdm-toast" id="toast" role="status"></div>
+<script src="assets/shared.js?v=148"></script>
+<script src="assets/monster-packs-data.js?v=148"></script>
+<script src="assets/anomaly-dm.js?v=148"></script>
+</body>
+</html>
