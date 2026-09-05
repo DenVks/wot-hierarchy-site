@@ -32,13 +32,13 @@
     {href:'classes.html', label:'Классы'},
     {href:'weaves.html', label:'Плетения'},
     {href:'feats.html', label:'Дополнительные черты'},
-    {href:'unity.html', label:'Единство'},
-    {href:'throne.html', label:'Трон'},
-    {href:'madding.html', label:'Хранители'},
+    {href:'unity.html', label:'Иерархия Единства'},
+    {href:'throne.html', label:'Иерархия Хрустального Трона'},
+    {href:'madding.html', label:'Гильдия Хранителей Фар Мэддинга'},
     {href:'shara-will.html', label:'Единая Воля Шары'},
-    {href:'hierarchy-wall.html', label:'Иерархия Стены'},
-    {href:'scream.html', label:'Крик'},
-    {href:'order.html', label:'Орден'},
+    {href:'hierarchy-wall.html', label:'Иерархия Аномальной Стены'},
+    {href:'scream.html', label:'Крик и Держащие Равновесие'},
+    {href:'order.html', label:'Орден Стражей Узора'},
     {href:'rituals.html', label:'Ритуалы'}
   ];
   window.WOT_RULE_ITEMS = ruleItems.slice();
@@ -63,6 +63,7 @@
 
   const menu = document.createElement('div');
   menu.className = 'nav-rule-menu nav-rule-menu-floating';
+  menu.style.minWidth = '340px';
   menu.setAttribute('role','menu');
 
   ruleItems.forEach(item => {
