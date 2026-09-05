@@ -264,6 +264,7 @@
   const dmItems = [
     {href:'wall-dm.html', label:'Аномальная Стена', meta:'Полевая консоль перехода', featured:true},
     {href:'anomaly-dm.html', label:'Временные аномалии', meta:'Пульт узловой операции', featured:true},
+    {href:'storm-belt-dm.html', label:'Штормовая Полоса', meta:'Пульт морского перехода', featured:true},
     {href:'monsters.html', label:'Монстры'},
     {href:'monsters-battle.html', label:'Monsters / Бой'},
     {href:'encounter-generator.html', label:'Генератор энкаунтеров'},
@@ -314,7 +315,7 @@
       a.append(title, meta);
     } else {
       a.textContent = item.label;
-      if(index === 2) a.classList.add('nav-dm-tools-start');
+      if(index === 3) a.classList.add('nav-dm-tools-start');
     }
     a.setAttribute('role','menuitem');
     a.dataset.protectedHref = item.href;

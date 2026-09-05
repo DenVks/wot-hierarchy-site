@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="Интерактивный пульт Мастера для прохождения Штормовой Полосы: два маршрута, проверки, положение корабля, события, повреждения и журнал."/>
+<title>Штормовая Полоса · DM Toolkit · 270 ПБ</title>
+<script src="assets/auth.js?v=117"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Pro:ital,wght@0,400;0,500;0,600&display=swap" rel="stylesheet"/>
+<link href="assets/styles.css?v=149" rel="stylesheet"/>
+<link href="assets/wall-dm.css?v=148" rel="stylesheet"/>
+<link href="assets/storm-belt-dm.css?v=152" rel="stylesheet"/>
+</head>
+<body class="theme-wall-dm-page theme-storm-dm-page">
+<div class="pattern-bg"></div>
+<div aria-hidden="true" class="storm-sky"><span></span><span></span><span></span></div>
+<nav class="sitenav"><div class="inner"><a class="nav-brand" href="index.html"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient cx="50%" cy="50%" id="wg"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"></stop><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"></stop></radialGradient></defs><g fill="none" stroke="url(#wg)" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"></circle><circle cx="40" cy="40" opacity=".75" r="28" stroke-width=".7"></circle><circle cx="40" cy="40" opacity=".55" r="18" stroke-width=".5"></circle><circle cx="40" cy="40" opacity=".85" r="8" stroke-width=".6"></circle><g opacity=".7" stroke-width=".55"><line x1="40" x2="40" y1="4" y2="76"></line><line x1="4" x2="76" y1="40" y2="40"></line><line x1="14.8" x2="65.2" y1="14.8" y2="65.2"></line><line x1="65.2" x2="14.8" y1="14.8" y2="65.2"></line></g><circle cx="40" cy="40" fill="#e8c878" r="3" stroke="none"></circle></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="epoch.html">Эпоха</a><a href="hierarchies.html">Иерархии</a><a href="unity.html">Единство</a><a href="throne.html">Трон</a><a href="madding.html">Хранители</a><a href="hierarchy-wall.html">Иерархия Стены</a><a href="scream.html">Крик</a><a href="order.html">Орден</a><a href="hierarchy-wall.html#p1">Стена</a><a href="chronicles.html">Хроника</a><a href="anomalies.html">Аномалии</a><a href="aiel.html">Айил</a><a href="tuataan.html">Туата’ан</a><a href="freefolk.html">Вольные</a><a href="rituals.html">Ритуалы</a><a href="classes.html">Классы</a><a href="weaves.html">Плетения</a><a href="ingredients.html">Ингредиенты</a><a href="loot-generator.html">Генератор</a><a href="encounter-generator.html">Энкаунтеры</a><a href="tsitadel.html">Цитадель</a><a href="monsters.html">Монстры</a><a href="dm-npc.html">NPC / Бой</a></div></div></nav>
+
+<main class="wall-dm-page storm-dm-page" id="stormDmApp">
+  <header class="wdm-hero storm-hero">
+    <div class="wdm-kicker">DM Toolkit · сессионный пульт</div>
+    <h1>Штормовая Полоса</h1>
+    <p>Один экран ведёт весь морской переход: выберите маршрут, откройте текущий сектор, отметьте результаты проверок и сразу увидьте нагрузку, Цены, события и состояние «Резчика Волн».</p>
+    <nav class="wdm-tabs" aria-label="Связанные разделы"><a href="land-madmen.html">Земля Безумцев</a><a class="active" href="storm-belt-dm.html" aria-current="page">Пульт перехода</a></nav>
+  </header>
+
+  <section class="storm-route-choice" aria-label="Выбор маршрута">
+    <button type="button" data-route="direct"><span>Путь 1 · около 24 часов</span><strong>Прямой проход</strong><small>5 секторов · нагрузка каждый сектор · до 3 боёв</small></button>
+    <button type="button" data-route="pulse"><span>Путь 2 · 48 часов</span><strong>Пульсовой коридор</strong><small>6 фаз · положение 0–2 · до 2 боёв</small></button>
+  </section>
+
+  <div class="wdm-status-grid storm-status-grid">
+    <article class="wdm-status"><span>Сейчас</span><strong id="statusStage">До входа</strong><small id="statusTime">Подготовка перехода</small></article>
+    <article class="wdm-status"><span>Положение / нагрузка</span><strong id="statusDanger">—</strong><small id="statusDangerNote">Зависит от маршрута</small></article>
+    <article class="wdm-status"><span>Корабль</span><strong id="statusShip">Готов</strong><small id="statusShipNote">100 фт/раунд</small></article>
+    <article class="wdm-status"><span>Цены</span><strong id="statusCosts">0</strong><small>применено за переход</small></article>
+    <article class="wdm-status"><span>Энкаунтеры</span><strong id="statusEncounters">0 / 3</strong><small id="statusEncounterNote">полноценных боёв</small></article>
+  </div>
+
+  <section class="wdm-card storm-before" id="beforePanel">
+    <div class="wdm-card-head"><div><span class="wdm-label">Перед сценой · 1–2 минуты</span><h2>Что зафиксировать до входа</h2></div><button class="wdm-btn small" id="toggleBefore" type="button">Свернуть</button></div>
+    <div class="storm-before-body" id="beforeBody">
+      <div class="storm-before-grid">
+        <label class="storm-check"><input type="checkbox" data-prep="chart"><span><b>Маршрут и лоция</b><small id="prepRouteText">Прямой путь не создаёт безопасной зоны.</small></span></label>
+        <label class="storm-check"><input type="checkbox" data-prep="roles"><span><b>Три роли назначены</b><small>Наблюдение · Навигация · Управление. Можно использовать +8 для навигатора и рулевого.</small></span></label>
+        <label class="storm-check"><input type="checkbox" data-prep="ship"><span><b>Состояние судна внесено</b><small>Корпус, две мачты, два комплекта парусов и руль.</small></span></label>
+        <label class="storm-check"><input type="checkbox" data-prep="supplies"><span><b>Люди и груз отмечены</b><small>Стартово 0 раненых и 4 Доли груза, если сцена не говорит иначе.</small></span></label>
+      </div>
+      <div class="storm-core-rules">
+        <article><b>Наблюдение</b><span>Мудрость (Восприятие). Успех даёт преимущество на Навигацию; провал сам по себе не штрафует.</span></article>
+        <article><b>Навигация</b><span>Интеллект + инструменты навигатора. Максимум одна проверка Наблюдения на одну Навигацию.</span></article>
+        <article><b>Управление</b><span>Ловкость + водный транспорт. Максимум одна Палубная поддержка на небойную проверку.</span></article>
+        <article><b>Палубная поддержка</b><span>Сила (Атлетика) СЛ 17: преимущество на Управление или снять одну помеху. Провал отдельной Цены не даёт.</span></article>
+        <article><b>«Обуздать Ветер» · 3+</b><span>Ячейка и концентрация. Один раз за фазу/сектор: преимущество на Управление или снять одну помеху. СЛ Навигации не меняет.</span></article>
+        <article><b>Натуральные 1/20</b><span>Не дают автоматический исход. Тяжёлый провал — итог проверки ниже СЛ на 5 или больше.</span></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="wdm-card storm-route-card">
+    <div class="wdm-card-head"><div><span class="wdm-label">Вся картина перехода</span><h2 id="routeHeading">Прямой проход · 5 секторов</h2></div><button class="wdm-btn small" id="resetSession" type="button">Новая сессия</button></div>
+    <div class="storm-track" id="routeTrack"></div>
+  </section>
+
+  <section class="wdm-card storm-director">
+    <div class="storm-director-head">
+      <div><span class="wdm-label" id="stageKicker">Сектор I · 0–3 часа</span><h2 id="stageTitle">Внешняя кромка</h2><p id="stagePurpose"></p></div>
+      <div class="storm-stage-actions"><button class="wdm-btn" id="previousStage" type="button">Назад</button><button class="wdm-btn primary" id="nextStage" type="button">Следующий сектор</button></div>
+    </div>
+    <div class="storm-readaloud"><span>Игроки видят</span><p id="stageReadaloud"></p></div>
+    <div class="storm-procedure">
+      <div class="storm-procedure-head"><div><span class="wdm-label">Процедура текущего этапа</span><h3>Выберите итог каждого броска</h3></div><div class="storm-result-badge" id="computedBadge">Ожидает бросков</div></div>
+      <div class="storm-checks" id="checkControls"></div>
+      <div class="storm-computed" id="computedOutcome"></div>
+      <button class="wdm-btn primary storm-apply" id="applyStage" type="button">Применить результаты этапа</button>
+    </div>
+  </section>
+
+  <div class="wdm-grid storm-main-grid">
+    <div class="wdm-stack">
+      <section class="wdm-card" id="eventPanel">
+        <div class="wdm-card-head"><div><span class="wdm-label">События и бои</span><h2 id="eventHeading">Событие Полосы · 1к8</h2></div><button class="wdm-btn primary small" id="rollEvent" type="button">Бросить</button></div>
+        <div class="storm-trigger" id="eventTrigger"></div>
+        <div class="wdm-roll-result storm-roll-result" id="eventResult"><p>Результат и полный эффект появятся здесь.</p></div>
+        <div class="storm-event-list" id="eventReference"></div>
+      </section>
+
+      <section class="wdm-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">Аварийные процедуры</span><h2>Что открыть при осложнении</h2></div></div>
+        <div class="storm-emergency-tabs" id="emergencyTabs"></div>
+        <div class="storm-emergency-body" id="emergencyBody"></div>
+      </section>
+
+      <section class="wdm-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">Существа Полосы</span><h2>Три боевых карточки</h2></div></div>
+        <p class="storm-note">Это старая фауна Штормовой Полосы, а не существа Крика.</p>
+        <div class="storm-monsters" id="monsterCards"></div>
+      </section>
+    </div>
+
+    <aside class="wdm-stack side">
+      <section class="wdm-card storm-ship-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">«Резчик Волн»</span><h2>Состояние корабля</h2></div></div>
+        <div class="storm-components" id="shipComponents"></div>
+        <div class="storm-ship-alerts" id="shipAlerts"></div>
+      </section>
+
+      <section class="wdm-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">Накопительные последствия</span><h2>Люди, груз и Цены</h2></div></div>
+        <div class="storm-counters">
+          <label><span>Раненые матросы</span><input id="injuredCrew" type="number" min="0" max="99"/></label>
+          <label><span>Доли груза</span><input id="cargoShares" type="number" min="0" max="4"/></label>
+          <label><span>Задержки</span><input id="delays" type="number" min="0" max="99"/></label>
+        </div>
+        <div class="storm-cost-buttons" id="costButtons"></div>
+        <div class="storm-cost-help" id="costHelp"></div>
+      </section>
+
+      <section class="wdm-card">
+        <div class="wdm-card-head"><div><span class="wdm-label">Хронология</span><h2>Журнал перехода</h2></div><button class="wdm-btn small" id="clearLog" type="button">Очистить</button></div>
+        <div class="wdm-log" id="eventLog"></div>
+      </section>
+
+      <section class="wdm-card wdm-reference">
+        <span class="wdm-label">Постоянные правила</span>
+        <details><summary>Компонент на 0 HP</summary><ul><li>Один комплект парусов: нет тяги, скорость −25%, следующая проверка Управления с помехой.</li><li>Два комплекта: нужна аварийная тяга, ремонт или иной источник движения.</li><li>Мачта: связанный парус = 0 HP; зона падения 10 фт, Лов СЛ 15, 3к10 дробящего и ничком; до расчистки следующая проверка Управления с помехой.</li><li>Руль: перед Управлением Сил (Атлетика) СЛ 18; успех — Управление с помехой, провал — штатное Управление невозможно.</li></ul></details>
+        <details><summary>Черты Ата’ан Миэйр</summary><ul><li>Пловец: скорость плавания 30 фт; без помехи на Атлетику при плавании.</li><li>Дети снастей: преимущество на Акробатику на судне и спасброски от падения.</li><li>Морская кровь: игнорирует первый уровень истощения от морского пути; такая Цена всё равно считается разрешённой.</li></ul></details>
+        <details><summary>Отдых</summary><ul id="restRules"></ul></details>
+        <details><summary>Финиш</summary><ul><li>Персонажи: хиты, Кости Хитов, ячейки, истощение, состояния.</li><li>Экипаж: число раненых и способность управлять кораблём.</li><li>Судно: HP корпуса, мачт, парусов и руля; аварийные ремонты.</li><li>Груз: сколько Долей сохранилось.</li><li>Последний вопрос: высадка сразу или сначала восстановить людей и корабль.</li></ul></details>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<footer><svg class="mini-wheel-ft" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient cx="50%" cy="50%" id="wg-ft"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"></stop><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"></stop></radialGradient></defs><g fill="none" stroke="url(#wg-ft)" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"></circle><circle cx="40" cy="40" opacity=".75" r="28" stroke-width=".7"></circle><circle cx="40" cy="40" opacity=".55" r="18" stroke-width=".5"></circle><circle cx="40" cy="40" opacity=".85" r="8" stroke-width=".6"></circle><g opacity=".7" stroke-width=".55"><line x1="40" x2="40" y1="4" y2="76"></line><line x1="4" x2="76" y1="40" y2="40"></line><line x1="14.8" x2="65.2" y1="14.8" y2="65.2"></line><line x1="65.2" x2="14.8" y1="14.8" y2="65.2"></line></g><circle cx="40" cy="40" fill="#e8c878" r="3" stroke="none"></circle></g></svg><div class="ft-quote">❖&nbsp;&nbsp;Даже море должно снова стать обычным морем.&nbsp;&nbsp;❖</div><p>Четвёртая Эпоха · 270 лет после Последней Битвы</p></footer>
+<div class="wdm-toast" id="toast" role="status"></div>
+<script src="assets/shared.js?v=152"></script>
+<script src="assets/storm-belt-dm.js?v=152"></script>
+</body>
+</html>
