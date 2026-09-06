@@ -1,1 +1,1 @@
-v155 — Remove obsolete hierarchy comparison table
+v156 — Add complete seven-hierarchy overview
