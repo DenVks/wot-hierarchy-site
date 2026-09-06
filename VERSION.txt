@@ -1,1 +1,1 @@
-v153 — Unified hierarchy database, comparison and NPC integration
+v154 — Manual hierarchy allocation and versioned NPC recalculation

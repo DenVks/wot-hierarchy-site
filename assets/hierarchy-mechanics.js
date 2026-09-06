@@ -7,6 +7,8 @@
   const profiles = {
     'crystal-throne': {
       version: 'v1.2', color: '#e87a7a', type: 'shonchan', priorities: ['str', 'cha'],
+      statGrant: { mode: 'paired', choices: 2, amount: 2, distinct: true },
+      penaltyGrant: { choices: 2, amount: -1, distinct: true },
       ranks: {
         I: { penaltyPoints: 2, initiative: -1, saves: -1 },
         II: { statPoints: 4, hp: 10, speed: 10, initiative: 2, saves: 1, dc: 1, weaveAttack: 1, weaveDamageDice: 2, weaveRangeMult: 1.5 },
@@ -18,6 +20,8 @@
     },
     unity: {
       version: 'v1.2', color: '#b07ae8', type: 'unity', priorities: ['wis', 'int'],
+      statGrant: { mode: 'paired', choices: 2, amount: 2, distinct: true },
+      penaltyGrant: { choices: 2, amount: -1, distinct: true },
       ranks: {
         I: { penaltyPoints: 2, initiative: -1, saves: -1 },
         II: { statPoints: 4, cap: 22, hp: 10, speed: 10, initiative: 2, saves: 1, dc: 2, weavePower: 2, extraSlots: 2 },
@@ -28,6 +32,8 @@
     },
     'far-madding-keepers': {
       version: 'v1.1', color: '#7ae8d4', type: 'guild', priorities: ['int', 'wis'],
+      statGrant: { mode: 'paired', choices: 2, amount: 2, distinct: true },
+      penaltyGrant: { choices: 2, amount: -1, distinct: true },
       ranks: {
         I: { penaltyPoints: 2, initiative: -1, saves: -1 },
         II: { statPoints: 4, cap: 20, hp: 10, speed: 10, initiative: 2, saves: 1, regen: 3 },
@@ -38,6 +44,7 @@
     },
     'shara-will': {
       version: 'редакция III', color: '#d7a849', type: 'shara', priorities: ['con', 'wis'],
+      statGrant: { mode: 'paired', choices: 2, amount: 2, distinct: true },
       branches: [
         { id: 'aiyad', name: 'Путь Айяд / Накша' },
         { id: 'warrior', name: 'Путь Воина / Клинка Воли' }
@@ -53,6 +60,7 @@
     },
     'pattern-guardians': {
       version: 'v1.1', color: '#c084fc', type: 'order', priorities: ['wis', 'con'],
+      statGrant: { mode: 'paired', choices: 2, amount: 1, distinct: true },
       ranks: {
         I: { initiative: -1 },
         II: { statPoints: 2, attack: 1, damage: 1, speed: 5, initiative: 1, saves: 1, dc: 1, weaveAttack: 1, weaveDamageDice: 1, weaveRangeMult: 1.3, extraSlots: 1 },
@@ -64,6 +72,7 @@
     },
     scream: {
       version: 'v2.4', color: '#fb923c', type: 'scream', priorities: ['wis', 'dex'],
+      statGrant: { mode: 'points', amount: 1, perStatMax: 6 },
       ranks: {
         I: { initiative: 1, initiativeExceptional: 2, conductivity: 1 },
         II: { statPoints: 1, ac: 1, initiative: 2, initiativeExceptional: 4, stability: 1, conductivity: 2, width: 1, chargeDie: 'к4' },
@@ -78,6 +87,7 @@
     },
     'anomalous-wall': {
       version: 'v1.0', color: '#7aa8e8', type: 'wall', priorities: ['con', 'wis'],
+      statGrant: { mode: 'paired', choices: 2, amount: 1, distinct: true },
       ranks: {
         I: { initiative: -1 },
         II: { statPoints: 2, attack: 1, damage: 1, speed: 5, initiative: 1, saves: 1 },
@@ -164,6 +174,19 @@
       if (!h.mechanics) errors.push('Нет механического профиля: ' + h.name);
       const contentRanks = (h.ranks || []).map(r => r.rank);
       const mechanicRanks = h.mechanics ? Object.keys(h.mechanics.ranks || {}) : [];
+      if (h.mechanics) {
+        const grant = h.mechanics.statGrant;
+        const hasStatPoints = mechanicRanks.some(rank => Number(h.mechanics.ranks[rank].statPoints || 0) > 0);
+        if (hasStatPoints && !grant) errors.push(h.name + ': не описан способ распределения характеристик');
+        if (grant && grant.mode === 'paired') mechanicRanks.forEach(rank => {
+          const points = Number(h.mechanics.ranks[rank].statPoints || 0);
+          if (points && Number(grant.choices || 0) * Number(grant.amount || 0) !== points) errors.push(h.name + ' ' + rank + ': ранговый пакет не совпадает со схемой распределения');
+        });
+        if (h.mechanics.penaltyGrant) mechanicRanks.forEach(rank => {
+          const penalties = Number(h.mechanics.ranks[rank].penaltyPoints || 0);
+          if (penalties && Number(h.mechanics.penaltyGrant.choices || 0) !== penalties) errors.push(h.name + ' ' + rank + ': штрафной пакет не совпадает со схемой выбора');
+        });
+      }
       mechanicRanks.forEach(rank => { if (!contentRanks.includes(rank)) errors.push(h.name + ': механический ранг ' + rank + ' отсутствует в справочном профиле'); });
       contentRanks.forEach((rank, index) => { if (rankNumber(rank) !== index + 1) errors.push(h.name + ': нарушена последовательность рангов у ' + rank); });
       const abilityNames = new Set();

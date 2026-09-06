@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css?v=149">
-<link rel="stylesheet" href="assets/npc-generator.css?v=65">
+<link rel="stylesheet" href="assets/npc-generator.css?v=154">
 <script src="assets/auth.js?v=65"></script>
 </head>
 <body>
@@ -48,8 +48,18 @@
       </div>
       <div class="hierarchy-options" id="hierarchy-options" hidden>
         <div class="field" id="hierarchy-branch-field" hidden><label>Путь внутри Иерархии</label><select id="npc-hierarchy-branch"></select></div>
+        <div class="field" id="hierarchy-shara-vessel-field" hidden><label>Сосуд V ранга</label><select id="npc-shara-vessel"><option value="shboan">Ш'боан · путь Айяд</option><option value="shbotai-aiyad">Ш'ботай-айяд</option><option value="shbotai-warrior">Ш'ботай-воитель</option></select></div>
+        <div class="field" id="hierarchy-throne-profile-field" hidden><label>Предел характеристик VI ранга</label><select id="npc-hierarchy-profile-kind"><option value="regular">Обычный персонаж / NPC · предел 24</option><option value="unique">Уникальный NPC · предел 26</option></select></div>
+        <div id="hierarchy-scream-fields" hidden>
+          <div class="grid2">
+            <div class="field"><label>Инициатива Крика</label><select id="npc-scream-initiative"><option value="none">«Счёт витков» не проводился</option><option value="success">Успех</option><option value="exceptional">Успех на 5+</option></select></div>
+            <div class="field"><label>Характеристика инициативы</label><select id="npc-scream-initiative-stat"><option value="dex">Ловкость</option><option value="wis">Мудрость</option></select></div>
+          </div>
+          <label class="check hierarchy-charge"><input type="checkbox" id="npc-scream-charge" checked> <span>Есть настроенный заряд кварца — действуют ранговые КД, скорость, инициатива, устойчивость и сопротивления.</span></label>
+        </div>
         <div class="hierarchy-selection-summary" id="hierarchy-selection-summary"></div>
-        <p class="hint">Повышения характеристик распределяются автоматически по приоритетам класса и роли. В блоке «Как посчитано» будет показано, какие характеристики получили каждый ранговый пакет.</p>
+        <div class="hierarchy-stat-allocation" id="hierarchy-stat-allocation"></div>
+        <p class="hint">Выбор характеристик фиксируется отдельно для каждого полученного ранга. Генератор показывает предел текущего ранга и не переносит неиспользованные пункты между рангами.</p>
       </div>
       <h2>2. Базовые характеристики</h2>
       <p class="hint">Вводятся базовые значения. Генератор автоматически добавляет бонус нации, рост характеристик по уровням, эффекты выбранных доп. черт и бонусы Иерархии.</p>
@@ -116,9 +126,9 @@
 <script src="assets/npc-rules-data.js?v=137"></script>
 <script src="assets/hierarchy-data.js?v=153"></script>
 <script src="assets/hierarchy-wall-data.js?v=153"></script>
-<script src="assets/hierarchy-mechanics.js?v=153"></script>
+<script src="assets/hierarchy-mechanics.js?v=154"></script>
 <script src="assets/npc-data.js?v=137"></script>
-<script src="assets/npc-generator.js?v=153"></script>
-<script src="assets/shared.js?v=153"></script>
+<script src="assets/npc-generator.js?v=154"></script>
+<script src="assets/shared.js?v=154"></script>
 </body>
 </html>
