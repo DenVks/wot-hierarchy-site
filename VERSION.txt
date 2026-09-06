@@ -1,1 +1,1 @@
-v154 — Manual hierarchy allocation and versioned NPC recalculation
+v155 — Remove obsolete hierarchy comparison table
