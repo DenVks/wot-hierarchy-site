@@ -43,8 +43,13 @@
         <div class="field"><label>Опасность</label><select id="npc-threat"><option>Обычный</option><option>Элитный</option><option>Мини-босс</option><option>Босс</option></select></div>
       </div>
       <div class="grid2">
-        <div class="field"><label>Фракция / Иерархия</label><select id="npc-faction"><option value="none">Без иерархии</option><option value="unity">Единство</option><option value="throne">Хрустальный Трон</option><option value="guild">Хранители Фар Мэддинга</option><option value="order">Орден</option><option value="wall">Иерархия Стены</option></select></div>
-        <div class="field"><label>Ранг</label><select id="npc-rank"><option value="0">—</option><option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option></select></div>
+        <div class="field"><label>Фракция / Иерархия</label><select id="npc-faction"></select></div>
+        <div class="field"><label>Ранг</label><select id="npc-rank"><option value="0">—</option></select></div>
+      </div>
+      <div class="hierarchy-options" id="hierarchy-options" hidden>
+        <div class="field" id="hierarchy-branch-field" hidden><label>Путь внутри Иерархии</label><select id="npc-hierarchy-branch"></select></div>
+        <div class="hierarchy-selection-summary" id="hierarchy-selection-summary"></div>
+        <p class="hint">Повышения характеристик распределяются автоматически по приоритетам класса и роли. В блоке «Как посчитано» будет показано, какие характеристики получили каждый ранговый пакет.</p>
       </div>
       <h2>2. Базовые характеристики</h2>
       <p class="hint">Вводятся базовые значения. Генератор автоматически добавляет бонус нации, рост характеристик по уровням, эффекты выбранных доп. черт и бонусы Иерархии.</p>
@@ -109,8 +114,11 @@
 <script src="assets/feats-data.js?v=65"></script>
 <script src="assets/weaves-data.js?v=65"></script>
 <script src="assets/npc-rules-data.js?v=137"></script>
+<script src="assets/hierarchy-data.js?v=153"></script>
+<script src="assets/hierarchy-wall-data.js?v=153"></script>
+<script src="assets/hierarchy-mechanics.js?v=153"></script>
 <script src="assets/npc-data.js?v=137"></script>
-<script src="assets/npc-generator.js?v=65"></script>
-<script src="assets/shared.js?v=152"></script>
+<script src="assets/npc-generator.js?v=153"></script>
+<script src="assets/shared.js?v=153"></script>
 </body>
 </html>

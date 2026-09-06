@@ -95,7 +95,9 @@ window.WOT_NPC_RULES = {
     'Пламя и пустота':{attackWis:true, wisdomSaveAdv:true}, 'Меткий стрелок':{rangedPower:true}, 'Мастер большого оружия':{heavyPower:true},
     'Меткие заклинания':{spellRange2:true}, 'Убийца направляющих':{mageSlayer:true}
   },
-  hierarchies: {
+  // Архивный набор оставлен только для совместимости старых выгрузок.
+  // NPC Generator использует нормализованную WOT_HIERARCHY_DB.
+  legacyHierarchies: {
     none:null,
     unity:{name:'Иерархия Единства',type:'unity',color:'#b07ae8',priority:['wis','int'],ranks:{
       I:{statPenalty:2,speed:0,initiative:-1,saves:-1,items:[['Переходный ранг','−1 к двум атрибутам; −1 к инициативе и спасброскам.']]},
