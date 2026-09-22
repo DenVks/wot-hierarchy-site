@@ -8,6 +8,8 @@ const featNameAliases={
   'Плетение без Жестов (Редкое)':'Плетение без жестов (Редкое)'
 };
 const normalizeFeatName=name=>featNameAliases[name]||name;
+const WILDER_TRADITIONS=['Мудрый','Странник','Сновидец'];
+const CLASS_ARCHETYPE_OVERRIDES={'Дичок':WILDER_TRADITIONS};
 const weaves=window.WOT_WEAVES||[];
 const existing=Array.isArray(window.CS)?window.CS:(typeof CS!=='undefined'?CS:[]);
 const rules=window.WOT_NPC_RULES||{};
@@ -359,8 +361,9 @@ function initClassSelect(){
   if(classes.includes('Варвар')) $('npc-class').value='Варвар'; updateArchSelect();
 }
 function updateArchSelect(){
-  const c=getClass(); const archs=Array.from(new Set(clsDb.features.filter(f=>f.className===c).map(f=>f.archetype).filter(a=>a&&a!=='Базовый класс')));
-  $('npc-arch').innerHTML='<option value="Базовый класс">Базовый класс</option>'+archs.sort((a,b)=>a.localeCompare(b)).map(a=>`<option>${safe(a)}</option>`).join('');
+  const c=getClass(), override=CLASS_ARCHETYPE_OVERRIDES[c];
+  const archs=override?[...override]:Array.from(new Set(clsDb.features.filter(f=>f.className===c).map(f=>f.archetype).filter(a=>a&&a!=='Базовый класс'))).sort((a,b)=>a.localeCompare(b));
+  $('npc-arch').innerHTML=(override?'':'<option value="Базовый класс">Базовый класс</option>')+archs.map(a=>`<option>${safe(a)}</option>`).join('');
   updateFightingStyleSelect();
 }
 function initNationSelect(){ const nats=Object.keys(rules.nationBonuses||{}).sort((a,b)=>a.localeCompare(b)); const inp=$('npc-nation'); if(!inp) return; const val=inp.value||'Андор'; const dl=document.createElement('datalist'); dl.id='nation-list'; dl.innerHTML=nats.map(n=>`<option value="${safe(n)}">`).join(''); document.body.appendChild(dl); inp.setAttribute('list','nation-list'); inp.value=val; }
@@ -445,8 +448,10 @@ function buildGeneratorSnapshot(){
 function restoreGeneratorSnapshot(snapshot){
   const i=snapshot&&snapshot.inputs;if(!i){alert('Эта карточка сохранена старой версией и не содержит исходных настроек для пересчёта.');return;}
   const previousDbVersion=snapshot.hierarchyDbVersion||'';
+  const wilderTraditionMigrated=i.cls==='Дичок'&&!WILDER_TRADITIONS.includes(i.arch);
+  const restoredArch=wilderTraditionMigrated?WILDER_TRADITIONS[0]:i.arch;
   const set=(id,value)=>{const el=$(id);if(el&&value!==undefined&&value!==null)el.value=String(value);};
-  set('npc-name',i.name);set('npc-nation',i.nation);set('npc-level',i.level);set('npc-class',i.cls);updateArchSelect();set('npc-arch',i.arch);set('npc-role',i.role);set('npc-threat',i.threat);
+  set('npc-name',i.name);set('npc-nation',i.nation);set('npc-level',i.level);set('npc-class',i.cls);updateArchSelect();set('npc-arch',restoredArch);set('npc-role',i.role);set('npc-threat',i.threat);
   statKeys.forEach(k=>set(k,i.stats&&i.stats[k]));
   set('weapon-select',i.weapon);set('weapon-bonus',i.weaponBonus);set('armor-select',i.armor);set('armor-bonus',i.armorBonus);set('shield-select',i.shield);set('shield-bonus',i.shieldBonus);
   set('npc-faction',i.faction||'none');updateHierarchyControls(true);set('npc-rank',i.rank);updateHierarchyControls(false);set('npc-hierarchy-branch',i.branch);set('npc-shara-vessel',i.sharaVessel);set('npc-hierarchy-profile-kind',i.profileKind);set('npc-scream-initiative',i.screamInitiative);set('npc-scream-initiative-stat',i.screamInitiativeStat);if($('npc-scream-charge'))$('npc-scream-charge').checked=i.screamCharge!==false;
@@ -456,6 +461,7 @@ function restoreGeneratorSnapshot(snapshot){
   renderTalentAffinityControls();document.querySelectorAll('[data-talent]').forEach(el=>el.checked=(i.talents||[]).includes(el.value));document.querySelectorAll('[data-affinity]').forEach(el=>el.checked=(i.affinities||[]).includes(el.value));
   renderWeavePicker();document.querySelectorAll('[data-weave-title]').forEach(el=>el.checked=(i.weaves||[]).includes(el.value));set('npc-weaves',i.manualWeaves);updateFightingStyleSelect();set('npc-fighting-style',i.fightingStyle);
   buildNpc();window.scrollTo({top:0,behavior:'smooth'});
+  if(wilderTraditionMigrated) alert('В сохранённой карточке Дичка вместо Традиции был указан Исключительный талант. Установлена Традиция «Мудрый»: выберите «Странник» или «Сновидец», если это требуется персонажу, и сохраните карточку заново.');
   if(previousDbVersion&&previousDbVersion!==(hierarchyDb.updated||'')) alert(`Карточка пересчитана: база Иерархий обновилась с ${previousDbVersion} до ${hierarchyDb.updated}. Проверьте блок «до → после» и сохраните карточку заново.`);
 }
 function buildNpc(){
