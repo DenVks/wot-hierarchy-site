@@ -4000,3 +4000,6 @@ nav.sitenav .inner{overflow:visible;}
 
 /* v157 mobile overflow fixes */
 .feats-grid,.feat-card,.feat-text,.class-reader-layout,.class-reader-content,.class-panel,.class-full-chapter{min-width:0}.feat-text .rules-table-wrap{max-width:100%;overflow-x:auto}.class-progression-table-wrap{max-width:100%;overflow-x:auto}@media(max-width:980px){.class-reader-layout{grid-template-columns:minmax(0,1fr)}.class-local-nav{width:100%;min-width:0}}@media(max-width:900px){.feats-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* v158: Weave Without Gestures v15 clarification */
+.feat-effect-note{margin:16px 0;padding:14px 16px;border:1px solid rgba(201,169,97,.32);border-left:3px solid var(--gold);border-radius:10px;background:rgba(201,169,97,.075);color:var(--ink)}.feat-effect-note strong{color:var(--gold-bright)}
