@@ -3,6 +3,11 @@
 const CUSTOM_KEY='wot_custom_npcs_v1';
 const clsDb=window.WOT_CLASSES_DB||{features:[],meta:{classes:[]}};
 const feats=(window.WOT_FEATS_DB&&window.WOT_FEATS_DB.feats)||[];
+const featNameAliases={
+  'Пламя и пустота (редкий)':'Пламя и Пустота (Редкое)',
+  'Плетение без Жестов (Редкое)':'Плетение без жестов (Редкое)'
+};
+const normalizeFeatName=name=>featNameAliases[name]||name;
 const weaves=window.WOT_WEAVES||[];
 const existing=Array.isArray(window.CS)?window.CS:(typeof CS!=='undefined'?CS:[]);
 const rules=window.WOT_NPC_RULES||{};
@@ -447,7 +452,7 @@ function restoreGeneratorSnapshot(snapshot){
   set('npc-faction',i.faction||'none');updateHierarchyControls(true);set('npc-rank',i.rank);updateHierarchyControls(false);set('npc-hierarchy-branch',i.branch);set('npc-shara-vessel',i.sharaVessel);set('npc-hierarchy-profile-kind',i.profileKind);set('npc-scream-initiative',i.screamInitiative);set('npc-scream-initiative-stat',i.screamInitiativeStat);if($('npc-scream-charge'))$('npc-scream-charge').checked=i.screamCharge!==false;
   renderHierarchyStatChoices();
   const saved=i.hierarchyChoices||{};document.querySelectorAll('[data-hierarchy-stat]').forEach(el=>{const group=el.dataset.hierarchyKind==='penalty'?saved.penalties:saved.stats;const row=group&&group[el.dataset.hierarchyRank];const found=(row||[]).find(x=>Number(x.slot)===Number(el.dataset.hierarchySlot));if(found)el.value=found.key;});
-  initFeats();document.querySelectorAll('#feat-list input').forEach(el=>el.checked=(i.feats||[]).includes(el.dataset.name));
+  const restoredFeats=(i.feats||[]).map(normalizeFeatName);initFeats();document.querySelectorAll('#feat-list input').forEach(el=>el.checked=restoredFeats.includes(el.dataset.name));
   renderTalentAffinityControls();document.querySelectorAll('[data-talent]').forEach(el=>el.checked=(i.talents||[]).includes(el.value));document.querySelectorAll('[data-affinity]').forEach(el=>el.checked=(i.affinities||[]).includes(el.value));
   renderWeavePicker();document.querySelectorAll('[data-weave-title]').forEach(el=>el.checked=(i.weaves||[]).includes(el.value));set('npc-weaves',i.manualWeaves);updateFightingStyleSelect();set('npc-fighting-style',i.fightingStyle);
   buildNpc();window.scrollTo({top:0,behavior:'smooth'});

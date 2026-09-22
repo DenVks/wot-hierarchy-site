@@ -1,1 +1,1 @@
-v158 — Update Weave Without Gestures to rules v15
+v159 — Restore Chapter 6 QA regressions from rules v16
