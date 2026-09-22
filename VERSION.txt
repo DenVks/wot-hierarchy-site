@@ -1,1 +1,1 @@
-v156 — Add complete seven-hierarchy overview
+v157 — Sync player rules v2.3/v14 and alchemy

@@ -1,0 +1,60 @@
+{
+  "version": "v157",
+  "status": "local QA complete; not published",
+  "canonicalSource": "Дополнение к Книге Игрока 5ed по Колесу Времени_v.2.3_синхронизировано_v14_Алхимия_QA.md",
+  "changeLog": "Изменения в редакции.md",
+  "classes": {
+    "classes": 10,
+    "featureRows": 519,
+    "progressionRows": 200,
+    "fullChapters": 8,
+    "canonicalV14FeatureRows": 272,
+    "pactBearer": "post-v14 patch loaded after canonical DB"
+  },
+  "feats": {
+    "total": 58,
+    "canonicalSupplement": 19,
+    "cancelledRemoved": 4,
+    "renamed": "Истребитель направляющих"
+  },
+  "weaves": {
+    "total": 93,
+    "levels": {
+      "0": 16,
+      "1": 21,
+      "2": 7,
+      "3": 13,
+      "4": 9,
+      "5": 7,
+      "6": 7,
+      "7": 6,
+      "8": 3,
+      "9": 4
+    }
+  },
+  "rulebook": {
+    "chapters": [
+      "chapter4",
+      "chapter5",
+      "chapter7",
+      "chapter8",
+      "chapter9",
+      "chapter11",
+      "chapter12"
+    ],
+    "fullTextCoverage": "100% token coverage (Посвящённый 99.98% due to typography normalization)"
+  },
+  "alchemy": {
+    "page": "alchemy.html",
+    "hasFeat": true,
+    "toolsChars": 4037,
+    "rulesChars": 12152
+  },
+  "qa": {
+    "javascriptSyntax": "passed",
+    "localLinks": "passed (10 entry pages, 0 missing)",
+    "desktopDom": "passed; no JavaScript errors",
+    "mobileOverflow": "passed at 390px after fixes",
+    "embeddedBase64Images": "none"
+  }
+}

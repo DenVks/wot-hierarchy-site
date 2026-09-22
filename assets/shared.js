@@ -29,9 +29,11 @@
 
   const path = (location.pathname.split('/').pop() || 'index.html');
   const ruleItems = [
+    {href:'player-rules.html', label:'Правила игрока v2.3'},
     {href:'classes.html', label:'Классы'},
     {href:'weaves.html', label:'Плетения'},
-    {href:'feats.html', label:'Дополнительные черты'},
+    {href:'feats.html', label:'Черты'},
+    {href:'alchemy.html', label:'Необычная алхимия'},
     {href:'unity.html', label:'Иерархия Единства'},
     {href:'throne.html', label:'Иерархия Хрустального Трона'},
     {href:'madding.html', label:'Гильдия Хранителей Фар Мэддинга'},

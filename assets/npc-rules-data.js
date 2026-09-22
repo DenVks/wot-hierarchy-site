@@ -93,7 +93,7 @@ window.WOT_NPC_RULES = {
     'Устойчивый':{statChoice:['str','dex','con','int','wis','cha']}, 'Отличная память':{stat:{int:1}}, 'Языковед':{stat:{int:1}},
     'Сдержанность':{statChoice:['int','wis'], tempHp:'level'}, 'Великая стойкость':{stat:{con:1}}, 'Боевой направляющий':{stat:{int:1}, concentrationAdv:true},
     'Пламя и пустота':{attackWis:true, wisdomSaveAdv:true}, 'Меткий стрелок':{rangedPower:true}, 'Мастер большого оружия':{heavyPower:true},
-    'Меткие заклинания':{spellRange2:true}, 'Убийца направляющих':{mageSlayer:true}
+    'Меткие заклинания':{spellRange2:true}, 'Истребитель направляющих':{mageSlayer:true}
   },
   // Архивный набор оставлен только для совместимости старых выгрузок.
   // NPC Generator использует нормализованную WOT_HIERARCHY_DB.

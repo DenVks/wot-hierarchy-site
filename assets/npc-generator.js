@@ -24,10 +24,10 @@ const roleTemplates={
   'Командир':{str:12,dex:12,con:14,int:14,wis:14,cha:16},
   'Сбалансированный':{str:13,dex:13,con:14,int:12,wis:13,cha:12}
 };
-const CHANNELING_TALENTS=['Танец Облаков','Соединение','Пение Земли','Элементализм','Исцеление','Иллюзия','Перемещение','Защита','Погибельный огонь'];
+const CHANNELING_TALENTS=Array.from(new Set(weaves.map(w=>w.school).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'ru'));
 const AFFINITIES=['Воздух','Земля','Огонь','Дух','Вода'];
-function isChannelingClass(cls){ return /Дичок|Посвящ/i.test(String(cls||'')); }
-function getMaxWeaveLevel(cls,lv){ lv=Number(lv)||1; if(lv>=17) return 9; if(lv>=15) return 8; if(lv>=13) return 7; if(lv>=11) return 6; if(lv>=9) return 5; if(lv>=7) return 4; if(lv>=5) return 3; if(lv>=3) return 2; return 1; }
+function isChannelingClass(cls){ return /Дичок|Посвящ|Носитель Договора/i.test(String(cls||'')); }
+function getMaxWeaveLevel(cls,lv){ lv=Number(lv)||1; if(/Носитель Договора/i.test(String(cls||''))){ const row=(clsDb.progression||[]).find(r=>r.className===cls&&Number(r.level)===lv); return Number(row&&row.slotLevel||1); } if(lv>=17) return 9; if(lv>=15) return 8; if(lv>=13) return 7; if(lv>=11) return 6; if(lv>=9) return 5; if(lv>=7) return 4; if(lv>=5) return 3; if(lv>=3) return 2; return 1; }
 function baseFreeWeaveLevel(cls){ return /Дичок/i.test(String(cls||'')) ? 2 : 1; }
 function getSelectedTalents(){ return [...document.querySelectorAll('[data-talent]:checked')].map(x=>x.value); }
 function getSelectedAffinities(){ return [...document.querySelectorAll('[data-affinity]:checked')].map(x=>x.value); }
@@ -144,6 +144,7 @@ function primaryStats(cls,role){
   if(/Пустынный/.test(cls)) return ['dex','con','wis','str'];
   if(/Скиталец/.test(cls)) return ['dex','int','cha','wis'];
   if(/Лесник/.test(cls)) return ['dex','wis','con','str'];
+  if(/Носитель Договора/.test(cls)) return ['cha','wis','con','int'];
   if(/Дичок|Посвящ/.test(cls)) return ['wis','int','con','dex'];
   if(/Благород/.test(cls)) return ['cha','wis','int','con'];
   const map={Фронтлайн:['str','con','dex','wis'],Стрелок:['dex','wis','con','str'],Скиталец:['dex','int','cha','wis'],Направляющий:['wis','int','con','dex'],Командир:['cha','wis','con','int']};
@@ -468,7 +469,7 @@ function buildNpc(){
   featsSel.forEach(fn=>{const f=feats.find(x=>x.name===fn); ab.push({n:fn,d:f?f.desc.join(' '):'Дополнительная черта.',hi:false,source:'feat'});});
   h.traits.forEach(t=>ab.push({n:t.n,d:t.d,hi:true,source:'hierarchy',color:t.color}));
   const id=loadedCustomId||200000+Date.now()%100000000;
-  const npc={id,sh:name,na:nation,lv,ic:/Дичок|Посвящ/.test(cls)?'🔥':/Лесник/.test(cls)?'🏹':/Скиталец/.test(cls)?'◇':/Варвар/.test(cls)?'🪓':'⚔',ty:hi?'purple':'warning',custom:true,ti:`${name} — ${cls}${arch&&arch!=='Базовый класс'?' / '+arch:''} ${lv}-го уровня`,su:`Черновик NPC · ${role} · ${$('npc-threat').value}`,tags:[cls,arch,`Ур.${lv}`,nation].filter(Boolean),talents:selectedTalents,affinities:selectedAffinities,st:stats,co:{hp,ac:acCalc.ac,sp:30+(h.speedBonus||0),ini:sign(ini)+(h.initiativeAdv?' / преим.':''),prof:sign(p),sv:`${cls==='Варвар'?'Сил, Тел':/Дичок|Посвящ/.test(cls)?'Инт, Мдр':'по классу'}${h.saveBonus?' +'+h.saveBonus+' от Иерархии':''}`,pp,cr:`${attack.n}: ${attack.a}, ${attack.d}`},at:[attack],ab,hi,eq:[{r:!!(eq.weaponBonus||eq.armorBonus||eq.shieldBonus),t:`${eq.weapon.name}${eq.weaponBonus?` +${eq.weaponBonus}`:''}; ${eq.armor.name}${eq.armorBonus?` +${eq.armorBonus}`:''}; ${eq.shield.name}${eq.shieldBonus?` +${eq.shieldBonus}`:''}. КД: ${acCalc.note}.`}],sk:[{n:'Восприятие',v:sign(mod(stats.wis)+p),e:false,note:'Черновой расчёт.'},{n:'Проницательность',v:sign(mod(stats.wis)+p),e:false,note:'Черновой расчёт.'}],verify:[],tactics:[{ph:'Роль',d:`${role}. Уточните боевой паттерн под сцену.`},{ph:'Проверка ГМ',d:'Перед канонизацией проверьте ОЗ, КД, предметы, плетения и бонусы Иерархии.'}],dm:$('npc-notes')?.value||'Создано генератором. Требует утверждения ГМ.',generator:buildGeneratorSnapshot()};
+  const npc={id,sh:name,na:nation,lv,ic:/Дичок|Посвящ|Носитель Договора/.test(cls)?'🔥':/Лесник/.test(cls)?'🏹':/Скиталец/.test(cls)?'◇':/Варвар/.test(cls)?'🪓':'⚔',ty:hi?'purple':'warning',custom:true,ti:`${name} — ${cls}${arch&&arch!=='Базовый класс'?' / '+arch:''} ${lv}-го уровня`,su:`Черновик NPC · ${role} · ${$('npc-threat').value}`,tags:[cls,arch,`Ур.${lv}`,nation].filter(Boolean),talents:selectedTalents,affinities:selectedAffinities,st:stats,co:{hp,ac:acCalc.ac,sp:30+(h.speedBonus||0),ini:sign(ini)+(h.initiativeAdv?' / преим.':''),prof:sign(p),sv:`${cls==='Варвар'?'Сил, Тел':/Носитель Договора/.test(cls)?'Мдр, Хар':/Дичок|Посвящ/.test(cls)?'Инт, Мдр':'по классу'}${h.saveBonus?' +'+h.saveBonus+' от Иерархии':''}`,pp,cr:`${attack.n}: ${attack.a}, ${attack.d}`},at:[attack],ab,hi,eq:[{r:!!(eq.weaponBonus||eq.armorBonus||eq.shieldBonus),t:`${eq.weapon.name}${eq.weaponBonus?` +${eq.weaponBonus}`:''}; ${eq.armor.name}${eq.armorBonus?` +${eq.armorBonus}`:''}; ${eq.shield.name}${eq.shieldBonus?` +${eq.shieldBonus}`:''}. КД: ${acCalc.note}.`}],sk:[{n:'Восприятие',v:sign(mod(stats.wis)+p),e:false,note:'Черновой расчёт.'},{n:'Проницательность',v:sign(mod(stats.wis)+p),e:false,note:'Черновой расчёт.'}],verify:[],tactics:[{ph:'Роль',d:`${role}. Уточните боевой паттерн под сцену.`},{ph:'Проверка ГМ',d:'Перед канонизацией проверьте ОЗ, КД, предметы, плетения и бонусы Иерархии.'}],dm:$('npc-notes')?.value||'Создано генератором. Требует утверждения ГМ.',generator:buildGeneratorSnapshot()};
   if(spells.length) npc.spells=spells;
   if(selectedTalents.length) npc.excTalents=selectedTalents.map(t=>({tal:t,items:[{lv:1,n:'Исключительный талант: '+t,d:'Выбран в генераторе NPC. Проверьте точное описание таланта по базе правил.'}]}));
   npc.verify=validateNpc({cls,arch,lv,nation,features,featsSel,spells,h,stats,hp,ac:acCalc.ac,applied,eq,attack,selectedTalents,selectedAffinities,hierarchyCtx});
@@ -488,11 +489,11 @@ function validateNpc(ctx){
   if(opts.length && st) out.push({s:'ok',t:`Стиль боя выбран: ${st.n}. Бонусы стиля учтены в финальной карточке.`});
   if(opts.length && !st) out.push({s:'warn',t:'Класс/архетип получает Стиль боя, но стиль не выбран.'});
   if(ctx.arch!=='Базовый класс'&&!ctx.features.some(f=>f.archetype===ctx.arch)) out.push({s:'warn',t:'Для выбранного архетипа нет доступных черт на этом уровне.'});
-  if(/Дичок|Посвящ/.test(ctx.cls)&&!(ctx.selectedTalents||[]).length) out.push({s:'warn',t:'NPC-направляющему не выбраны Исключительные таланты. Плетения выше свободного уровня будут скрыты.'});
-  if(/Дичок|Посвящ/.test(ctx.cls)&&!(ctx.selectedAffinities||[]).length) out.push({s:'warn',t:'NPC-направляющему не выбраны аффинитеты.'});
-  if(/Дичок|Посвящ/.test(ctx.cls)&&!ctx.spells.length) out.push({s:'warn',t:'NPC-направляющему не выбраны плетения.'});
-  if(/Дичок|Посвящ/.test(ctx.cls)&&(ctx.selectedTalents||[]).length) out.push({s:'ok',t:'Исключительные таланты: '+ctx.selectedTalents.join(', ')+'.'});
-  if(/Дичок|Посвящ/.test(ctx.cls)&&(ctx.selectedAffinities||[]).length) out.push({s:'ok',t:'Аффинитеты: '+ctx.selectedAffinities.join(', ')+'.'});
+  if(/Дичок|Посвящ|Носитель Договора/.test(ctx.cls)&&!(ctx.selectedTalents||[]).length) out.push({s:'warn',t:'NPC-направляющему не выбраны Таланты направления / Договора. Плетения выше свободного уровня будут скрыты.'});
+  if(/Дичок|Посвящ|Носитель Договора/.test(ctx.cls)&&!(ctx.selectedAffinities||[]).length) out.push({s:'warn',t:'NPC-направляющему не выбраны аффинитеты.'});
+  if(/Дичок|Посвящ|Носитель Договора/.test(ctx.cls)&&!ctx.spells.length) out.push({s:'warn',t:'NPC-направляющему не выбраны плетения.'});
+  if(/Дичок|Посвящ|Носитель Договора/.test(ctx.cls)&&(ctx.selectedTalents||[]).length) out.push({s:'ok',t:'Таланты направления / Договора: '+ctx.selectedTalents.join(', ')+'.'});
+  if(/Дичок|Посвящ|Носитель Договора/.test(ctx.cls)&&(ctx.selectedAffinities||[]).length) out.push({s:'ok',t:'Аффинитеты: '+ctx.selectedAffinities.join(', ')+'.'});
   if(ctx.h.name) out.push({s:'ok',t:`Иерархия применена по единой базе (${ctx.h.version||'редакция не указана'}): ${ctx.h.name}. Числовой профиль взят только у текущего ранга, уникальные способности нижних рангов унаследованы.`});
   if(ctx.h.type==='scream'&&ctx.hierarchyCtx.screamInitiative==='none') out.push({s:'warn',t:'«Счёт витков» не проводился: ранговый числовой бонус Крика к инициативе не применён.'});
   if(ctx.h.type==='scream'&&ctx.hierarchyCtx.screamInitiative==='success') out.push({s:'ok',t:'Инициатива Крика рассчитана для обычного успеха «Счёта витков».'});
