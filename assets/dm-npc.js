@@ -1704,6 +1704,9 @@ ${renderArmorSelector(c)}
   if (hasSpells) {
     html += `<div class="tab-content" id="tab_${id}_spells">`;
     if (c.angrial) html += renderAngrial(c.angrial);
+    if ((c.talents&&c.talents.length)||(c.affinities&&c.affinities.length)) {
+      html += `<div class="sec"><div class="sec-h">Доступ к Плетениям</div><div class="eq-list">${c.talents&&c.talents.length?`<div class="eq-item"><b>Таланты:</b> ${c.talents.map(escHtml).join(', ')}</div>`:''}${c.affinities&&c.affinities.length?`<div class="eq-item"><b>Аффинитеты:</b> ${c.affinities.map(escHtml).join(', ')}</div>`:''}</div></div>`;
+    }
     if (c.slots) {
       html += `<div class="sec"><div class="sec-h">Ячейки плетений (клик = использовать)</div>
 <div class="slots-row">${c.slots.map(sl=>{

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css?v=157">
-<link rel="stylesheet" href="assets/npc-generator.css?v=154">
+<link rel="stylesheet" href="assets/npc-generator.css?v=161">
 <script src="assets/auth.js?v=65"></script>
 </head>
 <body>
@@ -73,15 +73,28 @@
       </div>
       <div class="actions"><button type="button" id="apply-template">Применить роль</button><button type="button" id="generate">Собрать / обновить проверку</button></div>
       <h2>3. Дополнительные черты</h2>
-      <p class="hint">Каждая выбранная доп. черта вызывает предупреждение: нужно уменьшить один из уровневых приростов характеристик на 1. Генератор уменьшает авто-распределение, но выбор подтверждает ГМ.</p>
+      <p class="hint">Каждая выбранная дополнительная черта уменьшает автоматический уровневый прирост характеристик на 1 пункт. После выбора проверьте показанный расчёт и поставьте отметку подтверждения ГМ.</p>
       <div class="field"><input id="feat-search" placeholder="Фильтр черт..."></div>
       <div class="checks" id="feat-list"></div>
+      <div class="feat-confirm-panel" id="feat-confirm-panel" hidden>
+        <label class="check feat-confirm-check"><input type="checkbox" id="feat-cost-confirm"><span><b>ГМ подтверждает оплату дополнительных черт</b><small id="feat-cost-details"></small></span></label>
+        <p class="hint">Подтверждение означает, что вы проверили, какие пункты уровневого роста не были добавлены. Без этой отметки NPC с дополнительными чертами нельзя сохранить в список.</p>
+      </div>
       <h2>4. Плетения</h2>
       <div id="channeling-fields" class="channeling-fields" style="display:none">
+        <div class="field" id="ajah-field" hidden>
+          <label>Айя Айз Седай</label>
+          <select id="npc-ajah">
+            <option value="">Выберите Айя</option>
+            <option>Голубая</option><option>Коричневая</option><option>Зелёная</option><option>Серая</option><option>Красная</option><option>Белая</option><option>Жёлтая</option>
+          </select>
+          <p class="hint">Выбор появляется у Айз Седай с 7-го уровня. Зелёная Айя открывает наносящие урон Плетения до 3-го круга без соответствующего Таланта; Жёлтая даёт Талант Исцеления сверх обычного предела и известные Плетения Исцеления без пометок «Утерянное» или «Новое».</p>
+        </div>
         <div class="field">
-          <label>Исключительные таланты</label>
+          <label>Таланты Плетений</label>
           <div class="checks compact" id="talent-list"></div>
-          <p class="hint">Кантрипы и плетения 1-го уровня доступны без исключительного таланта. Для Дичка дополнительно доступны плетения 2-го уровня. Более высокие уровни требуют выбранного таланта плетения.</p>
+          <p class="hint" id="talent-limit-hint">Генератор покажет допустимое число Талантов для выбранного класса и уровня.</p>
+          <p class="hint">Без соответствующего Таланта Посвящённому доступны известные Плетения до 1-го круга, а Дичку и Носителю Договора — до 2-го круга. Специальные исключения традиций применяются отдельно.</p>
         </div>
         <div class="field">
           <label>Аффинитеты</label>
@@ -105,8 +118,9 @@
         <div class="field"><label>Магический бонус доспеха</label><input id="armor-bonus" type="number" min="0" max="5" value="0"></div>
       </div>
       <div class="field"><label>Магический бонус щита</label><input id="shield-bonus" type="number" min="0" max="5" value="0"></div>
-      <div class="actions"><button type="button" class="secondary" id="copy-export">Копировать JS</button><button type="button" id="save-local">Перенести в NPC / Бой</button><button type="button" class="danger" id="clear-custom">Очистить пользовательских NPC</button></div>
-      <h2>Пользовательские NPC этого браузера</h2>
+      <div class="actions"><button type="button" class="secondary" id="copy-export">Копировать JS</button><button type="button" class="secondary" id="download-export">Скачать JSON для общей базы</button><button type="button" id="save-local">Сохранить в список NPC</button><a class="button-link" href="dm-npc.html">Открыть NPC / Бой</a><button type="button" class="danger" id="clear-custom">Очистить пользовательских NPC</button></div>
+      <p class="hint save-hint">«Сохранить в список NPC» добавляет карточку в постоянный пользовательский список этого браузера и показывает её в разделе «NPC / Бой». Для другого компьютера или общей базы сайта скачайте JSON.</p>
+      <h2>Постоянный пользовательский список этого браузера</h2>
       <div id="custom-list" class="custom-list"></div>
     </section>
     <section class="panel">
@@ -124,12 +138,12 @@
 <script src="assets/classes-nositel-dogovora.js?v=157"></script>
 <script src="assets/feats-data.js?v=159"></script>
 <script src="assets/weaves-data.js?v=157"></script>
-<script src="assets/npc-rules-data.js?v=157"></script>
+<script src="assets/npc-rules-data.js?v=161"></script>
 <script src="assets/hierarchy-data.js?v=153"></script>
 <script src="assets/hierarchy-wall-data.js?v=153"></script>
 <script src="assets/hierarchy-mechanics.js?v=154"></script>
 <script src="assets/npc-data.js?v=137"></script>
-<script src="assets/npc-generator.js?v=160"></script>
+<script src="assets/npc-generator.js?v=161"></script>
 <script src="assets/shared.js?v=157"></script>
 </body>
 </html>

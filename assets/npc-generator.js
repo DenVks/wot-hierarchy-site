@@ -9,7 +9,8 @@ const featNameAliases={
 };
 const normalizeFeatName=name=>featNameAliases[name]||name;
 const WILDER_TRADITIONS=['Мудрый','Странник','Сновидец'];
-const CLASS_ARCHETYPE_OVERRIDES={'Дичок':WILDER_TRADITIONS};
+const PACT_PATRONS=['Ланфир, Госпожа Снов','Семираг, Госпожа Боли','Ишамаэль, Голос Конца','Могидин, Паучиха','Великая Мигрирующая Аномалия','Дракон Возрождённый, След огня в Узоре'];
+const CLASS_ARCHETYPE_OVERRIDES={'Дичок':WILDER_TRADITIONS,'Носитель Договора':PACT_PATRONS};
 const weaves=window.WOT_WEAVES||[];
 const existing=Array.isArray(window.CS)?window.CS:(typeof CS!=='undefined'?CS:[]);
 const rules=window.WOT_NPC_RULES||{};
@@ -22,7 +23,7 @@ const $=id=>document.getElementById(id);
 const statKeys=['str','dex','con','int','wis','cha'];
 const abbr={str:'СИЛ',dex:'ЛОВ',con:'ТЕЛ',int:'ИНТ',wis:'МДР',cha:'ХАР'};
 const ruStat={str:'Сила',dex:'Ловкость',con:'Телосложение',int:'Интеллект',wis:'Мудрость',cha:'Харизма'};
-const hitDie={'Варвар':12,'Пустынный воин':10,'Мастер по оружию':10,'Лесник':10,'Благородный':8,'Скиталец':8,'Дичок':8,'Посвящённый':4,'Посвященный':4};
+const hitDie={'Варвар':12,'Пустынный воин':10,'Мастер по оружию':10,'Лесник':10,'Благородный':8,'Скиталец':8,'Дичок':6,'Посвящённый':4,'Посвященный':4};
 const roleTemplates={
   'Фронтлайн':{str:16,dex:12,con:16,int:10,wis:12,cha:10},
   'Стрелок':{str:10,dex:16,con:14,int:12,wis:14,cha:10},
@@ -33,32 +34,70 @@ const roleTemplates={
 };
 const CHANNELING_TALENTS=Array.from(new Set(weaves.map(w=>w.school).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'ru'));
 const AFFINITIES=['Воздух','Земля','Огонь','Дух','Вода'];
+const PACT_GENERAL_WEAVES=[
+  'Руки Воздуха','Создать Огонь','Течение','Анализ почвы','Ложный след','Предсказание Погоды','Граната','Обуздать Ветер','Свет','Полировка','Инструмент Воздуха','Голос Силы','Тепло','Ледяные кристаллы',
+  'Преграда для взгляда','Круг тишины','Маскировка','Высушить','Подслушивание','Ложная Стена','Уплотнить Воздух','Консервация','Выровнять Землю','Зеркало Туманов','Поднять Туман','Огненный Жезл','Смерч','Воздушный кулак',
+  'Огненный Меч','Огненный шар','Свернутый Свет','Громовой Удар','Охрана от Направляющих','Охрана От Людей',
+  'Очищение','Разрезать Плетения','Искатель','Огненная Ловушка','Перемещение Воды','Щит','Охрана От Единой Силы','Водоворот',
+  'Отдалённый Глаз','Приносить в жертву','Защитный купол','Расколотая Земля','Оглушение','Молния','Дыхание зимы'
+];
+const PACT_PATRON_RULES={
+  'Ланфир, Госпожа Снов':{affinities:['Дух','Воздух','Вода'],talents:['Иллюзия','Путешествие','Соединение','Охранные Плетения'],weaves:['Защита Снов','Зеркало Туманов','Маскировка','Свернутый Свет','Небесные Огни','Влияние','Сокрытие способности Направлять','Предложение','Отдалённый Глаз','Полет','Узы как у Первых']},
+  'Семираг, Госпожа Боли':{affinities:['Дух','Вода','Воздух'],talents:['Исцеление','Соединение','Охранные Плетения','Элементализм'],weaves:['Разорвать плоть','Углубленное Исследование','Исцеление','Исцеление Разума','Обновление','Восстановление','Громовой Удар','Охрана от Направляющих','Очищение','Защитный кокон','Оглушение','Прикосновение Смерти','Дыхание зимы']},
+  'Ишамаэль, Голос Конца':{affinities:['Дух','Огонь','Земля'],talents:['Погибельный Огонь','Элементализм','Соединение','Охранные Плетения'],weaves:['Круг тишины','Зеркало Туманов','Огненный шар','Громовой Удар','Щит','Огненная Ловушка','Искатель','Приносить в жертву','Расколотая Земля','Прикосновение Смерти','Молния']},
+  'Могидин, Паучиха':{affinities:['Дух','Воздух','Вода'],talents:['Иллюзия','Соединение','Охранные Плетения','Путешествие'],weaves:['Круг тишины','Подслушивание','Маскировка','Свернутый Свет','Охрана От Людей','Влияние','Искатель','Огненная Ловушка','Предложение','Сокрытие способности Направлять','Отдалённый Глаз','Полет','Узы как у Первых']},
+  'Великая Мигрирующая Аномалия':{affinities:['Воздух','Вода','Земля','Огонь','Дух'],talents:['Танец Облаков','Элементализм','Пение Земли','Охранные Плетения','Соединение','Путешествие','Исцеление'],weaves:['Граната','Обуздать Ветер','Анализ почвы','Предсказание Погоды','Воздушный кулак','Смерч','Выровнять Землю','Исцеление','Громовой Удар','Охрана от Направляющих','Водоворот','Разрезать Плетения','Очищение','Расколотая Земля','Защитный купол','Отдалённый Глаз','Молния','Дыхание зимы','Узы как у Первых']},
+  'Дракон Возрождённый, След огня в Узоре':{affinities:['Огонь','Дух','Земля'],talents:['Элементализм','Охранные Плетения','Соединение','Погибельный Огонь'],weaves:['Огненный Жезл','Смерч','Зеркало Туманов','Огненный шар','Охрана от Направляющих','Щит','Разрезать Плетения','Охрана От Единой Силы','Защитный купол','Расколотая Земля','Приносить в жертву','Молния','Дыхание зимы']}
+};
+const WEAVE_MAX_CIRCLE={
+  'Дичок':[1,2,3,3,4,4,5,5,6,6,6,7,7,7,8,8,9,9,9,9],
+  'Посвящённый':[1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,9,9],
+  'Носитель Договора':[1,1,2,2,3,3,4,4,5,5,5,5,5,5,5,5,5,5,5,5]
+};
+const PACT_KNOWN_LIMITS={cantrips:[2,2,2,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4],weaves:[2,3,4,5,6,7,8,9,10,10,11,11,12,12,13,13,14,14,15,15]};
 function isChannelingClass(cls){ return /Дичок|Посвящ|Носитель Договора/i.test(String(cls||'')); }
-function getMaxWeaveLevel(cls,lv){ lv=Number(lv)||1; if(/Носитель Договора/i.test(String(cls||''))){ const row=(clsDb.progression||[]).find(r=>r.className===cls&&Number(r.level)===lv); return Number(row&&row.slotLevel||1); } if(lv>=17) return 9; if(lv>=15) return 8; if(lv>=13) return 7; if(lv>=11) return 6; if(lv>=9) return 5; if(lv>=7) return 4; if(lv>=5) return 3; if(lv>=3) return 2; return 1; }
-function baseFreeWeaveLevel(cls){ return /Дичок/i.test(String(cls||'')) ? 2 : 1; }
+function getEffectiveChannelerLevel(cls,arch,lv){ lv=Math.max(1,Math.min(20,Number(lv)||1)); if(/Посвящ/i.test(String(cls||''))&&/Аша.?ман/i.test(String(arch||''))){ if(lv>=17)return Math.min(20,lv+2); if(lv>=13)return Math.min(20,lv+1); } return lv; }
+function getMaxWeaveLevel(cls,lv,arch){ const table=WEAVE_MAX_CIRCLE[cls]; if(!table)return 0; const effective=getEffectiveChannelerLevel(cls,arch,lv); return Number(table[effective-1]||1); }
+function baseFreeWeaveLevel(cls){ return /Дичок|Носитель Договора/i.test(String(cls||'')) ? 2 : 1; }
+function getTalentLimit(cls,lv){ lv=Number(lv)||1; if(/Носитель Договора/i.test(String(cls||'')))return lv>=10?2:1; if(/Дичок|Посвящ/i.test(String(cls||'')))return lv>=11?3:2; return 0; }
+function getKnownWeaveLimits(cls,lv){ if(!/Носитель Договора/i.test(String(cls||'')))return null; const i=Math.max(0,Math.min(19,(Number(lv)||1)-1)); return {cantrips:PACT_KNOWN_LIMITS.cantrips[i],weaves:PACT_KNOWN_LIMITS.weaves[i]}; }
 function getSelectedTalents(){ return [...document.querySelectorAll('[data-talent]:checked')].map(x=>x.value); }
 function getSelectedAffinities(){ return [...document.querySelectorAll('[data-affinity]:checked')].map(x=>x.value); }
 function getSelectedWeaveTitles(){ return [...document.querySelectorAll('[data-weave-title]:checked')].map(x=>x.value); }
+function getAjah(){ return $('npc-ajah')?.value||''; }
+function updateAjahControl(){ const field=$('ajah-field'); if(!field)return; field.hidden=!(/Посвящ/i.test(getClass())&&/Айз Седай/i.test(getArch())&&getLevel()>=7); }
 function getWeaveSummary(w){ return Array.isArray(w.desc) ? w.desc.join(' ') : String(w.desc || w.summary || ''); }
 function getMetaValue(w,label){ const m=(w.meta||[]).find(x=>String(x.label||'').toLowerCase().includes(String(label).toLowerCase())); return m ? m.value : ''; }
-function weaveAllowedByTalent(w,cls,talents){ const lv=Number(w.level)||0; if(lv<=baseFreeWeaveLevel(cls)) return true; return talents.includes(w.school); }
+function weaveDealsHitPointDamage(w){ const positive=/(?:получает|получают|наносит|наносят|наносите|причиняет|причиняют)[^.]{0,100}урон|\d+[кd]\d+[^.]{0,80}урон/i, nonDamage=/не\s+(?:получает|получают|наносит|наносят|причиняет|причиняют)[^.]{0,60}урон|получа(?:ет|ют|ете)[^.]{0,40}(?:бонус[^.]{0,25}(?:к\s+)?урон|сопротивление\s+урон)/i; return getWeaveSummary(w).split(/[.!?]/).some(sentence=>positive.test(sentence)&&!nonDamage.test(sentence)); }
+function isPactWeaveAvailable(w,cls,arch){ if(!/Носитель Договора/i.test(String(cls||'')))return true; const allowed=[...PACT_GENERAL_WEAVES,...(PACT_PATRON_RULES[arch]?.weaves||[])].map(normText); return allowed.includes(normText(w.title)); }
+function weaveAllowedByTalent(w,cls,arch,lv,talents,ajah){ const circle=Number(w.level)||0; if(circle<=baseFreeWeaveLevel(cls)) return true; if(talents.includes(w.school)) return true; if(/Посвящ/i.test(String(cls||''))&&/Аша.?ман/i.test(String(arch||''))&&Number(lv)>=7&&circle<=4&&weaveDealsHitPointDamage(w))return true; if(/Посвящ/i.test(String(cls||''))&&/Айз Седай/i.test(String(arch||''))&&Number(lv)>=7&&ajah==='Зелёная'&&circle<=3&&weaveDealsHitPointDamage(w))return true; return /Посвящ/i.test(String(cls||''))&&/Айз Седай/i.test(String(arch||''))&&Number(lv)>=7&&ajah==='Жёлтая'&&w.school==='Исцеление'&&!/утрачен|новое/i.test(String(w.rarity||'')); }
 function renderTalentAffinityControls(){
   const tbox=$('talent-list'), abox=$('affinity-list'); if(!tbox||!abox) return;
-  const selected=new Set(getSelectedTalents());
-  tbox.innerHTML=CHANNELING_TALENTS.map(t=>'<label class="check"><input type="checkbox" data-talent value="'+safe(t)+'" '+(selected.has(t)?'checked':'')+'> <span>'+safe(t)+'</span></label>').join('');
+  const cls=getClass(), arch=getArch(), lv=getLevel(), limit=getTalentLimit(cls,lv), selected=new Set(getSelectedTalents()), patron=PACT_PATRON_RULES[arch];
+  const availableTalents=patron?patron.talents:CHANNELING_TALENTS, availableAffinities=patron?patron.affinities:AFFINITIES;
+  tbox.innerHTML=availableTalents.map(t=>'<label class="check"><input type="checkbox" data-talent value="'+safe(t)+'" '+(selected.has(t)?'checked':'')+' '+(!selected.has(t)&&selected.size>=limit?'disabled':'')+'> <span>'+safe(t)+'</span></label>').join('');
+  const limitHint=$('talent-limit-hint'); if(limitHint){ limitHint.classList.toggle('warn',selected.size>limit); limitHint.textContent=`Выбрано Талантов: ${selected.size} из ${limit}. ${/Носитель Договора/i.test(cls)?'Второй Талант Носитель получает на 10-м уровне.':'Третий Талант становится доступен на 11-м уровне.'}`; }
   const affSel=new Set(getSelectedAffinities());
-  abox.innerHTML=AFFINITIES.map(a=>'<label class="check"><input type="checkbox" data-affinity value="'+safe(a)+'" '+(affSel.has(a)?'checked':'')+'> <span>'+safe(a)+'</span></label>').join('');
+  abox.innerHTML=availableAffinities.map(a=>'<label class="check"><input type="checkbox" data-affinity value="'+safe(a)+'" '+(affSel.has(a)?'checked':'')+'> <span>'+safe(a)+'</span></label>').join('');
 }
 function renderWeavePicker(){
   const wrap=$('channeling-fields'), picker=$('weave-picker'); if(!wrap||!picker) return;
-  const cls=getClass(), lv=getLevel(), ch=isChannelingClass(cls);
+  const cls=getClass(), arch=getArch(), lv=getLevel(), ch=isChannelingClass(cls);
   wrap.style.display=ch?'':'none';
   if(!ch){ picker.innerHTML=''; return; }
+  updateAjahControl();
   renderTalentAffinityControls();
-  const talents=getSelectedTalents(); const maxLv=getMaxWeaveLevel(cls,lv); const q=normText($('weave-search')?.value||''); const selected=new Set(getSelectedWeaveTitles());
-  const filtered=(weaves||[]).filter(w=>Number(w.level||0)<=maxLv).filter(w=>weaveAllowedByTalent(w,cls,talents)).filter(w=>!q || normText(w.title).includes(q) || normText(w.school).includes(q));
-  const groups={}; filtered.forEach(w=>{ const k='Уровень '+w.level+' · '+(w.school||'Без таланта'); (groups[k]=groups[k]||[]).push(w); });
-  picker.innerHTML=Object.entries(groups).sort((a,b)=>a[0].localeCompare(b[0],undefined,{numeric:true})).map(([g,list])=>'<div class="weave-group"><div class="weave-group-title">'+safe(g)+'</div>'+list.sort((a,b)=>String(a.title).localeCompare(String(b.title))).map(w=>'<label class="weave-choice"><input type="checkbox" data-weave-title value="'+safe(w.title)+'" '+(selected.has(w.title)?'checked':'')+'> <span><b>'+safe(w.title)+'</b><small>'+safe((Array.isArray(w.powers)?w.powers.join('·'):'')+' · '+(getMetaValue(w,'Спасбросок')||''))+'</small></span></label>').join('')+'</div>').join('') || '<div class="muted mono">Нет доступных плетений при выбранных талантах/уровне.</div>';
+  const talents=getSelectedTalents(), ajah=getAjah(); const maxLv=getMaxWeaveLevel(cls,lv,arch); const q=normText($('weave-search')?.value||''); const selected=new Set(getSelectedWeaveTitles());
+  const filtered=(weaves||[]).filter(w=>Number(w.level||0)<=maxLv).filter(w=>isPactWeaveAvailable(w,cls,arch)).filter(w=>weaveAllowedByTalent(w,cls,arch,lv,talents,ajah)).filter(w=>!q || normText(w.title).includes(q) || normText(w.school).includes(q));
+  const groups={}; filtered.forEach(w=>{ const k=(Number(w.level)===0?'Кантрипы':'Круг '+w.level)+' · '+(w.school||'Без таланта'); (groups[k]=groups[k]||[]).push(w); });
+  const knownLimits=getKnownWeaveLimits(cls,lv), selectedRows=(weaves||[]).filter(w=>selected.has(w.title)), selectedCantrips=selectedRows.filter(w=>Number(w.level)===0).length, selectedLeveled=selectedRows.filter(w=>Number(w.level)>0).length;
+  const effective=getEffectiveChannelerLevel(cls,arch,lv), powerJump=effective!==lv?` «Скачок в силе»: для таблицы используется эффективный уровень ${effective}.`:'';
+  const combatException=/Посвящ/i.test(cls)&&/Аша.?ман/i.test(arch)&&lv>=7?' Аша’ман также видит наносящие урон Плетения до 4-го круга без соответствующего Таланта.':'';
+  const ajahException=ajah==='Зелёная'?' Зелёная Айя: наносящие урон Плетения до 3-го круга доступны без соответствующего Таланта.':ajah==='Жёлтая'?' Жёлтая Айя: Плетения Исцеления без пометок «Утерянное» и «Новое» доступны через особый Талант сверх обычного предела.':'';
+  const pactLimit=/Носитель Договора/i.test(cls)?` Показан общий список Носителя и расширенный список Покровителя «${arch}». По таблице известно: кантрипы ${selectedCantrips}/${knownLimits.cantrips}, Плетения 1-го круга и выше ${selectedLeveled}/${knownLimits.weaves}.`:'';
+  const summary=`<div class="weave-access-summary"><b>Доступный базовый круг: ${maxLv}-й.</b> Без соответствующего Таланта: до ${baseFreeWeaveLevel(cls)}-го круга включительно.${safe(powerJump+combatException+ajahException+pactLimit)}</div>`;
+  const list=Object.entries(groups).sort((a,b)=>a[0].localeCompare(b[0],undefined,{numeric:true})).map(([g,items])=>'<div class="weave-group"><div class="weave-group-title">'+safe(g)+'</div>'+items.sort((a,b)=>String(a.title).localeCompare(String(b.title))).map(w=>{const chosen=selected.has(w.title), capReached=knownLimits&&!chosen&&(Number(w.level)===0?selectedCantrips>=knownLimits.cantrips:selectedLeveled>=knownLimits.weaves);return '<label class="weave-choice"><input type="checkbox" data-weave-title value="'+safe(w.title)+'" '+(chosen?'checked':'')+' '+(capReached?'disabled':'')+'> <span><b>'+safe(w.title)+'</b><small>'+safe((Array.isArray(w.powers)?w.powers.join('·'):'')+' · '+(getMetaValue(w,'Спасбросок')||'')+(w.rarity&&w.rarity!=='Обычное'?' · '+w.rarity:''))+'</small></span></label>';}).join('')+'</div>').join('') || '<div class="muted mono">Нет доступных плетений при выбранных Талантах и уровне.</div>';
+  picker.innerHTML=summary+list;
 }
 const FIGHTING_STYLES = {
   master: [
@@ -370,7 +409,8 @@ function initNationSelect(){ const nats=Object.keys(rules.nationBonuses||{}).sor
 function initEquipment(){
   const W=(rules.equipment&&rules.equipment.weapons)||[], A=(rules.equipment&&rules.equipment.armor)||[], S=(rules.equipment&&rules.equipment.shields)||[];
   $('weapon-select').innerHTML=W.map((w,i)=>`<option value="${i}">${safe(w.name)} · ${safe(w.damage)}</option>`).join('');
-  $('armor-select').innerHTML=A.map((a,i)=>`<option value="${i}">${safe(a.name)} · КД ${a.base}${a.dexMax===0?'':'+ЛОВ'}</option>`).join('');
+  const armorGroups=[['none','Без доспеха'],['cloth','Тканевая защитная одежда'],['light','Лёгкие доспехи'],['medium','Средние доспехи'],['heavy','Тяжёлые доспехи']];
+  $('armor-select').innerHTML=armorGroups.map(([category,label])=>`<optgroup label="${safe(label)}">${A.map((a,i)=>({a,i})).filter(x=>x.a.category===category).map(x=>`<option value="${x.i}">${safe(x.a.name)} · КД ${x.a.base}${x.a.dexMax===0?'':'+ЛОВ'}</option>`).join('')}</optgroup>`).join('');
   $('shield-select').innerHTML=S.map((s,i)=>`<option value="${i}">${safe(s.name)} ${s.ac?'+КД '+s.ac:''}</option>`).join('');
 }
 function initFeats(){
@@ -383,6 +423,19 @@ function initFeats(){
   list.querySelectorAll('input').forEach(i=>i.addEventListener('change',buildNpc));
 }
 function selectedFeats(){return Array.from(document.querySelectorAll('#feat-list input:checked')).map(i=>i.dataset.name)}
+function getFeatCostSignature(featsSel=selectedFeats()){return [getClass(),getLevel(),$('npc-role')?.value||'',...featsSel.slice().sort((a,b)=>a.localeCompare(b))].join('|')}
+function getFeatCostPlan(cls,lv,role,featCount){ const events=getAsiEvents(cls,lv), total=events.length*2, paid=Math.min(featCount,total), pri=primaryStats(cls,role), removed=[]; for(let i=Math.max(0,total-paid);i<total;i++){removed.push({level:events[Math.floor(i/2)]||'?',stat:abbr[pri[i%pri.length]||'con']});} return {total,paid,unpaid:Math.max(0,featCount-paid),removed}; }
+function syncFeatCostConfirmation(featsSel=selectedFeats()){
+  const panel=$('feat-confirm-panel'), checkbox=$('feat-cost-confirm'), details=$('feat-cost-details'); if(!panel||!checkbox||!details)return {confirmed:!featsSel.length,plan:getFeatCostPlan(getClass(),getLevel(),$('npc-role')?.value||'',featsSel.length)};
+  const signature=getFeatCostSignature(featsSel), plan=getFeatCostPlan(getClass(),getLevel(),$('npc-role')?.value||'',featsSel.length);
+  panel.hidden=!featsSel.length;
+  if(checkbox.dataset.signature!==signature){checkbox.checked=false;checkbox.dataset.signature=signature;}
+  checkbox.disabled=plan.unpaid>0;
+  const paid=plan.removed.length?plan.removed.map(x=>`${x.level}-й ур.: ${x.stat} +1`).join('; '):'нет доступных уровневых приростов';
+  details.textContent=`Выбраны: ${featsSel.join(', ')||'нет'}. Не добавляются: ${paid}.${plan.unpaid?` Не оплачено черт: ${plan.unpaid}. Повысьте уровень или снимите выбор.`:''}`;
+  return {confirmed:!featsSel.length||(!checkbox.disabled&&checkbox.checked),plan};
+}
+function isFeatCostConfirmed(){return syncFeatCostConfirmation(selectedFeats()).confirmed}
 function applyTemplate(){ const t=roleTemplates[$('npc-role').value]||roleTemplates.Сбалансированный; Object.entries(t).forEach(([k,v])=>$(k).value=v); buildNpc(); }
 function availableFeatures(cls,arch,lv){
   return clsDb.features.filter(f=>f.className===cls && Number(f.levelSort||0)<=lv && (f.archetype==='Базовый класс'||f.archetype===arch))
@@ -405,7 +458,8 @@ function calcAc(cls,stats,eq,h,style){
   }else{
     const dexPart=a.dexMax===null?dex:Math.min(dex,a.dexMax); ac=a.base+dexPart+eq.armorBonus+shield; note=`${a.name}: ${a.base} + ЛОВ${a.dexMax===null?'':' макс. '+a.dexMax} + магия/щит`;
   }
-  if(style && style.id==='defense' && a.category!=='none'){ ac+=1; note+=' + стиль Защита +1'; }
+  if(style && style.id==='defense' && a.category!=='none' && a.isArmor!==false){ ac+=1; note+=' + стиль Защита +1'; }
+  if(a.isArmor===false) note+=' · защитная одежда не считается доспехом';
   ac+=h.acBonus||0; if(h.acBonus) note+=` + Иерархия ${h.acBonus}`;
   return {ac,note};
 }
@@ -437,11 +491,11 @@ function findWeavesInput(){
 }
 function buildGeneratorSnapshot(){
   const value=id=>$(id)?.value??'', checked=id=>!!$(id)?.checked;
-  return {schemaVersion:2,hierarchyDbVersion:hierarchyDb.updated||'',inputs:{
+  return {schemaVersion:4,hierarchyDbVersion:hierarchyDb.updated||'',inputs:{
     name:value('npc-name'),nation:value('npc-nation'),level:value('npc-level'),cls:value('npc-class'),arch:value('npc-arch'),role:value('npc-role'),threat:value('npc-threat'),
     faction:value('npc-faction'),rank:value('npc-rank'),branch:value('npc-hierarchy-branch'),sharaVessel:value('npc-shara-vessel'),profileKind:value('npc-hierarchy-profile-kind'),
     screamInitiative:value('npc-scream-initiative'),screamInitiativeStat:value('npc-scream-initiative-stat'),screamCharge:checked('npc-scream-charge'),
-    stats:getBaseStats(),hierarchyChoices:readHierarchyStatChoices(),fightingStyle:value('npc-fighting-style'),feats:selectedFeats(),talents:getSelectedTalents(),affinities:getSelectedAffinities(),weaves:getSelectedWeaveTitles(),manualWeaves:value('npc-weaves'),
+    stats:getBaseStats(),hierarchyChoices:readHierarchyStatChoices(),fightingStyle:value('npc-fighting-style'),feats:selectedFeats(),featCostConfirmed:isFeatCostConfirmed(),ajah:value('npc-ajah'),talents:getSelectedTalents(),affinities:getSelectedAffinities(),weaves:getSelectedWeaveTitles(),manualWeaves:value('npc-weaves'),
     weapon:value('weapon-select'),weaponBonus:value('weapon-bonus'),armor:value('armor-select'),armorBonus:value('armor-bonus'),shield:value('shield-select'),shieldBonus:value('shield-bonus')
   }};
 }
@@ -451,13 +505,14 @@ function restoreGeneratorSnapshot(snapshot){
   const wilderTraditionMigrated=i.cls==='Дичок'&&!WILDER_TRADITIONS.includes(i.arch);
   const restoredArch=wilderTraditionMigrated?WILDER_TRADITIONS[0]:i.arch;
   const set=(id,value)=>{const el=$(id);if(el&&value!==undefined&&value!==null)el.value=String(value);};
-  set('npc-name',i.name);set('npc-nation',i.nation);set('npc-level',i.level);set('npc-class',i.cls);updateArchSelect();set('npc-arch',restoredArch);set('npc-role',i.role);set('npc-threat',i.threat);
+  set('npc-name',i.name);set('npc-nation',i.nation);set('npc-level',i.level);set('npc-class',i.cls);updateArchSelect();set('npc-arch',restoredArch);set('npc-role',i.role);set('npc-threat',i.threat);set('npc-ajah',i.ajah||'');updateAjahControl();
   statKeys.forEach(k=>set(k,i.stats&&i.stats[k]));
   set('weapon-select',i.weapon);set('weapon-bonus',i.weaponBonus);set('armor-select',i.armor);set('armor-bonus',i.armorBonus);set('shield-select',i.shield);set('shield-bonus',i.shieldBonus);
   set('npc-faction',i.faction||'none');updateHierarchyControls(true);set('npc-rank',i.rank);updateHierarchyControls(false);set('npc-hierarchy-branch',i.branch);set('npc-shara-vessel',i.sharaVessel);set('npc-hierarchy-profile-kind',i.profileKind);set('npc-scream-initiative',i.screamInitiative);set('npc-scream-initiative-stat',i.screamInitiativeStat);if($('npc-scream-charge'))$('npc-scream-charge').checked=i.screamCharge!==false;
   renderHierarchyStatChoices();
   const saved=i.hierarchyChoices||{};document.querySelectorAll('[data-hierarchy-stat]').forEach(el=>{const group=el.dataset.hierarchyKind==='penalty'?saved.penalties:saved.stats;const row=group&&group[el.dataset.hierarchyRank];const found=(row||[]).find(x=>Number(x.slot)===Number(el.dataset.hierarchySlot));if(found)el.value=found.key;});
   const restoredFeats=(i.feats||[]).map(normalizeFeatName);initFeats();document.querySelectorAll('#feat-list input').forEach(el=>el.checked=restoredFeats.includes(el.dataset.name));
+  if($('feat-cost-confirm')){$('feat-cost-confirm').dataset.signature=getFeatCostSignature(restoredFeats);$('feat-cost-confirm').checked=!!i.featCostConfirmed;}
   renderTalentAffinityControls();document.querySelectorAll('[data-talent]').forEach(el=>el.checked=(i.talents||[]).includes(el.value));document.querySelectorAll('[data-affinity]').forEach(el=>el.checked=(i.affinities||[]).includes(el.value));
   renderWeavePicker();document.querySelectorAll('[data-weave-title]').forEach(el=>el.checked=(i.weaves||[]).includes(el.value));set('npc-weaves',i.manualWeaves);updateFightingStyleSelect();set('npc-fighting-style',i.fightingStyle);
   buildNpc();window.scrollTo({top:0,behavior:'smooth'});
@@ -466,6 +521,7 @@ function restoreGeneratorSnapshot(snapshot){
 }
 function buildNpc(){
   const name=$('npc-name').value.trim()||'Новый NPC', nation=getNation(), lv=getLevel(), cls=getClass(), arch=getArch(), role=$('npc-role').value, faction=$('npc-faction').value, rank=$('npc-rank').value, branch=$('npc-hierarchy-branch')?.value||'', p=prof(lv), featsSel=selectedFeats();
+  const featCostState=syncFeatCostConfirmation(featsSel);
   const style=getSelectedFightingStyle();
   const selectedTalents=getSelectedTalents(), selectedAffinities=getSelectedAffinities();
   const hierarchyChoices=readHierarchyStatChoices(), hierarchyCtx={cls,role,faction,rank,branch,isChanneler:isChannelingClass(cls),lv,nation,featsSel,hierarchyChoices,profileKind:$('npc-hierarchy-profile-kind')?.value||'regular',screamInitiative:$('npc-scream-initiative')?.value||'none',screamInitiativeStat:$('npc-scream-initiative-stat')?.value||'dex',screamCharge:$('npc-scream-charge')?.checked!==false};
@@ -480,10 +536,10 @@ function buildNpc(){
   featsSel.forEach(fn=>{const f=feats.find(x=>x.name===fn); ab.push({n:fn,d:f?f.desc.join(' '):'Дополнительная черта.',hi:false,source:'feat'});});
   h.traits.forEach(t=>ab.push({n:t.n,d:t.d,hi:true,source:'hierarchy',color:t.color}));
   const id=loadedCustomId||200000+Date.now()%100000000;
-  const npc={id,sh:name,na:nation,lv,ic:/Дичок|Посвящ|Носитель Договора/.test(cls)?'🔥':/Лесник/.test(cls)?'🏹':/Скиталец/.test(cls)?'◇':/Варвар/.test(cls)?'🪓':'⚔',ty:hi?'purple':'warning',custom:true,ti:`${name} — ${cls}${arch&&arch!=='Базовый класс'?' / '+arch:''} ${lv}-го уровня`,su:`Черновик NPC · ${role} · ${$('npc-threat').value}`,tags:[cls,arch,`Ур.${lv}`,nation].filter(Boolean),talents:selectedTalents,affinities:selectedAffinities,st:stats,co:{hp,ac:acCalc.ac,sp:30+(h.speedBonus||0),ini:sign(ini)+(h.initiativeAdv?' / преим.':''),prof:sign(p),sv:`${cls==='Варвар'?'Сил, Тел':/Носитель Договора/.test(cls)?'Мдр, Хар':/Дичок|Посвящ/.test(cls)?'Инт, Мдр':'по классу'}${h.saveBonus?' +'+h.saveBonus+' от Иерархии':''}`,pp,cr:`${attack.n}: ${attack.a}, ${attack.d}`},at:[attack],ab,hi,eq:[{r:!!(eq.weaponBonus||eq.armorBonus||eq.shieldBonus),t:`${eq.weapon.name}${eq.weaponBonus?` +${eq.weaponBonus}`:''}; ${eq.armor.name}${eq.armorBonus?` +${eq.armorBonus}`:''}; ${eq.shield.name}${eq.shieldBonus?` +${eq.shieldBonus}`:''}. КД: ${acCalc.note}.`}],sk:[{n:'Восприятие',v:sign(mod(stats.wis)+p),e:false,note:'Черновой расчёт.'},{n:'Проницательность',v:sign(mod(stats.wis)+p),e:false,note:'Черновой расчёт.'}],verify:[],tactics:[{ph:'Роль',d:`${role}. Уточните боевой паттерн под сцену.`},{ph:'Проверка ГМ',d:'Перед канонизацией проверьте ОЗ, КД, предметы, плетения и бонусы Иерархии.'}],dm:$('npc-notes')?.value||'Создано генератором. Требует утверждения ГМ.',generator:buildGeneratorSnapshot()};
+  const ajah=getAjah();
+  const npc={id,sh:name,na:nation,lv,ic:/Дичок|Посвящ|Носитель Договора/.test(cls)?'🔥':/Лесник/.test(cls)?'🏹':/Скиталец/.test(cls)?'◇':/Варвар/.test(cls)?'🪓':'⚔',ty:hi?'purple':'warning',custom:true,ti:`${name} — ${cls}${arch&&arch!=='Базовый класс'?' / '+arch:''} ${lv}-го уровня`,su:`Черновик NPC · ${role} · ${$('npc-threat').value}`,tags:[cls,arch,ajah&&`${ajah} Айя`,`Ур.${lv}`,nation].filter(Boolean),ajah:ajah||undefined,talents:selectedTalents,affinities:selectedAffinities,st:stats,co:{hp,ac:acCalc.ac,sp:30+(h.speedBonus||0),ini:sign(ini)+(h.initiativeAdv?' / преим.':''),prof:sign(p),sv:`${cls==='Варвар'?'Сил, Тел':/Носитель Договора/.test(cls)?'Мдр, Хар':/Дичок|Посвящ/.test(cls)?'Инт, Мдр':'по классу'}${h.saveBonus?' +'+h.saveBonus+' от Иерархии':''}`,pp,cr:`${attack.n}: ${attack.a}, ${attack.d}`},at:[attack],ab,hi,eq:[{r:!!(eq.weaponBonus||eq.armorBonus||eq.shieldBonus),t:`${eq.weapon.name}${eq.weaponBonus?` +${eq.weaponBonus}`:''}; ${eq.armor.name}${eq.armorBonus?` +${eq.armorBonus}`:''}; ${eq.shield.name}${eq.shieldBonus?` +${eq.shieldBonus}`:''}. КД: ${acCalc.note}.`}],sk:[{n:'Восприятие',v:sign(mod(stats.wis)+p),e:false,note:'Черновой расчёт.'},{n:'Проницательность',v:sign(mod(stats.wis)+p),e:false,note:'Черновой расчёт.'}],verify:[],tactics:[{ph:'Роль',d:`${role}. Уточните боевой паттерн под сцену.`},{ph:'Проверка ГМ',d:'Перед канонизацией проверьте ОЗ, КД, предметы, плетения и бонусы Иерархии.'}],dm:$('npc-notes')?.value||'Создано генератором. Требует утверждения ГМ.',generator:buildGeneratorSnapshot()};
   if(spells.length) npc.spells=spells;
-  if(selectedTalents.length) npc.excTalents=selectedTalents.map(t=>({tal:t,items:[{lv:1,n:'Исключительный талант: '+t,d:'Выбран в генераторе NPC. Проверьте точное описание таланта по базе правил.'}]}));
-  npc.verify=validateNpc({cls,arch,lv,nation,features,featsSel,spells,h,stats,hp,ac:acCalc.ac,applied,eq,attack,selectedTalents,selectedAffinities,hierarchyCtx});
+  npc.verify=validateNpc({cls,arch,lv,nation,features,featsSel,featCostState,spells,h,stats,hp,ac:acCalc.ac,applied,eq,attack,selectedTalents,selectedAffinities,hierarchyCtx});
   currentNpc=npc; reviewReady=true; renderReview(npc,{applied,acCalc,attack,eq,baseline:{stats:baseline.stats,hp:baselineHp,ac:baselineAc.ac,speed:30,initiative:baselineIni,attack:baselineAttack.a}}); return npc;
 }
 function validateNpc(ctx){
@@ -493,7 +549,9 @@ function validateNpc(ctx){
   if(Object.keys(ctx.applied.nationBonus).length) out.push({s:'ok',t:`Бонус нации применён (${nmatch.key||ctx.nation}): ${Object.entries(ctx.applied.nationBonus).map(([k,v])=>abbr[k]+' +'+v).join(', ')}.`});
   else if(nmatch.status==='ambiguous') out.push({s:'warn',t:`Нация указана неоднозначно: ${ctx.nation}. Возможные варианты: ${(nmatch.candidates||[]).join(', ')}.`});
   else out.push({s:'warn',t:'Бонус нации не найден: проверьте написание нации.'});
-  if(ctx.applied.featPenalty) out.push({s:'warn',t:`Выбрано дополнительных черт: ${ctx.applied.featPenalty}. По правилу нужно уменьшить один из уровневых приростов характеристик на 1 за каждую такую черту. Генератор уже уменьшил авто-распределение на ${ctx.applied.featPenalty}, но ГМ должен подтвердить выбор.`});
+  if(ctx.applied.featPenalty&&ctx.featCostState.plan.unpaid) out.push({s:'err',t:`Дополнительные черты не оплачены: не хватает ${ctx.featCostState.plan.unpaid} пункт(ов) уровневого прироста характеристик. Повысьте уровень NPC или снимите часть черт.`});
+  else if(ctx.applied.featPenalty&&!ctx.featCostState.confirmed) out.push({s:'err',t:`Выбрано дополнительных черт: ${ctx.applied.featPenalty}. Генератор уменьшил авто-распределение, но подтверждение ГМ не поставлено в разделе «Дополнительные черты».`});
+  else if(ctx.applied.featPenalty) out.push({s:'ok',t:`ГМ подтвердил оплату ${ctx.applied.featPenalty} дополнительных черт: соответствующие пункты уровневого прироста характеристик не добавлены.`});
   if(!ctx.features.length) out.push({s:'err',t:'Не найдены классовые черты. Проверьте класс/архетип в classes-data.js.'}); else out.push({s:'ok',t:`Найдено черт класса/архетипа: ${ctx.features.length}.`});
   const st=getSelectedFightingStyle();
   const opts=getFightingStyleOptions(ctx.cls,ctx.arch,ctx.lv);
@@ -504,6 +562,10 @@ function validateNpc(ctx){
   if(/Дичок|Посвящ|Носитель Договора/.test(ctx.cls)&&!(ctx.selectedAffinities||[]).length) out.push({s:'warn',t:'NPC-направляющему не выбраны аффинитеты.'});
   if(/Дичок|Посвящ|Носитель Договора/.test(ctx.cls)&&!ctx.spells.length) out.push({s:'warn',t:'NPC-направляющему не выбраны плетения.'});
   if(/Дичок|Посвящ|Носитель Договора/.test(ctx.cls)&&(ctx.selectedTalents||[]).length) out.push({s:'ok',t:'Таланты направления / Договора: '+ctx.selectedTalents.join(', ')+'.'});
+  if(/Посвящ/i.test(ctx.cls)&&/Айз Седай/i.test(ctx.arch)&&ctx.lv>=7) out.push(getAjah()?{s:'ok',t:`Айя выбрана: ${getAjah()}. Её доступ к Плетениям учтён.`}:{s:'warn',t:'Айз Седай 7-го уровня или выше должна выбрать Айя в разделе «Плетения».'});
+  const talentLimit=getTalentLimit(ctx.cls,ctx.lv); if((ctx.selectedTalents||[]).length>talentLimit) out.push({s:'err',t:`Выбрано слишком много Талантов: ${(ctx.selectedTalents||[]).length}, доступно ${talentLimit}.`});
+  if(isChannelingClass(ctx.cls)){ const maxCircle=getMaxWeaveLevel(ctx.cls,ctx.lv,ctx.arch), tooHigh=ctx.spells.filter(w=>Number(w.lv)>maxCircle); out.push({s:tooHigh.length?'err':'ok',t:tooHigh.length?`Есть Плетения выше доступного ${maxCircle}-го круга: ${tooHigh.map(w=>w.n).join(', ')}.`:`Базовые круги проверены: для ${ctx.cls} ${ctx.lv}-го уровня доступен максимум ${maxCircle}-й круг.`}); }
+  const knownLimits=getKnownWeaveLimits(ctx.cls,ctx.lv); if(knownLimits){ const cantrips=ctx.spells.filter(w=>Number(w.lv)===0).length, leveled=ctx.spells.filter(w=>Number(w.lv)>0).length, over=cantrips>knownLimits.cantrips||leveled>knownLimits.weaves; out.push({s:over?'err':'ok',t:`Известные Плетения Носителя: кантрипы ${cantrips}/${knownLimits.cantrips}, Плетения 1-го круга и выше ${leveled}/${knownLimits.weaves}.${over?' Снимите лишние Плетения.':''}`}); }
   if(/Дичок|Посвящ|Носитель Договора/.test(ctx.cls)&&(ctx.selectedAffinities||[]).length) out.push({s:'ok',t:'Аффинитеты: '+ctx.selectedAffinities.join(', ')+'.'});
   if(ctx.h.name) out.push({s:'ok',t:`Иерархия применена по единой базе (${ctx.h.version||'редакция не указана'}): ${ctx.h.name}. Числовой профиль взят только у текущего ранга, уникальные способности нижних рангов унаследованы.`});
   if(ctx.h.type==='scream'&&ctx.hierarchyCtx.screamInitiative==='none') out.push({s:'warn',t:'«Счёт витков» не проводился: ранговый числовой бонус Крика к инициативе не применён.'});
@@ -519,6 +581,7 @@ function validateNpc(ctx){
   if(ctx.featsSel.includes('Пламя и пустота')) out.push({s:'ok',t:'Пламя и пустота: модификатор Мудрости добавлен к броску атаки оружием в черновой атаке.'});
   ctx.featsSel.forEach(fn=>{const f=feats.find(x=>x.name===fn); if(f&&f.req&&f.req!=='—') out.push({s:'warn',t:`Проверьте требование черты «${fn}»: ${f.req}.`});});
   out.push({s:'ok',t:`Экипировка учтена: ${ctx.eq.weapon.name}; ${ctx.eq.armor.name}; ${ctx.eq.shield.name}.`});
+  if(ctx.eq.armor.isArmor===false) out.push({s:'ok',t:'Выбранная тканевая защитная одежда повышает КД, но механически не считается доспехом: не включает Стиль боя «Защита» и не вызывает проверку за создание Плетения в доспехе.'});
   return out;
 }
 function renderReview(npc,ctx){
@@ -545,22 +608,23 @@ function renderReview(npc,ctx){
 function showFeatureModal(idx){ if(!currentNpc) return; const a=currentNpc.ab[idx]; if(!a) return; const box=$('feature-modal'); box.innerHTML=`<div class="fm-box"><button class="fm-close" type="button">×</button><h3>${safe(a.n)}</h3><p>${safe(a.d)}</p><small>${safe(a.source||'')}</small></div>`; box.style.display='flex'; box.querySelector('.fm-close').onclick=()=>box.style.display='none'; }
 function getCustom(){try{return JSON.parse(localStorage.getItem(CUSTOM_KEY)||'[]')||[]}catch(e){return[]}}
 function setCustom(arr){localStorage.setItem(CUSTOM_KEY,JSON.stringify(arr||[]));}
-function saveLocal(){ const npc=currentNpc||buildNpc(); if(!reviewReady){alert('Сначала выполните проверку карточки.');return;} const arr=getCustom().filter(x=>Number(x.id)!==Number(npc.id)); arr.push(npc); setCustom(arr); renderCustomManager(); alert('NPC добавлен в пользовательскую базу этого браузера. Откройте NPC / Бой.'); }
+function saveLocal(){ const npc=currentNpc||buildNpc(); if(!reviewReady){alert('Сначала выполните проверку карточки.');return;} if(selectedFeats().length&&!isFeatCostConfirmed()){alert('Сначала подтвердите оплату дополнительных черт в разделе 3. Если пунктов уровневого роста недостаточно, повысьте уровень NPC или снимите часть черт.');return;} const arr=getCustom().filter(x=>Number(x.id)!==Number(npc.id)); arr.push(npc); setCustom(arr); renderCustomManager(); alert('NPC сохранён в постоянном пользовательском списке этого браузера. Нажмите «Открыть NPC / Бой»: карточка будет в группе «Пользовательские NPC».'); }
 function deleteCustomNpc(id){ const arr=getCustom().filter(x=>Number(x.id)!==Number(id)); setCustom(arr); if(Number(loadedCustomId)===Number(id))loadedCustomId=null; renderCustomManager(); }
 function loadCustomNpc(id){const npc=getCustom().find(x=>Number(x.id)===Number(id));if(npc){loadedCustomId=Number(npc.id);restoreGeneratorSnapshot(npc.generator);}}
 function renderCustomManager(){ const box=$('custom-list'); if(!box) return; const arr=getCustom(); box.innerHTML=arr.length?arr.map(x=>`<div class="custom-row"><span>${safe(x.ti||x.sh||'NPC')}<small class="muted">${x.generator?` · база ${safe(x.generator.hierarchyDbVersion||'—')}`:' · без исходных настроек'}</small></span><div class="custom-actions">${x.generator?`<button type="button" class="load" data-load-custom="${x.id}">Загрузить / пересчитать</button>`:''}<button type="button" data-del-custom="${x.id}">Удалить</button></div></div>`).join(''):'<div class="mono muted">Пользовательских NPC пока нет.</div>'; }
 function clearCustom(){ if(confirm('Удалить всех пользовательских NPC из этого браузера?')){localStorage.removeItem(CUSTOM_KEY); renderCustomManager(); alert('Пользовательские NPC удалены.');}}
 function copyExport(){navigator.clipboard&&navigator.clipboard.writeText($('export-box').textContent).then(()=>alert('JS/JSON скопирован.'));}
+function downloadExport(){ const npc=currentNpc||buildNpc(), blob=new Blob([JSON.stringify(npc,null,2)],{type:'application/json;charset=utf-8'}), url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url;a.download=(slug(npc.sh||'npc')||'npc')+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000); }
 function bind(){
   initClassSelect(); initNationSelect(); initEquipment(); initFeats(); initHierarchyControls(); updateFightingStyleSelect(); renderWeavePicker(); buildNpc(); renderCustomManager();
-  $('npc-class').addEventListener('change',()=>{updateArchSelect(); updateFightingStyleSelect(); renderWeavePicker(); renderHierarchyStatChoices(); buildNpc();}); $('npc-arch').addEventListener('change',()=>{updateFightingStyleSelect(); buildNpc();}); $('npc-fighting-style')?.addEventListener('change',buildNpc); $('feat-search').addEventListener('input',initFeats); $('weave-search')?.addEventListener('input',()=>{renderWeavePicker(); buildNpc();}); $('clear-weaves')?.addEventListener('click',()=>{document.querySelectorAll('[data-weave-title]').forEach(x=>x.checked=false); $('npc-weaves').value=''; buildNpc();});
+  $('npc-class').addEventListener('change',()=>{updateArchSelect(); updateFightingStyleSelect(); renderWeavePicker(); renderHierarchyStatChoices(); buildNpc();}); $('npc-arch').addEventListener('change',()=>{updateFightingStyleSelect(); renderWeavePicker(); buildNpc();}); $('npc-ajah')?.addEventListener('change',()=>{renderWeavePicker();buildNpc();}); $('npc-fighting-style')?.addEventListener('change',buildNpc); $('feat-search').addEventListener('input',initFeats); $('weave-search')?.addEventListener('input',()=>{renderWeavePicker(); buildNpc();}); $('clear-weaves')?.addEventListener('click',()=>{document.querySelectorAll('[data-weave-title]').forEach(x=>x.checked=false); $('npc-weaves').value=''; buildNpc();});
   $('npc-faction').addEventListener('change',()=>{updateHierarchyControls(true);buildNpc();}); $('npc-rank').addEventListener('change',()=>{updateHierarchyControls(false);buildNpc();}); $('npc-hierarchy-branch').addEventListener('change',buildNpc);
   $('npc-shara-vessel')?.addEventListener('change',()=>{const v=$('npc-shara-vessel').value;if($('npc-hierarchy-branch'))$('npc-hierarchy-branch').value=v==='shbotai-warrior'?'warrior':'aiyad';buildNpc();});
   $('npc-role').addEventListener('change',()=>{renderHierarchyStatChoices();buildNpc();});
-  $('apply-template').addEventListener('click',applyTemplate); $('generate').addEventListener('click',buildNpc); $('copy-export').addEventListener('click',copyExport); $('save-local').addEventListener('click',saveLocal); $('clear-custom').addEventListener('click',clearCustom);
+  $('apply-template').addEventListener('click',applyTemplate); $('generate').addEventListener('click',buildNpc); $('copy-export').addEventListener('click',copyExport); $('download-export')?.addEventListener('click',downloadExport); $('save-local').addEventListener('click',saveLocal); $('clear-custom').addEventListener('click',clearCustom);
   document.addEventListener('click',e=>{ const i=e.target.closest('.info-dot'); if(i){showFeatureModal(Number(i.dataset.featureIndex));} const d=e.target.closest('[data-del-custom]'); if(d){deleteCustomNpc(d.dataset.delCustom);} const l=e.target.closest('[data-load-custom]');if(l){loadCustomNpc(l.dataset.loadCustom);} if(e.target.id==='feature-modal') e.target.style.display='none'; });
-  document.addEventListener('change',e=>{ const t=e.target; if(t && t.matches && (t.matches('[data-talent]')||t.matches('[data-affinity]'))){ renderWeavePicker(); buildNpc(); } else if(t && t.matches && t.matches('[data-weave-title]')){ buildNpc(); } else if(t&&t.matches&&t.matches('[data-hierarchy-stat]')){normalizeDistinctHierarchyChoice(t);buildNpc();} });
-  document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('change',()=>{ if(el.id==='feat-search'||el.matches('[data-hierarchy-stat]')) return; if(el.id==='npc-class'||el.id==='npc-arch'||el.id==='npc-fighting-style'||el.id==='npc-faction'||el.id==='npc-rank'||el.id==='npc-hierarchy-branch'||el.id==='npc-role'||el.id==='npc-shara-vessel') return; if(el.id==='npc-level'){ updateFightingStyleSelect(); renderWeavePicker(); } if(el.matches && (el.matches('[data-talent]')||el.matches('[data-affinity]'))){ renderWeavePicker(); } buildNpc(); }));
+  document.addEventListener('change',e=>{ const t=e.target; if(t && t.matches && (t.matches('[data-talent]')||t.matches('[data-affinity]'))){ renderWeavePicker(); buildNpc(); } else if(t && t.matches && t.matches('[data-weave-title]')){ renderWeavePicker(); buildNpc(); } else if(t&&t.matches&&t.matches('[data-hierarchy-stat]')){normalizeDistinctHierarchyChoice(t);buildNpc();} });
+  document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('change',()=>{ if(el.id==='feat-search'||el.matches('[data-hierarchy-stat]')) return; if(el.id==='npc-class'||el.id==='npc-arch'||el.id==='npc-ajah'||el.id==='npc-fighting-style'||el.id==='npc-faction'||el.id==='npc-rank'||el.id==='npc-hierarchy-branch'||el.id==='npc-role'||el.id==='npc-shara-vessel') return; if(el.id==='npc-level'){ updateFightingStyleSelect(); renderWeavePicker(); } if(el.matches && (el.matches('[data-talent]')||el.matches('[data-affinity]'))){ renderWeavePicker(); } buildNpc(); }));
 }
 document.addEventListener('DOMContentLoaded',bind);
 })();

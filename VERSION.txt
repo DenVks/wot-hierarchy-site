@@ -1,1 +1,1 @@
-v160 — Fix Wilder traditions in NPC generator
+v161 — Audit NPC weaves, cloth armor, feat confirmation and saved NPC flow

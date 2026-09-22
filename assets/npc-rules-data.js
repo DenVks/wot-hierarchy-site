@@ -67,6 +67,9 @@ window.WOT_NPC_RULES = {
     ],
     armor: [
       {name:'Без доспеха',category:'none',base:10,dexMax:null,stealth:false,strReq:0,weight:'—'},
+      {name:'Одежда ашамана / Айз Седай',category:'cloth',base:11,dexMax:null,stealth:false,strReq:0,weight:'5 фнт.',cost:'200 gc',isArmor:false},
+      {name:'Одежда сул’дам',category:'cloth',base:12,dexMax:null,stealth:false,strReq:0,weight:'5 фнт.',cost:'400 gc',isArmor:false},
+      {name:'Одежда айяд',category:'cloth',base:13,dexMax:null,stealth:false,strReq:0,weight:'5 фнт.',cost:'600 gc',isArmor:false},
       {name:'Стеганый',category:'light',base:11,dexMax:null,stealth:true,strReq:0,weight:'10 lb.'},
       {name:'Кожаный',category:'light',base:11,dexMax:null,stealth:false,strReq:0,weight:'15 lb.'},
       {name:'Проклёпанная кожа',category:'light',base:12,dexMax:null,stealth:false,strReq:0,weight:'20 lb.'},
