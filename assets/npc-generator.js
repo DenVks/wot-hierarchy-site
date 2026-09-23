@@ -102,6 +102,25 @@ function updatePactControls(){
 function updateAjahControl(){ const field=$('ajah-field'); if(!field)return; field.hidden=!(/Посвящ/i.test(getClass())&&/Айз Седай/i.test(getArch())&&getLevel()>=7); }
 function getWeaveSummary(w){ return Array.isArray(w.desc) ? w.desc.join(' ') : String(w.desc || w.summary || ''); }
 function getMetaValue(w,label){ const m=(w.meta||[]).find(x=>String(x.label||'').toLowerCase().includes(String(label).toLowerCase())); return m ? m.value : ''; }
+const WEAVE_META_LABELS=['Время создания','Время плетения','Дальность','Цель или область','Длительность','Спасбросок или бросок атаки','Спасбросок'];
+function getCanonicalMetaValue(w,label){
+  const wanted=String(label||'').toLowerCase();
+  const direct=getMetaValue(w,label);
+  if(direct)return direct;
+  const aliases={
+    'время создания':['время создания','время плетения'],
+    'спасбросок или бросок атаки':['спасбросок или бросок атаки','спасбросок']
+  }[wanted]||[wanted];
+  const text=Array.isArray(w&&w.desc)?w.desc.join(' \n '):String(w&&w.desc||'');
+  for(const alias of aliases){
+    const escaped=alias.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const labels=WEAVE_META_LABELS.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
+    const re=new RegExp('(?:^\\s*-?\\s*|\\n\\s*-?\\s*|\\s+-\\s+)'+escaped+'\\s*:\\s*(.*?)(?=\\s+-\\s+(?:'+labels+')\\s*:|\\n|$)','i');
+    const match=text.match(re);
+    if(match&&match[1])return match[1].trim();
+  }
+  return '';
+}
 function weaveDealsHitPointDamage(w){ const positive=/(?:получает|получают|наносит|наносят|наносите|причиняет|причиняют)[^.]{0,100}урон|\d+[кd]\d+[^.]{0,80}урон/i, nonDamage=/не\s+(?:получает|получают|наносит|наносят|причиняет|причиняют)[^.]{0,60}урон|получа(?:ет|ют|ете)[^.]{0,40}(?:бонус[^.]{0,25}(?:к\s+)?урон|сопротивление\s+урон)/i; return getWeaveSummary(w).split(/[.!?]/).some(sentence=>positive.test(sentence)&&!nonDamage.test(sentence)); }
 function isPactWeaveAvailable(w,cls,arch){ if(!/Носитель Договора/i.test(String(cls||'')))return true; const allowed=[...PACT_GENERAL_WEAVES,...(PACT_PATRON_RULES[arch]?.weaves||[])].map(normText); return allowed.includes(normText(w.title)); }
 function talentMatchesSchool(talent,school){return (TALENT_SCHOOL_ALIASES[talent]||[talent]).includes(school);}
@@ -605,7 +624,7 @@ function buildNpc(){
   const initiativeStat=h.type==='scream'?(hierarchyCtx.screamInitiativeStat||'dex'):'dex', hp=avgHp(cls,lv,stats.con,h), ini=mod(stats[initiativeStat])+(h.initiativeBonus||0), pp=10+mod(stats.wis)+p+((featsSel.includes('Внимательный'))?5:0);
   const baselineHp=avgHp(cls,lv,baseline.stats.con,baseline.hierarchy), baselineIni=mod(baseline.stats.dex), baselineAttack=calcAttack(cls,baseline.stats,eq,p,featsSel,baseline.hierarchy,style,pactAnchor,lv);
   const attack=calcAttack(cls,stats,eq,p,featsSel,h,style,pactAnchor,lv), hi=h.name?{id:faction,rank,branch:branch||null,vessel:h.type==='shara'&&rank==='V'?($('npc-shara-vessel')?.value||null):null,version:h.version,source:h.source,nm:h.name,ty:h.type,items:[...h.items,{n:'Сводные бонусы',d:`${hierarchyProfileSummary({hp:h.hpBonus,hitDiceMult:h.hpMult,ac:h.acBonus,attack:h.attackBonus,damage:h.damageBonus,speed:h.speedBonus,initiative:h.initiativeBonus,initiativeAdv:h.initiativeAdv,saves:h.saveBonus,stability:h.stability,dc:h.dcBonus,regen:h.regen,conductivity:h.conductivity})}. Атаки плетениями ${sign(h.weaveAttack)}; дополнительных кубиков урона ${h.weaveDamageDice}; дальность/область ×${h.weaveRangeMult}; дополнительных применений ${h.extraSlots}.`}]}:null;
-  const spells=findWeavesInput().map(w=>({n:w.title,lv:w.level,tal:w.school||'',el:Array.isArray(w.powers)?w.powers.join('·'):'',t:getMetaValue(w,'Время плетения')||w.cast||'',r:getMetaValue(w,'Дальность')||w.range||'',dur:getMetaValue(w,'Длительность')||w.duration||'',sb:getMetaValue(w,'Спасбросок')||w.save||'',slot:String(w.level||''),dmg:w.damage||'—',ef:getWeaveSummary(w).slice(0,320)}));
+  const spells=findWeavesInput().map(w=>({n:w.title,lv:w.level,tal:w.school||'',el:Array.isArray(w.powers)?w.powers.join(' · '):'',t:getCanonicalMetaValue(w,'Время создания')||w.cast||'—',r:getCanonicalMetaValue(w,'Дальность')||w.range||'—',area:getCanonicalMetaValue(w,'Цель или область')||'',dur:getCanonicalMetaValue(w,'Длительность')||w.duration||'Мгновенная',sb:getCanonicalMetaValue(w,'Спасбросок или бросок атаки')||w.save||'—',slot:String(w.level||0),dmg:w.damage||'—',ef:getWeaveSummary(w).slice(0,420),calc:'canonical-v165'}));
   const ab=[];
   features.forEach(f=>ab.push({n:f.feature,d:f.description,hi:Number(f.levelSort||0)===lv||f.archetype===arch,source:'class'}));
   if(style) ab.push({n:style.n,d:style.d,hi:true,source:'fighting-style'});

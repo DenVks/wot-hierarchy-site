@@ -417,6 +417,195 @@ document.addEventListener('contextmenu', function(e) {
   e.stopPropagation();
   resetSpellDamageButton(btn);
 });
+
+// ── Canonical weave calculations / angreal equipment ────────────────────
+const ANGRIAL_CATALOG = [
+  {id:'none', kind:'none', label:'Без ангриала', lv:0, attack:0, dice:0, range:1},
+  {id:'angrial-1', kind:'angrial', label:'Ангриал · сила 1', lv:1, attack:1, dice:1, range:1.3},
+  {id:'angrial-2', kind:'angrial', label:'Ангриал · сила 2', lv:2, attack:1, dice:2, range:1.5},
+  {id:'angrial-3', kind:'angrial', label:'Ангриал · сила 3', lv:3, attack:2, dice:3, range:1.6},
+  {id:'angrial-4', kind:'angrial', label:'Ангриал · сила 4', lv:4, attack:2, dice:4, range:1.7},
+  {id:'angrial-5', kind:'angrial', label:'Ангриал · сила 5', lv:5, attack:3, dice:5, range:1.8},
+  {id:'angrial-6', kind:'angrial', label:'Ангриал · сила 6', lv:6, attack:3, dice:6, range:2},
+  {id:'saangrial-12', kind:'saangrial', label:"Са’ангриал · сила 12", lv:12, attack:4, dice:12, range:3},
+  {id:'saangrial-14', kind:'saangrial', label:"Са’ангриал · сила 14", lv:14, attack:4, dice:14, range:6},
+  {id:'saangrial-16', kind:'saangrial', label:"Са’ангриал · сила 16", lv:16, attack:5, dice:16, range:10},
+  {id:'saangrial-30', kind:'saangrial', label:"Са’ангриал · сила 30", lv:30, attack:6, dice:30, range:100}
+];
+const WEAVE_META_LABELS_DM=['Время создания','Время плетения','Дальность','Цель или область','Длительность','Спасбросок или бросок атаки','Спасбросок'];
+function normalizeWeaveKey(v){return String(v||'').toLowerCase().replace(/ё/g,'е').replace(/[«»"'’]/g,'').replace(/[^a-zа-я0-9]+/g,' ').trim();}
+function canonicalWeaveByName(name){
+  const key=normalizeWeaveKey(name);
+  return (Array.isArray(window.WOT_WEAVES)?window.WOT_WEAVES:[]).find(w=>normalizeWeaveKey(w&&w.title)===key)||null;
+}
+function weaveText(w){return Array.isArray(w&&w.desc)?w.desc.join('\n'):String(w&&w.desc||w&&w.summary||'');}
+function canonicalWeaveMeta(w,label){
+  const wanted=String(label||'').toLowerCase();
+  const aliases={
+    'время создания':['время создания','время плетения'],
+    'спасбросок или бросок атаки':['спасбросок или бросок атаки','спасбросок']
+  }[wanted]||[wanted];
+  for(const alias of aliases){
+    const direct=(w&&Array.isArray(w.meta)?w.meta:[]).find(x=>String(x&&x.label||'').toLowerCase().includes(alias));
+    if(direct&&direct.value)return String(direct.value).trim();
+  }
+  const text=weaveText(w);
+  const labels=WEAVE_META_LABELS_DM.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
+  for(const alias of aliases){
+    const escaped=alias.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const re=new RegExp('(?:^\\s*-?\\s*|\\n\\s*-?\\s*|\\s+-\\s+)'+escaped+'\\s*:\\s*(.*?)(?=\\s+-\\s+(?:'+labels+')\\s*:|\\n|$)','i');
+    const match=text.match(re);
+    if(match&&match[1])return match[1].trim();
+  }
+  return '';
+}
+function canonicalWeaveSummary(w){
+  const lines=(Array.isArray(w&&w.desc)?w.desc:[w&&w.desc]).filter(Boolean).map(String);
+  const useful=lines.filter(x=>!/^\s*-?\s*(?:Время создания|Время плетения|Дальность|Цель или область|Длительность|Спасбросок или бросок атаки|Спасбросок)\s*:/i.test(x));
+  const txt=useful.join(' ').replace(/\s+/g,' ').trim();
+  return txt.length>460?txt.slice(0,457).trimEnd()+'…':txt;
+}
+function legacyAngrialId(a){
+  if(!a||!Number(a.lv))return 'none';
+  const lv=Number(a.lv), kind=/са.?ангриал/i.test(String(a.kind||a.type||a.desc||''))||lv>6?'saangrial':'angrial';
+  return `${kind}-${lv}`;
+}
+function getStoredAngrialState(c){
+  const st=getState(c.id);
+  if(!st.angrial||typeof st.angrial!=='object')st.angrial={selectedId:legacyAngrialId(c.angrial)};
+  if(!ANGRIAL_CATALOG.some(x=>x.id===st.angrial.selectedId))st.angrial.selectedId='none';
+  return st.angrial;
+}
+function getSelectedAngrial(c){
+  if(!c)return ANGRIAL_CATALOG[0];
+  const stored=getStoredAngrialState(c);
+  return ANGRIAL_CATALOG.find(x=>x.id===stored.selectedId)||ANGRIAL_CATALOG[0];
+}
+function setNpcAngrial(id,value){
+  const c=getNpcById(id); if(!c)return;
+  const st=getStoredAngrialState(c);
+  st.selectedId=ANGRIAL_CATALOG.some(x=>x.id===value)?value:'none';
+  savePersistedState(); showNPC(id);
+}
+function resetNpcAngrial(id){
+  const c=getNpcById(id); if(!c)return;
+  const st=getStoredAngrialState(c); st.selectedId=legacyAngrialId(c.angrial);
+  savePersistedState(); showNPC(id);
+}
+function npcRulesText(c){
+  return [c&&c.ti,c&&c.su,...((c&&c.tags)||[]),...((c&&c.ab)||[]).flatMap(a=>[a.n,a.d]),...((c&&c.excTalents)||[]).flatMap(g=>[g.tal,...((g.items)||[]).flatMap(i=>[i.n,i.d])])].filter(Boolean).join(' ').toLowerCase();
+}
+function hierarchyWeaveProfile(c){
+  const text=c&&c.hi?[c.hi.nm,...((c.hi.items)||[]).flatMap(i=>[i.n,i.d])].filter(Boolean).join(' '):'';
+  const num=(patterns, fallback=0)=>{for(const re of patterns){const m=text.match(re);if(m)return Number(String(m[1]).replace(',','.'))||fallback;}return fallback;};
+  return {
+    attack:num([/атаки плетениями\s*([+\-]?\d+)/i,/броскам атаки плетениями\s*([+\-]?\d+)/i]),
+    dice:num([/дополнительн\w* кубик\w* урона\s*(\d+)/i,/\+(\d+)\s*кубик\w* урона/i]),
+    range:num([/дальность\s*\/\s*область\s*[×x]\s*([\d.,]+)/i,/дальность\/область\s*[×x]\s*([\d.,]+)/i],1),
+    dc:num([/сл плетений\s*([+\-]?\d+)/i,/dc (?:заклинаний|плетений)\s*([+\-]?\d+)/i])
+  };
+}
+function channelingStatKey(c){
+  const p=String(c&&c.pact&&c.pact.primary||'').toLowerCase();
+  if(p.includes('хар'))return 'cha'; if(p.includes('муд'))return 'wis'; if(p.includes('инт'))return 'int';
+  const txt=[c&&c.ti,...((c&&c.tags)||[])].filter(Boolean).join(' ');
+  if(/Носитель Договора/i.test(txt))return 'cha';
+  if(/Дичок/i.test(txt))return 'wis';
+  return 'int';
+}
+function spellcastingProfile(c,w){
+  const key=channelingStatKey(c), ability=statModNum(c&&c.st&&c.st[key]), prof=parseSignedBonus(c&&c.co&&c.co.prof), hi=hierarchyWeaveProfile(c), item=getSelectedAngrial(c);
+  const attackAmp=Math.max(hi.attack,item.attack), damageDice=Math.max(hi.dice,item.dice), rangeMult=Math.max(hi.range||1,item.range||1);
+  let dc=8+ability+prof+hi.dc;
+  const rules=npcRulesText(c), save=canonicalWeaveMeta(w,'Спасбросок или бросок атаки');
+  if(/прочные плетения/i.test(rules)&&w&&w.school==='Элементализм'&&/ловк/i.test(save)&&weaveDamageGroups(w.title,Number(w.level)||0,ability).length)dc+=1;
+  const damageSource=item.dice>hi.dice?item.label:(hi.dice?(c.hi&&c.hi.nm||'Иерархия'):'нет усиления');
+  return {key,ability,prof,attack:ability+prof+attackAmp,dc,hi,item,attackAmp,damageDice,rangeMult,ampSource:damageSource};
+}
+function affinitiesForSpell(c,w){
+  const rules=npcRulesText(c), original=Array.isArray(w&&w.powers)?w.powers.map(String):[], flows=[...original];
+  const thunderFlame=/грохочущее пламя/i.test(rules)&&w&&w.school==='Элементализм'&&original.some(x=>/огонь/i.test(x))&&weaveDamageGroups(w.title,Number(w.level)||0,0).length;
+  if(thunderFlame&&!flows.some(x=>/воздух/i.test(x)))flows.push('Воздух');
+  const aff=(Array.isArray(c&&c.affinities)?c.affinities:[]).map(normalizeWeaveKey);
+  const matched=flows.filter(x=>aff.includes(normalizeWeaveKey(x))).length, total=flows.length, base=Number(w&&w.level)||0;
+  const effective=base===0?Math.min(9,matched):Math.min(9,base+matched);
+  let slot=base===0?0:matched===0?base+1:matched===total?Math.max(1,base-1):base;
+  return {flows,matched,total,base,effective,slot,thunderFlame};
+}
+function diceTerm(count,sides,bonus=0){return `${Math.max(1,count)}к${sides}${bonus?`${bonus>0?'+':''}${bonus}`:''}`;}
+function weaveDamageGroups(name,effective,abilityMod){
+  const k=normalizeWeaveKey(name), up=(base)=>Math.max(0,effective-base);
+  if(k==='создать огонь')return [{label:'Урон огнём',expr:diceTerm(1+effective,6),main:true}];
+  if(k==='граната')return [{label:'Взрыв · дробящий + огненный',expr:`${diceTerm(1+effective,4)}+${diceTerm(1+effective,4)}`,main:true},{label:'Горение в конце хода',expr:'1к6',repeat:true}];
+  if(k==='инструмент воздуха'){
+    const expr=effective<=0?'1к4':effective===1?'1к6':effective===2?'1к8':effective===3?'1к10':'2к6';
+    return [{label:'Попадание выбранным инструментом',expr,main:true}];
+  }
+  if(k==='ледяные кристаллы')return [{label:'Урон холодом',expr:diceTerm(1+effective,10),main:true}];
+  if(k==='огненный жезл')return [{label:'Доп. урон при попадании',expr:'1к6',main:true},{label:'Урон чужому владельцу в начале хода',expr:'1к6',repeat:true}];
+  if(k==='воздушный кулак')return [{label:'Дробящий урон',expr:diceTerm(2+up(1),8),main:true}];
+  if(k==='огненный меч'){const n=effective<=2?1:effective===3?2:3;return [{label:'Попадание огненным мечом',expr:diceTerm(n,10,abilityMod),main:true}];}
+  if(k==='огненный шар')return [{label:'Огненный урон',expr:diceTerm(4+up(2),6),main:true}];
+  if(k==='громовой удар')return [];
+  if(k==='огненная ловушка')return [{label:'Огненный урон',expr:diceTerm(4+up(3),6),main:true}];
+  if(k==='водоворот')return [{label:'Дробящий урон при срабатывании',expr:diceTerm(2+up(3),8),main:true,repeat:true}];
+  if(k==='приносить в жертву')return [{label:'Первоначальный огненный урон',expr:diceTerm(4+up(4),8),main:true},{label:'Горение в начале хода',expr:'1к8',repeat:true}];
+  if(k==='расколотая земля'){const n=3+up(4);return [{label:'Взрыв · дробящий + огненный',expr:`${diceTerm(n,6)}+${diceTerm(n,6)}`,main:true}];}
+  if(k==='молния'){const d=up(5);return [{label:'Центральная цель · молния',expr:diceTerm(8+d,6),main:true},{label:'Вторичная область · молния',expr:diceTerm(2+d,6),secondary:true}];}
+  if(k==='дыхание зимы')return [{label:'Первоначальный урон холодом',expr:diceTerm(7+up(5),6),main:true},{label:'Повторный урон холодом',expr:'1к8',repeat:true}];
+  return [];
+}
+function firstDiceSides(expr){const m=String(expr||'').match(/\d+к(\d+)/);return m?Number(m[1]):0;}
+function scaleMeasurement(text,mult){
+  const raw=String(text||'').trim(); if(!raw||mult<=1)return raw;
+  let changed=false;
+  const scaled=raw.replace(/(\d+(?:[.,]\d+)?)\s*(фут(?:ов|а)?)/gi,(all,n,u)=>{changed=true;const base=Number(String(n).replace(',','.')), value=Math.round(base*mult*10)/10;return `${n}→${String(value).replace('.',',')} ${u}`;});
+  return changed?`${scaled} (×${String(mult).replace('.',',')})`:raw;
+}
+function resolveNpcSpell(c,sp){
+  const w=canonicalWeaveByName(sp&&sp.n), dynamic=!!(w&&(c.custom||Array.isArray(c.affinities)||!sp.t||!sp.r||!sp.sb));
+  if(!dynamic)return Object.assign({damageGroups:[]},sp,{damageHtml:null,descriptionHtml:null});
+  const level=Number(w.level)||0, profile=spellcastingProfile(c,w), aff=affinitiesForSpell(c,w), groups=weaveDamageGroups(w.title,aff.effective,profile.ability).map(g=>Object.assign({},g,{baseExpr:g.expr}));
+  if(groups.length&&profile.damageDice){
+    const main=groups.find(g=>g.main)||groups[0], sides=firstDiceSides(main.expr);
+    if(sides){main.expr+=`+${profile.damageDice}к${sides}`;main.amp=`+${profile.damageDice}к${sides} · ${profile.ampSource}`;}
+  }
+  const optional=[];
+  if(aff.thunderFlame&&groups.length)optional.push({label:'Грохочущее Пламя · гром',expr:`1к8${profile.ability?`${profile.ability>0?'+':''}${profile.ability}`:''}`,note:'Опционально; потоки Воздуха уже учтены в эффективном круге.'});
+  const patron=String(c&&c.pact&&c.pact.patron||c&&c.ti||'');
+  if(groups.length&&/Великая Мигрирующая Аномалия/i.test(patron))optional.push({label:'Резонанс фронта · Вал или Столп',expr:`1к${Number(c.lv)>=10?8:6}`,note:'Один режим и одна цель; выбрать до броска атаки или спасброска.'});
+  const save=canonicalWeaveMeta(w,'Спасбросок или бросок атаки')||'—';
+  let check=save;
+  if(/атак[аиуы]?\s+Плетением|бросок атаки Плетением/i.test(save))check+=` · атака ${profile.attack>=0?'+':''}${profile.attack}`;
+  if(save!=='—'&&!/^нет$/i.test(save)&&!(/атак[аиуы]?\s+Плетением/i.test(save)&&!/ловк|сил|тел|мудр|инт|хар|спас/i.test(save)))check+=` · СЛ ${profile.dc}`;
+  const notes=[];
+  notes.push(`Базовый круг ${level}; эффективный ${aff.effective}.`);
+  notes.push(aff.total?`Аффинитеты: совпало ${aff.matched} из ${aff.total} потоков (${aff.flows.join(', ')}).`:'Потоки не указаны.');
+  notes.push(level===0?'Кантрип: ячейка не расходуется.':`Требуемая ячейка: ${aff.slot}-го круга.`);
+  if(groups.length&&profile.damageDice)notes.push(`Усиление основного броска: +${profile.damageDice} куб. (${profile.ampSource}); совпадающие бонусы не складываются.`);
+  return {
+    n:w.title,lv:level,tal:w.school||sp.tal||'б/т',el:aff.flows.join(' · '),t:canonicalWeaveMeta(w,'Время создания')||'—',
+    r:scaleMeasurement(canonicalWeaveMeta(w,'Дальность')||'—',profile.rangeMult),area:scaleMeasurement(canonicalWeaveMeta(w,'Цель или область')||'',profile.rangeMult),
+    dur:canonicalWeaveMeta(w,'Длительность')||'Мгновенная',sb:check,slot:level===0?'0 · кантрип':`${aff.slot} ур. · эфф. ${aff.effective}`,damageGroups:groups,optionalDamage:optional,
+    ef:canonicalWeaveSummary(w)||sp.ef||'',calcNotes:notes
+  };
+}
+function renderSpellDamage(sp){
+  const groups=Array.isArray(sp.damageGroups)?sp.damageGroups:[];
+  if(!groups.length)return sp.dmg&&sp.dmg!=='—'?`${escHtml(sp.dmg)}${spellDamageButton(sp.dmg,sp.n)}`:'—';
+  const rows=groups.map(g=>`<div class="weave-damage-line${g.repeat?' repeat':''}${g.secondary?' secondary':''}"><span>${escHtml(g.label)}</span><b>${escHtml(g.expr)}</b>${spellDamageButton(g.expr,sp.n+' · '+g.label)}${g.amp?`<em>${escHtml(g.amp)}</em>`:''}</div>`).join('');
+  const optional=(sp.optionalDamage||[]).map(g=>`<div class="weave-damage-line optional"><span>${escHtml(g.label)}</span><b>${escHtml(g.expr)}</b>${spellDamageButton(g.expr,sp.n+' · '+g.label)}<em>${escHtml(g.note||'')}</em></div>`).join('');
+  return rows+optional;
+}
+function renderSpellDescription(sp){
+  if(!sp.calcNotes)return escHtml(sp.ef||'—');
+  return `<div class="weave-calc-notes">${sp.calcNotes.map(n=>`<span>${escHtml(n)}</span>`).join('')}</div><div class="weave-summary">${escHtml(sp.ef||'—')}</div>`;
+}
+function renderAngrialSelector(c){
+  const active=getSelectedAngrial(c), hi=hierarchyWeaveProfile(c), final={attack:Math.max(hi.attack,active.attack),dice:Math.max(hi.dice,active.dice),range:Math.max(hi.range||1,active.range||1)};
+  const options=ANGRIAL_CATALOG.map(x=>`<option value="${x.id}" ${x.id===active.id?'selected':''}>${escHtml(x.label)}${x.id==='none'?'':` · атака +${x.attack} · +${x.dice} куб. · ×${x.range}`}</option>`).join('');
+  return `<div class="angrial-tool"><div class="armor-tool-head"><div><strong>Ангриал / са’ангриал</strong><span>Выбранный предмет применяется к расчётам во вкладке «Плетения».</span></div><span class="angrial-equipped">${active.id==='none'?'не выбран':escHtml(active.label)}</span></div><div class="angrial-form"><label>Активный предмет<select onchange="setNpcAngrial(${c.id},this.value)">${options}</select></label></div><div class="angrial-result"><div><b>Итоговое усиление:</b> атака плетением +${final.attack}; +${final.dice} куб. к одному броску основного урона; дальность/область ×${final.range}.</div><div class="armor-formula">Иерархия и предмет не складываются по одному параметру — берётся большее значение.</div></div><div class="armor-actions"><button onclick="resetNpcAngrial(${c.id})">Вернуть предмет карточки</button></div></div>`;
+}
 // ── HP System ────────────────────────────────────────────────────────────
 let hpModalNpcId = null;
 function openHpModal(id) {
@@ -1466,6 +1655,7 @@ function renderCombatDashboard(id, c, s){
   const coreCr = c && c.co && c.co.cr ? clipNpcText(c.co.cr, 115) : '—';
   const spellLine = getSpellLine(c);
   const slotLine = c.slots && c.slots.length ? c.slots.map(sl=>`${escHtml(sl.lv)}:${sl.n}`).join(' · ') : '';
+  const activeAngrial = (c.spells || c.slots) ? getSelectedAngrial(c) : ANGRIAL_CATALOG[0];
   const criticalGroups = ['turn','defense','reaction','bonus','aura','resource']
     .map(k=>renderBriefGroup(brief.out[k].meta, brief.out[k]))
     .join('');
@@ -1486,7 +1676,7 @@ function renderCombatDashboard(id, c, s){
       <div class="bd-metric"><span>Пасс. ВСПР</span><b>${escHtml(c.co.pp)}</b></div>
       <div class="bd-metric"><span>Плетения</span><b>${escHtml(spellLine)}</b></div>
     </div>
-    ${slotLine || c.angrial ? `<div class="bd-resource-line">${slotLine ? `<span><b>Ячейки:</b> ${slotLine}</span>` : ''}${c.angrial ? `<span><b>Ангриал:</b> ур.${escHtml(c.angrial.lv)} · ${escHtml(c.angrial.dmgd)} · ${escHtml(c.angrial.range)}</span>` : ''}</div>` : ''}
+    ${slotLine || activeAngrial.id!=='none' ? `<div class="bd-resource-line">${slotLine ? `<span><b>Ячейки:</b> ${slotLine}</span>` : ''}${activeAngrial.id!=='none' ? `<span><b>${activeAngrial.kind==='saangrial'?'Са’ангриал':'Ангриал'}:</b> сила ${activeAngrial.lv} · атака +${activeAngrial.attack} · +${activeAngrial.dice} куб. · ×${activeAngrial.range}</span>` : ''}</div>` : ''}
     <div class="battle-brief-grid">${criticalGroups}${emptyLine}</div>
   </section>`;
 }
@@ -1675,7 +1865,7 @@ ${['СИЛ','ТЕЛ','ЛОВ','ИНТ','МДР','ХАР'].map((name,si)=>{
   <div class="core-box core-wide"><span style="font-size:10px;color:var(--text3)">Особенности</span><span class="core-val" style="font-size:10px;color:var(--gold2)">${c.co.cr}</span></div>
 </div>
 ${c.hi ? renderHi(c.hi, id) : ''}
-${c.angrial ? renderAngrial(c.angrial) : ''}
+${getSelectedAngrial(c).id!=='none' ? renderAngrial(getSelectedAngrial(c)) : ''}
 <div class="sec"><div class="sec-h">Навыки</div>
 <div class="sk-grid">${c.sk.map(sk=>`<div class="sk-item${sk.e?' expert':''}"><span class="sk-name">${sk.e?'<span class="sk-star">★</span>':''}${sk.n}<span style="font-size:9px;color:var(--text3);margin-left:3px">${sk.note||''}</span></span><span class="sk-val">${sk.v}</span></div>`).join('')}</div></div>
 <div class="tact-box"><div class="tact-title">🎯 Тактика</div>
@@ -1693,6 +1883,7 @@ ${c.tactics.map(t=>`<div class="tact-phase"><div class="tact-phase-name">${t.ph}
   // ── TAB: EQUIPMENT ────────────────────────────────────────────────────
   html += `<div class="tab-content" id="tab_${id}_equipment">
 ${renderArmorSelector(c)}
+${hasSpells?renderAngrialSelector(c):''}
 <div class="sec"><div class="sec-h">Снаряжение</div>
 <div class="eq-list">${c.eq.map(e=>`<div class="eq-item${e.r?' rare':''}">${e.r?'⭐ ':''}${e.t}</div>`).join('')}
 </div></div></div>`;
@@ -1702,8 +1893,9 @@ ${renderArmorSelector(c)}
 
   // ── SPELLS ────────────────────────────────────────────────────────────
   if (hasSpells) {
+    const activeAngrial=getSelectedAngrial(c);
     html += `<div class="tab-content" id="tab_${id}_spells">`;
-    if (c.angrial) html += renderAngrial(c.angrial);
+    if (activeAngrial.id!=='none') html += renderAngrial(activeAngrial);
     if ((c.talents&&c.talents.length)||(c.affinities&&c.affinities.length)) {
       html += `<div class="sec"><div class="sec-h">Доступ к Плетениям</div><div class="eq-list">${c.talents&&c.talents.length?`<div class="eq-item"><b>Таланты:</b> ${c.talents.map(escHtml).join(', ')}</div>`:''}${c.affinities&&c.affinities.length?`<div class="eq-item"><b>Аффинитеты:</b> ${c.affinities.map(escHtml).join(', ')}</div>`:''}</div></div>`;
     }
@@ -1716,19 +1908,20 @@ ${renderArmorSelector(c)}
 }).join('')}</div></div>`;
     }
     if (c.spells) {
+      const resolvedSpells=c.spells.map(sp=>resolveNpcSpell(c,sp));
       html += `<div class="sec"><div class="sec-h">Плетения</div>
 <div style="overflow-x:auto"><table class="sp-table"><thead><tr>
-<th>Плетение</th><th>Талант</th><th>Стихии</th><th>Время</th><th>Дальн.</th><th>Длит.</th><th>СБ</th><th>Слот</th><th>Урон</th><th>Описание</th>
+<th>Плетение</th><th>Талант</th><th>Стихии</th><th>Время</th><th>Дальн. / область</th><th>Длит.</th><th>Атака / СБ</th><th>Слот</th><th>Урон</th><th>Описание</th>
 </tr></thead><tbody>
-${c.spells.map((sp,spi)=>`<tr>
+${resolvedSpells.map((sp,spi)=>`<tr>
 <td class="sp-name ${sp.lv===0?'sp-lv0':lvClass(sp.lv)}"><span class="sp-title">${sp.n}</span> ${weaveInfoButton(sp.n)}</td>
 <td class="sp-dc">${sp.tal||'б/т'}</td>
 <td><span class="sp-el">${sp.el}</span></td>
-<td class="sp-dc">${sp.t}</td><td class="sp-dc">${sp.r||'—'}</td>
-<td class="sp-dc">${sp.dur||'Мгн.'}</td><td class="sp-dc">${sp.sb}</td>
-<td class="sp-dc">${sp.slot!=null?sp.slot:sp.lv===0?'0':sp.lv+' ур.'}</td>
-<td class="sp-dmg">${sp.dmg||'—'}${spellDamageButton(sp.dmg, sp.n)}</td>
-<td class="sp-note">${sp.ef}</td></tr>`).join('')}
+<td class="sp-dc">${escHtml(sp.t||'—')}</td><td class="sp-dc">${escHtml(sp.r||'—')}${sp.area?`<small class="sp-area">${escHtml(sp.area)}</small>`:''}</td>
+<td class="sp-dc">${escHtml(sp.dur||'Мгн.')}</td><td class="sp-dc">${escHtml(sp.sb||'—')}</td>
+<td class="sp-dc">${escHtml(sp.slot!=null?sp.slot:sp.lv===0?'0':sp.lv+' ур.')}</td>
+<td class="sp-dmg">${renderSpellDamage(sp)}</td>
+<td class="sp-note">${renderSpellDescription(sp)}</td></tr>`).join('')}
 </tbody></table></div></div>`;
     }
     html += `</div>`;
@@ -2002,15 +2195,22 @@ function renderHi(hi, npcId) {
 }
 
 function renderAngrial(a) {
+  const modern=a&&Object.prototype.hasOwnProperty.call(a,'attack');
+  const kind=modern&&a.kind==='saangrial'?"Са’ангриал":'Ангриал';
+  const attack=modern?`+${a.attack}`:a.atk;
+  const dice=modern?`+${a.dice} кубиков`:a.dmgd;
+  const range=modern?`×${a.range}`:a.range;
+  const area=modern?`×${a.range}`:a.area;
+  const desc=modern?'Дополнительные кубики добавляются к одному броску основного урона плетения и используют тип основного кубика. Совпадающие бонусы Иерархии и предмета не складываются: применяется большее значение.':a.desc;
   return `<div class="angrial-box">
-<div class="angrial-title">🔮 Ангриал (Уровень ${a.lv})</div>
+<div class="angrial-title">🔮 ${kind} (Сила ${a.lv})</div>
 <div class="angrial-grid">
-<div class="angrial-stat"><div class="angrial-label">Атака</div><div class="angrial-val">${a.atk}</div></div>
-<div class="angrial-stat"><div class="angrial-label">Доп. кубики</div><div class="angrial-val">${a.dmgd}</div></div>
-<div class="angrial-stat"><div class="angrial-label">Дистанция</div><div class="angrial-val">${a.range}</div></div>
-<div class="angrial-stat"><div class="angrial-label">Площадь</div><div class="angrial-val">${a.area}</div></div>
+<div class="angrial-stat"><div class="angrial-label">Атака</div><div class="angrial-val">${attack}</div></div>
+<div class="angrial-stat"><div class="angrial-label">Доп. кубики</div><div class="angrial-val">${dice}</div></div>
+<div class="angrial-stat"><div class="angrial-label">Дистанция</div><div class="angrial-val">${range}</div></div>
+<div class="angrial-stat"><div class="angrial-label">Площадь</div><div class="angrial-val">${area}</div></div>
 </div>
-<div style="font-size:11px;color:var(--text2);margin-top:6px;line-height:1.35">${a.desc}</div>
+<div style="font-size:11px;color:var(--text2);margin-top:6px;line-height:1.35">${desc}</div>
 </div>`;
 }
 

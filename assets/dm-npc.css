@@ -763,6 +763,29 @@ html.auth-lock body > *:not(.auth-overlay){filter:blur(5px);pointer-events:none;
 @media(max-width:900px){.armor-form{grid-template-columns:1fr 1fr}.armor-checks{grid-template-columns:1fr}.armor-tool-head{flex-direction:column}.armor-active{white-space:normal}}
 @media(max-width:560px){.armor-form{grid-template-columns:1fr}.armor-tool{padding:9px}.armor-form select,.armor-form input{font-size:12px}}
 
+/* v165: angreal equipment and calculated weave damage */
+.angrial-tool{background:linear-gradient(145deg,rgba(91,58,126,.16),var(--bg2));border:1px solid rgba(173,127,221,.34);border-radius:8px;padding:10px 12px;margin-bottom:12px}
+.angrial-equipped{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--purple2,#c8a8ea)!important;border:1px solid rgba(173,127,221,.34);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.angrial-form{display:grid;grid-template-columns:minmax(260px,1fr);gap:7px;margin-bottom:8px}
+.angrial-form label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;display:flex;flex-direction:column;gap:3px}
+.angrial-form select{background:var(--bg3);border:1px solid rgba(173,127,221,.34);border-radius:5px;color:var(--text);font-size:11px;padding:6px 8px;outline:none}
+.angrial-form select:focus{border-color:var(--purple2,#c8a8ea)}
+.angrial-result{border-radius:6px;padding:7px 9px;margin-bottom:8px;font-size:11px;line-height:1.45;background:rgba(91,58,126,.12);border:1px solid rgba(173,127,221,.24)}
+.sp-area{display:block;margin-top:4px;color:var(--text3);font-size:9px;line-height:1.3}
+.weave-damage-line{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:3px 5px;padding:4px 0;border-bottom:1px solid var(--border)}
+.weave-damage-line:last-child{border-bottom:0}
+.weave-damage-line span{grid-column:1/-1;color:var(--text2);font-size:9px;line-height:1.25}
+.weave-damage-line b{font-family:'JetBrains Mono',monospace;color:var(--red2);font-size:10px;white-space:normal}
+.weave-damage-line em{grid-column:1/-1;color:var(--gold2);font-size:8px;font-style:normal;line-height:1.3}
+.weave-damage-line.repeat span:before{content:'↻ ';color:var(--blue2)}
+.weave-damage-line.secondary span:before{content:'◌ ';color:var(--text3)}
+.weave-damage-line.optional{margin-top:3px;padding:4px 5px;border:1px dashed rgba(201,168,76,.34);border-radius:4px;background:rgba(201,168,76,.06)}
+.weave-damage-line.optional span:before{content:'◇ ';color:var(--gold2)}
+.weave-calc-notes{display:grid;gap:3px;margin-bottom:6px}
+.weave-calc-notes span{display:block;padding:3px 5px;border-left:2px solid rgba(201,168,76,.55);background:rgba(201,168,76,.05);color:var(--gold2);font-size:9px;line-height:1.35}
+.weave-summary{color:var(--text2);font-size:10px;line-height:1.45}
+@media(max-width:560px){.angrial-tool{padding:9px}.angrial-equipped{white-space:normal}.angrial-form select{font-size:12px}}
+
 /* v97: visible data-load diagnostic for NPC sidebar */
 .sb-load-error{
   margin:8px;
