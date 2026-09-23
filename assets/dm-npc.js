@@ -1923,11 +1923,81 @@ function refreshIniTracker() {
 }
 
 // ── Helper renderers ──────────────────────────────────────────────────────
+const SCREAM_ABILITY_SIGNATURE_RE=/(^|[.!?]\s+)([А-ЯЁ][^.!?]{1,70}?)\s*·\s*((?:пассив|1\/проход|\d+\s+заряд(?:а|ов)?)[^.]*\.)/g;
+const SCREAM_ATTACK_NAMES=/^(Искра Хвоста|Малый Вал|Столп|Осколок Ока)$/i;
+const SCREAM_DEFENSE_NAMES=/^(Твёрдый шаг|Полог дождя|Держать тело|Стена перед Валом|Обод|Стояние)$/i;
+function splitScreamAbilities(text){
+  const source=String(text||'').trim(), matches=[]; let m;
+  SCREAM_ABILITY_SIGNATURE_RE.lastIndex=0;
+  while((m=SCREAM_ABILITY_SIGNATURE_RE.exec(source))){
+    matches.push({rawIndex:m.index,leading:m[1]||'',name:m[2].trim(),meta:m[3].trim().replace(/\.$/,''),bodyStart:SCREAM_ABILITY_SIGNATURE_RE.lastIndex});
+  }
+  return matches.map((entry,index)=>{
+    const next=matches[index+1], bodyEnd=next?next.rawIndex+(next.leading?1:0):source.length;
+    return {name:entry.name,meta:entry.meta,body:source.slice(entry.bodyStart,bodyEnd).trim()};
+  }).filter(x=>x.name&&x.body);
+}
+function screamAbilityKind(block){
+  const name=String(block.name||''), meta=String(block.meta||''), body=String(block.body||'');
+  if(/пассив/i.test(meta))return {id:'passive',icon:'◇',label:'Пассивная'};
+  if(SCREAM_DEFENSE_NAMES.test(name)||(/реакц/i.test(meta)&&/помех|защищ|атак/i.test(body)))return {id:'defense',icon:'🛡',label:'Защитная'};
+  if(SCREAM_ATTACK_NAMES.test(name)||/наносит|получает \d+[кd]\d+|урона при провале|конус|цилиндр/i.test(body))return {id:'attack',icon:'⚔',label:'Атакующая'};
+  return {id:'support',icon:'◆',label:'Поддержка'};
+}
+function screamSentences(text){
+  const normalized=String(text||'').replace(/\s+/g,' ').trim();
+  return normalized.match(/[^.!?]+[.!?]+(?=\s+[А-ЯЁ0-9]|$)|[^.!?]+$/g)?.map(x=>x.trim()).filter(Boolean)||[];
+}
+function renderScreamNarrative(text){
+  const raw=String(text||'').trim(); if(!raw)return '';
+  const visualIndex=raw.search(/(?:^|\s)Проявление:/i);
+  const main=visualIndex>=0?raw.slice(0,visualIndex).trim():raw;
+  const visual=visualIndex>=0?raw.slice(visualIndex).trim():'';
+  const marker=/^(При провале|При успехе|Если|Когда|Пока|После|До конца|В начале|В конце|Начиная|Впервые|Защищённые|Выбранные|Существо|Способность не|Перегрузка|За проход|Один раз)/i;
+  let html='',listOpen=false;
+  screamSentences(main).forEach(sentence=>{
+    if(marker.test(sentence)){
+      if(!listOpen){html+='<ul class="scream-rule-list">';listOpen=true;}
+      html+='<li>'+escHtml(sentence)+'</li>';
+    }else{
+      if(listOpen){html+='</ul>';listOpen=false;}
+      html+='<p>'+escHtml(sentence)+'</p>';
+    }
+  });
+  if(listOpen)html+='</ul>';
+  if(visual)html+='<div class="scream-manifestation"><span>◈ Проявление</span>'+escHtml(visual.replace(/^Проявление:\s*/i,''))+'</div>';
+  return html;
+}
+function renderScreamAbility(block){
+  const kind=screamAbilityKind(block);
+  const chips=String(block.meta||'').split(/\s*·\s*/).filter(Boolean).map(x=>'<span>'+escHtml(x)+'</span>').join('');
+  return '<article class="scream-ability-card '+kind.id+'">'+
+    '<div class="scream-ability-head"><span class="scream-kind">'+kind.icon+' '+kind.label+'</span><strong>'+escHtml(block.name)+'</strong></div>'+
+    (chips?'<div class="scream-ability-meta">'+chips+'</div>':'')+
+    '<div class="scream-ability-body">'+renderScreamNarrative(block.body)+'</div>'+
+  '</article>';
+}
+function isScreamReferenceItem(item){
+  return /^(Предчувствие:|Проводимость|Настройка Хвоста|Сопротивления по рангам)/i.test(String(item&&item.n||''));
+}
+function renderHierarchyItem(hi,item,npcId){
+  const name=String(item&&item.n||''), text=String(item&&item.d||''), info=npcId?classFeatureInfoButton(npcId,name):'';
+  if(hi.ty!=='scream')return '<div class="hi-item"><div class="hi-item-name">'+name+' '+info+'</div><div class="hi-item-desc">'+text+'</div></div>';
+  const blocks=splitScreamAbilities(text);
+  if(blocks.length){
+    return '<div class="hi-item scream-rank-item"><div class="hi-item-name">'+escHtml(name)+' '+info+'</div><div class="scream-ability-list">'+blocks.map(renderScreamAbility).join('')+'</div></div>';
+  }
+  const formatted=renderScreamNarrative(text);
+  if(isScreamReferenceItem(item)||text.length>700){
+    return '<div class="hi-item scream-reference-item"><div class="hi-item-name">'+escHtml(name)+' '+info+'</div><details class="scream-reference"><summary><span>☰ Справочное правило</span> Показать полное описание</summary><div class="scream-reference-body">'+formatted+'</div></details></div>';
+  }
+  return '<div class="hi-item scream-summary-item"><div class="hi-item-name">'+escHtml(name)+' '+info+'</div><div class="hi-item-desc scream-formatted">'+formatted+'</div></div>';
+}
 function renderHi(hi, npcId) {
   if (!hi) return '';
   return `<div class="hi-box ${hi.ty||'unity'}" style="margin-bottom:8px">
 <div class="hi-name">${hi.nm}</div>
-<div class="hi-items">${hi.items.map(it=>`<div class="hi-item"><div class="hi-item-name">${it.n} ${npcId ? classFeatureInfoButton(npcId, it.n) : ''}</div><div class="hi-item-desc">${it.d}</div></div>`).join('')}</div>
+<div class="hi-items">${hi.items.map(it=>renderHierarchyItem(hi,it,npcId)).join('')}</div>
 </div>`;
 }
 
