@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css?v=157">
-<link rel="stylesheet" href="assets/npc-generator.css?v=161">
+<link rel="stylesheet" href="assets/npc-generator.css?v=163">
 <script src="assets/auth.js?v=65"></script>
 </head>
 <body>
@@ -26,12 +26,30 @@
       <h2>1. Концепция</h2>
       <div class="field"><label>Имя</label><input id="npc-name" value="Новый NPC"></div>
       <div class="grid2">
-        <div class="field"><label>Нация</label><input id="npc-nation" value="Андор"></div>
+        <div class="field"><label>Нация / народ</label><input id="npc-nation" value="Андор" placeholder="Выберите из списка или введите вручную"><p class="hint nation-hint">В список добавлены народы Земли Безумцев: Агори, Тишани, Харани и Кайнар.</p></div>
         <div class="field"><label>Уровень</label><input id="npc-level" type="number" min="1" max="20" value="7"></div>
       </div>
       <div class="grid2">
         <div class="field"><label>Класс</label><select id="npc-class"></select></div>
-        <div class="field"><label>Архетип / Традиция</label><select id="npc-arch"></select></div>
+        <div class="field"><label id="npc-arch-label">Архетип / Традиция</label><select id="npc-arch"></select></div>
+      </div>
+      <div class="pact-options" id="pact-options" hidden>
+        <div class="pact-summary">
+          <strong>Носитель Договора · ориентир по характеристикам</strong>
+          <p><b>Основная:</b> Харизма — атака и СЛ Плетений Договора, способности Покровителя и механики Якоря.</p>
+          <p><b>Поддерживающая:</b> Телосложение — хиты и концентрация. Ловкость полезна для КД в лёгком доспехе, но не является второй базовой характеристикой класса.</p>
+        </div>
+        <div class="field" id="pact-anchor-field" hidden>
+          <label>Якорь Договора</label>
+          <select id="npc-pact-anchor">
+            <option value="">Выберите Якорь</option>
+            <option value="blade">Якорь Клинка</option>
+            <option value="book">Якорь Книги</option>
+            <option value="sign">Якорь Знака</option>
+          </select>
+          <p class="hint">Якорь выбирается на 3-м уровне и не меняется при повышении уровня. Генератор добавит только способности выбранной ветки.</p>
+        </div>
+        <p class="hint" id="pact-focus-note"></p>
       </div>
       <div class="field" id="fighting-style-field" style="display:none">
         <label>Стиль боя</label>
@@ -138,12 +156,12 @@
 <script src="assets/classes-nositel-dogovora.js?v=157"></script>
 <script src="assets/feats-data.js?v=159"></script>
 <script src="assets/weaves-data.js?v=157"></script>
-<script src="assets/npc-rules-data.js?v=161"></script>
+<script src="assets/npc-rules-data.js?v=163"></script>
 <script src="assets/hierarchy-data.js?v=153"></script>
 <script src="assets/hierarchy-wall-data.js?v=153"></script>
 <script src="assets/hierarchy-mechanics.js?v=154"></script>
 <script src="assets/npc-data.js?v=137"></script>
-<script src="assets/npc-generator.js?v=161"></script>
+<script src="assets/npc-generator.js?v=163"></script>
 <script src="assets/shared.js?v=157"></script>
 </body>
 </html>
