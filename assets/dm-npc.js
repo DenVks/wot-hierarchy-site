@@ -553,6 +553,11 @@ function weaveDamageGroups(name,effective,abilityMod){
   if(k==='расколотая земля'){const n=3+up(4);return [{label:'Взрыв · дробящий + огненный',expr:`${diceTerm(n,6)}+${diceTerm(n,6)}`,main:true}];}
   if(k==='молния'){const d=up(5);return [{label:'Центральная цель · молния',expr:diceTerm(8+d,6),main:true},{label:'Вторичная область · молния',expr:diceTerm(2+d,6),secondary:true}];}
   if(k==='дыхание зимы')return [{label:'Первоначальный урон холодом',expr:diceTerm(7+up(5),6),main:true},{label:'Повторный урон холодом',expr:'1к8',repeat:true}];
+  if(k==='разорвать плоть')return [{label:'Рубящий урон',expr:diceTerm(1+effective,10),main:true}];
+  if(k==='каменный вихрь')return [{label:'Начальный дробящий урон',expr:diceTerm(8+up(6),8),main:true},{label:'Урон в конце хода в области',expr:diceTerm(2+up(6),8),repeat:true}];
+  if(k==='огненные цветки')return [{label:'Огненный урон при появлении столба',expr:'8к6',main:true},{label:'Огненный взрыв действием',expr:'8к6',secondary:true}];
+  if(k==='землятресение')return [{label:'Урон сооружению при начале и в начале каждого хода',expr:'50',main:true,repeat:true},{label:'Обломки рухнувшего сооружения',expr:'5к6',secondary:true}];
+  if(k==='огненные стрелы')return [{label:'Огненный урон',expr:diceTerm(12+up(7),8),main:true}];
   return [];
 }
 function firstDiceSides(expr){const m=String(expr||'').match(/\d+к(\d+)/);return m?Number(m[1]):0;}
@@ -1077,6 +1082,17 @@ function keyMatchesRecord(queryKeys, recordKeys){
 }
 function escHtml(v){
   return String(v ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+}
+function renderPactMatrices(c){
+  const pact=c&&c.pact||{}, secret=Array.isArray(pact.secretMatrices)?pact.secretMatrices:[], forbidden=Array.isArray(pact.forbiddenMatrices)?pact.forbiddenMatrices:[];
+  let html='';
+  if(secret.length){
+    html+=`<div class="sec"><div class="sec-h">Тайные матрицы · постоянные улучшения, не Плетения</div><div class="ab-grid">${secret.map(matrix=>`<div class="ab-card"><div class="ab-name">${escHtml(matrix.n||matrix.name)}</div><div class="ab-desc"><b>${escHtml(matrix.group||'Тайная матрица')}</b>${matrix.req?` · ${escHtml(matrix.req)}`:''}<br>${escHtml(String(matrix.d||matrix.description||'').replace(/\*\*/g,'')).replace(/\n/g,'<br>')}</div></div>`).join('')}</div></div>`;
+  }
+  if(forbidden.length){
+    html+=`<div class="sec"><div class="sec-h">Запретные матрицы · отдельно от ячеек Договора</div><div class="ab-grid">${forbidden.map(matrix=>`<div class="ab-card highlight"><div class="ab-name">${escHtml(matrix.n||matrix.name)} · ${escHtml(matrix.lv||matrix.level)}-й уровень</div><div class="ab-desc"><b>${escHtml(matrix.uses||'1/продолжительный отдых')}</b>${matrix.defaultPatron?' · матрица Покровителя':' · замена того же уровня'}<br>${escHtml(String(matrix.d||matrix.description||'').replace(/\*\*/g,'')).replace(/\n/g,'<br>')}</div></div>`).join('')}</div></div>`;
+  }
+  return html;
 }
 function npcClassContexts(c){
   const text = [c.sh, c.ti].concat(c.tags || []).join(' ').toLowerCase();
@@ -1697,7 +1713,7 @@ function showNPC(id) {
   const ph = document.getElementById('placeholder');
   if (ph) ph.style.display = 'none';
 
-  const hasSpells = !!(c.spells || c.slots);
+  const hasSpells = !!(c.spells || c.slots || (c.pact&&((c.pact.secretMatrices||[]).length||(c.pact.forbiddenMatrices||[]).length)));
   const hasForms = !!c.hasForms;
   const hasTalents = !!(c.excTalents && c.excTalents.length);
   const hasSD = c.co.cr && /\d+к8.*Превосх/.test(c.co.cr);
@@ -1896,9 +1912,10 @@ ${hasSpells?renderAngrialSelector(c):''}
     const activeAngrial=getSelectedAngrial(c);
     html += `<div class="tab-content" id="tab_${id}_spells">`;
     if (activeAngrial.id!=='none') html += renderAngrial(activeAngrial);
-    if ((c.talents&&c.talents.length)||(c.affinities&&c.affinities.length)) {
-      html += `<div class="sec"><div class="sec-h">Доступ к Плетениям</div><div class="eq-list">${c.talents&&c.talents.length?`<div class="eq-item"><b>Таланты:</b> ${c.talents.map(escHtml).join(', ')}</div>`:''}${c.affinities&&c.affinities.length?`<div class="eq-item"><b>Аффинитеты:</b> ${c.affinities.map(escHtml).join(', ')}</div>`:''}</div></div>`;
+    if ((c.talents&&c.talents.length)||(c.affinities&&c.affinities.length)||(c.pact&&c.pact.openFormula)) {
+      html += `<div class="sec"><div class="sec-h">Доступ к Плетениям</div><div class="eq-list">${c.talents&&c.talents.length?`<div class="eq-item"><b>Таланты:</b> ${c.talents.map(escHtml).join(', ')}</div>`:''}${c.affinities&&c.affinities.length?`<div class="eq-item"><b>Аффинитеты:</b> ${c.affinities.map(escHtml).join(', ')}</div>`:''}${c.pact&&c.pact.openFormula?`<div class="eq-item"><b>Открытая формула Якоря Книги:</b> ${escHtml(c.pact.openFormula)} · сверх обычного числа известных Плетений</div>`:''}</div></div>`;
     }
+    html += renderPactMatrices(c);
     if (c.slots) {
       html += `<div class="sec"><div class="sec-h">Ячейки плетений (клик = использовать)</div>
 <div class="slots-row">${c.slots.map(sl=>{
