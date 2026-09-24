@@ -773,7 +773,11 @@ function validateNpc(ctx){
   if(ctx.h.type==='shara'&&/Воина/.test(ctx.h.branch||'')&&isChannelingClass(ctx.cls)) out.push({s:'warn',t:'Путь Воина не использует ранговые бонусы к направлению. Классовые плетения сохранены, но Иерархия их не усиливает.'});
   if((hierarchyDb.validationErrors||[]).length) out.push({s:'err',t:'Проверка базы Иерархий: '+hierarchyDb.validationErrors.join(' · ')});
   if(ctx.featsSel.includes('Пламя и пустота')) out.push({s:'ok',t:'Пламя и пустота: модификатор Мудрости добавлен к броску атаки оружием в черновой атаке.'});
-  ctx.featsSel.forEach(fn=>{const f=feats.find(x=>x.name===fn); if(f&&f.req&&f.req!=='—') out.push({s:'warn',t:`Проверьте требование черты «${fn}»: ${f.req}.`});});
+  if(ctx.featsSel.includes('Меткий стрелок')){
+    const ranged=ctx.eq.weapon.type==='ranged';
+    out.push({s:ranged?'ok':'err',t:ranged?`Меткий стрелок: классового ограничения нет; выбрано дальнобойное оружие «${ctx.eq.weapon.name}», БМ владения уже включён в бросок атаки.`:'Меткий стрелок требует владения дальнобойным оружием, но в экипировке выбрано оружие ближнего боя.'});
+  }
+  ctx.featsSel.forEach(fn=>{const f=feats.find(x=>x.name===fn); if(fn!=='Меткий стрелок'&&f&&f.req&&f.req!=='—') out.push({s:'warn',t:`Проверьте требование черты «${fn}»: ${f.req}.`});});
   out.push({s:'ok',t:`Экипировка учтена: ${ctx.eq.weapon.name}; ${ctx.eq.armor.name}; ${ctx.eq.shield.name}.`});
   if(ctx.eq.armor.isArmor===false) out.push({s:'ok',t:'Выбранная тканевая защитная одежда повышает КД, но механически не считается доспехом: не включает Стиль боя «Защита» и не вызывает проверку за создание Плетения в доспехе.'});
   return out;
