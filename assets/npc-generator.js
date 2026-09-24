@@ -176,6 +176,7 @@ const FIGHTING_STYLES = {
 };
 function getFightingStyleOptions(cls,arch,lv){
   lv=Number(lv)||1;
+  if(cls==='Воин' && lv>=1) return FIGHTING_STYLES.master;
   if(/Мастер по оружию/.test(cls) && lv>=1) return FIGHTING_STYLES.master;
   if(/Лесник/.test(cls) && lv>=2) return FIGHTING_STYLES.lesnik;
   if(/Посвящ/.test(cls) && /Аша'?ман/i.test(String(arch||'')) && lv>=3) return FIGHTING_STYLES.ashaman;
@@ -548,7 +549,10 @@ function calcAc(cls,stats,eq,h,style){
   ac+=h.acBonus||0; if(h.acBonus) note+=` + Иерархия ${h.acBonus}`;
   return {ac,note};
 }
-function hasFeat(name,sel){return sel.some(x=>x.toLowerCase()===name.toLowerCase())}
+function hasFeat(name,sel){
+  const wanted=String(name||'').toLowerCase();
+  return sel.some(x=>{const actual=String(x||'').toLowerCase();return actual===wanted||actual.startsWith(wanted+' (');});
+}
 function calcAttack(cls,stats,eq,p,featsSel,h,style,pactAnchor='',lv=1){
   const w=eq.weapon; let stat=w.stat||'str'; if(w.properties&&/Finesse|фехтов/i.test(w.properties)){ stat=mod(stats.dex)>=mod(stats.str)?'dex':'str'; }
   const pactBladeSelected=/Носитель Договора/i.test(cls)&&pactAnchor==='blade'&&Number(lv)>=3;
@@ -575,7 +579,10 @@ function calcAttack(cls,stats,eq,p,featsSel,h,style,pactAnchor='',lv=1){
   if(h.forceDamageDie){extraDamage.push(`${h.forceDamageDie} силового (Иерархия)`);notes.push(`Иерархия: +${h.forceDamageDie} силового урона при подходящей оружейной атаке`);}
   const damage=`${w.damage}${sign(dmgBonus)}${extraDamage.length?' + '+extraDamage.join(' + '):''}`;
   const formula=`Атака: ${attackParts.join(' + ')} = ${sign(attack)}. Урон: ${w.damage} + ${damageParts.join(' + ')} = ${w.damage}${sign(dmgBonus)}${extraDamage.length?'; дополнительно '+extraDamage.join(' + '):''}.`;
-  return {n:w.name,a:sign(attack),d:damage,t:w.type==='ranged'?'Прон.':'Руб./Прон.',r:w.type==='ranged'?'дистанция по оружию':'Ближний',no:[w.properties, ...notes].filter(Boolean).join(' · '),formula,stat,attacks:pactBlade&&Number(lv)>=5?2:1};
+  const martialExtraAttack=/^(Воин|Мастер по оружию)$/.test(cls)
+    ? (Number(lv)>=20?4:Number(lv)>=11?3:Number(lv)>=5?2:1)
+    : 1;
+  return {n:w.name,a:sign(attack),d:damage,t:w.type==='ranged'?'Прон.':'Руб./Прон.',r:w.type==='ranged'?'дистанция по оружию':'Ближний',no:[w.properties, ...notes].filter(Boolean).join(' · '),formula,stat,attacks:pactBlade&&Number(lv)>=5?2:martialExtraAttack};
 }
 
 function findWeavesInput(){
