@@ -17,16 +17,19 @@ function run(file) {
 run('assets/hierarchy-data.js');
 run('assets/hierarchy-wall-data.js');
 run('assets/hierarchy-mechanics.js');
+run('assets/classes-data.js');
+run('assets/pact-matrices-data.js');
 
 let generatorSource = fs.readFileSync(path.join(root, 'assets/npc-generator.js'), 'utf8');
 generatorSource = generatorSource.replace(
   /document\.addEventListener\('DOMContentLoaded',bind\);\r?\n\}\)\(\);\s*$/,
-  "global.__npcHierarchyTest={applyHierarchy,avgHp,rankOrder,hierarchyProfileSummary};\n})();"
+  "global.__npcHierarchyTest={applyHierarchy,avgHp,rankOrder,hierarchyProfileSummary,getChannelingSlots};\n})();"
 );
 vm.runInThisContext(generatorSource, { filename: 'assets/npc-generator.js' });
 
-const { applyHierarchy } = global.__npcHierarchyTest;
+const { applyHierarchy, getChannelingSlots } = global.__npcHierarchyTest;
 const db = window.WOT_HIERARCHY_DB;
+const matrixDb = window.WOT_PACT_MATRICES;
 const blankStats = value => ({ str: value, dex: value, con: value, int: value, wis: value, cha: value });
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 const picks = (ranks, first, second, amount = 2) => Object.fromEntries(ranks.map(rank => [rank, [{ key: first, amount, slot: 0 }, { key: second, amount, slot: 1 }]]));
@@ -34,6 +37,17 @@ const context = extra => Object.assign({ cls: 'Варвар', role: 'Фронт�
 
 assert(db.validationErrors.length === 0, 'Database validation errors: ' + db.validationErrors.join(' · '));
 assert(db.hierarchies.length === 7, 'Expected seven hierarchies.');
+assert(matrixDb.validationErrors.length === 0, 'Pact matrix validation errors: ' + matrixDb.validationErrors.join(' · '));
+assert(matrixDb.secret.length === 40, 'Expected 40 Secret matrices.');
+assert(matrixDb.forbidden.length === 24, 'Expected 24 general Forbidden matrices.');
+assert(matrixDb.restricted.length === 19, 'Expected 19 GM-restricted Forbidden matrices.');
+assert(matrixDb.secret.every(matrix => matrix.description && matrix.requirement), 'Every Secret matrix must have a full description and requirement.');
+assert(matrixDb.forbidden.every(matrix => matrix.description), 'Every Forbidden matrix must have a full description.');
+
+{
+  const slots = getChannelingSlots('Дичок', 13, 'Странник', { extraSlots: 0 }, []);
+  assert(JSON.stringify(slots) === JSON.stringify([{lv:'1',n:5},{lv:'2',n:4},{lv:'3',n:4},{lv:'4',n:3},{lv:'5',n:3},{lv:'6',n:2},{lv:'7',n:1}]), 'Wilder level-13 weave slots are incorrect.');
+}
 
 {
   const stats = blankStats(10);
@@ -71,4 +85,31 @@ assert(db.hierarchies.length === 7, 'Expected seven hierarchies.');
   assert(warrior.attackBonus === 3 && warrior.forceDamageDie === '1к8', 'Shara warrior branch profile is incorrect.');
 }
 
-console.log(`OK: ${db.hierarchies.length} hierarchies, ${db.hierarchies.reduce((sum, h) => sum + h.ranks.length, 0)} ranks, ${db.hierarchies.reduce((sum, h) => sum + h.abilities.length, 0)} abilities; NPC special profiles passed.`);
+run('assets/npc-data.js');
+{
+  const expectedAttackCounts = { 43: 4, 44: 3, 45: 3, 46: 1, 47: 2, 48: 1 };
+  Object.entries(expectedAttackCounts).forEach(([id, count]) => {
+    const npc = window.NPC_DATA.find(entry => Number(entry.id) === Number(id));
+    assert(npc, `NPC ${id} is missing.`);
+    assert(npc.at.length === count, `NPC ${id} must render ${count} weapon attacks in a full ordinary turn; found ${npc.at.length}.`);
+  });
+  const blade = window.NPC_DATA.find(entry => Number(entry.id) === 45);
+  const book = window.NPC_DATA.find(entry => Number(entry.id) === 46);
+  const wilder = window.NPC_DATA.find(entry => Number(entry.id) === 48);
+  assert(blade.pact.secretMatrices.length === 4 && blade.pact.forbiddenMatrices.length === 2, 'Blade Pact NPC matrix selection is incomplete.');
+  assert(book.pact.secretMatrices.length === 4 && book.pact.forbiddenMatrices.length === 2, 'Book Pact NPC matrix selection is incomplete.');
+  assert(book.pact.openFormula === 'Прикосновение Смерти', 'Book Pact NPC Open Formula is incorrect.');
+  assert([blade, book].every(npc => !(npc.spells || []).some(spell => /Плетение не найдено в базе/i.test(String(spell.ef || '')))), 'Pact matrices leaked into the normal weave list.');
+  assert(JSON.stringify(wilder.slots) === JSON.stringify([{lv:'1',n:5},{lv:'2',n:4},{lv:'3',n:4},{lv:'4',n:3},{lv:'5',n:3},{lv:'6',n:2},{lv:'7',n:1}]), 'Wilder NPC slots are missing or incorrect.');
+  assert([blade, book].every(npc => JSON.stringify(npc.slots) === JSON.stringify([{lv:'5',n:3},{lv:'Запр. 6',n:1},{lv:'Запр. 7',n:1}])), 'Pact NPC slot resources are missing or incorrect.');
+  assert([43,44,45,46,47,48].every(id => window.NPC_DATA.find(entry => entry.id === id).tactics.length === 5), 'Every new NPC must have five standalone tactics phases.');
+}
+
+{
+  const dmSource = fs.readFileSync(path.join(root, 'assets/dm-npc.js'), 'utf8');
+  ['разорвать плоть','каменный вихрь','огненные цветки','землятресение','огненные стрелы'].forEach(name => {
+    assert(dmSource.includes(`k==='${name}'`), `Missing calculated damage rule for «${name}».`);
+  });
+}
+
+console.log(`OK: ${db.hierarchies.length} hierarchies, ${db.hierarchies.reduce((sum, h) => sum + h.ranks.length, 0)} ranks, ${db.hierarchies.reduce((sum, h) => sum + h.abilities.length, 0)} abilities; ${matrixDb.secret.length + matrixDb.forbidden.length + matrixDb.restricted.length} Pact matrix records; six level-13 NPC combat profiles passed.`);

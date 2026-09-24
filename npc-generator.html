@@ -49,6 +49,21 @@
           </select>
           <p class="hint">Якорь выбирается на 3-м уровне и не меняется при повышении уровня. Генератор добавит только способности выбранной ветки.</p>
         </div>
+        <div class="field" id="pact-secret-field" hidden>
+          <label>Тайные матрицы</label>
+          <div class="checks" id="pact-secret-list"></div>
+          <p class="hint" id="pact-secret-limit-hint"></p>
+        </div>
+        <div class="field" id="pact-forbidden-field" hidden>
+          <label>Запретные матрицы</label>
+          <div id="pact-forbidden-list"></div>
+          <p class="hint">Каждая выбранная Запретная матрица применяется один раз за продолжительный отдых и не расходует ячейку Договора.</p>
+          <details>
+            <summary>Ограниченный каталог Мастера</summary>
+            <div id="pact-restricted-list"></div>
+            <p class="hint">Эти матрицы перечислены в базе для справки, но не выдаются генератором автоматически: у них нет единого полного игрового блока и требуется сюжетное открытие либо особый допуск Мастера.</p>
+          </details>
+        </div>
         <p class="hint" id="pact-focus-note"></p>
       </div>
       <div class="field" id="fighting-style-field" style="display:none">
@@ -153,6 +168,7 @@
 </div>
 <div id="feature-modal" class="feature-modal" style="display:none"></div>
 <script src="assets/classes-data.js?v=160"></script>
+<script src="assets/pact-matrices-data.js?v=167"></script>
 <script src="assets/classes-nositel-dogovora.js?v=157"></script>
 <script src="assets/feats-data.js?v=159"></script>
 <script src="assets/weaves-data.js?v=157"></script>
@@ -160,8 +176,8 @@
 <script src="assets/hierarchy-data.js?v=153"></script>
 <script src="assets/hierarchy-wall-data.js?v=153"></script>
 <script src="assets/hierarchy-mechanics.js?v=154"></script>
-<script src="assets/npc-data.js?v=138"></script>
-<script src="assets/npc-generator.js?v=166"></script>
+<script src="assets/npc-data.js?v=140"></script>
+<script src="assets/npc-generator.js?v=168"></script>
 <script src="assets/shared.js?v=157"></script>
 </body>
 </html>
