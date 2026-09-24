@@ -19,6 +19,7 @@ run('assets/hierarchy-wall-data.js');
 run('assets/hierarchy-mechanics.js');
 run('assets/classes-data.js');
 run('assets/pact-matrices-data.js');
+run('assets/feats-data.js');
 
 let generatorSource = fs.readFileSync(path.join(root, 'assets/npc-generator.js'), 'utf8');
 generatorSource = generatorSource.replace(
@@ -30,6 +31,7 @@ vm.runInThisContext(generatorSource, { filename: 'assets/npc-generator.js' });
 const { applyHierarchy, getChannelingSlots } = global.__npcHierarchyTest;
 const db = window.WOT_HIERARCHY_DB;
 const matrixDb = window.WOT_PACT_MATRICES;
+const featsDb = window.WOT_FEATS_DB;
 const blankStats = value => ({ str: value, dex: value, con: value, int: value, wis: value, cha: value });
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 const picks = (ranks, first, second, amount = 2) => Object.fromEntries(ranks.map(rank => [rank, [{ key: first, amount, slot: 0 }, { key: second, amount, slot: 1 }]]));
@@ -43,6 +45,9 @@ assert(matrixDb.forbidden.length === 24, 'Expected 24 general Forbidden matrices
 assert(matrixDb.restricted.length === 19, 'Expected 19 GM-restricted Forbidden matrices.');
 assert(matrixDb.secret.every(matrix => matrix.description && matrix.requirement), 'Every Secret matrix must have a full description and requirement.');
 assert(matrixDb.forbidden.every(matrix => matrix.description), 'Every Forbidden matrix must have a full description.');
+const sharpshooter = featsDb.feats.find(feat => feat.name === 'Меткий стрелок');
+assert(sharpshooter && sharpshooter.cls === '—', 'Sharpshooter must not have a class restriction.');
+assert(sharpshooter.req === 'Владение дальнобойным оружием', 'Sharpshooter must require ranged-weapon proficiency.');
 
 {
   const slots = getChannelingSlots('Дичок', 13, 'Странник', { extraSlots: 0 }, []);
