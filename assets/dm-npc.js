@@ -243,9 +243,13 @@ function getState(id) {
   st.conditions = Array.isArray(st.conditions) ? st.conditions : [];
   st.slots = st.slots && typeof st.slots === 'object' ? st.slots : {};
   if (c && Array.isArray(c.slots)) c.slots.forEach(sl => {
-    if (!st.slots[sl.lv]) st.slots[sl.lv] = {total: Number(sl.n)||0, used: 0};
-    if (!Number.isFinite(Number(st.slots[sl.lv].total))) st.slots[sl.lv].total = Number(sl.n)||0;
+    const canonicalTotal = Number(sl.n) || 0;
+    if (!st.slots[sl.lv]) st.slots[sl.lv] = {total: canonicalTotal, used: 0};
+    // Количество ресурсов задаётся карточкой NPC. Старое состояние браузера
+    // хранит только расход и не должно навсегда фиксировать прежний максимум.
+    st.slots[sl.lv].total = canonicalTotal;
     if (!Number.isFinite(Number(st.slots[sl.lv].used))) st.slots[sl.lv].used = 0;
+    st.slots[sl.lv].used = Math.max(0, Math.min(canonicalTotal, Number(st.slots[sl.lv].used) || 0));
   });
   st.sdUsed = Number.isFinite(Number(st.sdUsed)) ? Number(st.sdUsed) : 0;
   if (!Number.isFinite(Number(st.sdTotal))) {
@@ -301,8 +305,8 @@ function rollAttack(atkBonus, label) {
 function rollDamage(dmgExpr, label, isCrit) {
   const cleanExpr = normalizeDamageExpr(dmgExpr);
   const parts = (cleanExpr.match(/\d+к\d+/g) || []);
-  const bonusM = cleanExpr.match(/\+(\d+)(?!к)/g) || [];
-  const bonus = bonusM.reduce((s,b) => s + parseInt(b.replace('+','')), 0);
+  const bonusM = cleanExpr.match(/[+\-]\s*\d+(?!\d)(?!\s*к)/g) || [];
+  const bonus = bonusM.reduce((s,b) => s + parseInt(b.replace(/\s+/g,''), 10), 0);
   let allResults = [], sum = 0;
   parts.forEach((p, pi) => {
     const pm = p.match(/(\d+)к(\d+)/);
@@ -729,12 +733,17 @@ function refreshSlotsPanel(id) {
     const st = s.slots[slot.lv];
     if (!st) return;
     const container = document.getElementById('slot-pips-'+id+'-'+slot.lv);
-    if (!container) return;
     const cnt = document.getElementById('slot-cnt-'+id+'-'+slot.lv);
     if (cnt) cnt.textContent = (st.total-st.used)+'/'+st.total;
-    container.innerHTML = Array.from({length:st.total},(_,i)=>
-      `<div class="slot-pip${i<st.used?' used':''}" onclick="useSlot(${id},'${slot.lv}')"></div>`
-    ).join('');
+    if (container) {
+      container.innerHTML = Array.from({length:st.total},(_,i)=>
+        `<div class="slot-pip${i<st.used?' used':''}" onclick="useSlot(${id},'${slot.lv}')"></div>`
+      ).join('');
+    }
+    const spellCnt = document.getElementById('slot-cnt-sp-'+id+'-'+slot.lv);
+    if (spellCnt) spellCnt.textContent = (st.total-st.used)+'/'+st.total;
+    const spellBox = document.getElementById('slot-box-sp-'+id+'-'+slot.lv);
+    if (spellBox) spellBox.classList.toggle('used', st.used >= st.total);
   });
 }
 
@@ -1588,7 +1597,44 @@ function canUseStealthQuickRoll(c){
 function getSneakAttackExpr(c){
   const sources = [c && c.co && c.co.cr, ...((c && c.ab) || []).flatMap(a => [a.n, a.d])].filter(Boolean).join(' · ');
   const m = sources.match(/(?:СА|Скрытн(?:ая|ая)? атака|Скрытая атака)\s*(\d+к\d+)/i) || sources.match(/(\d+к\d+)\s*(?:СА|скрытн|скрыт)/i);
-  return m ? m[1] : null;
+  if (m) return m[1];
+  const hasSneakAttack = (c && c.ab || []).some(a => /Скрытая атака/i.test(String(a.n || '')));
+  const levelTag = (c && c.tags || []).map(String).find(t => /Ур\.\s*\d+/i.test(t));
+  const levelMatch = String(levelTag || '').match(/(\d+)/);
+  if (hasSneakAttack && levelMatch) return Math.ceil(Number(levelMatch[1]) / 2) + 'к6';
+  return null;
+}
+
+function addFlatDamageBonus(expr, extra){
+  const raw = String(expr || '').trim();
+  const firstFlat = raw.match(/^(\s*\d+к\d+)\s*([+\-])\s*(\d+)([\s\S]*)$/i);
+  if (firstFlat) {
+    const current = Number(firstFlat[3]) * (firstFlat[2] === '-' ? -1 : 1);
+    const total = current + Number(extra || 0);
+    return `${firstFlat[1]}${total >= 0 ? '+' : ''}${total}${firstFlat[4]}`;
+  }
+  return `${raw}${Number(extra) >= 0 ? '+' : ''}${Number(extra) || 0}`;
+}
+function attackPowerOption(atk, bonus){
+  const rules = `${atk && atk.no || ''} ${atk && atk.formula || ''}`;
+  if (/Меткий стрелок/i.test(rules)) return {name:'Меткий стрелок', bonus:bonus-5, damage:addFlatDamageBonus(atk.d,10)};
+  if (/Мастер большого оружия/i.test(rules) && /тяж[её]л/i.test(rules)) return {name:'Мастер большого оружия', bonus:bonus-5, damage:addFlatDamageBonus(atk.d,10)};
+  return null;
+}
+function attackSupportsSneakAttack(atk){
+  const rules = `${atk && atk.r || ''} ${atk && atk.no || ''}`;
+  return !/^ближн/i.test(String(atk && atk.r || '')) || /finesse|фехтовальн|ловкость/i.test(rules);
+}
+function combineDamageExpr(base, extra){
+  return [String(base || '').trim(), String(extra || '').trim()].filter(Boolean).join(' + ');
+}
+function pactResourceSummary(c){
+  if (!c || !Array.isArray(c.slots) || !/Носитель Договора/i.test(`${c.ti || ''} ${(c.tags || []).join(' ')}`)) return '';
+  const ordinary = c.slots.filter(sl => !/^Запр\./i.test(String(sl.lv || '')));
+  const forbidden = c.slots.filter(sl => /^Запр\./i.test(String(sl.lv || '')));
+  const ordinaryText = ordinary.map(sl => `${sl.n} яч. ${sl.lv}-го ур.`).join(', ') || 'нет';
+  const forbiddenText = forbidden.map(sl => `${String(sl.lv).replace(/^Запр\.\s*/i,'')}-й ур. ×${sl.n}`).join(', ') || 'нет';
+  return `Ячейки Договора: ${ordinaryText}; Запретные матрицы: ${forbiddenText}. Обычные ячейки восстанавливаются после короткого или продолжительного отдыха, матрицы — только после продолжительного.`;
 }
 
 
@@ -1813,6 +1859,12 @@ ${renderCombatDashboard(id, c, s)}
     const dmgSafe = String(atk.d || '—').replace(/'/g,"\\'");
     const nameSafe = String(atk.n || 'Атака').replace(/'/g,"\\'");
     const canCrit = /^[+\-]\d+/.test(String(atk.a || ''));
+    const power = attackPowerOption(atk, bonus);
+    const powerNameSafe = power ? `${power.name} · ${atk.n || 'Атака'}`.replace(/'/g,"\\'") : '';
+    const powerDmgSafe = power ? String(power.damage).replace(/'/g,"\\'") : '';
+    const sneakDamage = saExpr && attackSupportsSneakAttack(atk) ? combineDamageExpr(atk.baseDamage || atk.d, saExpr) : '';
+    const sneakNameSafe = sneakDamage ? `Скрытая атака · ${atk.n || 'Атака'}`.replace(/'/g,"\\'") : '';
+    const sneakDmgSafe = sneakDamage.replace(/'/g,"\\'");
     html += `<div class="atk-card" id="atk-card-${id}-${ai}">
 <div class="atk-card-header">
   <span class="atk-name">${atk.n||'Атака'}</span>
@@ -1824,15 +1876,36 @@ ${renderCombatDashboard(id, c, s)}
   <button class="atk-dmg-btn" onclick="rollDmgInline(${id},${ai},'${dmgSafe}','${nameSafe}',false)">🎲 ${atk.d||'—'}</button>
   ${canCrit ? `<button class="atk-crit-btn" onclick="rollDmgInline(${id},${ai},'${dmgSafe}','${nameSafe}',true)">💥</button>` : ''}
 </div>
+${power ? `<div class="atk-option-row power"><span class="atk-option-name">${escHtml(power.name)} · −5/+10</span><button class="atk-roll-btn" onclick="rollAtkInline(${id},${ai},${power.bonus},'${powerNameSafe}','${powerDmgSafe}',false)">⚔ ${power.bonus>=0?'+':''}${power.bonus}</button><button class="atk-dmg-btn" onclick="rollDmgInline(${id},${ai},'${powerDmgSafe}','${powerNameSafe}',false)">🎲 ${escHtml(power.damage)}</button></div>` : ''}
+${sneakDamage ? `<div class="atk-option-row sneak"><span class="atk-option-name">Скрытая атака · 1/ход</span><button class="atk-roll-btn" onclick="rollAtkInline(${id},${ai},${bonus},'${sneakNameSafe}','${sneakDmgSafe}',true)">⚔ ${atk.a}</button><button class="atk-dmg-btn" onclick="rollDmgInline(${id},${ai},'${sneakDmgSafe}','${sneakNameSafe}',false,true)">🎲 ${escHtml(sneakDamage)}</button></div>` : ''}
 <div class="atk-inline-result" id="atk-res-${id}-${ai}"></div>
 <div class="atk-note">${atk.no||''}</div>
 </div>`;
   });
   html += `</div></div>`;
 
+  // Repeatable combat cantrips: no slot expenditure, one normal casting action each.
+  const battleCantrips = (c.spells || []).map(sp=>resolveNpcSpell(c,sp)).filter(sp=>Number(sp.lv)===0);
+  if (battleCantrips.length) {
+    html += `<div class="sec battle-cantrips"><div class="sec-h">Кантрипы · без ячеек <span class="sec-h-note">обычно 1 кантрип за действие</span></div><div class="battle-grid">`;
+    battleCantrips.forEach(sp => {
+      const attackMatch = String(sp.sb || '').match(/атака\s*([+\-]\d+)/i);
+      const spellNameSafe = String(sp.n || 'Кантрип').replace(/'/g,"\\'");
+      html += `<div class="cantrip-card">
+        <div class="atk-card-header"><span class="atk-name">${escHtml(sp.n)}</span><span class="cantrip-repeat">∞</span><span class="atk-type">${escHtml(sp.tal || 'б/т')}</span><span class="atk-range">${escHtml(sp.r || '—')}</span></div>
+        <div class="cantrip-check-row">${attackMatch ? `<button class="atk-roll-btn" onclick="rollCantripAttack(${id},${Number(attackMatch[1])},'${spellNameSafe}')">⚔ ${attackMatch[1]}</button>` : `<span class="cantrip-save">${escHtml(sp.sb || 'без броска')}</span>`}<span class="cantrip-action">${escHtml(sp.t || '1 действие')} · ячейка 0</span></div>
+        <div class="cantrip-damage">${renderSpellDamage(sp)}</div>
+        <div class="atk-note">${escHtml(clipNpcText(sp.ef || '', 230))}</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
   // Slots (clickable)
   if (c.slots) {
-    html += `<div class="sec"><div class="sec-h">Ячейки плетений</div>
+    const pactSummary = pactResourceSummary(c);
+    html += `<div class="sec"><div class="sec-h">${pactSummary ? 'Ресурсы Договора' : 'Ячейки плетений'}</div>
+${pactSummary ? `<div class="slot-rules-note">${escHtml(pactSummary)}</div>` : ''}
 <div class="slots-block">
 <div class="slots-row">`;
     c.slots.forEach(slot => {
@@ -1917,10 +1990,12 @@ ${hasSpells?renderAngrialSelector(c):''}
     }
     html += renderPactMatrices(c);
     if (c.slots) {
-      html += `<div class="sec"><div class="sec-h">Ячейки плетений (клик = использовать)</div>
+      const pactSummary = pactResourceSummary(c);
+      html += `<div class="sec"><div class="sec-h">${pactSummary ? 'Ресурсы Договора' : 'Ячейки плетений'} (клик = использовать)</div>
+${pactSummary ? `<div class="slot-rules-note">${escHtml(pactSummary)}</div>` : ''}
 <div class="slots-row">${c.slots.map(sl=>{
   const st=s.slots[sl.lv]||{total:sl.n,used:0};
-  return `<div class="slot-box2${st.used>=st.total?' used':''}" onclick="useSlot(${id},'${sl.lv}')">
+  return `<div class="slot-box2${st.used>=st.total?' used':''}" id="slot-box-sp-${id}-${sl.lv}" onclick="useSlot(${id},'${sl.lv}')">
 <div class="slot-lv2">${sl.lv}</div><div class="slot-cnt2" id="slot-cnt-sp-${id}-${sl.lv}">${st.total-st.used}/${st.total}</div></div>`;
 }).join('')}</div></div>`;
     }
@@ -1958,7 +2033,7 @@ ${resolvedSpells.map((sp,spi)=>`<tr>
 
 
 // ── Inline attack rolling ────────────────────────────────────────────────
-function rollAtkInline(npcId, atkIdx, bonus, name, dmgExpr, saOn) {
+function rollAtkInline(npcId, atkIdx, bonus, name, dmgExpr, critAllDice) {
   const d20 = Math.floor(Math.random()*20)+1;
   const total = d20 + bonus;
   const isCrit = d20 === 20, isFumble = d20 === 1;
@@ -1967,7 +2042,7 @@ function rollAtkInline(npcId, atkIdx, bonus, name, dmgExpr, saOn) {
   let html = '';
   if (isCrit) {
     html = `<span class="r-label">d20 </span><span class="r-d20 r-crit">20 КРИ!</span> — `;
-    html += `<button class="atk-crit-btn" style="font-size:11px;padding:2px 6px" onclick="rollDmgInline(${npcId},${atkIdx},'${dmgExpr}','${name}',true)">💥 Крит урон</button>`;
+    html += `<button class="atk-crit-btn" style="font-size:11px;padding:2px 6px" onclick="rollDmgInline(${npcId},${atkIdx},'${dmgExpr}','${name}',true,${critAllDice?'true':'false'})">💥 Крит урон</button>`;
   } else if (isFumble) {
     html = `<span class="r-d20 r-miss">ПРОВАЛ (1)</span>`;
   } else {
@@ -1981,20 +2056,20 @@ function rollAtkInline(npcId, atkIdx, bonus, name, dmgExpr, saOn) {
   addToAtkLog(npcId, isCrit?`💥 ${name}: КРИ!`:isFumble?`✗ ${name}: ПРОВАЛ`:`⚔ ${name}: ${total} (d20[${d20}]+${bonus})`);
 }
 
-function rollDmgInline(npcId, atkIdx, dmgExpr, name, isCrit) {
+function rollDmgInline(npcId, atkIdx, dmgExpr, name, isCrit, critAllDice) {
   const cleanExpr = normalizeDamageExpr(dmgExpr);
   // Parse dice groups (e.g. "1к8", "3к6")
   const parts = (cleanExpr.match(/\d+к\d+/g) || []);
   // Parse flat bonus: +N where N is NOT followed by к (so "+4" yes, "+4к6" no)
-  const bonusM = cleanExpr.match(/\+(\d+)(?!к)/g) || [];
-  const bonus = bonusM.reduce((s,b) => s + parseInt(b.replace('+','')), 0);
+  const bonusM = cleanExpr.match(/[+\-]\s*\d+(?!\d)(?!\s*к)/g) || [];
+  const bonus = bonusM.reduce((s,b) => s + parseInt(b.replace(/\s+/g,''), 10), 0);
 
   let allResults = [], sum = 0;
   parts.forEach((p, pi) => {
     const pm = p.match(/(\d+)к(\d+)/);
-    // Only double the FIRST dice group on crit (base weapon/spell die)
-    // Bonus dice like angrial (+Nк) stay single — they are enhancement, not weapon die
-    const n = parseInt(pm[1]) * (isCrit && pi === 0 ? 2 : 1);
+    // Обычный крит удваивает базовый куб оружия. Для Скрытой атаки
+    // удваиваются также её дополнительные кубики.
+    const n = parseInt(pm[1]) * (isCrit && (critAllDice || pi === 0) ? 2 : 1);
     const s = parseInt(pm[2]);
     for (let i=0;i<n;i++) { const r=Math.floor(Math.random()*s)+1; allResults.push(r); sum+=r; }
   });
@@ -2003,9 +2078,10 @@ function rollDmgInline(npcId, atkIdx, dmgExpr, name, isCrit) {
   const el = document.getElementById('atk-res-'+npcId+'-'+atkIdx);
   if (!el) return;
   const prefix = isCrit ? '💥 КРИТ ' : '🎲 ';
-  el.innerHTML = `<span class="r-label">${prefix}[${allResults.join('+')}]${bonus?'+'+bonus:''} = </span><span class="r-dmg">${sum}</span>`;
+  const bonusText = bonus ? (bonus>0?'+':'')+bonus : '';
+  el.innerHTML = `<span class="r-label">${prefix}[${allResults.join('+')}]${bonusText} = </span><span class="r-dmg">${sum}</span>`;
   el.className = 'atk-inline-result show';
-  addToAtkLog(npcId, `${isCrit?'💥':'🎲'} ${name}: ${sum} ур. [${allResults.join('+')}${bonus?'+'+bonus:''}]`);
+  addToAtkLog(npcId, `${isCrit?'💥':'🎲'} ${name}: ${sum} ур. [${allResults.join('+')}${bonusText}]`);
 }
 
 function addToAtkLog(npcId, text) {
@@ -2021,8 +2097,8 @@ function addToAtkLog(npcId, text) {
 function rollDiceExpressionRaw(expr){
   const cleanExpr = normalizeDamageExpr(expr);
   const parts = (cleanExpr.match(/\d+к\d+/g) || []);
-  const bonusM = cleanExpr.match(/\+(\d+)(?!к)/g) || [];
-  const bonus = bonusM.reduce((sum,b)=>sum+parseInt(b.replace('+',''),10),0);
+  const bonusM = cleanExpr.match(/[+\-]\s*\d+(?!\d)(?!\s*к)/g) || [];
+  const bonus = bonusM.reduce((sum,b)=>sum+parseInt(b.replace(/\s+/g,''),10),0);
   let rolls = [], total = bonus;
   parts.forEach(p => {
     const m = p.match(/(\d+)к(\d+)/);
@@ -2040,6 +2116,11 @@ function rollSkillInline(npcId, name, bonus){
   const d20 = Math.floor(Math.random()*20)+1;
   const total = d20 + bonus;
   addToAtkLog(npcId, `🕶 ${name}: ${total} (d20[${d20}]${bonus>=0?'+':''}${bonus})`);
+}
+function rollCantripAttack(npcId, bonus, name){
+  const d20 = Math.floor(Math.random()*20)+1;
+  const total = d20 + bonus;
+  addToAtkLog(npcId, d20===20?`💥 ${name}: КРИ!`:d20===1?`✗ ${name}: ПРОВАЛ`:`🌀 ${name}: ${total} (d20[${d20}]${bonus>=0?'+':''}${bonus})`);
 }
 
 function rollAllAtk(npcId) {
@@ -2062,6 +2143,13 @@ function shortRest(id) {
   const conMod = Math.floor((c.st.con-10)/2);
   const healed = Math.floor(Math.random()*hd)+1+conMod;
   s.curHp = Math.min(c.co.hp, s.curHp + healed);
+  // Ячейки Договора восстанавливаются после короткого отдыха. Запретные
+  // матрицы являются отдельными применениями и ждут продолжительного отдыха.
+  if (/Носитель Договора/i.test(`${c.ti || ''} ${(c.tags || []).join(' ')}`) && c.slots) {
+    c.slots.filter(sl=>!/^Запр\./i.test(String(sl.lv || ''))).forEach(sl=>{
+      if (s.slots[sl.lv]) s.slots[sl.lv].used = 0;
+    });
+  }
   savePersistedState();
   refreshCombatPanel(id);
   refreshSidebarHP(id);
