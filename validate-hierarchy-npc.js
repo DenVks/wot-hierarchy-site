@@ -48,6 +48,9 @@ assert(matrixDb.forbidden.every(matrix => matrix.description), 'Every Forbidden 
 const sharpshooter = featsDb.feats.find(feat => feat.name === 'Меткий стрелок');
 assert(sharpshooter && sharpshooter.cls === '—', 'Sharpshooter must not have a class restriction.');
 assert(sharpshooter.req === 'Владение дальнобойным оружием', 'Sharpshooter must require ranged-weapon proficiency.');
+const pactLevel13 = window.WOT_CLASSES_DB.progression.find(row => row.className === 'Носитель Договора' && row.level === 13);
+assert(pactLevel13 && pactLevel13.pactSlots === 3 && pactLevel13.slotLevel === 5, 'Pact Bearer level 13 must have three ordinary 5th-level Pact slots.');
+assert(pactLevel13.forbiddenMatrix === '7-й уровень', 'Pact Bearer level 13 must gain the separate 7th-level Forbidden Matrix resource.');
 
 {
   const slots = getChannelingSlots('Дичок', 13, 'Странник', { extraSlots: 0 }, []);
@@ -100,6 +103,9 @@ run('assets/npc-data.js');
   });
   const blade = window.NPC_DATA.find(entry => Number(entry.id) === 45);
   const book = window.NPC_DATA.find(entry => Number(entry.id) === 46);
+  const guard = window.NPC_DATA.find(entry => Number(entry.id) === 43);
+  const archer = window.NPC_DATA.find(entry => Number(entry.id) === 44);
+  const rogue = window.NPC_DATA.find(entry => Number(entry.id) === 47);
   const wilder = window.NPC_DATA.find(entry => Number(entry.id) === 48);
   assert(blade.pact.secretMatrices.length === 4 && blade.pact.forbiddenMatrices.length === 2, 'Blade Pact NPC matrix selection is incomplete.');
   assert(book.pact.secretMatrices.length === 4 && book.pact.forbiddenMatrices.length === 2, 'Book Pact NPC matrix selection is incomplete.');
@@ -107,6 +113,11 @@ run('assets/npc-data.js');
   assert([blade, book].every(npc => !(npc.spells || []).some(spell => /Плетение не найдено в базе/i.test(String(spell.ef || '')))), 'Pact matrices leaked into the normal weave list.');
   assert(JSON.stringify(wilder.slots) === JSON.stringify([{lv:'1',n:5},{lv:'2',n:4},{lv:'3',n:4},{lv:'4',n:3},{lv:'5',n:3},{lv:'6',n:2},{lv:'7',n:1}]), 'Wilder NPC slots are missing or incorrect.');
   assert([blade, book].every(npc => JSON.stringify(npc.slots) === JSON.stringify([{lv:'5',n:3},{lv:'Запр. 6',n:1},{lv:'Запр. 7',n:1}])), 'Pact NPC slot resources are missing or incorrect.');
+  assert(guard.at.every(atk => /Мастер большого оружия/i.test(atk.no) && /тяж[её]л/i.test(atk.no)), 'Guardian attacks must expose the Great Weapon Master mode.');
+  assert(archer.at.every(atk => /Меткий стрелок/i.test(atk.no)), 'Archer attacks must expose the Sharpshooter mode.');
+  assert(rogue.ab.some(feature => /Скрытая атака/i.test(feature.n)), 'Rogue must expose Sneak Attack for the combined attack-and-damage roll.');
+  assert(wilder.spells.filter(spell => Number(spell.lv) === 0).length === 4, 'Wilder must have four repeatable cantrip actions.');
+  assert(wilder.spells.some(spell => Number(spell.lv) === 0 && /Разорвать плоть/i.test(spell.n)), 'Wilder combat cantrips must include Rend Flesh.');
   assert([43,44,45,46,47,48].every(id => window.NPC_DATA.find(entry => entry.id === id).tactics.length === 5), 'Every new NPC must have five standalone tactics phases.');
 }
 
@@ -115,6 +126,11 @@ run('assets/npc-data.js');
   ['разорвать плоть','каменный вихрь','огненные цветки','землятресение','огненные стрелы'].forEach(name => {
     assert(dmSource.includes(`k==='${name}'`), `Missing calculated damage rule for «${name}».`);
   });
+  assert(dmSource.includes('atk-option-row power') && dmSource.includes('atk-option-row sneak'), 'Battle cards must render power-attack and Sneak Attack roll modes.');
+  assert(dmSource.includes('battleCantrips') && dmSource.includes('Кантрипы · без ячеек'), 'Battle tab must render repeatable cantrip actions.');
+  assert(dmSource.includes("slot-cnt-sp-") && dmSource.includes("slot-box-sp-"), 'Weaves-tab resource clicks must refresh their own counter and used state.');
+  assert(dmSource.includes("filter(sl=>!/^Запр\\./i"), 'A short rest must restore ordinary Pact slots without restoring Forbidden Matrices.');
+  assert(dmSource.includes("/[+\\-]\\s*\\d+(?!\\d)(?!\\s*к)/g"), 'Weapon damage rolls must support signed flat modifiers such as the Wilder\'s 1к4-1.');
 }
 
 console.log(`OK: ${db.hierarchies.length} hierarchies, ${db.hierarchies.reduce((sum, h) => sum + h.ranks.length, 0)} ranks, ${db.hierarchies.reduce((sum, h) => sum + h.abilities.length, 0)} abilities; ${matrixDb.secret.length + matrixDb.forbidden.length + matrixDb.restricted.length} Pact matrix records; six level-13 NPC combat profiles passed.`);
