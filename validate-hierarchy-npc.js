@@ -20,7 +20,7 @@ run('assets/hierarchy-mechanics.js');
 
 let generatorSource = fs.readFileSync(path.join(root, 'assets/npc-generator.js'), 'utf8');
 generatorSource = generatorSource.replace(
-  "document.addEventListener('DOMContentLoaded',bind);\n})();",
+  /document\.addEventListener\('DOMContentLoaded',bind\);\r?\n\}\)\(\);\s*$/,
   "global.__npcHierarchyTest={applyHierarchy,avgHp,rankOrder,hierarchyProfileSummary};\n})();"
 );
 vm.runInThisContext(generatorSource, { filename: 'assets/npc-generator.js' });
