@@ -118,11 +118,15 @@ run('assets/npc-data.js');
   assert(rogue.ab.some(feature => /Скрытая атака/i.test(feature.n)), 'Rogue must expose Sneak Attack for the combined attack-and-damage roll.');
   assert(wilder.spells.filter(spell => Number(spell.lv) === 0).length === 4, 'Wilder must have four repeatable cantrip actions.');
   assert(wilder.spells.some(spell => Number(spell.lv) === 0 && /Разорвать плоть/i.test(spell.n)), 'Wilder combat cantrips must include Rend Flesh.');
+  assert(JSON.stringify(wilder.affinities) === JSON.stringify(['Земля','Огонь']), 'Wilder affinities must remain Earth and Fire.');
+  assert(/Страж проходов/.test(guard.su) && !/контрол[её]р/i.test(guard.su), 'Guardian role subtitle must explain the battlefield-control role without unexplained jargon.');
   assert([43,44,45,46,47,48].every(id => window.NPC_DATA.find(entry => entry.id === id).tactics.length === 5), 'Every new NPC must have five standalone tactics phases.');
 }
 
 {
   const dmSource = fs.readFileSync(path.join(root, 'assets/dm-npc.js'), 'utf8');
+  const dmHtml = fs.readFileSync(path.join(root, 'dm-npc.html'), 'utf8');
+  const miscSource = fs.readFileSync(path.join(root, 'assets/npc-misc-items.js'), 'utf8');
   ['разорвать плоть','каменный вихрь','огненные цветки','землятресение','огненные стрелы'].forEach(name => {
     assert(dmSource.includes(`k==='${name}'`), `Missing calculated damage rule for «${name}».`);
   });
@@ -131,6 +135,12 @@ run('assets/npc-data.js');
   assert(dmSource.includes("slot-cnt-sp-") && dmSource.includes("slot-box-sp-"), 'Weaves-tab resource clicks must refresh their own counter and used state.');
   assert(dmSource.includes("filter(sl=>!/^Запр\\./i"), 'A short rest must restore ordinary Pact slots without restoring Forbidden Matrices.');
   assert(dmSource.includes("/[+\\-]\\s*\\d+(?!\\d)(?!\\s*к)/g"), 'Weapon damage rolls must support signed flat modifiers such as the Wilder\'s 1к4-1.');
+  assert(dmSource.includes('function renderWeaponSelector') && dmSource.includes('function getDisplayAttacks'), 'Equipment tab must expose a weapon selector that updates combat attacks.');
+  assert(dmSource.includes('magicBonus') && dmSource.includes('Магическое оружие'), 'Weapon override must account for the magic bonus in attacks and damage.');
+  assert(dmSource.includes('function renderMiscEquipmentSelector') && miscSource.includes('window.WOT_NPC_MISC_ITEMS = []'), 'Empty miscellaneous equipment catalog template is missing.');
+  assert(dmHtml.includes('assets/npc-misc-items.js'), 'NPC page must load the miscellaneous equipment catalog before the combat UI.');
+  assert(dmSource.includes('function npcClassNames') && dmSource.includes('Класс: Воин / Мастер по оружию'), 'Armor proficiency must use structured class names and recognize the Fighter class.');
+  assert(dmSource.includes('const effective=base===0?Math.min(9,matched):Math.min(9,base+matched)') && dmSource.includes('Аффинитеты: совпало'), 'Wilder affinity matches must increase the effective weave circle and remain visible in calculation notes.');
 }
 
 console.log(`OK: ${db.hierarchies.length} hierarchies, ${db.hierarchies.reduce((sum, h) => sum + h.ranks.length, 0)} ranks, ${db.hierarchies.reduce((sum, h) => sum + h.abilities.length, 0)} abilities; ${matrixDb.secret.length + matrixDb.forbidden.length + matrixDb.restricted.length} Pact matrix records; six level-13 NPC combat profiles passed.`);
