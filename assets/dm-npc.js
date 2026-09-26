@@ -67,13 +67,18 @@ function normalizeCustomNpc(raw, index){
     hi: !!(a && a.hi),
     source: a && a.source || ''
   })) : [];
-  npc.at = Array.isArray(npc.at) ? npc.at.map((a,i)=>({
+  npc.at = Array.isArray(npc.at) ? npc.at.map((a,i)=>Object.assign({},a||{}, {
     n: String(a && (a.n || a.name || a.title) || ('Атака '+(i+1))),
     a: String(a && (a.a || a.attack || a.bonus) || '+0'),
     d: String(a && (a.d || a.damage || a.dmg) || '—'),
     t: String(a && (a.t || a.type) || '—'),
     r: String(a && (a.r || a.range) || '—'),
-    no: String(a && (a.no || a.note || a.notes || '') || '')
+    no: String(a && (a.no || a.note || a.notes || '') || ''),
+    stat: String(a && a.stat || '').toLowerCase(),
+    baseDamage: String(a && (a.baseDamage || a.base_damage) || ''),
+    onceDamage: String(a && (a.onceDamage || a.once_damage) || ''),
+    attacks: Number(a && a.attacks)>0?Number(a.attacks):undefined,
+    formula: String(a && a.formula || '')
   })) : [];
   npc.eq = Array.isArray(npc.eq) ? npc.eq.map(e=>({r:!!(e&&e.r), t:String(e && (e.t || e.name || e.desc) || '')})) : [];
   npc.sk = Array.isArray(npc.sk) ? npc.sk.map(x=>({n:String(x&&x.n||''), v:String(x&&x.v||'+0'), e:!!(x&&x.e), note:String(x&&x.note||'')})) : [];
@@ -518,7 +523,7 @@ function channelingStatKey(c){
   return 'int';
 }
 function spellcastingProfile(c,w){
-  const key=channelingStatKey(c), ability=statModNum(c&&c.st&&c.st[key]), prof=parseSignedBonus(c&&c.co&&c.co.prof), hi=hierarchyWeaveProfile(c), item=getSelectedAngrial(c);
+  const key=channelingStatKey(c), ability=statModNum(getDisplayStat(c,key)), prof=parseSignedBonus(c&&c.co&&c.co.prof), hi=hierarchyWeaveProfile(c), item=getSelectedAngrial(c);
   const attackAmp=Math.max(hi.attack,item.attack), damageDice=Math.max(hi.dice,item.dice), rangeMult=Math.max(hi.range||1,item.range||1);
   let dc=8+ability+prof+hi.dc;
   const rules=npcRulesText(c), save=canonicalWeaveMeta(w,'Спасбросок или бросок атаки');
@@ -631,7 +636,8 @@ function applyHp(sign) {
   const val = parseInt(document.getElementById('hp-modal-val').value) || 0;
   const c = getNpcById(id);
   const s = getState(id);
-  s.curHp = Math.max(0, Math.min(c.co.hp, s.curHp + sign * val));
+  const hp=getDisplayHpProfile(c,s);
+  s.curHp = Math.max(0, Math.min(hp.max, s.curHp + sign * val));
   savePersistedState();
   closeHpModal();
   refreshCombatPanel(id);
@@ -692,7 +698,7 @@ function refreshSidebarHP(id) {
   if (!btn) return;
   const s = getState(id);
   const c = getNpcById(id);
-  const maxHp = c.co.hp;
+  const maxHp = getDisplayHpProfile(c,s).max;
   const pct = Math.max(0, s.curHp/maxHp*100);
   const fill = btn.querySelector('.npc-btn-hp-fill');
   if (fill) { fill.style.width = pct+'%'; fill.className = 'npc-btn-hp-fill ' + hpColor(s.curHp, maxHp); }
@@ -708,7 +714,7 @@ function refreshCombatPanel(id) {
   const s = getState(id);
   const c = getNpcById(id);
   if (!c) return;
-  const maxHp = c.co.hp;
+  const maxHp = getDisplayHpProfile(c,s).max;
   const pct = Math.max(0, s.curHp/maxHp*100);
   const el = document.getElementById('cp-hp-cur');
   if (el) {
@@ -768,6 +774,7 @@ function sidebarGroupLabel(text, extraHtml){
 
 function renderSidebarNpcButton(c, mode){
   const s = getState(c.id);
+  const maxHp = getDisplayHpProfile(c,s).max;
   const hiHtml = c.hiIcon==='throne'?'<span class="hi-badge throne">△</span>':
     c.hiIcon==='unity'?'<span class="hi-badge unity">⊙</span>':
     c.hiIcon==='guild'?'<span class="hi-badge guild">◇</span>':
@@ -775,7 +782,7 @@ function renderSidebarNpcButton(c, mode){
   const btn = document.createElement('div');
   btn.className = 'npc-btn ty-' + c.ty + (npcIdEquals(c.id,curNPC)?' active':'') + (c.isClone?' npc-btn-clone':'');
   btn.dataset.npcid = c.id;
-  const pct = Math.max(0,s.curHp/c.co.hp*100);
+  const pct = Math.max(0,s.curHp/maxHp*100);
   const clLabel = c.isClone ? (baseNpcLabel(c) + ' #' + c.cloneNo) : ((c.tags[0]||'') + (c.tags[1]&&!String(c.tags[1]).startsWith('Ур.')?' / '+c.tags[1]:''));
   const nameLabel = c.isClone ? ((getNpcById(c.baseId)||{}).sh || 'Копия') : (c.sh !== c.tags[0] && c.sh !== (c.tags[0]+'-'+c.tags[1]) ? c.sh : '');
   // На левой панели не показываем кнопку создания копии у базовых NPC,
@@ -787,7 +794,7 @@ function renderSidebarNpcButton(c, mode){
     '<span class="npc-btn-info">'+
       '<span class="npc-btn-name">'+clLabel+'</span>'+
       '<span class="npc-btn-sub">'+(nameLabel ? nameLabel+' · ' : '')+c.na+'</span>'+
-      '<div class="npc-btn-hp"><div class="npc-btn-hp-fill '+hpColor(s.curHp,c.co.hp)+'" style="width:'+pct+'%"></div></div>'+
+      '<div class="npc-btn-hp"><div class="npc-btn-hp-fill '+hpColor(s.curHp,maxHp)+'" style="width:'+pct+'%"></div></div>'+
       '<div class="cond-badges">'+s.conditions.map(k=>'<span class="cond-badge cb-'+k+'">'+(COND_LABELS[k]||k)+'</span>').join('')+'</div>'+
     '</span>'+hiHtml+actionHtml+'<span class="npc-btn-lv">'+c.lv+'</span>';
   btn.onclick = () => showNPC(c.id);
@@ -1756,11 +1763,33 @@ function addMiscAttackDamage(expr,delta){
   if(!delta||!/\d+к\d+/i.test(text))return text;
   return `${text} ${delta>=0?'+':'-'} ${Math.abs(delta)}`;
 }
+function attackAbilityProfile(c,attack){
+  const explicit=String(attack&&attack.stat||'').toLowerCase();
+  if(Object.prototype.hasOwnProperty.call(MISC_STAT_LABELS,explicit)){
+    return {key:explicit,delta:miscAbilityModifierDelta(c,explicit)};
+  }
+  const attackText=[attack&&attack.n,attack&&attack.no,attack&&attack.r,attack&&attack.t].filter(Boolean).join(' ').toLowerCase().replace(/ё/g,'е');
+  const attackBonus=String(attack&&attack.a||'');
+  const damage=String(attack&&attack.d||'');
+  // Спасброски, плетения и служебные строки не являются оружейскими атаками.
+  if(!/^[+\-]\d+/.test(attackBonus)||!/\d+к\d+/i.test(damage)||/\bdc\b|сл\s*\d|плетен|кантрип|огненный шар|молния|воздушный кулак|каменный вихрь|кристалл/.test(attackText))return null;
+  const weapon=findWeaponByName(attack&&attack.n), props=String(weapon&&weapon.properties||attackText).toLowerCase();
+  const ranged=weapon&&weapon.type==='ranged'||/лук|арбалет|пращ|выстрел|дальний/.test(attackText);
+  const finesse=/finesse|финесс|фехтовальн|рапир|кинжал|коротк(?:ий|ого) меч/.test(props+' '+attackText);
+  if(finesse){
+    const base=Math.max(statModNum(c&&c.st&&c.st.str),statModNum(c&&c.st&&c.st.dex));
+    const display=Math.max(statModNum(getDisplayStat(c,'str')),statModNum(getDisplayStat(c,'dex')));
+    const key=statModNum(getDisplayStat(c,'dex'))>=statModNum(getDisplayStat(c,'str'))?'dex':'str';
+    return {key,delta:display-base};
+  }
+  const key=ranged?'dex':'str';
+  return {key,delta:miscAbilityModifierDelta(c,key)};
+}
 function applyMiscAbilityToBaseAttacks(c,attacks){
   return (attacks||[]).map(attack=>{
-    const key=String(attack&&attack.stat||'').toLowerCase();
-    if(!Object.prototype.hasOwnProperty.call(MISC_STAT_LABELS,key))return attack;
-    const delta=miscAbilityModifierDelta(c,key);
+    const ability=attackAbilityProfile(c,attack);
+    if(!ability)return attack;
+    const key=ability.key, delta=ability.delta;
     if(!delta)return attack;
     const row=Object.assign({},attack);
     if(/^[+\-]\d+/.test(String(row.a||'')))row.a=signedFlat(parseSignedBonus(row.a)+delta);
@@ -1842,8 +1871,10 @@ function selectedMiscItems(cOrId){
   }).filter(Boolean);
 }
 function miscItemAlreadyInBaseEquipment(c,item){
-  const equipmentText=(c&&c.eq||[]).map(row=>String(row&&row.t||'')).join(' ').toLocaleLowerCase('ru-RU');
-  return !!(item&&item.name&&equipmentText.includes(String(item.name).toLocaleLowerCase('ru-RU')));
+  // Текстовое упоминание предмета не доказывает, что его числа уже зашиты в
+  // карточку. Подавление разрешено только явным машинным маркером в данных NPC.
+  const included=Array.isArray(c&&c.miscItemEffectsIncluded)?c.miscItemEffectsIncluded:[];
+  return !!(item&&included.map(String).includes(String(item.id)));
 }
 function miscItemMechanicEntries(c){
   const active=[], suppressed=[], seen=new Set();
@@ -1852,7 +1883,7 @@ function miscItemMechanicEntries(c){
     if(!Object.keys(mechanics).length)return;
     if(seen.has(item.id)){suppressed.push(`${item.name}: повторный выбор не складывается.`);return;}
     seen.add(item.id);
-    if(miscItemAlreadyInBaseEquipment(c,item)){suppressed.push(`${item.name}: уже указан в базовом снаряжении карточки; повторное числовое применение отключено.`);return;}
+    if(miscItemAlreadyInBaseEquipment(c,item)){suppressed.push(item.name+': эффект явно помечен в miscItemEffectsIncluded как уже включённый в исходные числа; повторное применение отключено.');return;}
     active.push({item,mechanics});
   });
   return {active,suppressed};
@@ -1919,21 +1950,41 @@ function getMiscItemEffectProfile(c, armorState){
 function getDisplayStats(c){return getMiscItemEffectProfile(c).stats;}
 function getDisplayStat(c,key){const stats=getDisplayStats(c);return Number(stats&&stats[key]||c&&c.st&&c.st[key]||10);}
 function miscAbilityModifierDelta(c,key){return statModNum(getDisplayStat(c,key))-statModNum(c&&c.st&&c.st[key]);}
+function getMiscHpBonus(c){
+  return miscAbilityModifierDelta(c,'con')*Math.max(1,Number(c&&c.lv)||1);
+}
+function getDisplayHpProfile(c,state){
+  const s=state||getState(c&&c.id), base=Math.max(1,Number(c&&c.co&&c.co.hp)||1), bonus=getMiscHpBonus(c), max=Math.max(1,base+bonus);
+  const previous=Number.isFinite(Number(s.miscHpBonusApplied))?Number(s.miscHpBonusApplied):0;
+  let changed=false;
+  if(previous!==bonus){
+    const current=Number.isFinite(Number(s.curHp))?Number(s.curHp):base+previous;
+    s.curHp=Math.max(0,Math.min(max,current+bonus-previous));
+    s.miscHpBonusApplied=bonus;
+    changed=true;
+    savePersistedState();
+  }
+  return {base,bonus,max,current:s.curHp,changed};
+}
 function getDisplayInitiativeProfile(c){
   const raw=String(c&&c.co&&c.co.ini||'+0'), match=raw.match(/[+\-]?\d+/), base=match?Number(match[0])||0:0;
-  const effects=getMiscItemEffectProfile(c), bonus=effects.initiativeBonus, total=base+bonus;
+  const effects=getMiscItemEffectProfile(c), abilityBonus=miscAbilityModifierDelta(c,'dex'), bonus=effects.initiativeBonus+abilityBonus, total=base+bonus;
   const advantage=/преим|с\s+преим/i.test(raw)||effects.initiativeAdvantage;
-  return {base,bonus,total,advantage,text:`${total>=0?'+':''}${total}${advantage?' / преим.':''}`};
+  return {base,bonus,abilityBonus,itemBonus:effects.initiativeBonus,total,advantage,text:(total>=0?'+':'')+total+(advantage?' / преим.':'')};
 }
 function getDisplayInitiative(c){return getDisplayInitiativeProfile(c).text;}
 function getDisplaySaves(c){
   const raw=String(c&&c.co&&c.co.sv||'—'), effects=getMiscItemEffectProfile(c);
   const keyByLabel={сил:'str',лов:'dex',тел:'con',инт:'int',мдр:'wis',хар:'cha'};
-  return raw.replace(/(Сил|Лов|Тел|Инт|Мдр|Хар)(\s*)([+\-]\d+)/gi,(full,label,space,value)=>{
+  const adjusted=raw.replace(/(Сил|Лов|Тел|Инт|Мдр|Хар)(\s*)([+\-]\d+)/gi,(full,label,space,value)=>{
     const key=keyByLabel[label.toLocaleLowerCase('ru-RU')], delta=miscAbilityModifierDelta(c,key)+effects.saveBonus;
-    const adjusted=(Number(value)||0)+delta;
-    return `${label}${space}${adjusted>=0?'+':''}${adjusted}`;
+    const adjustedValue=(Number(value)||0)+delta;
+    return label+space+(adjustedValue>=0?'+':'')+adjustedValue;
   });
+  const notes=[];
+  if(effects.saveBonus)notes.push('включая '+(effects.saveBonus>=0?'+':'')+effects.saveBonus+' ко всем СБ от предметов');
+  if(effects.statChanges.some(row=>miscAbilityModifierDelta(c,row.key)!==0)&&adjusted===raw)notes.push('модификаторы характеристик от предметов учитываются при броске');
+  return adjusted+(notes.length?' · '+notes.join(' · '):'');
 }
 function getDisplayResistances(c){return getMiscItemEffectProfile(c).resistances;}
 function renderMiscItemCard(item){
@@ -1952,6 +2003,7 @@ function renderMiscEffectSummary(c,profile){
   if(profile.acBonus)applied.push(`КД +${profile.acBonus}`);
   if(profile.initiativeBonus)applied.push(`инициатива ${profile.initiativeBonus>=0?'+':''}${profile.initiativeBonus}`);
   if(profile.initiativeAdvantage)applied.push('преимущество на инициативу');
+  const hpBonus=getMiscHpBonus(c); if(hpBonus)applied.push(`макс. ОЗ ${hpBonus>=0?'+':''}${hpBonus}`);
   profile.statChanges.forEach(row=>applied.push(`${row.label} ${row.from}→${row.to}`));
   if(profile.saveBonus)applied.push(`все спасброски +${profile.saveBonus}`);
   if(profile.resistances.length)applied.push(`сопротивления: ${profile.resistances.join(', ')}`);
@@ -1988,15 +2040,37 @@ function parseSignedBonus(v){
   const m = String(v || '').match(/[+\-]?\d+/);
   return m ? parseInt(m[0], 10) : 0;
 }
+const SKILL_ABILITY_RULES=[
+  [/акробат/i,'dex'],[/обращени.*живот/i,'wis'],[/магия|аркан/i,'int'],[/атлет/i,'str'],
+  [/обман/i,'cha'],[/истор/i,'int'],[/проницат/i,'wis'],[/запугив/i,'cha'],[/расслед/i,'int'],
+  [/медицин/i,'wis'],[/природ/i,'int'],[/восприят/i,'wis'],[/выступл/i,'cha'],[/убежд/i,'cha'],
+  [/религ/i,'int'],[/ловкость рук|ловкость пальц/i,'dex'],[/скрыт/i,'dex'],[/выжив/i,'wis']
+];
+function skillAbilityKey(skill){
+  const name=String(skill&&skill.n||skill||'');
+  const match=SKILL_ABILITY_RULES.find(([pattern])=>pattern.test(name));
+  return match?match[1]:'';
+}
+function getDisplaySkillBonus(c,skill){
+  const base=parseSignedBonus(skill&&skill.v), key=skillAbilityKey(skill);
+  return base+(key?miscAbilityModifierDelta(c,key):0);
+}
+function getDisplaySkillValue(c,skill){
+  const value=getDisplaySkillBonus(c,skill);
+  return (value>=0?'+':'')+value;
+}
 function getSkillBonus(c, names){
   const list = Array.isArray(names) ? names : [names];
   const sk = (c.sk || []).find(x => list.some(n => String(x.n || '').toLowerCase().includes(String(n).toLowerCase())));
-  return sk ? parseSignedBonus(sk.v) : null;
+  return sk ? getDisplaySkillBonus(c,sk) : null;
+}
+function getPassivePerception(c){
+  return Number(c&&c.co&&c.co.pp||10)+miscAbilityModifierDelta(c,'wis');
 }
 function getPassiveInsight(c){
   const insight = getSkillBonus(c, ['Проницательность']);
   if (insight !== null) return 10 + insight;
-  return 10 + Math.floor((((c.st && c.st.wis) || 10) - 10) / 2);
+  return 10 + statModNum(getDisplayStat(c,'wis'));
 }
 function canUseStealthQuickRoll(c){
   return !!(c && c.sk && c.sk.some(x => String(x.n || '').toLowerCase().includes('скрытность')) &&
@@ -2129,6 +2203,7 @@ function renderCombatDashboard(id, c, s){
   const slotLine = c.slots && c.slots.length ? c.slots.map(sl=>`${escHtml(sl.lv)}:${sl.n}`).join(' · ') : '';
   const activeAngrial = (c.spells || c.slots) ? getSelectedAngrial(c) : ANGRIAL_CATALOG[0];
   const itemResistances = getDisplayResistances(c);
+  const hp=getDisplayHpProfile(c,s);
   const criticalGroups = ['turn','defense','reaction','bonus','aura','resource']
     .map(k=>renderBriefGroup(brief.out[k].meta, brief.out[k]))
     .join('');
@@ -2143,10 +2218,10 @@ function renderCombatDashboard(id, c, s){
     </div>
     <div class="bd-metrics">
       <div class="bd-metric ac"><span>КД</span><b>${getDisplayAC(c)}</b></div>
-      <div class="bd-metric hp"><span>ОЗ</span><b>${s.curHp}/${c.co.hp}</b></div>
+      <div class="bd-metric hp"><span>ОЗ</span><b>${hp.current}/${hp.max}</b></div>
       <div class="bd-metric"><span>Иниц.</span><b>${escHtml(getDisplayInitiative(c))}</b></div>
       <div class="bd-metric"><span>Скор.</span><b>${escHtml(c.co.sp)} фт</b></div>
-      <div class="bd-metric"><span>Пасс. ВСПР</span><b>${escHtml(c.co.pp)}</b></div>
+      <div class="bd-metric"><span>Пасс. ВСПР</span><b>${escHtml(getPassivePerception(c))}</b></div>
       <div class="bd-metric"><span>Плетения</span><b>${escHtml(spellLine)}</b></div>
     </div>
     ${slotLine || activeAngrial.id!=='none' || itemResistances.length ? `<div class="bd-resource-line">${slotLine ? `<span><b>Ячейки:</b> ${slotLine}</span>` : ''}${activeAngrial.id!=='none' ? `<span><b>${activeAngrial.kind==='saangrial'?'Са’ангриал':'Ангриал'}:</b> сила ${activeAngrial.lv} · атака +${activeAngrial.attack} · +${activeAngrial.dice} куб. · ×${activeAngrial.range}</span>` : ''}${itemResistances.length?`<span><b>Сопр. от предметов:</b> ${escHtml(itemResistances.join(', '))}</span>`:''}</div>` : ''}
@@ -2167,6 +2242,7 @@ function showNPC(id) {
   try{
   buildSidebar(); // update active state
   const s = getState(c.id);
+  const hp=getDisplayHpProfile(c,s), maxHp=hp.max;
   const displayAttacks=getDisplayAttacks(c);
   const displaySummary=getDisplayCombatSummary(c);
   const ph = document.getElementById('placeholder');
@@ -2185,10 +2261,10 @@ function showNPC(id) {
   <span class="cp-name">${c.ic} ${(c.tags[0]||"")+(c.tags[1]&&!c.tags[1].startsWith("Ур.")?" / "+c.tags[1]:"")+(c.sh&&c.sh!==c.tags[0]?" · "+c.sh:"")}</span>
   <div class="cp-hp-block">
     <span class="cp-hp-label">ОЗ</span>
-    <span class="cp-hp-cur ${(hpColor(s.curHp,c.co.hp)||'hp-low').replace('hp-','')}" id="cp-hp-cur" onclick="openHpModal(${c.id})">${s.curHp}</span>
+    <span class="cp-hp-cur ${(hpColor(s.curHp,maxHp)||'hp-low').replace('hp-','')}" id="cp-hp-cur" onclick="openHpModal(${c.id})">${s.curHp}</span>
     <span class="cp-hp-sep">/</span>
-    <span class="cp-hp-max">${c.co.hp}</span>
-    <div class="cp-hp-bar"><div class="cp-hp-fill ${hpColor(s.curHp,c.co.hp)}" id="cp-hp-fill" style="width:${Math.max(0,s.curHp/c.co.hp*100)}%"></div></div>
+    <span class="cp-hp-max">${maxHp}</span>
+    <div class="cp-hp-bar"><div class="cp-hp-fill ${hpColor(s.curHp,maxHp)}" id="cp-hp-fill" style="width:${Math.max(0,s.curHp/maxHp*100)}%"></div></div>
   </div>
   <button class="cp-dmg-btn" onclick="openHpModal(${c.id})">−ОЗ</button>
   <button class="cp-heal-btn" onclick="openHpModal(${c.id})">+ОЗ</button>
@@ -2198,7 +2274,7 @@ function showNPC(id) {
   <div class="cp-ac-box"><div class="cp-ac-val" id="cp-ac-val">${getDisplayAC(c)}</div><div class="cp-ac-lbl">КД</div></div>
   <div class="cp-ini-box" onclick="addToIni(${c.id})" title="Добавить в трекер инициативы"><div class="cp-ini-val">${getDisplayInitiative(c)}</div><div class="cp-ini-lbl">Иниц.</div></div>
   <div class="cp-sp-box"><div class="cp-sp-val">${c.co.sp} фт</div><div class="cp-sp-lbl">Скор.</div></div>
-  <div class="cp-pass-box" title="Пассивное восприятие"><div class="cp-pass-val">${c.co.pp}</div><div class="cp-pass-lbl">Пасс ВСПР</div></div>
+  <div class="cp-pass-box" title="Пассивное восприятие"><div class="cp-pass-val">${getPassivePerception(c)}</div><div class="cp-pass-lbl">Пасс ВСПР</div></div>
   <div class="cp-pass-box" title="Пассивная проницательность"><div class="cp-pass-val">${getPassiveInsight(c)}</div><div class="cp-pass-lbl">Пасс ПРН</div></div>
   <div class="cond-panel">
     ${COND_KEYS.map(k=>`<button class="cond-toggle${s.conditions.includes(k)?' on-'+k:''}" id="ct-${k}" onclick="toggleCondition(${c.id},'${k}')">${COND_LABELS[k]}</button>`).join('')}
@@ -2363,14 +2439,14 @@ ${['СИЛ','ТЕЛ','ЛОВ','ИНТ','МДР','ХАР'].map((name,si)=>{
   <div class="core-box"><span style="font-size:10px;color:var(--text3)">Спасброски</span><span class="core-val" style="font-size:11px">${getDisplaySaves(c)}</span></div>
   ${getDisplayResistances(c).length?`<div class="core-box core-wide item-resistances"><span style="font-size:10px;color:var(--text3)">Сопротивления от предметов</span><span class="core-val" style="font-size:11px">${escHtml(getDisplayResistances(c).join(', '))}</span></div>`:''}
   <div class="core-box"><span style="font-size:10px;color:var(--text3)">Бонус умения</span><span class="core-val">${c.co.prof}</span></div>
-  <div class="core-box passive-core"><span class="core-label">Пасс ВСПР<br><em>пассивное восприятие</em></span><span class="core-val big">${c.co.pp}</span></div>
+  <div class="core-box passive-core"><span class="core-label">Пасс ВСПР<br><em>пассивное восприятие</em></span><span class="core-val big">${getPassivePerception(c)}</span></div>
   <div class="core-box passive-core"><span class="core-label">Пасс ПРН<br><em>пассивная проницательность</em></span><span class="core-val big">${getPassiveInsight(c)}</span></div>
   <div class="core-box core-wide"><span style="font-size:10px;color:var(--text3)">Особенности</span><span class="core-val" style="font-size:10px;color:var(--gold2)">${displaySummary}</span></div>
 </div>
 ${c.hi ? renderHi(c.hi, id) : ''}
 ${getSelectedAngrial(c).id!=='none' ? renderAngrial(getSelectedAngrial(c)) : ''}
 <div class="sec"><div class="sec-h">Навыки</div>
-<div class="sk-grid">${c.sk.map(sk=>`<div class="sk-item${sk.e?' expert':''}"><span class="sk-name">${sk.e?'<span class="sk-star">★</span>':''}${sk.n}<span style="font-size:9px;color:var(--text3);margin-left:3px">${sk.note||''}</span></span><span class="sk-val">${sk.v}</span></div>`).join('')}</div></div>
+<div class="sk-grid">${c.sk.map(sk=>`<div class="sk-item${sk.e?' expert':''}"><span class="sk-name">${sk.e?'<span class="sk-star">★</span>':''}${sk.n}<span style="font-size:9px;color:var(--text3);margin-left:3px">${sk.note||''}</span></span><span class="sk-val">${getDisplaySkillValue(c,sk)}</span></div>`).join('')}</div></div>
 <div class="tact-box"><div class="tact-title">🎯 Тактика</div>
 ${c.tactics.map(t=>`<div class="tact-phase"><div class="tact-phase-name">${t.ph}</div><div class="tact-desc">${t.d}</div></div>`).join('')}
 </div>
@@ -2556,9 +2632,10 @@ function shortRest(id) {
   s.sdUsed = 0;
   // Roll HD to restore HP (simplified: restore 1d8+con or 1d10+con)
   const hd = c.co.cr.includes('1к8')||c.sh.includes('Скиталец') ? 8 : 10;
-  const conMod = Math.floor((c.st.con-10)/2);
+  const conMod = statModNum(getDisplayStat(c,'con'));
   const healed = Math.floor(Math.random()*hd)+1+conMod;
-  s.curHp = Math.min(c.co.hp, s.curHp + healed);
+  const hp=getDisplayHpProfile(c,s);
+  s.curHp = Math.min(hp.max, s.curHp + healed);
   // Ячейки Договора восстанавливаются после короткого отдыха. Запретные
   // матрицы являются отдельными применениями и ждут продолжительного отдыха.
   if (/Носитель Договора/i.test(`${c.ti || ''} ${(c.tags || []).join(' ')}`) && c.slots) {
@@ -2572,13 +2649,13 @@ function shortRest(id) {
   refreshSDPanel(id);
   // Refresh slots panel
   if (c.slots) c.slots.forEach(sl => { const st=s.slots[sl.lv]; if(st) refreshSlotsPanel(id); });
-  addToAtkLog(id, `☕ Кор.отдых: +${healed} ОЗ (${s.curHp}/${c.co.hp})`);
+  addToAtkLog(id, `☕ Кор.отдых: +${healed} ОЗ (${hp.current}/${hp.max})`);
 }
 
 function longRest(id) {
   const s = getState(id);
   const c = getNpcById(id);
-  s.curHp = c.co.hp;
+  s.curHp = getDisplayHpProfile(c,s).max;
   s.sdUsed = 0;
   s.saOn = false;
   s.conditions = [];
@@ -2777,7 +2854,7 @@ function toggleSA(id) {
 // ── Reset HP ─────────────────────────────────────────────────────────────
 function resetHP(id) {
   const c = getNpcById(id);
-  if (c) { getState(id).curHp = c.co.hp; savePersistedState(); refreshCombatPanel(id); refreshSidebarHP(id); }
+  if (c) { const s=getState(id); s.curHp=getDisplayHpProfile(c,s).max; savePersistedState(); refreshCombatPanel(id); refreshSidebarHP(id); }
 }
 
 // ── Initiative Tracker ────────────────────────────────────────────────────

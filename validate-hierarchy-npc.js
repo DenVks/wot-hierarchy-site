@@ -187,9 +187,14 @@ run('assets/npc-data.js');
   assert(dmSource.includes('function renderMiscEquipmentSelector') && dmSource.includes('function renderMiscItemCard') && miscSource.includes("id:'ring-steady-step'"), 'Miscellaneous equipment catalog and full item cards are missing.');
   assert(dmSource.includes('function miscItemCombatTags') && dmSource.includes("selectedMiscItems(c).forEach(item=>add('Предмет'") && dmSource.includes('(r.tags||[]).includes(cat.key)'), 'Selected item combat properties must feed the combat dashboard.');
   assert(dmSource.includes('function getMiscItemEffectProfile') && dmSource.includes('function getDisplayInitiativeProfile') && dmSource.includes('function getDisplayResistances'), 'Permanent misc-item effects must recalculate displayed combat values.');
-  assert(dmSource.includes('повторный выбор не складывается') && dmSource.includes('повторное числовое применение отключено'), 'Misc-item mechanics must prevent duplicate and pre-baked effects.');
+  assert(dmSource.includes('повторный выбор не складывается') && dmSource.includes('miscItemEffectsIncluded'), 'Misc-item mechanics must prevent duplicates and require an explicit pre-baked marker.');
+  assert(!dmSource.includes("equipmentText.includes(String(item.name)"), 'Equipment prose must never silently disable selected item mechanics.');
+  assert(dmSource.includes("abilityBonus=miscAbilityModifierDelta(c,'dex')") && dmSource.includes("statModNum(getDisplayStat(c,'con'))") && dmSource.includes('function getDisplayHpProfile'), 'Initiative, maximum HP, and Constitution-derived healing must use adjusted abilities.');
+  assert(dmSource.includes('function getDisplaySkillBonus') && dmSource.includes('function getPassivePerception') && dmSource.includes('function attackAbilityProfile'), 'Skills, passives, and legacy attacks must use the unified adjusted-ability layer.');
+  assert(dmSource.includes('ability=statModNum(getDisplayStat(c,key))'), 'Weave attacks and DC must use the adjusted channeling ability.');
+  assert(dmSource.includes('Object.assign({},a||{}, {') && dmSource.includes('baseDamage: String(a && (a.baseDamage || a.base_damage)'), 'Imported future NPC attacks must preserve structured recalculation fields.');
   assert(dmSource.includes('requiresUnarmored') && dmSource.includes('requiresNoShield') && dmSource.includes('setNpcMiscEquipmentChoice'), 'Conditional AC and elemental-resistance choices are missing.');
-  assert(dmHtml.includes('assets/npc-misc-items.js?v=3'), 'NPC page must load the current miscellaneous equipment catalog before the combat UI.');
+  assert(dmHtml.includes('assets/npc-misc-items.js?v=3') && dmHtml.includes('assets/dm-npc.js?v=173'), 'NPC page must load the current item catalog and universal recalculation layer.');
   assert(dmSource.includes('function npcClassNames') && dmSource.includes('Класс: Воин / Мастер по оружию'), 'Armor proficiency must use structured class names and recognize the Fighter class.');
   assert(dmSource.includes('const effective=base===0?Math.min(9,matched):Math.min(9,base+matched)') && dmSource.includes('Аффинитеты: совпало'), 'Wilder affinity matches must increase the effective weave circle and remain visible in calculation notes.');
 }
