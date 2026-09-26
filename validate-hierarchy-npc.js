@@ -21,6 +21,7 @@ run('assets/classes-data.js');
 run('assets/pact-matrices-data.js');
 run('assets/feats-data.js');
 run('assets/npc-rules-data.js');
+run('assets/npc-misc-items.js');
 
 let generatorSource = fs.readFileSync(path.join(root, 'assets/npc-generator.js'), 'utf8');
 generatorSource = generatorSource.replace(
@@ -33,6 +34,8 @@ const { applyHierarchy, getChannelingSlots, applyStatBlock, calcAttack, buildWea
 const db = window.WOT_HIERARCHY_DB;
 const matrixDb = window.WOT_PACT_MATRICES;
 const featsDb = window.WOT_FEATS_DB;
+const miscDb = window.WOT_NPC_MISC_ITEMS;
+const miscEffectsDb = window.WOT_NPC_MISC_ITEM_EFFECTS;
 const blankStats = value => ({ str: value, dex: value, con: value, int: value, wis: value, cha: value });
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 const picks = (ranks, first, second, amount = 2) => Object.fromEntries(ranks.map(rank => [rank, [{ key: first, amount, slot: 0 }, { key: second, amount, slot: 1 }]]));
@@ -49,6 +52,18 @@ assert(matrixDb.forbidden.every(matrix => matrix.description), 'Every Forbidden 
 const sharpshooter = featsDb.feats.find(feat => feat.name === 'Меткий стрелок');
 assert(sharpshooter && sharpshooter.cls === '—', 'Sharpshooter must not have a class restriction.');
 assert(sharpshooter.req === 'Владение дальнобойным оружием', 'Sharpshooter must require ranged-weapon proficiency.');
+assert(Array.isArray(miscDb) && miscDb.length === 60, 'Expected 60 miscellaneous NPC items.');
+assert(new Set(miscDb.map(item => item.id)).size === miscDb.length, 'Miscellaneous item ids must be unique.');
+assert(miscDb.every(item => item.id && item.name && item.category && item.rarity && typeof item.attunement === 'boolean' && item.description), 'Every miscellaneous item must have the complete schema.');
+const miscCategories = [...new Set(miscDb.map(item => item.category))];
+assert(miscCategories.length === 10 && miscCategories.every(category => miscDb.filter(item => item.category === category).length === 6), 'Miscellaneous item categories must contain six records each.');
+assert(miscDb.every(item => ['Необычный','Редкий','Очень редкий','Легендарный'].includes(item.rarity)), 'Miscellaneous item rarity is invalid.');
+assert(miscEffectsDb && Object.keys(miscEffectsDb).length === 14, 'Expected 14 structured permanent misc-item effect records.');
+assert(Object.keys(miscEffectsDb).every(id => miscDb.some(item => item.id === id)), 'Every structured misc-item effect must reference a catalog item.');
+assert(miscEffectsDb['ring-protection'].ac.bonus === 1 && miscEffectsDb['ring-protection'].saves.all === 1, 'Ring of Protection mechanics are incomplete.');
+assert(miscEffectsDb['belt-titan'].abilitySet.str === 25 && miscEffectsDb['belt-vitality'].abilityBonus.con.max === 20, 'Ability-changing belt mechanics are incomplete.');
+assert(!miscEffectsDb['brooch-impervious-pattern'], 'Temporary resistance must not be treated as permanently active.');
+
 const pactLevel13 = window.WOT_CLASSES_DB.progression.find(row => row.className === 'Носитель Договора' && row.level === 13);
 assert(pactLevel13 && pactLevel13.pactSlots === 3 && pactLevel13.slotLevel === 5, 'Pact Bearer level 13 must have three ordinary 5th-level Pact slots.');
 assert(pactLevel13.forbiddenMatrix === '7-й уровень', 'Pact Bearer level 13 must gain the separate 7th-level Forbidden Matrix resource.');
@@ -169,8 +184,12 @@ run('assets/npc-data.js');
   assert(dmSource.includes('function canFrenzyBonus') && dmSource.includes('Атака Бешенства'), 'Weapon override must preserve the Berserker Frenzy attack.');
   assert(generatorSource.includes("/Варвар/.test(cls)&&Number(lv)>=5?2:1") && generatorSource.includes('Ярость ${sign(rageBonus)}'), 'NPC Generator must include Barbarian Extra Attack and Rage damage.');
   assert(generatorSource.includes("fn==='Устойчивый'&&isChannelingClass(ctx.cls)"), 'NPC Generator must assign Resilient to Constitution for channeling classes.');
-  assert(dmSource.includes('function renderMiscEquipmentSelector') && miscSource.includes('window.WOT_NPC_MISC_ITEMS = []'), 'Empty miscellaneous equipment catalog template is missing.');
-  assert(dmHtml.includes('assets/npc-misc-items.js'), 'NPC page must load the miscellaneous equipment catalog before the combat UI.');
+  assert(dmSource.includes('function renderMiscEquipmentSelector') && dmSource.includes('function renderMiscItemCard') && miscSource.includes("id:'ring-steady-step'"), 'Miscellaneous equipment catalog and full item cards are missing.');
+  assert(dmSource.includes('function miscItemCombatTags') && dmSource.includes("selectedMiscItems(c).forEach(item=>add('Предмет'") && dmSource.includes('(r.tags||[]).includes(cat.key)'), 'Selected item combat properties must feed the combat dashboard.');
+  assert(dmSource.includes('function getMiscItemEffectProfile') && dmSource.includes('function getDisplayInitiativeProfile') && dmSource.includes('function getDisplayResistances'), 'Permanent misc-item effects must recalculate displayed combat values.');
+  assert(dmSource.includes('повторный выбор не складывается') && dmSource.includes('повторное числовое применение отключено'), 'Misc-item mechanics must prevent duplicate and pre-baked effects.');
+  assert(dmSource.includes('requiresUnarmored') && dmSource.includes('requiresNoShield') && dmSource.includes('setNpcMiscEquipmentChoice'), 'Conditional AC and elemental-resistance choices are missing.');
+  assert(dmHtml.includes('assets/npc-misc-items.js?v=3'), 'NPC page must load the current miscellaneous equipment catalog before the combat UI.');
   assert(dmSource.includes('function npcClassNames') && dmSource.includes('Класс: Воин / Мастер по оружию'), 'Armor proficiency must use structured class names and recognize the Fighter class.');
   assert(dmSource.includes('const effective=base===0?Math.min(9,matched):Math.min(9,base+matched)') && dmSource.includes('Аффинитеты: совпало'), 'Wilder affinity matches must increase the effective weave circle and remain visible in calculation notes.');
 }

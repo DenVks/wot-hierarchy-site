@@ -1482,12 +1482,13 @@ function findShieldByName(name){
   const sh = armorRules().shields || [];
   return sh.find(x=>x.name === name) || sh[0] || {name:'Нет',ac:0};
 }
-function calculateArmorAC(c, armorState){
+function calculateArmorAC(c, armorState, statsOverride){
   const ar = findArmorByName(armorState && armorState.armorName || 'Без доспеха');
   const sh = findShieldByName(armorState && armorState.shieldName || 'Нет');
-  const dex = statModNum(c && c.st && c.st.dex);
-  const con = statModNum(c && c.st && c.st.con);
-  const wis = statModNum(c && c.st && c.st.wis);
+  const stats = statsOverride || c && c.st || {};
+  const dex = statModNum(stats.dex);
+  const con = statModNum(stats.con);
+  const wis = statModNum(stats.wis);
   const armorMagic = Number(armorState && armorState.armorMagic)||0;
   const shieldMagic = Number(armorState && armorState.shieldMagic)||0;
   const miscBonus = Number(armorState && armorState.miscBonus)||0;
@@ -1520,14 +1521,14 @@ function calculateArmorAC(c, armorState){
   return {ac, formula, armor:ar, shield:sh, dexPart, armorMagic, shieldMagic, miscBonus};
 }
 function validateArmorChoice(c, armorState){
-  const calc = calculateArmorAC(c, armorState);
+  const calc = calculateArmorAC(c, armorState, getDisplayStats(c));
   const ar = calc.armor, sh = calc.shield;
   const prof = getNpcArmorProficiencies(c);
   const warnings = [], ok = [];
   if(ar.category !== 'none' && ar.category !== 'cloth' && ar.isArmor !== false){
     if(!prof[ar.category]) warnings.push(`Нет подтверждённого владения категорией: ${armorCategoryLabel(ar.category)} доспех.`);
     else ok.push(`Владение категорией «${armorCategoryLabel(ar.category)} доспех» подтверждено.`);
-    if(Number(ar.strReq||0) && Number(c.st && c.st.str || 10) < Number(ar.strReq)) warnings.push(`Недостаточно Силы: требуется ${ar.strReq}, у NPC ${c.st.str}. В D&D 5e это обычно снижает скорость на 10 фт.`);
+    if(Number(ar.strReq||0) && getDisplayStat(c,'str') < Number(ar.strReq)) warnings.push(`Недостаточно Силы: требуется ${ar.strReq}, у NPC ${getDisplayStat(c,'str')}. В D&D 5e это обычно снижает скорость на 10 фт.`);
     if(ar.stealth) warnings.push('Доспех даёт помеху на проверки Ловкости (Скрытность), если её не отменяет черта/класс/предмет.');
   } else if(ar.category === 'cloth' || ar.isArmor === false) ok.push('Одежда не считается доспехом: владение не требуется.');
   else ok.push('Без доспеха: владение не требуется.');
@@ -1544,9 +1545,19 @@ function validateArmorChoice(c, armorState){
   return {calc, ok, warnings, prof};
 }
 function getDisplayAC(c){
-  const st = c ? getStoredArmorState(c) : null;
-  if(st && st.active) return calculateArmorAC(c, st).ac;
-  return Number(c && c.co && c.co.ac) || 10;
+  if(!c) return 10;
+  const st = getStoredArmorState(c);
+  const armorState = st && st.active ? st : defaultNpcArmorState(c);
+  const baseStats = c.st || {};
+  const displayStats = getDisplayStats(c);
+  let ac;
+  if(st && st.active) ac = calculateArmorAC(c, st, displayStats).ac;
+  else {
+    const baseAc = Number(c.co && c.co.ac) || 10;
+    const statDelta = calculateArmorAC(c, armorState, displayStats).ac - calculateArmorAC(c, armorState, baseStats).ac;
+    ac = baseAc + statDelta;
+  }
+  return ac + getMiscItemEffectProfile(c, armorState).acBonus;
 }
 function renderArmorSelector(c){
   const st = getStoredArmorState(c);
@@ -1555,6 +1566,8 @@ function renderArmorSelector(c){
   const val = st;
   const validation = validateArmorChoice(c, val);
   const calc = validation.calc;
+  const itemAc = getMiscItemEffectProfile(c, val).acBonus;
+  const finalAc = calc.ac + itemAc;
   const armorOptions = (rules.armor||[]).map(a=>`<option value="${escHtml(a.name)}" ${a.name===val.armorName?'selected':''}>${escHtml(a.name)} · ${armorCategoryLabel(a.category)} · КД ${a.base}${a.dexMax===null?'+ЛОВ':a.dexMax>0?'+ЛОВ max '+a.dexMax:''}${a.strReq?` · СИЛ ${a.strReq}`:''}${a.stealth?' · скрытн. помеха':''}</option>`).join('');
   const shieldOptions = (rules.shields||[]).map(s=>`<option value="${escHtml(s.name)}" ${s.name===val.shieldName?'selected':''}>${escHtml(s.name)} · КД +${s.ac}</option>`).join('');
   const prof=validation.prof;
@@ -1574,8 +1587,8 @@ function renderArmorSelector(c){
       <label>Прочий бонус КД<input type="number" min="-10" max="20" value="${Number(val.miscBonus)||0}" onchange="setNpcArmor(${c.id},'miscBonus',this.value)"></label>
     </div>
     <div class="armor-result ${validation.warnings.length?'warn':'ok'}">
-      <div><b>Текущий КД карточки:</b> ${c.co.ac} · <b>Расчётный КД:</b> ${calc.ac} ${active?'<span class="armor-pill applied">применён</span>':'<span class="armor-pill">не применён</span>'}</div>
-      <div class="armor-formula">${escHtml(calc.formula)}</div>
+      <div><b>Текущий КД карточки:</b> ${c.co.ac} · <b>Расчётный КД:</b> ${finalAc} ${active?'<span class="armor-pill applied">применён</span>':'<span class="armor-pill">не применён</span>'}</div>
+      <div class="armor-formula">${escHtml(calc.formula)}${itemAc?` + предметы +${itemAc}`:''}</div>
     </div>
     <div class="armor-checks">
       ${validation.ok.map(x=>`<div class="armor-ok">✓ ${escHtml(x)}</div>`).join('')}
@@ -1663,7 +1676,7 @@ function weaponAbilityKey(c,w){
   if(npcHasFeature(c,/Договорный клинок/i))return 'cha';
   const props=String(w&&w.properties||'');
   if(w&&w.type==='ranged')return 'dex';
-  if(/finesse|фехтовальн/i.test(props))return statModNum(c&&c.st&&c.st.dex)>=statModNum(c&&c.st&&c.st.str)?'dex':'str';
+  if(/finesse|фехтовальн/i.test(props))return statModNum(getDisplayStat(c,'dex'))>=statModNum(getDisplayStat(c,'str'))?'dex':'str';
   return String(w&&w.stat||'str');
 }
 function weaponDamageType(w){
@@ -1720,7 +1733,7 @@ function canFrenzyBonus(c,w){
 function buildWeaponOverrideAttacks(c,weaponState){
   const w=findWeaponByName(weaponState&&weaponState.weaponName), base=c&&c.at&&c.at[0]||{}, count=weaponPrimaryAttackCount(c), magic=Number(weaponState&&weaponState.magicBonus)||0;
   if(!w)return c&&c.at||[];
-  const stat=weaponAbilityKey(c,w), ability=statModNum(c&&c.st&&c.st[stat]), proficient=isWeaponProficient(c,w), prof=proficient?Math.abs(parseSignedBonus(c&&c.co&&c.co.prof)):0, special=attackSpecialBonus(c,base), attack=ability+prof+special+magic;
+  const stat=weaponAbilityKey(c,w), ability=statModNum(getDisplayStat(c,stat)), proficient=isWeaponProficient(c,w), prof=proficient?Math.abs(parseSignedBonus(c&&c.co&&c.co.prof)):0, special=attackSpecialBonus(c,base), attack=ability+prof+special+magic;
   const tail=damageTail(base.baseDamage||base.d), damage=w.damage==='—'?'—':`${w.damage}${signedFlat(ability+magic)}${tail}`;
   const once=base.onceDamage||'', props=String(w.properties||'—'), notes=compatibleWeaponNotes(c,w,magic), rows=[];
   const common={a:signedFlat(attack),baseDamage:damage,t:weaponDamageType(w),r:weaponRangeLabel(w),stat,attacks:count};
@@ -1738,9 +1751,29 @@ function buildWeaponOverrideAttacks(c,weaponState){
   }
   return rows;
 }
+function addMiscAttackDamage(expr,delta){
+  const text=String(expr||'');
+  if(!delta||!/\d+к\d+/i.test(text))return text;
+  return `${text} ${delta>=0?'+':'-'} ${Math.abs(delta)}`;
+}
+function applyMiscAbilityToBaseAttacks(c,attacks){
+  return (attacks||[]).map(attack=>{
+    const key=String(attack&&attack.stat||'').toLowerCase();
+    if(!Object.prototype.hasOwnProperty.call(MISC_STAT_LABELS,key))return attack;
+    const delta=miscAbilityModifierDelta(c,key);
+    if(!delta)return attack;
+    const row=Object.assign({},attack);
+    if(/^[+\-]\d+/.test(String(row.a||'')))row.a=signedFlat(parseSignedBonus(row.a)+delta);
+    row.d=addMiscAttackDamage(row.d,delta);
+    if(row.baseDamage)row.baseDamage=addMiscAttackDamage(row.baseDamage,delta);
+    row.no=`${row.no||''}${row.no?' · ':''}Предметы: модификатор ${MISC_STAT_LABELS[key]} ${delta>=0?'+':''}${delta} к атаке и урону`;
+    row.formula=`${row.formula||''}${row.formula?' ':''}Предметы изменили модификатор ${MISC_STAT_LABELS[key]} на ${delta>=0?'+':''}${delta}.`;
+    return row;
+  });
+}
 function getDisplayAttacks(c){
   const st=c?getStoredWeaponState(c):null;
-  return st&&st.active?buildWeaponOverrideAttacks(c,st):(c&&c.at||[]);
+  return st&&st.active?buildWeaponOverrideAttacks(c,st):applyMiscAbilityToBaseAttacks(c,c&&c.at||[]);
 }
 function getDisplayCombatSummary(c){
   const st=c?getStoredWeaponState(c):null;
@@ -1749,7 +1782,7 @@ function getDisplayCombatSummary(c){
   return `${prefix}${attacks.length} оружейных атак в полном ходу · ${st.weaponName}: ${first&&first.a||'—'}`;
 }
 function renderWeaponSelector(c){
-  const st=getStoredWeaponState(c), active=!!st.active, w=findWeaponByName(st.weaponName), attacks=active?buildWeaponOverrideAttacks(c,st):(c.at||[]), prof=getNpcWeaponProficiencies(c), proficient=isWeaponProficient(c,w);
+  const st=getStoredWeaponState(c), active=!!st.active, w=findWeaponByName(st.weaponName), attacks=getDisplayAttacks(c), prof=getNpcWeaponProficiencies(c), proficient=isWeaponProficient(c,w);
   const options=weaponRules().map(item=>`<option value="${escHtml(item.name)}" ${item.name===st.weaponName?'selected':''}>${escHtml(item.name)} · ${weaponCategoryLabel(weaponCategory(item))} · ${escHtml(item.damage)} · ${escHtml(item.properties||'—')}</option>`).join('');
   return `<div class="armor-tool weapon-tool">
     <div class="armor-tool-head"><div><strong>Выбор оружия и пересчёт атак</strong><span>Магический бонус добавляется и к атаке, и к урону.</span></div><label class="armor-active"><input type="checkbox" ${active?'checked':''} onchange="toggleWeaponOverride(${c.id},this.checked)"> применить override атак</label></div>
@@ -1768,21 +1801,187 @@ function setNpcWeapon(id,key,value){
 function toggleWeaponOverride(id,enabled){const st=getStoredWeaponState(getNpcById(id)||id);st.active=!!enabled;savePersistedState();showNPC(id);}
 function resetNpcWeapon(id){const c=getNpcById(id),st=getStoredWeaponState(c||id);Object.assign(st,defaultNpcWeaponState(c));savePersistedState();showNPC(id);}
 
-// ── Miscellaneous equipment template ───────────────────────────────────
-function miscEquipmentCatalog(){return Array.isArray(window.WOT_NPC_MISC_ITEMS)?window.WOT_NPC_MISC_ITEMS:[];}
+// ── Miscellaneous equipment ────────────────────────────────────────────
+function miscEquipmentCatalog(){return Array.isArray(window.WOT_NPC_MISC_ITEMS)?window.WOT_NPC_MISC_ITEMS.filter(item=>item&&item.id&&item.name):[];}
+function miscEquipmentEffectCatalog(){return window.WOT_NPC_MISC_ITEM_EFFECTS&&typeof window.WOT_NPC_MISC_ITEM_EFFECTS==='object'?window.WOT_NPC_MISC_ITEM_EFFECTS:{};}
+function findMiscEquipmentItem(value){
+  const key=String(value||'');
+  return miscEquipmentCatalog().find(item=>String(item.id||item.name)===key)||null;
+}
+function miscItemMechanics(item){return item&&miscEquipmentEffectCatalog()[item.id]||{};}
 function getStoredMiscEquipment(cOrId){
   const c=typeof cOrId==='object'?cOrId:getNpcById(cOrId),st=getState(c?c.id:cOrId);
   st.miscEquipment=Array.isArray(st.miscEquipment)?st.miscEquipment.slice(0,3):['','',''];
   while(st.miscEquipment.length<3)st.miscEquipment.push('');
   return st.miscEquipment;
 }
-function renderMiscEquipmentSelector(c){
-  const catalog=miscEquipmentCatalog(), selected=getStoredMiscEquipment(c), empty=!catalog.length;
-  const options=`<option value="">${empty?'— база предметов пока пуста —':'— не выбрано —'}</option>`+catalog.map(item=>`<option value="${escHtml(item.id||item.name)}">${escHtml(item.name)}${item.category?` · ${escHtml(item.category)}`:''}${item.rarity?` · ${escHtml(item.rarity)}`:''}</option>`).join('');
-  return `<div class="armor-tool misc-tool"><div class="armor-tool-head"><div><strong>Прочее снаряжение</strong><span>Амулеты, кольца, плащи и другие предметы. Каталог подключён отдельным шаблоном.</span></div><span class="misc-db-state">${empty?'0 предметов':'предметов: '+catalog.length}</span></div><div class="misc-form">${selected.map((value,index)=>`<label>Слот ${index+1}<select ${empty?'disabled':''} onchange="setNpcMiscEquipment(${c.id},${index},this.value)">${options.replace(`value="${escHtml(value)}"`,`value="${escHtml(value)}" selected`)}</select></label>`).join('')}</div><div class="armor-result ${empty?'warn':'ok'}">${empty?'Шаблон готов. Добавьте записи в <code>WOT_NPC_MISC_ITEMS</code> — они автоматически появятся во всех трёх списках каждого NPC.':'Выбранные предметы сохраняются отдельно для каждого NPC.'}</div><div class="armor-actions"><button onclick="resetNpcMiscEquipment(${c.id})">Очистить слоты</button></div></div>`;
+function getStoredMiscEquipmentChoices(cOrId){
+  const c=typeof cOrId==='object'?cOrId:getNpcById(cOrId),st=getState(c?c.id:cOrId);
+  st.miscEquipmentChoices=Array.isArray(st.miscEquipmentChoices)?st.miscEquipmentChoices.slice(0,3):['','',''];
+  while(st.miscEquipmentChoices.length<3)st.miscEquipmentChoices.push('');
+  return st.miscEquipmentChoices;
 }
-function setNpcMiscEquipment(id,index,value){const list=getStoredMiscEquipment(getNpcById(id)||id);list[index]=String(value||'');getState(id).miscEquipment=list;savePersistedState();showNPC(id);}
-function resetNpcMiscEquipment(id){getState(id).miscEquipment=['','',''];savePersistedState();showNPC(id);}
+function miscItemCombatTags(item){
+  const text=`${item&&item.name||''} ${item&&item.description||''}`, tags=[];
+  const add=tag=>{if(!tags.includes(tag))tags.push(tag);};
+  if(/реакц/i.test(text))add('reaction');
+  if(/\bКД\b|сопротивлен|спасброс|помехой|невидим|нельзя застать врасплох|уменьшить[^.]{0,100}урон|урон[^.]{0,60}вдвое|не можете быть целью|смерт|концентрац|Испуган|Очарован|Оглох|(?<![а-яё])яд(?:а|у|ом|е)?(?![а-яё])|болезн|восстанавлива[^.]{0,80}(?:хит|ОЗ)/i.test(text))add('defense');
+  if(/бонусн(?:ым|ое) действ/i.test(text))add('bonus');
+  if(/\d+\s+заряд|заряд(?:а|ов)?\b|один раз|до \d+ раз|число применений|между продолжительными отдыхами|после продолжительного отдыха|восстанавлива(?:ется|ются).*отдых/i.test(text))add('resource');
+  return tags;
+}
+function selectedMiscItems(cOrId){
+  const c=typeof cOrId==='object'?cOrId:getNpcById(cOrId), npcId=c?c.id:cOrId;
+  const choices=getStoredMiscEquipmentChoices(c||cOrId);
+  return getStoredMiscEquipment(c||cOrId).map((value,index)=>{
+    const item=findMiscEquipmentItem(value);
+    if(!item)return null;
+    const mechanics=miscItemMechanics(item), allowed=Array.isArray(mechanics.resistanceChoice)?mechanics.resistanceChoice:[];
+    const choice=allowed.includes(choices[index])?choices[index]:(allowed[0]||'');
+    return Object.assign({slot:index+1,npcId,choice},item,{mechanics,combatTags:miscItemCombatTags(item)});
+  }).filter(Boolean);
+}
+function miscItemAlreadyInBaseEquipment(c,item){
+  const equipmentText=(c&&c.eq||[]).map(row=>String(row&&row.t||'')).join(' ').toLocaleLowerCase('ru-RU');
+  return !!(item&&item.name&&equipmentText.includes(String(item.name).toLocaleLowerCase('ru-RU')));
+}
+function miscItemMechanicEntries(c){
+  const active=[], suppressed=[], seen=new Set();
+  selectedMiscItems(c).forEach(item=>{
+    const mechanics=item.mechanics||{};
+    if(!Object.keys(mechanics).length)return;
+    if(seen.has(item.id)){suppressed.push(`${item.name}: повторный выбор не складывается.`);return;}
+    seen.add(item.id);
+    if(miscItemAlreadyInBaseEquipment(c,item)){suppressed.push(`${item.name}: уже указан в базовом снаряжении карточки; повторное числовое применение отключено.`);return;}
+    active.push({item,mechanics});
+  });
+  return {active,suppressed};
+}
+const MISC_STAT_LABELS={str:'СИЛ',dex:'ЛОВ',con:'ТЕЛ',int:'ИНТ',wis:'МДР',cha:'ХАР'};
+function getMiscItemEffectProfile(c, armorState){
+  const keys=Object.keys(MISC_STAT_LABELS), baseStats={}, stats={};
+  keys.forEach(key=>{baseStats[key]=Number(c&&c.st&&c.st[key]||10);stats[key]=baseStats[key];});
+  const entries=miscItemMechanicEntries(c), conditional=[], acSources=[], initiativeSources=[], resistanceSet=new Set(), abilitySets={};
+  let acBonus=0, initiativeBonus=0, initiativeAdvantage=false, saveBonus=0;
+  const activeArmor=armorState||defaultNpcArmorState(c);
+  const armor=findArmorByName(activeArmor&&activeArmor.armorName||'Без доспеха');
+  const shield=findShieldByName(activeArmor&&activeArmor.shieldName||'Нет');
+  entries.active.forEach(({item,mechanics})=>{
+    Object.entries(mechanics.abilityBonus||{}).forEach(([key,rule])=>{
+      if(!(key in stats))return;
+      const value=Number(rule&&rule.value)||0, max=Number(rule&&rule.max);
+      const before=stats[key];
+      stats[key]=before+value;
+      if(Number.isFinite(max))stats[key]=Math.max(before,Math.min(stats[key],max));
+    });
+    Object.entries(mechanics.abilitySet||{}).forEach(([key,targetRaw])=>{
+      if(!(key in stats))return;
+      const target=Number(targetRaw)||0;
+      if(!abilitySets[key])abilitySets[key]=[];
+      abilitySets[key].push({item,target});
+    });
+    if(mechanics.initiative){
+      const bonus=Number(mechanics.initiative.bonus)||0;
+      if(bonus){initiativeBonus+=bonus;initiativeSources.push(`${item.name} ${bonus>=0?'+':''}${bonus}`);}
+      if(mechanics.initiative.advantage)initiativeAdvantage=true;
+    }
+    saveBonus+=Number(mechanics.saves&&mechanics.saves.all)||0;
+    (mechanics.resistances||[]).forEach(value=>resistanceSet.add(value));
+    if(Array.isArray(mechanics.resistanceChoice)&&mechanics.resistanceChoice.length){
+      resistanceSet.add(mechanics.resistanceChoice.includes(item.choice)?item.choice:mechanics.resistanceChoice[0]);
+    }
+    if(mechanics.ac){
+      const unarmored=armor.category==='none'||armor.isArmor===false;
+      const noShield=!shield||shield.name==='Нет';
+      const blocked=(mechanics.ac.requiresUnarmored&&!unarmored)||(mechanics.ac.requiresNoShield&&!noShield);
+      if(blocked){
+        const requirements=[mechanics.ac.requiresUnarmored?'без доспеха':'',mechanics.ac.requiresNoShield?'без щита':''].filter(Boolean).join(' и ');
+        conditional.push(`${item.name}: КД +${Number(mechanics.ac.bonus)||0} не применяется — требуется ${requirements}.`);
+      }else{
+        const bonus=Number(mechanics.ac.bonus)||0;
+        acBonus+=bonus;
+        if(bonus)acSources.push(`${item.name} +${bonus}`);
+      }
+    }
+  });
+  Object.entries(abilitySets).forEach(([key,candidates])=>{
+    const best=candidates.slice().sort((a,b)=>b.target-a.target)[0];
+    candidates.filter(row=>row!==best).forEach(row=>conditional.push(`${row.item.name}: значение ${MISC_STAT_LABELS[key]} ${row.target} заменено более сильным эффектом ${best.target}.`));
+    if(baseStats[key]<=best.target)stats[key]=Math.max(stats[key],best.target);
+    else conditional.push(`${best.item.name}: ${MISC_STAT_LABELS[key]} уже выше ${best.target}; фиксированное значение не применяется.`);
+  });
+  const statChanges=keys.filter(key=>stats[key]!==baseStats[key]).map(key=>({key,label:MISC_STAT_LABELS[key],from:baseStats[key],to:stats[key]}));
+  return {
+    baseStats,stats,statChanges,acBonus,acSources,initiativeBonus,initiativeSources,initiativeAdvantage,saveBonus,
+    resistances:Array.from(resistanceSet),conditional,suppressed:entries.suppressed
+  };
+}
+function getDisplayStats(c){return getMiscItemEffectProfile(c).stats;}
+function getDisplayStat(c,key){const stats=getDisplayStats(c);return Number(stats&&stats[key]||c&&c.st&&c.st[key]||10);}
+function miscAbilityModifierDelta(c,key){return statModNum(getDisplayStat(c,key))-statModNum(c&&c.st&&c.st[key]);}
+function getDisplayInitiativeProfile(c){
+  const raw=String(c&&c.co&&c.co.ini||'+0'), match=raw.match(/[+\-]?\d+/), base=match?Number(match[0])||0:0;
+  const effects=getMiscItemEffectProfile(c), bonus=effects.initiativeBonus, total=base+bonus;
+  const advantage=/преим|с\s+преим/i.test(raw)||effects.initiativeAdvantage;
+  return {base,bonus,total,advantage,text:`${total>=0?'+':''}${total}${advantage?' / преим.':''}`};
+}
+function getDisplayInitiative(c){return getDisplayInitiativeProfile(c).text;}
+function getDisplaySaves(c){
+  const raw=String(c&&c.co&&c.co.sv||'—'), effects=getMiscItemEffectProfile(c);
+  const keyByLabel={сил:'str',лов:'dex',тел:'con',инт:'int',мдр:'wis',хар:'cha'};
+  return raw.replace(/(Сил|Лов|Тел|Инт|Мдр|Хар)(\s*)([+\-]\d+)/gi,(full,label,space,value)=>{
+    const key=keyByLabel[label.toLocaleLowerCase('ru-RU')], delta=miscAbilityModifierDelta(c,key)+effects.saveBonus;
+    const adjusted=(Number(value)||0)+delta;
+    return `${label}${space}${adjusted>=0?'+':''}${adjusted}`;
+  });
+}
+function getDisplayResistances(c){return getMiscItemEffectProfile(c).resistances;}
+function renderMiscItemCard(item){
+  const attunement=item.attunement?'Требуется настройка':'Настройка не требуется';
+  const choices=Array.isArray(item.mechanics&&item.mechanics.resistanceChoice)?item.mechanics.resistanceChoice:[];
+  const choiceControl=choices.length?`<label class="misc-item-choice">Тип сопротивления<select onchange="setNpcMiscEquipmentChoice(${item.npcId},${item.slot-1},this.value)">${choices.map(value=>`<option value="${escHtml(value)}" ${value===item.choice?'selected':''}>${escHtml(value)}</option>`).join('')}</select></label>`:'';
+  return `<article class="misc-item-card" data-item-id="${escHtml(item.id)}">
+    <div class="misc-item-head"><strong>${escHtml(item.name)}</strong><span>Слот ${item.slot}</span></div>
+    <div class="misc-item-meta"><span>${escHtml(item.category||'Предмет')}</span><span class="misc-rarity">${escHtml(item.rarity||'Без редкости')}</span><span class="misc-attunement ${item.attunement?'required':'free'}">${attunement}</span></div>
+    ${choiceControl}
+    <div class="misc-item-effect">${escHtml(item.description||'Эффект не указан.').replace(/\n/g,'<br>')}</div>
+  </article>`;
+}
+function renderMiscEffectSummary(c,profile){
+  const applied=[];
+  if(profile.acBonus)applied.push(`КД +${profile.acBonus}`);
+  if(profile.initiativeBonus)applied.push(`инициатива ${profile.initiativeBonus>=0?'+':''}${profile.initiativeBonus}`);
+  if(profile.initiativeAdvantage)applied.push('преимущество на инициативу');
+  profile.statChanges.forEach(row=>applied.push(`${row.label} ${row.from}→${row.to}`));
+  if(profile.saveBonus)applied.push(`все спасброски +${profile.saveBonus}`);
+  if(profile.resistances.length)applied.push(`сопротивления: ${profile.resistances.join(', ')}`);
+  const notes=profile.conditional.concat(profile.suppressed);
+  return `<div class="misc-effect-summary">
+    <div class="misc-effect-title">Автоматический пересчёт</div>
+    <div class="misc-effect-pills">${applied.length?applied.map(text=>`<span>${escHtml(text)}</span>`).join(''):'<span class="muted">постоянных числовых эффектов нет</span>'}</div>
+    ${notes.length?`<div class="misc-effect-notes">${notes.map(text=>`<div>⚠ ${escHtml(text)}</div>`).join('')}</div>`:''}
+  </div>`;
+}
+function renderMiscEquipmentSelector(c){
+  const catalog=miscEquipmentCatalog(), selected=getStoredMiscEquipment(c), selectedItems=selectedMiscItems(c), empty=!catalog.length;
+  const options=`<option value="">${empty?'— база предметов пока пуста —':'— не выбрано —'}</option>`+catalog.map(item=>`<option value="${escHtml(item.id||item.name)}">${escHtml(item.name)}${item.category?` · ${escHtml(item.category)}`:''}${item.rarity?` · ${escHtml(item.rarity)}`:''}</option>`).join('');
+  const cards=selectedItems.length?`<div class="misc-card-grid">${selectedItems.map(renderMiscItemCard).join('')}</div>`:'<div class="misc-card-empty">Предметы не выбраны.</div>';
+  const attuned=selectedItems.filter(item=>item.attunement).length, profile=getMiscItemEffectProfile(c);
+  return `<div class="armor-tool misc-tool"><div class="armor-tool-head"><div><strong>Прочее снаряжение</strong><span>Амулеты, кольца, плащи и другие носимые тер’ангриалы.</span></div><span class="misc-db-state">${empty?'0 предметов':`выбрано ${selectedItems.length}/3 · настройка ${attuned}/3`}</span></div><div class="misc-form">${selected.map((value,index)=>`<label>Слот ${index+1}<select ${empty?'disabled':''} onchange="setNpcMiscEquipment(${c.id},${index},this.value)">${options.replace(`value="${escHtml(value)}"`,`value="${escHtml(value)}" selected`)}</select></label>`).join('')}</div>${cards}${renderMiscEffectSummary(c,profile)}<div class="armor-result ${empty?'warn':'ok'}">${empty?'Добавьте записи в <code>WOT_NPC_MISC_ITEMS</code>.':'Постоянные эффекты пересчитываются поверх исходной карточки без её изменения. Реакции и временные свойства остаются в «Боевом пульте».'}</div><div class="armor-actions"><button onclick="resetNpcMiscEquipment(${c.id})">Очистить слоты</button></div></div>`;
+}
+function setNpcMiscEquipment(id,index,value){
+  const list=getStoredMiscEquipment(getNpcById(id)||id), choices=getStoredMiscEquipmentChoices(getNpcById(id)||id);
+  if(list[index]!==String(value||''))choices[index]='';
+  list[index]=String(value||'');
+  const state=getState(id);state.miscEquipment=list;state.miscEquipmentChoices=choices;
+  savePersistedState();showNPC(id);
+}
+function setNpcMiscEquipmentChoice(id,index,value){
+  const choices=getStoredMiscEquipmentChoices(getNpcById(id)||id);
+  choices[index]=String(value||'');getState(id).miscEquipmentChoices=choices;
+  savePersistedState();showNPC(id);
+}
+function resetNpcMiscEquipment(id){const state=getState(id);state.miscEquipment=['','',''];state.miscEquipmentChoices=['','',''];savePersistedState();showNPC(id);}
 
 
 function parseSignedBonus(v){
@@ -1861,15 +2060,16 @@ function clipNpcText(v, limit){
 }
 function npcTextRecords(c){
   const rec=[];
-  const add=(source,name,text,rank)=>{
+  const add=(source,name,text,rank,tags=[])=>{
     const t=cleanNpcText(text);
     if(!t) return;
-    rec.push({source:source||'', name:name||'', text:t, rank:rank||0});
+    rec.push({source:source||'', name:name||'', text:t, rank:rank||0, tags:Array.isArray(tags)?tags:[]});
   };
-  if(c && c.co){ add('Бой','Кратко',c.co.cr,4); add('Спасброски','СБ',c.co.sv,2); }
+  if(c && c.co){ add('Бой','Кратко',c.co.cr,4); add('Спасброски','СБ',getDisplaySaves(c),2); }
   (c.ab||[]).forEach(a=>add('Черта',a.n,a.d,a.hi?5:3));
   (c.hi && c.hi.items || []).forEach(it=>add('Иерархия',it.n,it.d,6));
   (c.eq||[]).forEach(e=>add('Снаряжение',e.r?'⭐ предмет':'предмет',e.t,e.r?4:1));
+  selectedMiscItems(c).forEach(item=>add('Предмет',item.name,item.description,8,item.combatTags));
   getDisplayAttacks(c).forEach(a=>add('Атака',a.n,a.no,2));
   (c.tactics||[]).forEach(t=>add('Тактика',t.ph,t.d,1));
   if(c.angrial) add('Ангриал','Ангриал',c.angrial.desc,4);
@@ -1898,7 +2098,7 @@ function combatBrief(c){
   const out = {};
   cats.forEach(cat=>{
     const found = records
-      .filter(r=>briefMatches(r.name+' '+r.text, cat.patterns))
+      .filter(r=>(r.tags||[]).includes(cat.key)||briefMatches(r.name+' '+r.text, cat.patterns))
       .sort((a,b)=>(b.rank||0)-(a.rank||0));
     out[cat.key] = uniqueBriefItems(found).slice(0,4).map(r=>({source:r.source, name:r.name, text:clipNpcText(r.text, 210)}));
     out[cat.key].meta = cat;
@@ -1928,6 +2128,7 @@ function renderCombatDashboard(id, c, s){
   const spellLine = getSpellLine(c);
   const slotLine = c.slots && c.slots.length ? c.slots.map(sl=>`${escHtml(sl.lv)}:${sl.n}`).join(' · ') : '';
   const activeAngrial = (c.spells || c.slots) ? getSelectedAngrial(c) : ANGRIAL_CATALOG[0];
+  const itemResistances = getDisplayResistances(c);
   const criticalGroups = ['turn','defense','reaction','bonus','aura','resource']
     .map(k=>renderBriefGroup(brief.out[k].meta, brief.out[k]))
     .join('');
@@ -1943,12 +2144,12 @@ function renderCombatDashboard(id, c, s){
     <div class="bd-metrics">
       <div class="bd-metric ac"><span>КД</span><b>${getDisplayAC(c)}</b></div>
       <div class="bd-metric hp"><span>ОЗ</span><b>${s.curHp}/${c.co.hp}</b></div>
-      <div class="bd-metric"><span>Иниц.</span><b>${escHtml(c.co.ini)}</b></div>
+      <div class="bd-metric"><span>Иниц.</span><b>${escHtml(getDisplayInitiative(c))}</b></div>
       <div class="bd-metric"><span>Скор.</span><b>${escHtml(c.co.sp)} фт</b></div>
       <div class="bd-metric"><span>Пасс. ВСПР</span><b>${escHtml(c.co.pp)}</b></div>
       <div class="bd-metric"><span>Плетения</span><b>${escHtml(spellLine)}</b></div>
     </div>
-    ${slotLine || activeAngrial.id!=='none' ? `<div class="bd-resource-line">${slotLine ? `<span><b>Ячейки:</b> ${slotLine}</span>` : ''}${activeAngrial.id!=='none' ? `<span><b>${activeAngrial.kind==='saangrial'?'Са’ангриал':'Ангриал'}:</b> сила ${activeAngrial.lv} · атака +${activeAngrial.attack} · +${activeAngrial.dice} куб. · ×${activeAngrial.range}</span>` : ''}</div>` : ''}
+    ${slotLine || activeAngrial.id!=='none' || itemResistances.length ? `<div class="bd-resource-line">${slotLine ? `<span><b>Ячейки:</b> ${slotLine}</span>` : ''}${activeAngrial.id!=='none' ? `<span><b>${activeAngrial.kind==='saangrial'?'Са’ангриал':'Ангриал'}:</b> сила ${activeAngrial.lv} · атака +${activeAngrial.attack} · +${activeAngrial.dice} куб. · ×${activeAngrial.range}</span>` : ''}${itemResistances.length?`<span><b>Сопр. от предметов:</b> ${escHtml(itemResistances.join(', '))}</span>`:''}</div>` : ''}
     <div class="battle-brief-grid">${criticalGroups}${emptyLine}</div>
   </section>`;
 }
@@ -1995,7 +2196,7 @@ function showNPC(id) {
   ${c.isClone ? `<button class="cp-reset-btn cp-clone-remove" onclick="removeEncounterClone(${c.id})" title="Удалить эту копию из сцены">× копия</button>` : `<button class="cp-reset-btn cp-clone-add" onclick="addEncounterClone(${c.id})" title="Создать ещё одну копию этого NPC">＋ копия</button>`}
   ${c.custom && !c.isClone ? `<button class="cp-reset-btn cp-custom-remove" onclick="deleteCustomNpcFromBrowser(${c.id})" title="Удалить пользовательского NPC из этого браузера">× удалить NPC</button>` : ``}
   <div class="cp-ac-box"><div class="cp-ac-val" id="cp-ac-val">${getDisplayAC(c)}</div><div class="cp-ac-lbl">КД</div></div>
-  <div class="cp-ini-box" onclick="addToIni(${c.id})" title="Добавить в трекер инициативы"><div class="cp-ini-val">${c.co.ini}</div><div class="cp-ini-lbl">Иниц.</div></div>
+  <div class="cp-ini-box" onclick="addToIni(${c.id})" title="Добавить в трекер инициативы"><div class="cp-ini-val">${getDisplayInitiative(c)}</div><div class="cp-ini-lbl">Иниц.</div></div>
   <div class="cp-sp-box"><div class="cp-sp-val">${c.co.sp} фт</div><div class="cp-sp-lbl">Скор.</div></div>
   <div class="cp-pass-box" title="Пассивное восприятие"><div class="cp-pass-val">${c.co.pp}</div><div class="cp-pass-lbl">Пасс ВСПР</div></div>
   <div class="cp-pass-box" title="Пассивная проницательность"><div class="cp-pass-val">${getPassiveInsight(c)}</div><div class="cp-pass-lbl">Пасс ПРН</div></div>
@@ -2154,12 +2355,13 @@ ${Array.from({length:sdN},(_,i)=>`<div class="sd-pip${i<s.sdUsed?' used':''}" on
 <div class="stats-grid">
 ${['СИЛ','ТЕЛ','ЛОВ','ИНТ','МДР','ХАР'].map((name,si)=>{
   const keys=['str','con','dex','int','wis','cha'];
-  const val=c.st[keys[si]];
-  return `<div class="stat-box"><div class="stat-name">${name}</div><div class="stat-val">${val}</div><div class="stat-mod">${m(val)}</div></div>`;
+  const key=keys[si], base=c.st[key], val=getDisplayStat(c,key), changed=val!==base;
+  return `<div class="stat-box${changed?' item-adjusted':''}"><div class="stat-name">${name}</div><div class="stat-val">${val}</div><div class="stat-mod">${m(val)}</div>${changed?`<div class="stat-base">база ${base}</div>`:''}</div>`;
 }).join('')}
 </div>
 <div class="core-grid">
-  <div class="core-box"><span style="font-size:10px;color:var(--text3)">Спасброски</span><span class="core-val" style="font-size:11px">${c.co.sv}</span></div>
+  <div class="core-box"><span style="font-size:10px;color:var(--text3)">Спасброски</span><span class="core-val" style="font-size:11px">${getDisplaySaves(c)}</span></div>
+  ${getDisplayResistances(c).length?`<div class="core-box core-wide item-resistances"><span style="font-size:10px;color:var(--text3)">Сопротивления от предметов</span><span class="core-val" style="font-size:11px">${escHtml(getDisplayResistances(c).join(', '))}</span></div>`:''}
   <div class="core-box"><span style="font-size:10px;color:var(--text3)">Бонус умения</span><span class="core-val">${c.co.prof}</span></div>
   <div class="core-box passive-core"><span class="core-label">Пасс ВСПР<br><em>пассивное восприятие</em></span><span class="core-val big">${c.co.pp}</span></div>
   <div class="core-box passive-core"><span class="core-label">Пасс ПРН<br><em>пассивная проницательность</em></span><span class="core-val big">${getPassiveInsight(c)}</span></div>
@@ -2582,10 +2784,11 @@ function resetHP(id) {
 function addToIni(id) {
   const c = getNpcById(id);
   if (!c) return;
-  const iniStr = c.co.ini.replace(/[^0-9+\-]/g,'');
-  const iniBonus = parseInt(iniStr)||0;
-  const roll20 = Math.floor(Math.random()*20)+1;
-  const total = roll20 + iniBonus;
+  const initiative=getDisplayInitiativeProfile(c);
+  const first=Math.floor(Math.random()*20)+1;
+  const second=initiative.advantage?Math.floor(Math.random()*20)+1:first;
+  const roll20=initiative.advantage?Math.max(first,second):first;
+  const total=roll20+initiative.total;
   if (!iniOrder.find(e=>Number(e.id)===Number(id))) {
     iniOrder.push({id, val:total});
     iniOrder.sort((a,b)=>b.val-a.val);
@@ -2595,6 +2798,7 @@ function addToIni(id) {
 }
 
 
+
 function iniNext() { if (iniOrder.length) { iniCurrent=(iniCurrent+1)%iniOrder.length; savePersistedState(); refreshIniTracker(); } }
 function iniJump(i) { iniCurrent=i; savePersistedState(); refreshIniTracker(); if(iniOrder[i]) showNPC(iniOrder[i].id); }
 function iniClear() { iniOrder=[]; iniCurrent=0; savePersistedState(); refreshIniTracker(); }
@@ -2602,7 +2806,7 @@ function iniClear() { iniOrder=[]; iniCurrent=0; savePersistedState(); refreshIn
 
 
 function renderFormsTab(i, c) {
-  var dexMod = Math.floor((c.st.dex - 10)/2);
+  var dexMod = Math.floor((getDisplayStat(c,'dex') - 10)/2);
   var prof = parseInt(c.co.prof);
   var dc = 10 + dexMod + prof;
   var parts = [];
