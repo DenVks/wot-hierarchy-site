@@ -20,15 +20,16 @@ run('assets/hierarchy-mechanics.js');
 run('assets/classes-data.js');
 run('assets/pact-matrices-data.js');
 run('assets/feats-data.js');
+run('assets/npc-rules-data.js');
 
 let generatorSource = fs.readFileSync(path.join(root, 'assets/npc-generator.js'), 'utf8');
 generatorSource = generatorSource.replace(
   /document\.addEventListener\('DOMContentLoaded',bind\);\r?\n\}\)\(\);\s*$/,
-  "global.__npcHierarchyTest={applyHierarchy,avgHp,rankOrder,hierarchyProfileSummary,getChannelingSlots};\n})();"
+  "global.__npcHierarchyTest={applyHierarchy,avgHp,rankOrder,hierarchyProfileSummary,getChannelingSlots,applyStatBlock,calcAttack,buildWeaponAttackSequence};\n})();"
 );
 vm.runInThisContext(generatorSource, { filename: 'assets/npc-generator.js' });
 
-const { applyHierarchy, getChannelingSlots } = global.__npcHierarchyTest;
+const { applyHierarchy, getChannelingSlots, applyStatBlock, calcAttack, buildWeaponAttackSequence } = global.__npcHierarchyTest;
 const db = window.WOT_HIERARCHY_DB;
 const matrixDb = window.WOT_PACT_MATRICES;
 const featsDb = window.WOT_FEATS_DB;
@@ -55,6 +56,19 @@ assert(pactLevel13.forbiddenMatrix === '7-й уровень', 'Pact Bearer level
 {
   const slots = getChannelingSlots('Дичок', 13, 'Странник', { extraSlots: 0 }, []);
   assert(JSON.stringify(slots) === JSON.stringify([{lv:'1',n:5},{lv:'2',n:4},{lv:'3',n:4},{lv:'4',n:3},{lv:'5',n:3},{lv:'6',n:2},{lv:'7',n:1}]), 'Wilder level-13 weave slots are incorrect.');
+}
+
+{
+  const result = applyStatBlock(blankStats(10), context({ cls: 'Дичок', role: 'Контроль', nation: '', lv: 15, featsSel: ['Устойчивый'], faction: 'none', rank: '0', branch: '', isChanneler: true }));
+  assert(result.featNotes.includes('Устойчивый: ТЕЛ +1'), 'Resilient must increase Constitution for a channeling NPC.');
+}
+
+{
+  const equipment = { weapon: { name: 'Axe, hafted / Секира', damage: '1к12', stat: 'str', type: 'melee', properties: 'Heavy, two-handed' }, weaponBonus: 3 };
+  const attack = calcAttack('Варвар', { str: 24, dex: 15, con: 24, int: 10, wis: 13, cha: 10 }, equipment, 5, ['Мастер большого оружия'], { attackBonus: 3, damageBonus: 0, forceDamageDie: '1к8' }, null, '', 14, 'Путь Берсерка');
+  const sequence = buildWeaponAttackSequence(attack, ['Мастер большого оружия'], equipment, 'Варвар', 'Путь Берсерка', 14);
+  assert(attack.a === '+18' && /1к12\+13/.test(attack.baseDamage) && /Ярость: \+3/.test(attack.no), 'Barbarian attack must include rank-IV accuracy and level-14 Rage damage.');
+  assert(sequence.length === 3 && /Бешенство/.test(sequence[2].n), 'Berserker sequence must contain two action attacks and one Frenzy attack.');
 }
 
 {
@@ -95,7 +109,7 @@ assert(pactLevel13.forbiddenMatrix === '7-й уровень', 'Pact Bearer level
 
 run('assets/npc-data.js');
 {
-  const expectedAttackCounts = { 43: 4, 44: 3, 45: 3, 46: 1, 47: 2, 48: 1 };
+  const expectedAttackCounts = { 43: 4, 44: 3, 45: 3, 46: 1, 47: 2, 48: 1, 49: 3, 50: 1 };
   Object.entries(expectedAttackCounts).forEach(([id, count]) => {
     const npc = window.NPC_DATA.find(entry => Number(entry.id) === Number(id));
     assert(npc, `NPC ${id} is missing.`);
@@ -107,6 +121,8 @@ run('assets/npc-data.js');
   const archer = window.NPC_DATA.find(entry => Number(entry.id) === 44);
   const rogue = window.NPC_DATA.find(entry => Number(entry.id) === 47);
   const wilder = window.NPC_DATA.find(entry => Number(entry.id) === 48);
+  const berserker = window.NPC_DATA.find(entry => Number(entry.id) === 49);
+  const naksha = window.NPC_DATA.find(entry => Number(entry.id) === 50);
   assert(blade.pact.secretMatrices.length === 4 && blade.pact.forbiddenMatrices.length === 2, 'Blade Pact NPC matrix selection is incomplete.');
   assert(book.pact.secretMatrices.length === 4 && book.pact.forbiddenMatrices.length === 2, 'Book Pact NPC matrix selection is incomplete.');
   assert(book.pact.openFormula === 'Прикосновение Смерти', 'Book Pact NPC Open Formula is incorrect.');
@@ -120,7 +136,20 @@ run('assets/npc-data.js');
   assert(wilder.spells.some(spell => Number(spell.lv) === 0 && /Разорвать плоть/i.test(spell.n)), 'Wilder combat cantrips must include Rend Flesh.');
   assert(JSON.stringify(wilder.affinities) === JSON.stringify(['Земля','Огонь']), 'Wilder affinities must remain Earth and Fire.');
   assert(/Страж проходов/.test(guard.su) && !/контрол[её]р/i.test(guard.su), 'Guardian role subtitle must explain the battlefield-control role without unexplained jargon.');
-  assert([43,44,45,46,47,48].every(id => window.NPC_DATA.find(entry => entry.id === id).tactics.length === 5), 'Every new NPC must have five standalone tactics phases.');
+  assert([43,44,45,46,47,48,49,50].every(id => window.NPC_DATA.find(entry => entry.id === id).tactics.length === 5), 'Every new NPC must have five standalone tactics phases.');
+  assert(berserker.lv === 14 && berserker.na === 'Шара' && berserker.hi.rank === 'IV' && berserker.hi.branch === 'warrior', 'NPC 49 identity or hierarchy branch is incorrect.');
+  assert(berserker.co.hp === 355 && berserker.co.ac === 24 && berserker.co.sp === 45, 'NPC 49 defenses or movement are incorrect.');
+  assert(berserker.st.str === 24 && berserker.st.con === 24, 'NPC 49 primary characteristics must be 24/24.');
+  assert(berserker.at.every(attack => attack.a === '+18' && /1к8/.test(attack.d)), 'NPC 49 attacks must include the IV-rank attack bonus and Blood of Hundreds damage.');
+  assert(berserker.ab.some(feature => /Мастер большого оружия/i.test(feature.n)), 'NPC 49 must expose Great Weapon Master.');
+  assert(naksha.lv === 15 && naksha.na === 'Шара' && naksha.hi.rank === 'IV' && naksha.hi.branch === 'aiyad', 'NPC 50 identity or hierarchy branch is incorrect.');
+  assert(naksha.co.hp === 260 && naksha.co.ac === 23 && naksha.st.wis === 24 && naksha.st.con === 24, 'NPC 50 core profile is incorrect.');
+  assert(JSON.stringify(naksha.slots) === JSON.stringify([{lv:'1',n:5},{lv:'2',n:5},{lv:'3',n:4},{lv:'4',n:4},{lv:'5',n:4},{lv:'6',n:2},{lv:'7',n:1},{lv:'8',n:1}]), 'NPC 50 Wilder slots are missing or incorrect.');
+  assert(naksha.spells.filter(spell => Number(spell.lv) === 0).length === 4 && Math.max(...naksha.spells.map(spell => Number(spell.lv))) === 7, 'NPC 50 must have four cantrips and no illegal circle-8 weave.');
+  assert(JSON.stringify(naksha.affinities) === JSON.stringify(['Воздух','Огонь']), 'NPC 50 affinities must remain Air and Fire.');
+  assert(naksha.angrial.lv === 6 && naksha.angrial.attack === 3 && naksha.angrial.dice === 6 && naksha.angrial.range === 2, 'NPC 50 angrial profile is incorrect.');
+  assert(naksha.excTalents.some(group => group.items.some(entry => /Усиленный Танец Облаков/i.test(entry.n))), 'NPC 50 must expose the level-15 Potent Cloud Dancing talent.');
+  assert(naksha.ab.some(feature => /Боевой направляющий/i.test(feature.n)) && naksha.ab.some(feature => /Устойчивый/i.test(feature.n)), 'NPC 50 combat feats are incomplete.');
 }
 
 {
@@ -137,10 +166,13 @@ run('assets/npc-data.js');
   assert(dmSource.includes("/[+\\-]\\s*\\d+(?!\\d)(?!\\s*к)/g"), 'Weapon damage rolls must support signed flat modifiers such as the Wilder\'s 1к4-1.');
   assert(dmSource.includes('function renderWeaponSelector') && dmSource.includes('function getDisplayAttacks'), 'Equipment tab must expose a weapon selector that updates combat attacks.');
   assert(dmSource.includes('magicBonus') && dmSource.includes('Магическое оружие'), 'Weapon override must account for the magic bonus in attacks and damage.');
+  assert(dmSource.includes('function canFrenzyBonus') && dmSource.includes('Атака Бешенства'), 'Weapon override must preserve the Berserker Frenzy attack.');
+  assert(generatorSource.includes("/Варвар/.test(cls)&&Number(lv)>=5?2:1") && generatorSource.includes('Ярость ${sign(rageBonus)}'), 'NPC Generator must include Barbarian Extra Attack and Rage damage.');
+  assert(generatorSource.includes("fn==='Устойчивый'&&isChannelingClass(ctx.cls)"), 'NPC Generator must assign Resilient to Constitution for channeling classes.');
   assert(dmSource.includes('function renderMiscEquipmentSelector') && miscSource.includes('window.WOT_NPC_MISC_ITEMS = []'), 'Empty miscellaneous equipment catalog template is missing.');
   assert(dmHtml.includes('assets/npc-misc-items.js'), 'NPC page must load the miscellaneous equipment catalog before the combat UI.');
   assert(dmSource.includes('function npcClassNames') && dmSource.includes('Класс: Воин / Мастер по оружию'), 'Armor proficiency must use structured class names and recognize the Fighter class.');
   assert(dmSource.includes('const effective=base===0?Math.min(9,matched):Math.min(9,base+matched)') && dmSource.includes('Аффинитеты: совпало'), 'Wilder affinity matches must increase the effective weave circle and remain visible in calculation notes.');
 }
 
-console.log(`OK: ${db.hierarchies.length} hierarchies, ${db.hierarchies.reduce((sum, h) => sum + h.ranks.length, 0)} ranks, ${db.hierarchies.reduce((sum, h) => sum + h.abilities.length, 0)} abilities; ${matrixDb.secret.length + matrixDb.forbidden.length + matrixDb.restricted.length} Pact matrix records; six level-13 NPC combat profiles passed.`);
+console.log(`OK: ${db.hierarchies.length} hierarchies, ${db.hierarchies.reduce((sum, h) => sum + h.ranks.length, 0)} ranks, ${db.hierarchies.reduce((sum, h) => sum + h.abilities.length, 0)} abilities; ${matrixDb.secret.length + matrixDb.forbidden.length + matrixDb.restricted.length} Pact matrix records; NPC 43–50 combat profiles passed.`);

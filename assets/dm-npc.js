@@ -1714,6 +1714,9 @@ function canPolearmBonus(c,w){
 function canCrossbowBonus(c,w){
   return npcHasFeature(c,/Эксперт в арбалетах/i)&&/арбалет ручной|crossbow, hand/i.test(String(w&&w.name||''));
 }
+function canFrenzyBonus(c,w){
+  return npcHasClass(c,/^варвар$/i)&&npcHasFeature(c,/Бешенство/i)&&w&&w.type==='melee';
+}
 function buildWeaponOverrideAttacks(c,weaponState){
   const w=findWeaponByName(weaponState&&weaponState.weaponName), base=c&&c.at&&c.at[0]||{}, count=weaponPrimaryAttackCount(c), magic=Number(weaponState&&weaponState.magicBonus)||0;
   if(!w)return c&&c.at||[];
@@ -1725,7 +1728,9 @@ function buildWeaponOverrideAttacks(c,weaponState){
     const d=i===0&&once?`${damage} + ${once} (1/ход)`:damage;
     rows.push(Object.assign({},common,{n:`${w.name} · атака ${i+1}/${count}`,d,onceDamage:once,no:`Действие «Атака». ${props}${notes.length?' · '+notes.join(' · '):''}`,formula:`Атака: ${stat.toUpperCase()} ${signedFlat(ability)}${proficient?` + БМ ${signedFlat(prof)}`:' + без владения'}${special?` + особые бонусы ${signedFlat(special)}`:''}${magic?` + магия +${magic}`:''} = ${signedFlat(attack)}. Урон: ${damage}.`}));
   }
-  if(canPolearmBonus(c,w)){
+  if(canFrenzyBonus(c,w)){
+    rows.push(Object.assign({},common,{n:`${w.name} · Бешенство`,d:damage,baseDamage:damage,onceDamage:'',no:`Бонусное действие · Бешенство Пути Берсерка во время Ярости; после окончания Ярости — 1 уровень истощения. ${props}${notes.length?' · '+notes.join(' · '):''}`,formula:`Атака Бешенства: ${signedFlat(attack)}. Урон: ${damage}.`}));
+  }else if(canPolearmBonus(c,w)){
     const haft=w.damage==='—'?'—':`1к4${signedFlat(ability+magic)}${tail}`;
     rows.push(Object.assign({},common,{n:`${w.name} · древко`,d:haft,baseDamage:haft,onceDamage:'',t:'Дроб.',no:`Бонусное действие · Мастер древкового оружия: 1к4 вместо основного кубика. ${props}${notes.length?' · '+notes.join(' · '):''}`,formula:`Атака древком: ${signedFlat(attack)}. Урон: ${haft}.`}));
   }else if(canCrossbowBonus(c,w)){

@@ -342,7 +342,10 @@ function applyStatBlock(base,ctx){
   const fnotes=[]; ctx.featsSel.forEach(fn=>{
     const eff=(rules.featEffects||{})[fn]; if(!eff) return;
     let statObj=eff.stat;
-    if(!statObj && eff.statChoice){ const chosen=eff.statChoice.find(k=>pri.includes(k))||eff.statChoice[0]; statObj={[chosen]:1}; }
+    if(!statObj && eff.statChoice){
+      const chosen=fn==='Устойчивый'&&isChannelingClass(ctx.cls)&&eff.statChoice.includes('con')?'con':(eff.statChoice.find(k=>pri.includes(k))||eff.statChoice[0]);
+      statObj={[chosen]:1};
+    }
     if(statObj){ Object.entries(statObj).forEach(([k,v])=>{addStat(stats,k,v,20); fnotes.push(`${fn}: ${abbr[k]} +${v}`);}); }
   });
   fnotes.forEach(x=>steps.push(x));
@@ -605,7 +608,7 @@ function hasFeat(name,sel){
   const wanted=String(name||'').toLowerCase();
   return sel.some(x=>{const actual=String(x||'').toLowerCase();return actual===wanted||actual.startsWith(wanted+' (');});
 }
-function calcAttack(cls,stats,eq,p,featsSel,h,style,pactAnchor='',lv=1){
+function calcAttack(cls,stats,eq,p,featsSel,h,style,pactAnchor='',lv=1,arch=''){
   const w=eq.weapon; let stat=w.stat||'str'; if(w.properties&&/Finesse|фехтов/i.test(w.properties)){ stat=mod(stats.dex)>=mod(stats.str)?'dex':'str'; }
   const pactBladeSelected=/Носитель Договора/i.test(cls)&&pactAnchor==='blade'&&Number(lv)>=3;
   const pactBlade=pactBladeSelected&&!/^Без оружия$/i.test(String(w.name||''));
@@ -625,7 +628,12 @@ function calcAttack(cls,stats,eq,p,featsSel,h,style,pactAnchor='',lv=1){
     if(style.id==='protection') notes.push(`${style.n}: реакция, помеха атаке по союзнику в 5 фт при наличии щита`);
     if(style.id==='two_weapon') notes.push(`${style.n}: модификатор характеристики добавляется к урону второй атаки`);
   }
-  if(/Варвар/.test(cls)&&w.type==='melee') notes.push('Ярость добавляет урон ярости только при атаке Силой и активной ярости.');
+  if(/Варвар/.test(cls)&&w.type==='melee'&&stat==='str'){
+    const rageBonus=Number(lv)>=16?4:Number(lv)>=9?3:2;
+    dmgBonus+=rageBonus;
+    damageParts.push(`Ярость ${sign(rageBonus)}`);
+    notes.push(`Ярость: ${sign(rageBonus)} к урону рукопашной атаки Силой; строка показывает активную Ярость.`);
+  }
   if(hasFeat('Мастер большого оружия',featsSel) && /Heavy|тяж/i.test(w.properties||'')) notes.push('Мастер большого оружия: можно −5 к атаке / +10 к урону.');
   if(hasFeat('Меткий стрелок',featsSel) && w.type==='ranged') notes.push('Меткий стрелок: можно −5 к атаке / +10 к урону, игнор укрытий.');
   if(h.forceDamageDie){perHitDamage.push(`${h.forceDamageDie} силового (Иерархия)`);notes.push(`Иерархия: +${h.forceDamageDie} силового урона при подходящей оружейной атаке`);}
@@ -634,18 +642,19 @@ function calcAttack(cls,stats,eq,p,featsSel,h,style,pactAnchor='',lv=1){
   const formula=`Атака: ${attackParts.join(' + ')} = ${sign(attack)}. Урон каждого попадания: ${w.damage} + ${damageParts.join(' + ')} = ${w.damage}${sign(dmgBonus)}${perHitDamage.length?'; дополнительно '+perHitDamage.join(' + '):''}${onceDamage.length?'; один раз за ход '+onceDamage.join(' + '):''}.`;
   const martialExtraAttack=/^(Воин|Мастер по оружию)$/.test(cls)
     ? (Number(lv)>=20?4:Number(lv)>=11?3:Number(lv)>=5?2:1)
-    : 1;
+    : (/Варвар/.test(cls)&&Number(lv)>=5?2:1);
   return {n:w.name,a:sign(attack),d:damage,baseDamage,onceDamage:onceDamage.join(' + '),t:w.type==='ranged'?'Прон.':'Руб./Прон.',r:w.type==='ranged'?'дистанция по оружию':'Ближний',no:[w.properties, ...notes].filter(Boolean).join(' · '),formula,stat,attacks:pactBlade&&Number(lv)>=5?2:martialExtraAttack};
 }
 
-function buildWeaponAttackSequence(attack,featsSel,eq){
+function buildWeaponAttackSequence(attack,featsSel,eq,cls='',arch='',lv=1){
   const rows=[], count=Math.max(1,Number(attack.attacks)||1), onceNote=attack.onceDamage?` Усиление «${attack.onceDamage}» можно перенести на первое успешное попадание этого хода.`:'';
   for(let index=0;index<count;index++)rows.push(Object.assign({},attack,{n:`${attack.n} · атака ${index+1}/${count}`,d:index===0?attack.d:attack.baseDamage,no:`Действие «Атака». ${attack.no}${onceNote}`}));
-  if(hasFeat('Мастер древкового оружия',featsSel)&&/алебард|глеф|копь|посох|древков/i.test(String(eq.weapon.name||'')+' '+String(eq.weapon.properties||''))){
+  if(/Варвар/.test(cls)&&/Берсерк/i.test(arch)&&Number(lv)>=3&&eq.weapon.type==='melee'){
+    rows.push(Object.assign({},attack,{n:`${attack.n} · Бешенство`,d:attack.baseDamage,onceDamage:'',no:`Бонусное действие · Бешенство Пути Берсерка во время Ярости; после окончания Ярости — 1 уровень истощения.${onceNote} ${attack.no}`}));
+  }else if(hasFeat('Мастер древкового оружия',featsSel)&&/алебард|глеф|копь|посох|древков/i.test(String(eq.weapon.name||'')+' '+String(eq.weapon.properties||''))){
     const haftDamage=String(attack.baseDamage||attack.d).replace(/^\d+к\d+/i,'1к4');
     rows.push(Object.assign({},attack,{n:`${attack.n} · древко`,d:haftDamage,baseDamage:haftDamage,onceDamage:'',no:`Бонусное действие · Мастер древкового оружия: 1к4 вместо основного кубика оружия.${onceNote} ${attack.no}`,formula:`${attack.formula} Для удара древком основной кубик оружия заменён на 1к4.`}));
-  }
-  if(hasFeat('Эксперт в арбалетах',featsSel)&&/арбалет/i.test(String(eq.weapon.name||''))){
+  }else if(hasFeat('Эксперт в арбалетах',featsSel)&&/арбалет/i.test(String(eq.weapon.name||''))){
     rows.push(Object.assign({},attack,{n:`${attack.n} · дополнительный выстрел`,d:attack.baseDamage,onceDamage:'',no:`Бонусное действие · Эксперт в арбалетах.${onceNote} ${attack.no}`}));
   }
   return rows;
@@ -695,8 +704,8 @@ function buildNpc(){
   const hierarchyChoices=readHierarchyStatChoices(), hierarchyCtx={cls,role,faction,rank,branch,isChanneler:isChannelingClass(cls),lv,nation,featsSel,hierarchyChoices,profileKind:$('npc-hierarchy-profile-kind')?.value||'regular',screamInitiative:$('npc-scream-initiative')?.value||'none',screamInitiativeStat:$('npc-scream-initiative-stat')?.value||'dex',screamCharge:$('npc-scream-charge')?.checked!==false};
   const baseStats=getBaseStats(), applied=applyStatBlock(baseStats,hierarchyCtx), baseline=applyStatBlock(baseStats,Object.assign({},hierarchyCtx,{faction:'none',rank:'0',branch:''})), stats=applied.stats, h=applied.hierarchy, eq=getEquipment(), acCalc=calcAc(cls,stats,eq,h,style,selectedSecretMatrices), baselineAc=calcAc(cls,baseline.stats,eq,baseline.hierarchy,style,selectedSecretMatrices), features=availableFeatures(cls,arch,lv,pactAnchor,selectedSecretMatrices,selectedForbiddenMatrices);
   const initiativeStat=h.type==='scream'?(hierarchyCtx.screamInitiativeStat||'dex'):'dex', hp=avgHp(cls,lv,stats.con,h), ini=mod(stats[initiativeStat])+(h.initiativeBonus||0), pp=10+mod(stats.wis)+p+((featsSel.includes('Внимательный'))?5:0);
-  const baselineHp=avgHp(cls,lv,baseline.stats.con,baseline.hierarchy), baselineIni=mod(baseline.stats.dex), baselineAttack=calcAttack(cls,baseline.stats,eq,p,featsSel,baseline.hierarchy,style,pactAnchor,lv);
-  const attack=calcAttack(cls,stats,eq,p,featsSel,h,style,pactAnchor,lv), weaponAttacks=buildWeaponAttackSequence(attack,featsSel,eq), channelingSlots=getChannelingSlots(cls,lv,arch,h,selectedForbiddenMatrices), hi=h.name?{id:faction,rank,branch:branch||null,vessel:h.type==='shara'&&rank==='V'?($('npc-shara-vessel')?.value||null):null,version:h.version,source:h.source,nm:h.name,ty:h.type,items:[...h.items,{n:'Сводные бонусы',d:`${hierarchyProfileSummary({hp:h.hpBonus,hitDiceMult:h.hpMult,ac:h.acBonus,attack:h.attackBonus,damage:h.damageBonus,speed:h.speedBonus,initiative:h.initiativeBonus,initiativeAdv:h.initiativeAdv,saves:h.saveBonus,stability:h.stability,dc:h.dcBonus,regen:h.regen,conductivity:h.conductivity})}. Атаки плетениями ${sign(h.weaveAttack)}; дополнительных кубиков урона ${h.weaveDamageDice}; дальность/область ×${h.weaveRangeMult}; дополнительных применений ${h.extraSlots}.`}]}:null;
+  const baselineHp=avgHp(cls,lv,baseline.stats.con,baseline.hierarchy), baselineIni=mod(baseline.stats.dex), baselineAttack=calcAttack(cls,baseline.stats,eq,p,featsSel,baseline.hierarchy,style,pactAnchor,lv,arch);
+  const attack=calcAttack(cls,stats,eq,p,featsSel,h,style,pactAnchor,lv,arch), weaponAttacks=buildWeaponAttackSequence(attack,featsSel,eq,cls,arch,lv), channelingSlots=getChannelingSlots(cls,lv,arch,h,selectedForbiddenMatrices), hi=h.name?{id:faction,rank,branch:branch||null,vessel:h.type==='shara'&&rank==='V'?($('npc-shara-vessel')?.value||null):null,version:h.version,source:h.source,nm:h.name,ty:h.type,items:[...h.items,{n:'Сводные бонусы',d:`${hierarchyProfileSummary({hp:h.hpBonus,hitDiceMult:h.hpMult,ac:h.acBonus,attack:h.attackBonus,damage:h.damageBonus,speed:h.speedBonus,initiative:h.initiativeBonus,initiativeAdv:h.initiativeAdv,saves:h.saveBonus,stability:h.stability,dc:h.dcBonus,regen:h.regen,conductivity:h.conductivity})}. Атаки плетениями ${sign(h.weaveAttack)}; дополнительных кубиков урона ${h.weaveDamageDice}; дальность/область ×${h.weaveRangeMult}; дополнительных применений ${h.extraSlots}.`}]}:null;
   const spells=findWeavesInput().map(w=>({n:w.title,lv:w.level,tal:w.school||'',el:Array.isArray(w.powers)?w.powers.join(' · '):'',t:getCanonicalMetaValue(w,'Время создания')||w.cast||'—',r:getCanonicalMetaValue(w,'Дальность')||w.range||'—',area:getCanonicalMetaValue(w,'Цель или область')||'',dur:getCanonicalMetaValue(w,'Длительность')||w.duration||'Мгновенная',sb:getCanonicalMetaValue(w,'Спасбросок или бросок атаки')||w.save||'—',slot:String(w.level||0),dmg:w.damage||'—',ef:getWeaveSummary(w).slice(0,420),calc:'canonical-v165'}));
   const ab=[];
   features.forEach(f=>ab.push({n:f.feature,d:f.description,hi:Number(f.levelSort||0)===lv||f.archetype===arch,source:'class'}));
@@ -709,6 +718,10 @@ function buildNpc(){
   const pact=/Носитель Договора/i.test(cls)?{patron:arch,anchor:pactAnchor||null,anchorLabel:getPactAnchorLabel(pactAnchor)||null,primary:'Харизма',supporting:'Телосложение',spellAttack:sign(mod(stats.cha)+p+(h.weaveAttack||0)),spellDc:8+p+mod(stats.cha)+(h.dcBonus||0),openFormula:openFormulaNames[0]||null,secretMatrices:selectedSecretMatrices.map(x=>({n:x.name,group:x.group,req:x.requirement,minLevel:x.minLevel,anchor:x.anchor||null,d:x.description})),forbiddenMatrices:selectedForbiddenMatrices.map(x=>({n:x.name,lv:x.level,uses:x.uses,defaultPatron:(x.defaultPatrons||[]).includes(arch),d:x.description})),note:'Тайные матрицы — постоянные улучшения Договора, а не Плетения. Запретные матрицы применяются отдельно от ячеек Договора.'}:null;
   const combatSummary=`${pact?`Плетение: ${pact.spellAttack}, СЛ ${pact.spellDc} · `:''}${weaponAttacks.length} оружейных атак в полном ходу · ${attack.n}: ${attack.a}`;
   const npc={id,sh:name,na:nation,lv,ic:/Дичок|Посвящ|Носитель Договора/.test(cls)?'🔥':/Лесник/.test(cls)?'🏹':/Скиталец/.test(cls)?'◇':/Варвар/.test(cls)?'🪓':'⚔',ty:hi?'purple':'warning',custom:true,ti:`${name} — ${cls}${arch&&arch!=='Базовый класс'?' / '+arch:''} ${lv}-го уровня`,su:`Черновик NPC · ${role} · ${$('npc-threat').value}`,tags:[cls,arch,pact&&pact.anchorLabel,ajah&&`${ajah} Айя`,`Ур.${lv}`,nation].filter(Boolean),ajah:ajah||undefined,pact:pact||undefined,talents:selectedTalents,affinities:selectedAffinities,st:stats,co:{hp,ac:acCalc.ac,sp:30+(h.speedBonus||0),ini:sign(ini)+(h.initiativeAdv?' / преим.':''),prof:sign(p),sv:`${cls==='Варвар'?'Сил, Тел':/Носитель Договора/.test(cls)?'Мдр, Хар':/Дичок|Посвящ/.test(cls)?'Инт, Мдр':'по классу'}${h.saveBonus?' +'+h.saveBonus+' от Иерархии':''}`,pp,cr:combatSummary},at:weaponAttacks,ab,hi,eq:[{r:!!(eq.weaponBonus||eq.armorBonus||eq.shieldBonus),t:`${eq.weapon.name}${eq.weaponBonus?` +${eq.weaponBonus}`:''}; ${eq.armor.name}${eq.armorBonus?` +${eq.armorBonus}`:''}; ${eq.shield.name}${eq.shieldBonus?` +${eq.shieldBonus}`:''}. КД: ${acCalc.note}.`}],sk:[{n:'Восприятие',v:sign(mod(stats.wis)+p),e:false,note:'Черновой расчёт.'},{n:'Проницательность',v:sign(mod(stats.wis)+p),e:false,note:'Черновой расчёт.'}],verify:[],tactics:[{ph:'Роль',d:`${role}. Уточните боевой паттерн под сцену.`},{ph:'Проверка ГМ',d:'Перед канонизацией проверьте ОЗ, КД, предметы, плетения и бонусы Иерархии.'}],dm:$('npc-notes')?.value||'Создано генератором. Требует утверждения ГМ.',generator:buildGeneratorSnapshot()};
+  if(/Варвар/.test(cls)&&lv>=5) npc.co.sp+=10;
+  if(/Дичок/.test(cls)){
+    npc.co.sv=`Мдр, Хар${featsSel.includes('Устойчивый')?', Тел (Устойчивый)':''}${h.saveBonus?' +'+h.saveBonus+' от Иерархии':''}`;
+  }
   if(channelingSlots.length) npc.slots=channelingSlots;
   if(spells.length) npc.spells=spells;
   npc.verify=validateNpc({cls,arch,pactAnchor,pact,lv,nation,features,featsSel,featCostState,spells,h,stats,hp,ac:acCalc.ac,applied,eq,attack,weaponAttacks,selectedTalents,selectedAffinities,selectedSecretMatrices,selectedForbiddenMatrices,hierarchyCtx});
