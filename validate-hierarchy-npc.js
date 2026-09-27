@@ -22,6 +22,7 @@ run('assets/pact-matrices-data.js');
 run('assets/feats-data.js');
 run('assets/npc-rules-data.js');
 run('assets/npc-misc-items.js');
+run('assets/npc-elixirs.js');
 
 let generatorSource = fs.readFileSync(path.join(root, 'assets/npc-generator.js'), 'utf8');
 generatorSource = generatorSource.replace(
@@ -36,6 +37,7 @@ const matrixDb = window.WOT_PACT_MATRICES;
 const featsDb = window.WOT_FEATS_DB;
 const miscDb = window.WOT_NPC_MISC_ITEMS;
 const miscEffectsDb = window.WOT_NPC_MISC_ITEM_EFFECTS;
+const elixirDb = window.WOT_NPC_ELIXIRS;
 const blankStats = value => ({ str: value, dex: value, con: value, int: value, wis: value, cha: value });
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 const picks = (ranks, first, second, amount = 2) => Object.fromEntries(ranks.map(rank => [rank, [{ key: first, amount, slot: 0 }, { key: second, amount, slot: 1 }]]));
@@ -63,6 +65,9 @@ assert(Object.keys(miscEffectsDb).every(id => miscDb.some(item => item.id === id
 assert(miscEffectsDb['ring-protection'].ac.bonus === 1 && miscEffectsDb['ring-protection'].saves.all === 1, 'Ring of Protection mechanics are incomplete.');
 assert(miscEffectsDb['belt-titan'].abilitySet.str === 25 && miscEffectsDb['belt-vitality'].abilityBonus.con.max === 20, 'Ability-changing belt mechanics are incomplete.');
 assert(!miscEffectsDb['brooch-impervious-pattern'], 'Temporary resistance must not be treated as permanently active.');
+assert(Array.isArray(elixirDb) && elixirDb.length === 16, 'Expected 16 Order elixirs and field compounds.');
+assert(new Set(elixirDb.map(item => item.id)).size === elixirDb.length, 'Elixir ids must be unique.');
+assert(elixirDb.every(item => item.id && item.name && item.rarity && item.activation && item.duration && item.effect && item.components), 'Every elixir must have the complete combat schema.');
 
 const pactLevel13 = window.WOT_CLASSES_DB.progression.find(row => row.className === 'Носитель Договора' && row.level === 13);
 assert(pactLevel13 && pactLevel13.pactSlots === 3 && pactLevel13.slotLevel === 5, 'Pact Bearer level 13 must have three ordinary 5th-level Pact slots.');
@@ -194,9 +199,10 @@ run('assets/npc-data.js');
   assert(dmSource.includes('ability=statModNum(getDisplayStat(c,key))'), 'Weave attacks and DC must use the adjusted channeling ability.');
   assert(dmSource.includes('Object.assign({},a||{}, {') && dmSource.includes('baseDamage: String(a && (a.baseDamage || a.base_damage)'), 'Imported future NPC attacks must preserve structured recalculation fields.');
   assert(dmSource.includes('requiresUnarmored') && dmSource.includes('requiresNoShield') && dmSource.includes('setNpcMiscEquipmentChoice'), 'Conditional AC and elemental-resistance choices are missing.');
-  assert(dmHtml.includes('assets/npc-misc-items.js?v=3') && dmHtml.includes('assets/dm-npc.js?v=173'), 'NPC page must load the current item catalog and universal recalculation layer.');
+  assert(dmHtml.includes('assets/npc-misc-items.js?v=3') && dmHtml.includes('assets/npc-elixirs.js?v=1') && dmHtml.includes('assets/dm-npc.js?v=174'), 'NPC page must load the current item catalogs and combat calculation layer.');
+  assert(dmSource.includes('function renderElixirQuickResources') && dmSource.includes('function recordCombatEvent') && dmSource.includes("resource:'elixir'"), 'Battle tab must expose five persisted elixir slots and record their use.');
   assert(dmSource.includes('function npcClassNames') && dmSource.includes('Класс: Воин / Мастер по оружию'), 'Armor proficiency must use structured class names and recognize the Fighter class.');
   assert(dmSource.includes('const effective=base===0?Math.min(9,matched):Math.min(9,base+matched)') && dmSource.includes('Аффинитеты: совпало'), 'Wilder affinity matches must increase the effective weave circle and remain visible in calculation notes.');
 }
 
-console.log(`OK: ${db.hierarchies.length} hierarchies, ${db.hierarchies.reduce((sum, h) => sum + h.ranks.length, 0)} ranks, ${db.hierarchies.reduce((sum, h) => sum + h.abilities.length, 0)} abilities; ${matrixDb.secret.length + matrixDb.forbidden.length + matrixDb.restricted.length} Pact matrix records; NPC 43–50 combat profiles passed.`);
+console.log(`OK: ${db.hierarchies.length} hierarchies, ${db.hierarchies.reduce((sum, h) => sum + h.ranks.length, 0)} ranks, ${db.hierarchies.reduce((sum, h) => sum + h.abilities.length, 0)} abilities; ${matrixDb.secret.length + matrixDb.forbidden.length + matrixDb.restricted.length} Pact matrix records; ${elixirDb.length} Order elixirs; NPC 43–50 combat profiles passed.`);

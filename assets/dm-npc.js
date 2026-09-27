@@ -246,6 +246,12 @@ function getState(id) {
   const maxHp = Number(c && c.co && c.co.hp) || 1;
   if (!Number.isFinite(Number(st.curHp))) st.curHp = maxHp;
   st.conditions = Array.isArray(st.conditions) ? st.conditions : [];
+  const storedElixirs = Array.isArray(st.elixirs) ? st.elixirs.slice(0,5) : [];
+  st.elixirs = storedElixirs.map(entry => entry && typeof entry === 'object'
+    ? {itemId:String(entry.itemId || ''), used:!!entry.used}
+    : {itemId:String(entry || ''), used:false});
+  while(st.elixirs.length < 5) st.elixirs.push({itemId:'',used:false});
+  st.combatEvents = Array.isArray(st.combatEvents) ? st.combatEvents.slice(-100) : [];
   st.slots = st.slots && typeof st.slots === 'object' ? st.slots : {};
   if (c && Array.isArray(c.slots)) c.slots.forEach(sl => {
     const canonicalTotal = Number(sl.n) || 0;
@@ -2035,6 +2041,79 @@ function setNpcMiscEquipmentChoice(id,index,value){
 }
 function resetNpcMiscEquipment(id){const state=getState(id);state.miscEquipment=['','',''];state.miscEquipmentChoices=['','',''];savePersistedState();showNPC(id);}
 
+// ── Quick combat elixirs ──────────────────────────────────────────────────
+function elixirCatalog(){
+  return Array.isArray(window.WOT_NPC_ELIXIRS) ? window.WOT_NPC_ELIXIRS.filter(item=>item&&item.id&&item.name) : [];
+}
+function getElixirItem(itemId){
+  const key=String(itemId||'');
+  return elixirCatalog().find(item=>String(item.id)===key)||null;
+}
+function getElixirSlots(id){
+  return getState(id).elixirs;
+}
+function recordCombatEvent(id,event){
+  const state=getState(id);
+  const entry=Object.assign({kind:'note',at:new Date().toISOString(),round:Number(state.combatRound)||null},event||{});
+  state.combatEvents.push(entry);
+  if(state.combatEvents.length>100)state.combatEvents=state.combatEvents.slice(-100);
+  savePersistedState();
+  return entry;
+}
+function renderElixirCell(id,slot,index,catalog){
+  const item=getElixirItem(slot.itemId), used=!!(item&&slot.used);
+  const options='<option value="">— пусто —</option>'+catalog.map(entry=>`<option value="${escHtml(entry.id)}"${entry.id===slot.itemId?' selected':''}>${escHtml(entry.shortName||entry.name)} · ${escHtml(entry.rarity)}</option>`).join('');
+  const status=!item?'пусто':used?'использован':'готов';
+  return `<article class="combat-elixir-cell${item?' has-item':' is-empty'}${used?' is-used':''}">
+    <div class="combat-elixir-top"><span>Слот ${index+1}</span><b>${status}</b></div>
+    <select aria-label="Эликсир, слот ${index+1}" onchange="setNpcElixir(${id},${index},this.value)">${options}</select>
+    ${item?`<div class="combat-elixir-name">${escHtml(item.name)}</div>
+      <div class="combat-elixir-tags"><span class="rarity-${escHtml(item.rarityKey||'uncommon')}">${escHtml(item.rarity)}</span><span>${escHtml(item.activation)}</span></div>
+      <div class="combat-elixir-actions"><button class="combat-elixir-use" ${used?'disabled':''} onclick="useNpcElixir(${id},${index})">${used?'Использован':'Применить'}</button>${used?`<button class="combat-elixir-undo" onclick="restoreNpcElixir(${id},${index})" title="Отменить отметку расхода">↶</button>`:''}</div>
+      <details class="combat-elixir-details"><summary>Полный эффект</summary><div class="combat-elixir-effect"><b>${escHtml(item.activation)} · ${escHtml(item.duration)}</b><p>${escHtml(item.effect)}</p><dl><div><dt>Варка</dt><dd>${escHtml(item.brew)}</dd></div><div><dt>Цена</dt><dd>${escHtml(item.price)}</dd></div></dl><small><strong>Компоненты:</strong> ${escHtml(item.components)}</small><a href="ingredients.html#i2">Открыть орденские рецепты →</a></div></details>`:''}
+  </article>`;
+}
+function renderElixirQuickResources(id){
+  const catalog=elixirCatalog(), slots=getElixirSlots(id);
+  const selected=slots.filter(slot=>getElixirItem(slot.itemId));
+  const ready=selected.filter(slot=>!slot.used).length;
+  return `<section class="combat-quick-resources" id="combat-elixirs-${id}">
+    <div class="combat-quick-resources-head"><div><strong>🧪 Эликсиры</strong><span>5 независимых расходников этой копии NPC</span></div><b>${ready}/${selected.length||0} готово</b></div>
+    ${catalog.length?`<div class="combat-elixir-strip">${slots.map((slot,index)=>renderElixirCell(id,slot,index,catalog)).join('')}</div>`:'<div class="combat-elixir-empty">Каталог орденских составов не загружен.</div>'}
+    <div class="combat-elixir-note">Применение отмечает расход и записывает событие боя. Временные эффекты и лечение пока не меняют параметры автоматически.</div>
+  </section>`;
+}
+function refreshElixirPanel(id){
+  const panel=document.getElementById('combat-elixirs-'+id);
+  if(panel)panel.outerHTML=renderElixirQuickResources(id);
+}
+function setNpcElixir(id,index,value){
+  const slots=getElixirSlots(id);
+  if(!slots[index])return;
+  slots[index]={itemId:String(value||''),used:false};
+  savePersistedState();
+  refreshElixirPanel(id);
+}
+function useNpcElixir(id,index){
+  const slots=getElixirSlots(id), slot=slots[index], item=slot&&getElixirItem(slot.itemId);
+  if(!slot||!item||slot.used)return;
+  slot.used=true;
+  recordCombatEvent(id,{kind:'item-use',resource:'elixir',slot:index+1,itemId:item.id,label:item.name,activation:item.activation,effect:item.effect});
+  refreshElixirPanel(id);
+  addToAtkLog(id,`🧪 ${item.name}: применён (${item.activation.toLowerCase()})`);
+}
+function restoreNpcElixir(id,index){
+  const slots=getElixirSlots(id), slot=slots[index], item=slot&&getElixirItem(slot.itemId);
+  if(!slot||!item||!slot.used)return;
+  slot.used=false;
+  recordCombatEvent(id,{kind:'item-use-undo',resource:'elixir',slot:index+1,itemId:item.id,label:item.name});
+  refreshElixirPanel(id);
+  addToAtkLog(id,`↶ ${item.name}: расход отменён`);
+}
+
+
+
+
 
 function parseSignedBonus(v){
   const m = String(v || '').match(/[+\-]?\d+/);
@@ -2313,6 +2392,9 @@ ${renderCombatDashboard(id, c, s)}
   <button class="short-rest-btn" onclick="shortRest(${id})">☕ Кор. отдых</button>
   <button class="long-rest-btn" onclick="longRest(${id})">🌙 Долг. отдых</button>
   </div>`;
+
+  // Compact, per-NPC consumables. Kept separate from equipment calculations.
+  html += renderElixirQuickResources(id);
 
   // Dice buttons
   html += `<div class="sec"><div class="sec-h">Кубики</div>
