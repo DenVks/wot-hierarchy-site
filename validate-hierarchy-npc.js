@@ -23,6 +23,7 @@ run('assets/feats-data.js');
 run('assets/npc-rules-data.js');
 run('assets/npc-misc-items.js');
 run('assets/npc-elixirs.js');
+run('assets/npc-tactics.js');
 
 let generatorSource = fs.readFileSync(path.join(root, 'assets/npc-generator.js'), 'utf8');
 generatorSource = generatorSource.replace(
@@ -38,6 +39,7 @@ const featsDb = window.WOT_FEATS_DB;
 const miscDb = window.WOT_NPC_MISC_ITEMS;
 const miscEffectsDb = window.WOT_NPC_MISC_ITEM_EFFECTS;
 const elixirDb = window.WOT_NPC_ELIXIRS;
+const tacticProfiles = window.WOT_NPC_TACTIC_PROFILES;
 const blankStats = value => ({ str: value, dex: value, con: value, int: value, wis: value, cha: value });
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 const picks = (ranks, first, second, amount = 2) => Object.fromEntries(ranks.map(rank => [rank, [{ key: first, amount, slot: 0 }, { key: second, amount, slot: 1 }]]));
@@ -68,6 +70,8 @@ assert(!miscEffectsDb['brooch-impervious-pattern'], 'Temporary resistance must n
 assert(Array.isArray(elixirDb) && elixirDb.length === 16, 'Expected 16 Order elixirs and field compounds.');
 assert(new Set(elixirDb.map(item => item.id)).size === elixirDb.length, 'Elixir ids must be unique.');
 assert(elixirDb.every(item => item.id && item.name && item.rarity && item.activation && item.duration && item.effect && item.components), 'Every elixir must have the complete combat schema.');
+assert(tacticProfiles && Object.keys(tacticProfiles).length === 8, 'Expected tactic hint profiles for NPC 43–50.');
+assert([43,44,45,46,47,48,49,50].every(id => tacticProfiles[id] && tacticProfiles[id].sequence.length === 5), 'Every tactic pilot must expose a five-phase sequence.');
 
 const pactLevel13 = window.WOT_CLASSES_DB.progression.find(row => row.className === 'Носитель Договора' && row.level === 13);
 assert(pactLevel13 && pactLevel13.pactSlots === 3 && pactLevel13.slotLevel === 5, 'Pact Bearer level 13 must have three ordinary 5th-level Pact slots.');
@@ -199,10 +203,15 @@ run('assets/npc-data.js');
   assert(dmSource.includes('ability=statModNum(getDisplayStat(c,key))'), 'Weave attacks and DC must use the adjusted channeling ability.');
   assert(dmSource.includes('Object.assign({},a||{}, {') && dmSource.includes('baseDamage: String(a && (a.baseDamage || a.base_damage)'), 'Imported future NPC attacks must preserve structured recalculation fields.');
   assert(dmSource.includes('requiresUnarmored') && dmSource.includes('requiresNoShield') && dmSource.includes('setNpcMiscEquipmentChoice'), 'Conditional AC and elemental-resistance choices are missing.');
-  assert(dmHtml.includes('assets/npc-misc-items.js?v=3') && dmHtml.includes('assets/npc-elixirs.js?v=1') && dmHtml.includes('assets/dm-npc.js?v=174'), 'NPC page must load the current item catalogs and combat calculation layer.');
+  assert(dmHtml.includes('assets/npc-misc-items.js?v=3') && dmHtml.includes('assets/npc-elixirs.js?v=1') && dmHtml.includes('assets/npc-tactics.js?v=1') && dmHtml.includes('assets/dm-npc.js?v=175'), 'NPC page must load the current item, tactic, and combat calculation layers.');
   assert(dmSource.includes('function renderElixirQuickResources') && dmSource.includes('function recordCombatEvent') && dmSource.includes("resource:'elixir'"), 'Battle tab must expose five persisted elixir slots and record their use.');
+  assert(dmSource.includes('function startCombat') && dmSource.includes('function undoCombatTransition') && dmSource.includes('if(wrapped)combatRound++'), 'Initiative must own start, undo, and last-to-first round transitions.');
+  assert(dmSource.includes('combatEncounterId++') && dmSource.includes('Number(event.encounterId)===Number(combatEncounterId)'), 'Tactic history must be isolated per combat encounter.');
+  assert(dmSource.includes('function selectTacticHint') && dmSource.includes('function openTacticHint') && dmSource.includes('function renderCombatJournalTools'), 'Round-aware tactic hints and the combat journal are missing.');
+  assert(dmSource.includes('fallbackSequence=c.tactics.map') && dmSource.includes('const raw=db[tacticBaseId(c)]||{}'), 'Every NPC with tactic records must receive the generic round sequence.');  assert(dmSource.includes('function tacticProgressEvents') && dmSource.includes('tacticContextEncounterId') && dmSource.includes("event.kind!=='condition'"), 'Administrative events and prior-encounter context must not advance tactics.');
+  assert(dmSource.includes("kind:'attack'") && dmSource.includes("kind:'slot-use'") && dmSource.includes("kind:'manual-action'"), 'Attacks, slots, and manual actions must feed the combat journal.');
   assert(dmSource.includes('function npcClassNames') && dmSource.includes('Класс: Воин / Мастер по оружию'), 'Armor proficiency must use structured class names and recognize the Fighter class.');
   assert(dmSource.includes('const effective=base===0?Math.min(9,matched):Math.min(9,base+matched)') && dmSource.includes('Аффинитеты: совпало'), 'Wilder affinity matches must increase the effective weave circle and remain visible in calculation notes.');
 }
 
-console.log(`OK: ${db.hierarchies.length} hierarchies, ${db.hierarchies.reduce((sum, h) => sum + h.ranks.length, 0)} ranks, ${db.hierarchies.reduce((sum, h) => sum + h.abilities.length, 0)} abilities; ${matrixDb.secret.length + matrixDb.forbidden.length + matrixDb.restricted.length} Pact matrix records; ${elixirDb.length} Order elixirs; NPC 43–50 combat profiles passed.`);
+console.log(`OK: ${db.hierarchies.length} hierarchies, ${db.hierarchies.reduce((sum, h) => sum + h.ranks.length, 0)} ranks, ${db.hierarchies.reduce((sum, h) => sum + h.abilities.length, 0)} abilities; ${matrixDb.secret.length + matrixDb.forbidden.length + matrixDb.restricted.length} Pact matrix records; ${elixirDb.length} Order elixirs; ${Object.keys(tacticProfiles).length} tactic profiles; NPC 43–50 combat profiles passed.`);

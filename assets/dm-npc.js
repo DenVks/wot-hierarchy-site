@@ -213,11 +213,16 @@ function loadPersistedState(){
     if(data && data.STATE) Object.assign(STATE, data.STATE);
     if(data && Array.isArray(data.iniOrder)) iniOrder = data.iniOrder;
     if(data && typeof data.iniCurrent === 'number') iniCurrent = data.iniCurrent;
+    if(data && typeof data.combatRound === 'number') combatRound = Math.max(0, data.combatRound);
+    combatActive = !!(data && data.combatActive && iniOrder.length);
+    combatEncounterId = Math.max(0, Number(data && data.combatEncounterId)||0);
+    combatTransitionHistory = data && Array.isArray(data.combatTransitionHistory) ? data.combatTransitionHistory.slice(-30) : [];
+    combatTransitionCounter = Number(data && data.combatTransitionCounter)||0;
   }catch(e){ console.warn('Не удалось загрузить состояние DM NPC', e); }
 }
 function savePersistedState(){
   try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({STATE, iniOrder, iniCurrent, encounterClones: ENCOUNTER_CLONES}));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({STATE, iniOrder, iniCurrent, combatRound, combatActive, combatEncounterId, combatTransitionHistory:combatTransitionHistory.slice(-30), combatTransitionCounter, encounterClones: ENCOUNTER_CLONES}));
   }catch(e){ console.warn('Не удалось сохранить состояние DM NPC', e); }
 }
 function resetAllDmState(){
@@ -230,6 +235,12 @@ function resetAllDmState(){
   ENCOUNTER_CLONES = [];
   iniOrder = [];
   iniCurrent = 0;
+  combatRound = 0;
+  combatActive = false;
+  combatEncounterId = 0;
+  combatTransitionHistory = [];
+  combatTransitionCounter = 0;
+  closeTacticHint();
   curNPC = -1;
   buildSidebar();
   document.getElementById('mn').innerHTML = '<div class="placeholder" id="placeholder">← Выбери персонажа слева</div>';
@@ -238,6 +249,11 @@ let curNPC = -1;
 let groupBy = 'lv';
 let iniOrder = []; // [{id, val}]
 let iniCurrent = 0;
+let combatRound = 0;
+let combatActive = false;
+let combatEncounterId = 0;
+let combatTransitionHistory = [];
+let combatTransitionCounter = 0;
 
 function getState(id) {
   const c = getNpcById(id);
@@ -252,6 +268,10 @@ function getState(id) {
     : {itemId:String(entry || ''), used:false});
   while(st.elixirs.length < 5) st.elixirs.push({itemId:'',used:false});
   st.combatEvents = Array.isArray(st.combatEvents) ? st.combatEvents.slice(-100) : [];
+  st.tacticContext = st.tacticContext && typeof st.tacticContext === 'object' ? st.tacticContext : {};
+  st.tacticContextEncounterId = Number(st.tacticContextEncounterId)||0;
+  st.tacticHintsDisabled = !!st.tacticHintsDisabled;
+  st.tacticLastShownRound = Number(st.tacticLastShownRound)||0;
   st.slots = st.slots && typeof st.slots === 'object' ? st.slots : {};
   if (c && Array.isArray(c.slots)) c.slots.forEach(sl => {
     const canonicalTotal = Number(sl.n) || 0;
@@ -399,6 +419,7 @@ function rollSpellDamage(dmgExpr, label, resultTarget) {
     btn.setAttribute('data-last-detail', detail);
     btn.title = (label || 'Урон плетения') + ': ' + sum + ' = ' + detail + '. ПКМ или Shift+ЛКМ — сбросить.';
   }
+  if(curNPC>0){recordCombatEvent(curNPC,{kind:'spell-damage',label:label||'Урон плетения',total,formula:cleanExpr});refreshCombatJournalTools(curNPC);}
 }
 
 function escAttr(v) {
@@ -663,17 +684,19 @@ function toggleCondition(id, key) {
   const s = getState(id);
   const idx = s.conditions.indexOf(key);
   if (idx >= 0) s.conditions.splice(idx,1); else s.conditions.push(key);
-  savePersistedState();
+  const active=s.conditions.includes(key);
+  recordCombatEvent(id,{kind:'condition',label:COND_LABELS[key]||key,condition:key,active});
   refreshCombatPanel(id);
   refreshSidebarHP(id);
+  refreshCombatJournalTools(id);
 }
 
 // ── Slots ─────────────────────────────────────────────────────────────────
 function useSlot(id, lvKey) {
-  const s = getState(id);
-  if (s.slots[lvKey] && s.slots[lvKey].used < s.slots[lvKey].total) s.slots[lvKey].used++;
-  savePersistedState();
-  refreshSlotsPanel(id);
+  const s = getState(id);let spent=false;
+  if (s.slots[lvKey] && s.slots[lvKey].used < s.slots[lvKey].total) {s.slots[lvKey].used++;spent=true;}
+  if(spent)recordCombatEvent(id,{kind:'slot-use',label:`Ячейка ${lvKey}`,slotLevel:String(lvKey)});else savePersistedState();
+  refreshSlotsPanel(id);refreshCombatJournalTools(id);
 }
 function resetSlot(id, lvKey) {
   const s = getState(id);
@@ -683,7 +706,7 @@ function resetSlot(id, lvKey) {
 }
 function useSD(id) {
   const s = getState(id);
-  if (s.sdUsed < s.sdTotal) { s.sdUsed++; savePersistedState(); refreshSDPanel(id); }
+  if (s.sdUsed < s.sdTotal) { s.sdUsed++; recordCombatEvent(id,{kind:'resource-use',label:'Кость превосходства'}); refreshSDPanel(id); refreshCombatJournalTools(id); }
 }
 function resetSD(id) {
   const s = getState(id);
@@ -2054,7 +2077,7 @@ function getElixirSlots(id){
 }
 function recordCombatEvent(id,event){
   const state=getState(id);
-  const entry=Object.assign({kind:'note',at:new Date().toISOString(),round:Number(state.combatRound)||null},event||{});
+  const entry=Object.assign({kind:'note',at:new Date().toISOString(),encounterId:combatActive&&combatEncounterId?combatEncounterId:null,round:combatActive&&combatRound?combatRound:null,turnIndex:combatActive?iniCurrent:null},event||{});
   state.combatEvents.push(entry);
   if(state.combatEvents.length>100)state.combatEvents=state.combatEvents.slice(-100);
   savePersistedState();
@@ -2101,6 +2124,7 @@ function useNpcElixir(id,index){
   recordCombatEvent(id,{kind:'item-use',resource:'elixir',slot:index+1,itemId:item.id,label:item.name,activation:item.activation,effect:item.effect});
   refreshElixirPanel(id);
   addToAtkLog(id,`🧪 ${item.name}: применён (${item.activation.toLowerCase()})`);
+  refreshCombatJournalTools(id);
 }
 function restoreNpcElixir(id,index){
   const slots=getElixirSlots(id), slot=slots[index], item=slot&&getElixirItem(slot.itemId);
@@ -2109,12 +2133,138 @@ function restoreNpcElixir(id,index){
   recordCombatEvent(id,{kind:'item-use-undo',resource:'elixir',slot:index+1,itemId:item.id,label:item.name});
   refreshElixirPanel(id);
   addToAtkLog(id,`↶ ${item.name}: расход отменён`);
+  refreshCombatJournalTools(id);
 }
 
 
 
 
 
+// ── Round-aware combat journal and tactic hints ───────────────────────────
+const TACTIC_CONTEXT_OPTIONS=[
+  {key:'adjacent',label:'Враг рядом',reason:'рядом находится опасный противник'},
+  {key:'group',label:'Группа 3+',reason:'доступна группа из трёх и более целей'},
+  {key:'channeler',label:'Опасный направляющий',reason:'на поле есть опасный направляющий'},
+  {key:'hold',label:'Держать позицию',reason:'позицию нельзя отдавать'}
+];
+function tacticBaseId(c){return Number(c&&c.isClone?c.baseId:c&&c.id);}
+function tacticProfileForNpc(c){
+  if(!Array.isArray(c&&c.tactics)||!c.tactics.length)return null;
+  const db=window.WOT_NPC_TACTIC_PROFILES&&typeof window.WOT_NPC_TACTIC_PROFILES==='object'?window.WOT_NPC_TACTIC_PROFILES:{};
+  const raw=db[tacticBaseId(c)]||{},fallbackSequence=c.tactics.map((_,index)=>index);
+  const sequence=(Array.isArray(raw.sequence)?raw.sequence:fallbackSequence).map(Number).filter(index=>c.tactics[index]);
+  return Object.assign({},raw,{sequence:sequence.length?sequence:fallbackSequence,contexts:raw.contexts&&typeof raw.contexts==='object'?raw.contexts:{},lowHp:raw.lowHp==null?null:Number(raw.lowHp)});
+}
+function combatEventDisplay(event){
+  if(!event)return '';
+  const label=String(event.label||event.name||'').trim();
+  if(event.kind==='attack')return `Атака: ${label||'бросок атаки'}`;
+  if(event.kind==='spell-damage')return `Плетение: ${label||'урон'}`;
+  if(event.kind==='item-use')return `Эликсир: ${label||'применён'}`;
+  if(event.kind==='slot-use')return `Ячейка ${event.slotLevel||''} израсходована`.trim();
+  if(event.kind==='resource-use')return label||'Ресурс израсходован';
+  if(event.kind==='feature-use')return label||'Черта использована';
+  if(event.kind==='condition')return `${event.active?'Добавлено':'Снято'} состояние: ${label}`;
+  if(event.kind==='manual-action')return label||'Действие отмечено';
+  if(event.kind==='tactic-complete')return `Тактика выполнена: ${label}`;
+  return label;
+}
+function meaningfulCombatEvents(events){
+  return (events||[]).filter(event=>!['turn-start','tactic-shown','item-use-undo'].includes(event.kind)&&!(event.kind==='manual-action'&&event.actionKind==='turn-reset')&&combatEventDisplay(event));
+}
+function tacticProgressEvents(events){
+  return meaningfulCombatEvents(events).filter(event=>event.kind!=='condition');
+}
+function eventsForCombatRound(state,round){
+  return (state.combatEvents||[]).filter(event=>Number(event.encounterId)===Number(combatEncounterId)&&Number(event.round)===Number(round));
+}
+function previousRoundSummary(state,round){
+  if(round<=1)return 'Предыдущего раунда ещё нет.';
+  const labels=meaningfulCombatEvents(eventsForCombatRound(state,round-1)).slice(-4).map(combatEventDisplay);
+  return labels.length?labels.join(' · '):'Действия предыдущего раунда не отмечены.';
+}
+function selectTacticHint(c){
+  const profile=tacticProfileForNpc(c); if(!profile)return null;
+  const state=getState(c.id), round=Math.max(1,Number(combatRound)||1), sequence=profile.sequence;
+  const contextState=Number(state.tacticContextEncounterId)===Number(combatEncounterId)?state.tacticContext:{};
+  const previous=eventsForCombatRound(state,round-1), meaningful=tacticProgressEvents(previous);
+  const previousShown=[...previous].reverse().find(event=>event.kind==='tactic-shown'&&c.tactics[Number(event.hintIndex)]);
+  const previousCompleted=[...previous].reverse().find(event=>event.kind==='tactic-complete');
+  const hp=getDisplayHpProfile(c,state), hpRatio=hp.max?hp.current/hp.max:1;
+  let index=sequence[0],reason='первый раунд: начальная тактическая фаза',source='opening';
+  if(profile.lowHp!=null&&hpRatio<=0.35&&c.tactics[Number(profile.lowHp)]){
+    index=Number(profile.lowHp); reason=`ОЗ снижены до ${Math.round(hpRatio*100)}%: приоритет выживания и защиты`; source='low-hp';
+  }else{
+    const context=TACTIC_CONTEXT_OPTIONS.find(option=>contextState[option.key]&&c.tactics[Number(profile.contexts&&profile.contexts[option.key])]);
+    if(context){index=Number(profile.contexts[context.key]);reason=`Контекст ГМ: ${context.reason}`;source='context';}
+    else if(round>1&&previousShown){
+      const previousIndex=Number(previousShown.hintIndex),position=Math.max(0,sequence.indexOf(previousIndex));
+      if(previousCompleted||meaningful.length){index=sequence[Math.min(position+1,sequence.length-1)];reason=previousCompleted?'Предыдущая рекомендация отмечена выполненной.':'В предыдущем раунде зарегистрировано действие; очередь перешла к следующей фазе.';source='history';}
+      else{index=previousIndex;reason='В предыдущем раунде действие не отмечено; рекомендация повторена.';source='repeat';}
+    }else if(round>1){index=sequence[Math.min(round-1,sequence.length-1)];reason=`Выбрана последовательная фаза для раунда ${round}.`;source='round';}
+  }
+  if(!c.tactics[index])index=sequence[0];
+  const sequencePosition=Math.max(0,sequence.indexOf(index));
+  const alternativeIndex=sequence[Math.min(sequencePosition+1,sequence.length-1)];
+  return {round,index,tactic:c.tactics[index],alternative:c.tactics[alternativeIndex]||c.tactics[index],reason,source,previous:previousRoundSummary(state,round)};
+}
+function ensureTacticHintHost(){
+  let host=document.getElementById('tactic-hint-popover');
+  if(!host){host=document.createElement('aside');host.id='tactic-hint-popover';host.className='tactic-hint-popover';host.setAttribute('aria-live','polite');document.body.appendChild(host);}
+  return host;
+}
+function renderTacticHintPopover(id){
+  const c=getNpcById(id),profile=c&&tacticProfileForNpc(c),recommendation=c&&selectTacticHint(c);if(!c||!profile||!recommendation)return;
+  const state=getState(id),host=ensureTacticHintHost(),contextState=Number(state.tacticContextEncounterId)===Number(combatEncounterId)?state.tacticContext:{};host.dataset.npcId=String(id);
+  const contextButtons=TACTIC_CONTEXT_OPTIONS.filter(option=>c.tactics[Number(profile.contexts&&profile.contexts[option.key])]).map(option=>`<button class="tactic-context-btn${contextState[option.key]?' active':''}" onclick="toggleTacticContext(${id},'${option.key}')">${escHtml(option.label)}</button>`).join('');
+  host.innerHTML=`<div class="tactic-popover-head"><div><span>Тактическая подсказка · раунд ${recommendation.round}</span><strong>${escHtml(c.sh)}</strong></div><button onclick="closeTacticHint()" aria-label="Закрыть">×</button></div>
+    ${contextButtons?`<div class="tactic-context-row"><span>Контекст:</span>${contextButtons}</div>`:''}
+    <div class="tactic-recommendation"><span>Рекомендуется</span><h3>${escHtml(recommendation.tactic.ph)}</h3><p>${escHtml(recommendation.tactic.d)}</p></div>
+    <div class="tactic-why"><b>Почему:</b> ${escHtml(recommendation.reason)}</div>
+    <div class="tactic-previous"><b>Предыдущий раунд:</b> ${escHtml(recommendation.previous)}</div>
+    ${recommendation.alternative&&recommendation.alternative!==recommendation.tactic?`<details><summary>Альтернатива</summary><strong>${escHtml(recommendation.alternative.ph)}</strong><p>${escHtml(recommendation.alternative.d)}</p></details>`:''}
+    <div class="tactic-popover-actions"><button class="primary" onclick="markTacticComplete(${id},${recommendation.index})">✓ Выполнено</button><button onclick="markCombatAction(${id},'other');closeTacticHint()">Другое действие</button><button onclick="setTacticHintsDisabled(${id},true)">Не показывать</button></div>`;
+  host.classList.add('show');
+}
+function openTacticHint(id,manual,transitionToken){
+  const c=getNpcById(id),profile=c&&tacticProfileForNpc(c);if(!c||!profile)return false;
+  const state=getState(id),round=Math.max(1,Number(combatRound)||1);
+  const alreadyShown=(state.combatEvents||[]).some(event=>event.kind==='tactic-shown'&&Number(event.encounterId)===Number(combatEncounterId)&&Number(event.round)===round);
+  if(!manual&&(!combatActive||state.tacticHintsDisabled||alreadyShown))return false;
+  state.tacticLastShownRound=round;
+  const recommendation=selectTacticHint(c);if(!recommendation)return false;
+  recordCombatEvent(id,{kind:'tactic-shown',label:recommendation.tactic.ph,hintIndex:recommendation.index,transitionToken:transitionToken||null,manual:!!manual});
+  renderTacticHintPopover(id);
+  return true;
+}
+function closeTacticHint(){const host=document.getElementById('tactic-hint-popover');if(host)host.classList.remove('show');}
+function toggleTacticContext(id,key){
+  if(!TACTIC_CONTEXT_OPTIONS.some(option=>option.key===key))return;
+  const state=getState(id);if(Number(state.tacticContextEncounterId)!==Number(combatEncounterId)){state.tacticContext={};state.tacticContextEncounterId=combatEncounterId;}state.tacticContext[key]=!state.tacticContext[key];savePersistedState();renderTacticHintPopover(id);refreshCombatJournalTools(id);
+}
+function setTacticHintsDisabled(id,disabled){
+  const state=getState(id);state.tacticHintsDisabled=!!disabled;savePersistedState();closeTacticHint();refreshCombatJournalTools(id);
+}
+function markTacticComplete(id,index){
+  const c=getNpcById(id),tactic=c&&c.tactics&&c.tactics[index];if(!tactic)return;
+  recordCombatEvent(id,{kind:'tactic-complete',label:tactic.ph,hintIndex:index});
+  addToAtkLog(id,`✓ Тактика: ${tactic.ph}`);closeTacticHint();refreshCombatJournalTools(id);
+}
+function markCombatAction(id,actionKind){
+  const labels={action:'Действие выполнено',bonus:'Бонусное действие использовано',reaction:'Реакция использована',concentration:'Концентрация изменена',other:'Другое действие'};
+  const label=labels[actionKind]||labels.other;
+  recordCombatEvent(id,{kind:'manual-action',actionKind,label});addToAtkLog(id,`◈ ${label}`);refreshCombatJournalTools(id);
+}
+function renderCombatJournalTools(c){
+  const state=getState(c.id),currentEvents=meaningfulCombatEvents((state.combatEvents||[]).filter(event=>Number(event.encounterId)===Number(combatEncounterId))),events=currentEvents.slice(-6).reverse(),profile=tacticProfileForNpc(c);
+  const rows=events.length?events.map(event=>`<div><span>${event.round?`R${event.round}`:'—'}</span>${escHtml(combatEventDisplay(event))}</div>`).join(''):'<div class="combat-journal-empty">Событий пока нет.</div>';
+  return `<section class="combat-turn-tools" id="combat-turn-tools-${c.id}"><div class="combat-turn-tools-head"><div><strong>Действия хода</strong><span>${combatActive?`Раунд ${combatRound}`:'Бой не начат'}</span></div>${profile?`<button class="tactic-open-btn${state.tacticHintsDisabled?' disabled':''}" onclick="openTacticHint(${c.id},true)">💡 ${state.tacticHintsDisabled?'Открыть подсказку':'Тактика'}</button>`:''}</div>
+    <div class="combat-action-buttons"><button onclick="markCombatAction(${c.id},'action')">Действие</button><button onclick="markCombatAction(${c.id},'bonus')">Бонус</button><button onclick="markCombatAction(${c.id},'reaction')">Реакция</button><button onclick="markCombatAction(${c.id},'concentration')">Концентрация</button></div>
+    <details class="combat-journal"><summary>Журнал · ${currentEvents.length}</summary><div class="combat-journal-list">${rows}</div></details></section>`;
+}
+function refreshCombatJournalTools(id){
+  const c=getNpcById(id),panel=document.getElementById('combat-turn-tools-'+id);if(c&&panel)panel.outerHTML=renderCombatJournalTools(c);
+}
 function parseSignedBonus(v){
   const m = String(v || '').match(/[+\-]?\d+/);
   return m ? parseInt(m[0], 10) : 0;
@@ -2388,10 +2538,12 @@ ${renderCombatDashboard(id, c, s)}
 
   // Rest + round buttons
   html += `<div class="rest-row">
-  <button class="new-round-btn" onclick="newRound(${id})">🔄 Новый раунд</button>
+  <button class="new-round-btn" onclick="newRound(${id})">🔄 Сброс хода</button>
   <button class="short-rest-btn" onclick="shortRest(${id})">☕ Кор. отдых</button>
   <button class="long-rest-btn" onclick="longRest(${id})">🌙 Долг. отдых</button>
   </div>`;
+
+  html += renderCombatJournalTools(c);
 
   // Compact, per-NPC consumables. Kept separate from equipment calculations.
   html += renderElixirQuickResources(id);
@@ -2599,6 +2751,7 @@ ${resolvedSpells.map((sp,spi)=>`<tr>
   html += `</div></div>`; // sheet + app
 
   main.innerHTML = html;
+  refreshIniTracker();
   }catch(err){
     console.error('Cannot render NPC', c, err);
     if(main) main.innerHTML = '<div class="placeholder" id="placeholder">Ошибка открытия NPC: '+(err && err.message ? err.message : err)+'</div>';
@@ -2628,6 +2781,8 @@ function rollAtkInline(npcId, atkIdx, bonus, name, dmgExpr, critAllDice) {
   
   // Log
   addToAtkLog(npcId, isCrit?`💥 ${name}: КРИ!`:isFumble?`✗ ${name}: ПРОВАЛ`:`⚔ ${name}: ${total} (d20[${d20}]+${bonus})`);
+  recordCombatEvent(npcId,{kind:'attack',label:name,result:isCrit?'critical':isFumble?'fumble':'roll',total,d20});
+  refreshCombatJournalTools(npcId);
 }
 
 function rollDmgInline(npcId, atkIdx, dmgExpr, name, isCrit, critAllDice) {
@@ -2685,6 +2840,7 @@ function rollDiceExpressionRaw(expr){
 function rollSADmg(npcId, expr){
   const r = rollDiceExpressionRaw(expr);
   addToAtkLog(npcId, `🎲 Скрытая атака ${expr}: ${r.total} ур. [${r.rolls.join('+')}${r.bonus?'+'+r.bonus:''}]`);
+  recordCombatEvent(npcId,{kind:'feature-use',label:'Скрытая атака',total:r.total});refreshCombatJournalTools(npcId);
 }
 function rollSkillInline(npcId, name, bonus){
   const d20 = Math.floor(Math.random()*20)+1;
@@ -2695,6 +2851,7 @@ function rollCantripAttack(npcId, bonus, name){
   const d20 = Math.floor(Math.random()*20)+1;
   const total = d20 + bonus;
   addToAtkLog(npcId, d20===20?`💥 ${name}: КРИ!`:d20===1?`✗ ${name}: ПРОВАЛ`:`🌀 ${name}: ${total} (d20[${d20}]${bonus>=0?'+':''}${bonus})`);
+  recordCombatEvent(npcId,{kind:'spell-damage',label:name,total,d20});refreshCombatJournalTools(npcId);
 }
 
 function rollAllAtk(npcId) {
@@ -2759,7 +2916,9 @@ function newRound(id) {
   savePersistedState();
   const saBtn = document.getElementById('sa-btn');
   if (saBtn) { saBtn.className='sa-toggle'; saBtn.textContent='⬜ Не использована'; }
-  addToAtkLog(id, `🔄 Новый раунд`);
+  recordCombatEvent(id,{kind:'manual-action',actionKind:'turn-reset',label:'Ресурсы хода сброшены'});
+  addToAtkLog(id, `🔄 Сброс ресурсов хода`);
+  refreshCombatJournalTools(id);
 }
 
 // ── Manual initiative add ─────────────────────────────────────────────────
@@ -2777,15 +2936,17 @@ function refreshIniTracker() {
   const el = document.getElementById('ini-tracker');
   if (!el) return;
   let html = '<span class="ini-tracker-label">Инициатива:</span>';
-  html += iniOrder.map((e,i)=>{
+  html += `<span class="combat-round-badge${combatActive?' active':''}">${combatActive?`Раунд ${combatRound}`:'Бой не начат'}</span>`;
+  html += iniOrder.length?iniOrder.map((e,i)=>{
     const nc = e.id>0 ? getNpcById(e.id) : null;
     const ico = nc?nc.ic:'👤';
     const nm = nc?nc.sh.split(' ')[0]:(e.manualName||'?');
-    return `<div class="ini-slot${i===iniCurrent?' current':''}" onclick="${e.id>0?'iniJump('+i+')':'iniJump('+i+')'}">${ico} <span class="ini-slot-name">${nm}</span><span class="ini-slot-val">${e.val}</span></div>`;
-  }).join('');
+    return `<div class="ini-slot${i===iniCurrent?' current':''}" onclick="iniJump(${i})">${ico} <span class="ini-slot-name">${escHtml(nm)}</span><span class="ini-slot-val">${e.val}</span></div>`;
+  }).join(''):'<span class="ini-empty-note">Добавьте участников нажатием на показатель инициативы NPC.</span>';
   if (iniOrder.length) {
-    html += `<button class="ini-next-btn" onclick="iniNext()">→</button>`;
-    html += `<button class="ini-clear-btn" onclick="iniClear()">✕</button>`;
+    html += combatActive?`<button class="ini-next-btn" onclick="iniNext()">→ След.</button><button class="combat-stop-btn" onclick="finishCombat()">■ Стоп</button>`:`<button class="combat-start-btn" onclick="startCombat()">▶ Начать бой</button>`;
+    if(combatTransitionHistory.length)html += `<button class="combat-undo-btn" onclick="undoCombatTransition()" title="Отменить последний переход">↶</button>`;
+    html += `<button class="ini-clear-btn" onclick="iniClear()" title="Очистить инициативу">✕</button>`;
   }
   html += `<div class="ini-add-manual">
     <input class="ini-manual-name" id="ini-manual-name" placeholder="Имя (игрок)" maxlength="12">
@@ -2928,7 +3089,7 @@ function switchTab(i, tabId) {
 function toggleSA(id) {
   const s = getState(id);
   s.saOn = !s.saOn;
-  savePersistedState();
+  recordCombatEvent(id,{kind:'feature-use',label:`Скрытая атака: ${s.saOn?'активна':'сброшена'}`});refreshCombatJournalTools(id);
   const btn = document.getElementById('sa-btn');
   if (btn) { btn.className='sa-toggle'+(s.saOn?' on':''); btn.textContent=s.saOn?'✅ Активна':'⬜ Не использована'; }
 }
@@ -2958,9 +3119,56 @@ function addToIni(id) {
 
 
 
-function iniNext() { if (iniOrder.length) { iniCurrent=(iniCurrent+1)%iniOrder.length; savePersistedState(); refreshIniTracker(); } }
-function iniJump(i) { iniCurrent=i; savePersistedState(); refreshIniTracker(); if(iniOrder[i]) showNPC(iniOrder[i].id); }
-function iniClear() { iniOrder=[]; iniCurrent=0; savePersistedState(); refreshIniTracker(); }
+function pushCombatTransition(){
+  const token='turn-'+Date.now()+'-'+(++combatTransitionCounter);
+  combatTransitionHistory.push({token,iniCurrent,combatRound,combatActive,combatEncounterId});
+  if(combatTransitionHistory.length>30)combatTransitionHistory=combatTransitionHistory.slice(-30);
+  return token;
+}
+function activateInitiativeTurn(transitionToken,showHint){
+  const entry=iniOrder[iniCurrent];
+  if(!entry){refreshIniTracker();return;}
+  if(entry.id>0){
+    const state=getState(entry.id);state.saOn=false;
+    recordCombatEvent(entry.id,{kind:'turn-start',label:`Начало хода · раунд ${combatRound}`,transitionToken:transitionToken||null});
+    showNPC(entry.id);
+    if(showHint)window.setTimeout(()=>openTacticHint(entry.id,false,transitionToken),0);
+  }else refreshIniTracker();
+}
+function startCombat(){
+  if(!iniOrder.length)return;
+  const token=pushCombatTransition();combatActive=true;combatRound=1;combatEncounterId++;
+  iniCurrent=Math.max(0,Math.min(iniCurrent,iniOrder.length-1));savePersistedState();refreshIniTracker();activateInitiativeTurn(token,true);
+}
+function finishCombat(){
+  if(!combatActive)return;
+  pushCombatTransition();combatActive=false;savePersistedState();closeTacticHint();refreshIniTracker();if(curNPC>0)refreshCombatJournalTools(curNPC);
+}
+function undoCombatTransition(){
+  const previous=combatTransitionHistory.pop();if(!previous)return;
+  Object.values(STATE).forEach(state=>{
+    if(!state||!Array.isArray(state.combatEvents))return;
+    state.combatEvents=state.combatEvents.filter(event=>event.transitionToken!==previous.token);
+    const lastShown=[...state.combatEvents].reverse().find(event=>event.kind==='tactic-shown'&&Number(event.encounterId)===Number(previous.combatEncounterId));
+    state.tacticLastShownRound=lastShown?Number(lastShown.round)||0:0;
+  });
+  iniCurrent=previous.iniCurrent;combatRound=previous.combatRound;combatActive=previous.combatActive;combatEncounterId=Number(previous.combatEncounterId)||0;
+  savePersistedState();closeTacticHint();refreshIniTracker();const entry=iniOrder[iniCurrent];if(entry&&entry.id>0)showNPC(entry.id);
+}
+function iniNext(){
+  if(!iniOrder.length)return;
+  if(!combatActive){startCombat();return;}
+  const token=pushCombatTransition(),wrapped=iniCurrent>=iniOrder.length-1;
+  iniCurrent=(iniCurrent+1)%iniOrder.length;if(wrapped)combatRound++;
+  savePersistedState();refreshIniTracker();activateInitiativeTurn(token,true);
+}
+function iniJump(i){
+  if(!iniOrder[i])return;
+  iniCurrent=i;savePersistedState();refreshIniTracker();if(iniOrder[i].id>0)showNPC(iniOrder[i].id);
+}
+function iniClear(){
+  iniOrder=[];iniCurrent=0;combatRound=0;combatActive=false;combatTransitionHistory=[];closeTacticHint();savePersistedState();refreshIniTracker();if(curNPC>0)refreshCombatJournalTools(curNPC);
+}
 
 
 
