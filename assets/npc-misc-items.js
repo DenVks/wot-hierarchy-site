@@ -77,6 +77,7 @@ window.WOT_NPC_MISC_ITEM_EFFECTS = Object.freeze({
   'amulet-null-thread': {resistances:['урон от плетений и магических эффектов']},
   'bracers-defense': {ac:{bonus:2, requiresUnarmored:true, requiresNoShield:true}},
   'bracers-reflected-impulse': {resistances:['силовой урон']},
+  'amulet-health': {abilitySet:{con:19}},
   'belt-great-strength': {abilitySet:{str:21}},
   'belt-vitality': {abilityBonus:{con:{value:2,max:20}}},
   'belt-stone-skin': {resistances:['немагический дробящий урон','немагический колющий урон','немагический рубящий урон']},

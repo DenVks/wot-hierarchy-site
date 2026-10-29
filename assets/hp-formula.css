@@ -1,0 +1,12 @@
+.hp-formula{clear:both;break-inside:avoid;margin:1.4rem 0;padding:1rem 1.2rem;border:1px solid rgba(201,168,76,.3);border-radius:10px;background:rgba(201,168,76,.04);line-height:1.65}
+.hp-formula h4{margin:0 0 .8rem;color:var(--gold,#d8ba70);font-family:inherit;font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase}
+.hp-formula p{margin:.65rem 0!important}
+.hp-formula-box{padding:.8rem 1rem;border:1px solid rgba(114,153,103,.3);border-radius:7px;background:rgba(93,125,75,.06)}
+.hp-formula ul{padding-left:1.4rem;margin:.6rem 0}
+.hp-formula li{margin:.35rem 0}
+.npc-hp-formula{margin:12px 0;font-size:12px;line-height:1.6;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:12px 14px}
+.npc-hp-formula summary{font-family:inherit;color:var(--gold2);font-weight:700;cursor:pointer}
+.npc-hp-formula p{margin:6px 0}
+.npc-hp-formula code{white-space:normal;color:var(--gold2);font-size:11px}
+.npc-hp-formula.needs-source{border-color:var(--gold);background:var(--warning-bg)}
+@media(max-width:600px){.hp-formula{padding:.8rem}.hp-formula-box{padding:.7rem}.npc-hp-formula{padding:10px}}

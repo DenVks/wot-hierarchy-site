@@ -61,6 +61,8 @@ function normalizeCustomNpc(raw, index){
   npc.co.ac = Number(npc.co.ac || 10);
   npc.co.sp = Number(npc.co.sp || 30);
   npc.co.pp = Number(npc.co.pp || 10);
+  const hpData = calculateNpcBaseHp(npc);
+  if(hpData){ npc.hpCalculation=hpData; npc.co.hp=hpData.expected; }
   npc.ab = Array.isArray(npc.ab) ? npc.ab.map((a,i)=>({
     n: String(a && (a.n || a.name || a.feature) || ('Черта '+(i+1))),
     d: String(a && (a.d || a.desc || a.description || '') || ''),
@@ -136,6 +138,11 @@ function hydrateEncounterClones(clones){
     const id = Number(raw.id);
     if(CS.some(c => Number(c.id) === id)) return;
     const clone = deepCloneNpc(raw);
+    const base = CS.find(c => Number(c.id) === Number(raw.baseId));
+    if(base && base.hpCalculation){
+      clone.hpCalculation = deepCloneNpc(base.hpCalculation);
+      clone.co = Object.assign({}, clone.co, {hp:base.co.hp});
+    }
     clone.id = id;
     clone.isClone = true;
     CS.push(clone);
@@ -1982,6 +1989,43 @@ function miscAbilityModifierDelta(c,key){return statModNum(getDisplayStat(c,key)
 function getMiscHpBonus(c){
   return miscAbilityModifierDelta(c,'con')*Math.max(1,Number(c&&c.lv)||1);
 }
+function calculateNpcBaseHp(c){
+  const db=window.WOT_HIERARCHY_DB;
+  if(!db||!db.calculateHitPoints)return null;
+  const input=c.generator&&c.generator.inputs||{}, saved=c.hpCalculation||{};
+  const dice={'Варвар':12,'Пустынный воин':10,'Мастер по оружию':10,'Мастер по Оружию':10,'Мечник':10,'Воин':10,'Лесник':10,'Следопыт':10,'Благородный':8,'Скиталец':8,'Носитель Договора':8,'Дичок':6,'Посвящённый':4,'Посвященный':4};
+  const name=input.cls||(c.tags||[]).find(t=>Object.prototype.hasOwnProperty.call(dice,t));
+  const classes=saved.classes||(name?[{name,die:dice[name],levels:c.lv,first:true}]:null);
+  if(!classes)return null;
+  const ids={shonchan:'crystal-throne',unity:'unity',guild:'far-madding-keepers',shara:'shara-will',order:'pattern-guardians',wall:'anomalous-wall',scream:'scream'};
+  const hierarchyId=c.hi&&(c.hi.id||ids[c.hi.ty])||input.faction||null;
+  const rank=c.hi&&(c.hi.rank||(String(c.hi.nm||'').match(/Ранг\s+(VIII|VII|VI|IV|V|III|II|I)\b/i)||[])[1])||input.rank||null;
+  const hierarchy=db.getHierarchy(hierarchyId), profile=hierarchy&&hierarchy.mechanics&&hierarchy.mechanics.ranks[rank];
+  if(c.hi&&!profile)return null;
+  const coefficient=profile&&profile.hitDiceMult||1, hierarchyFlat=profile&&profile.hp||0;
+  const flatModifiers=(saved.flatModifiers||[]).filter(x=>x.name!=='Шончан: Крепкий');
+  if(/^Шончан$/i.test(c.na))flatModifiers.push({name:'Шончан: Крепкий',value:Number(c.lv)||1});
+  const calc=db.calculateHitPoints(classes,c.st.con,coefficient,[{name:'Иерархия',value:hierarchyFlat},...flatModifiers]);
+  return {method:'average',classes,coefficient,hierarchyId,rank,hierarchyFlat,flatModifiers,hitDicePart:calc.hitDicePart,contribution:calc.contribution,expected:calc.total,status:'verified',source:'Средние D&D 5e; текущий профиль Иерархии'};
+}
+function renderNpcHpCalculation(c){
+  const saved=c.hpCalculation;
+  const input=c.generator&&c.generator.inputs;
+  let data=saved;
+  if(!data&&input&&input.cls){
+    const dice={'Варвар':12,'Пустынный воин':10,'Мастер по оружию':10,'Лесник':10,'Благородный':8,'Скиталец':8,'Носитель Договора':8,'Дичок':6,'Посвящённый':4};
+    const db=window.WOT_HIERARCHY_DB, h=db&&db.getHierarchy(input.faction), rank=h&&h.mechanics&&h.mechanics.ranks[input.rank]||{};
+    const classes=[{name:input.cls,die:dice[input.cls]||8,levels:c.lv,first:true}];
+    data={method:'average',classes,coefficient:rank.hitDiceMult||1,hierarchyFlat:rank.hp||0,flatModifiers:/^Шончан$/i.test(c.na)?[{name:'Шончан: Крепкий',value:c.lv}]:[]};
+  }
+  if(!data)return '<div class="npc-hp-formula needs-source"><b>Формула хитов требует исходных данных.</b><p>В карточке сохранён готовый максимум '+escHtml(c.co.hp)+'. Для проверки нужны классы и уровни, исходный компонент Костей Хитов и плоские модификаторы.</p></div>';
+  const db=window.WOT_HIERARCHY_DB, flat=[{name:'Ранг',value:data.hierarchyFlat||0},...(data.flatModifiers||[])];
+  const calc=db.calculateHitPoints(data.classes,getDisplayStat(c,'con'),data.coefficient,flat);
+  const shown=getDisplayHpProfile(c).max, uncertain=data.status==='needs-source'||data.method==='unverified'||calc.total!==shown;
+  const classLine=(data.classes||[]).map(x=>`${x.name} ${x.levels} ур., к${x.die}`).join(' + ');
+  const flatLine=flat.map(x=>`${Number(x.value)||0} (${x.name})`).join(' + ');
+  return `<details class="npc-hp-formula${uncertain?' needs-source':''}"${uncertain?' open':''}><summary>Формула максимума хитов · ${shown}${uncertain?' · требуется источник':' · проверено'}</summary><p>${escHtml(classLine)}</p><p><code>⌊${calc.hitDicePart} × ${String(calc.coefficient).replace('.',',')}⌋ + ${calc.contribution} (Телосложение) + ${escHtml(flatLine)} = ${calc.total}</code></p><p>Телосложение и все плоские модификаторы добавлены после умножения. Изменение Телосложения от выбранных предметов уже учтено.</p>${uncertain?`<p>В карточке сохранено ${shown}. Средний расчёт даёт ${calc.total}; исходные броски или индивидуальный модификатор не подтверждены. Значение сохранено до решения Мастера.</p>`:''}</details>`;
+}
 function getDisplayHpProfile(c,state){
   const s=state||getState(c&&c.id), base=Math.max(1,Number(c&&c.co&&c.co.hp)||1), bonus=getMiscHpBonus(c), max=Math.max(1,base+bonus);
   const previous=Number.isFinite(Number(s.miscHpBonusApplied))?Number(s.miscHpBonusApplied):0;
@@ -1993,6 +2037,7 @@ function getDisplayHpProfile(c,state){
     changed=true;
     savePersistedState();
   }
+  if(Number(s.curHp)>max){s.curHp=max;changed=true;savePersistedState();}
   return {base,bonus,max,current:s.curHp,changed};
 }
 function getDisplayInitiativeProfile(c){
@@ -2677,6 +2722,7 @@ ${['СИЛ','ТЕЛ','ЛОВ','ИНТ','МДР','ХАР'].map((name,si)=>{
   <div class="core-box passive-core"><span class="core-label">Пасс ПРН<br><em>пассивная проницательность</em></span><span class="core-val big">${getPassiveInsight(c)}</span></div>
   <div class="core-box core-wide"><span style="font-size:10px;color:var(--text3)">Особенности</span><span class="core-val" style="font-size:10px;color:var(--gold2)">${displaySummary}</span></div>
 </div>
+${renderNpcHpCalculation(c)}
 ${c.hi ? renderHi(c.hi, id) : ''}
 ${getSelectedAngrial(c).id!=='none' ? renderAngrial(getSelectedAngrial(c)) : ''}
 <div class="sec"><div class="sec-h">Навыки</div>

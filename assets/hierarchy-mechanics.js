@@ -165,6 +165,22 @@
   db.getHierarchy = getHierarchy;
   db.getRankNumber = rankNumber;
   db.getAbilities = abilitiesFor;
+  // HP multipliers affect only the class Hit Dice component, before all flat terms.
+  db.calculateHitPoints = function (classes, constitution, coefficient, flatModifiers) {
+    let levels = 0, hitDicePart = 0;
+    (classes || []).forEach((row, index) => {
+      const count = Math.max(0, Number(row.levels) || 0), die = Number(row.die) || 0;
+      if (!count || !die) return;
+      const first = row.first == null ? index === 0 : !!row.first;
+      levels += count;
+      hitDicePart += (first ? die : 0) + (count - (first ? 1 : 0)) * (Math.floor(die / 2) + 1);
+    });
+    const multiplier = Number(coefficient) > 0 ? Number(coefficient) : 1;
+    const contribution = levels * Math.floor(((Number(constitution) || 10) - 10) / 2);
+    const flat = (flatModifiers || []).reduce((sum, row) => sum + (Number(row.value) || 0), 0);
+    const scaled = Math.floor(hitDicePart * multiplier);
+    return { hitDicePart, coefficient: multiplier, scaled, contribution, flat, levels, total: Math.max(1, scaled + contribution + flat) };
+  };
   db.validate = function () {
     const errors = [];
     const ids = new Set();

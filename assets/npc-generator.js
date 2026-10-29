@@ -502,7 +502,13 @@ function applyHierarchy(stats,ctx){
   out.items.push({n:'Наследование рангов',d:'Уникальные способности нижестоящих рангов сохранены. Числовые значения взяты из итогового профиля выбранного ранга и не сложены повторно.',rank:ctx.rank});
   return out;
 }
-function avgHp(cls,lv,con,h){const die=hitDie[cls]||8, conPart=lv*mod(con), hitDicePart=die+Math.max(0,lv-1)*(Math.floor(die/2)+1); const scaled=h&&h.hpMult?Math.floor(hitDicePart*h.hpMult):hitDicePart; return Math.max(1,scaled+conPart+(h?h.hpBonus:0));}
+function hpCalculation(cls,lv,con,h,nation){
+  const classes=[{name:cls,die:hitDie[cls]||8,levels:lv,first:true}], hierarchyFlat=Number(h&&h.hpBonus)||0;
+  const flatModifiers=/^Шончан$/i.test(String(nation||''))?[{name:'Шончан: Крепкий',value:lv}]:[];
+  const calc=hierarchyDb.calculateHitPoints(classes,con,h&&h.hpMult||1,[{name:'Иерархия',value:hierarchyFlat},...flatModifiers]);
+  return {method:'average',classes,coefficient:calc.coefficient,hierarchyFlat,flatModifiers,hitDicePart:calc.hitDicePart,contribution:calc.contribution,expected:calc.total,status:'verified',source:'Генератор NPC; классовые средние; текущий ранговый профиль'};
+}
+function avgHp(cls,lv,con,h){return hpCalculation(cls,lv,con,h,getNation()).expected;}
 function initClassSelect(){
   const classes=Array.from(new Set(clsDb.features.map(f=>f.className).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
   $('npc-class').innerHTML=classes.map(c=>`<option>${safe(c)}</option>`).join('');
@@ -723,6 +729,7 @@ function buildNpc(){
     npc.co.sv=`Мдр, Хар${featsSel.includes('Устойчивый')?', Тел (Устойчивый)':''}${h.saveBonus?' +'+h.saveBonus+' от Иерархии':''}`;
   }
   if(channelingSlots.length) npc.slots=channelingSlots;
+  npc.hpCalculation=hpCalculation(cls,lv,stats.con,h,nation);
   if(spells.length) npc.spells=spells;
   npc.verify=validateNpc({cls,arch,pactAnchor,pact,lv,nation,features,featsSel,featCostState,spells,h,stats,hp,ac:acCalc.ac,applied,eq,attack,weaponAttacks,selectedTalents,selectedAffinities,selectedSecretMatrices,selectedForbiddenMatrices,hierarchyCtx});
   currentNpc=npc; reviewReady=true; renderReview(npc,{applied,acCalc,attack,eq,baseline:{stats:baseline.stats,hp:baselineHp,ac:baselineAc.ac,speed:30,initiative:baselineIni,attack:baselineAttack.a}}); return npc;
