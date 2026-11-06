@@ -1,0 +1,7 @@
+/* Shared book layout and palette are supplied by tarabon.css. */
+.altara-page .tarabon-book h4{font-family:'Marcellus','Cormorant Garamond',serif;font-size:23px;line-height:1.35;font-weight:400;color:var(--gold-bright);margin:28px 0 14px;scroll-margin-top:105px}
+.altara-page .tarabon-book h5{font-family:'Marcellus','Cormorant Garamond',serif;font-size:20px;line-height:1.4;font-weight:400;color:var(--ink);margin:24px 0 12px;scroll-margin-top:105px}
+.altara-page .tarabon-toc ul{margin:6px 0 10px;padding-left:20px;list-style:disc}
+.altara-page .tarabon-toc ul li{font-size:16px;padding:3px 0}
+.altara-page .tarabon-book .altara-publication{font-size:16px;color:var(--ink-soft)}
+@media(max-width:600px){.altara-page .tarabon-book h4{font-size:22px}.altara-page .tarabon-book h5{font-size:20px}}

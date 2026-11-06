@@ -163,6 +163,7 @@
     {href:'shienar.html', label:'Шайнар'},
     {href:'tar-valon.html', label:'Тар Валон'},
     {href:'tarabon.html', label:'Тарабон'},
+    {href:'altara.html', label:'Алтара'},
     {href:'shara.html', label:'Шара'}
   ];
   window.WOT_NATION_ITEMS = nationItems.slice();
