@@ -1,0 +1,71 @@
+/* Тарабон uses the site's typography, ink and gold palette. */
+.tarabon-page .page-header{padding-bottom:42px}
+.tarabon-page .page-header .eyebrow{letter-spacing:.24em}
+.tarabon-edition{color:var(--gold);font-size:15px;margin:20px auto 0;letter-spacing:.04em}
+.tarabon-book{max-width:1260px;margin:0 auto;padding:0 28px 64px}
+.tarabon-intro{max-width:880px;margin:0 auto 56px}
+.tarabon-quick{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:0 0 32px}
+.tarabon-quick a{border:1px solid var(--border-gold);border-radius:var(--rad);padding:9px 16px;color:var(--gold-bright);font-size:16px;background:var(--bg-deep);text-decoration:none}
+.tarabon-book a{color:var(--gold-bright);text-underline-offset:.2em}
+.tarabon-book a:hover{color:var(--gold-pale)}
+.tarabon-book a:focus-visible,.tarabon-book summary:focus-visible,.tarabon-table-wrap:focus-visible{outline:2px solid var(--gold-bright);outline-offset:5px}
+.tarabon-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:48px;align-items:start}
+.tarabon-sidebar{position:sticky;top:105px;min-width:0}
+.tarabon-toc{border:1px solid var(--border-gold);background:var(--bg-deep);border-radius:var(--rad)}
+.tarabon-toc summary{padding:18px;color:var(--gold-bright);font-family:'Marcellus','Cormorant Garamond',serif;font-size:21px;cursor:pointer}
+.tarabon-toc summary span{display:block;font-family:'Crimson Pro',Georgia,serif;color:var(--ink-soft);font-size:14px;padding:7px 0 0 18px}
+.tarabon-toc nav{max-height:calc(100dvh - 220px);overflow-y:auto;padding:0 18px 20px;scrollbar-width:thin;scrollbar-color:var(--gold-deep) var(--bg-deep)}
+.tarabon-toc ol{margin:0;padding-left:23px;color:var(--gold-deep)}
+.tarabon-toc li{padding:5px 0 5px 2px;line-height:1.3;font-size:16px}
+.tarabon-toc a{color:var(--ink-soft);text-decoration:none;display:block}
+.tarabon-prose{min-width:0}
+.tarabon-section{margin:0 0 56px;scroll-margin-top:105px}
+.tarabon-book h2{font-family:'Marcellus','Cormorant Garamond',serif;font-size:clamp(28px,3.2vw,38px);line-height:1.22;font-weight:400;color:var(--ink);padding-bottom:16px;border-bottom:1px solid var(--border-gold);margin:0 0 25px;text-wrap:balance}
+.tarabon-book h3{font-family:'Marcellus','Cormorant Garamond',serif;color:var(--gold-bright);font-size:25px;line-height:1.3;font-weight:400;margin:32px 0 14px;scroll-margin-top:105px;text-wrap:balance}
+.tarabon-book p,.tarabon-book li{font-size:18px;line-height:1.78;color:var(--ink-soft)}
+.tarabon-book p{margin:0 0 16px}
+.tarabon-book strong{color:var(--ink)}
+.tarabon-book .tarabon-kicker{font-family:'Cinzel',serif;font-size:11px;line-height:1.5;letter-spacing:.14em;color:var(--gold);margin:0 0 14px}
+.tarabon-book .tarabon-deck{font-family:'Cormorant Garamond',serif;font-size:25px;font-style:italic;line-height:1.45;color:var(--gold);margin-bottom:24px}
+.tarabon-figure{margin:28px 0 32px;scroll-margin-top:105px}
+.tarabon-figure img{width:100%;height:auto;display:block;border:1px solid var(--border-gold);border-radius:var(--rad);box-shadow:var(--shadow-deep)}
+.tarabon-figure>a{display:block}
+.tarabon-figure figcaption{font-size:15px;line-height:1.55;color:var(--ink-soft);padding:13px 4px 0}
+.tarabon-figure figcaption a{display:inline-block;margin-left:6px}
+.tarabon-guide{padding:26px 28px 12px;border:1px solid var(--border);background:linear-gradient(120deg,var(--bg-card),var(--bg-deep));margin:32px 0}
+.tarabon-guide h2{font-size:27px}
+.tarabon-table-wrap{overflow-x:auto;border:1px solid var(--border);margin:24px 0 28px;scrollbar-width:thin}
+.tarabon-table-wrap table{width:100%;border-collapse:collapse;background:var(--bg-deep);font-size:16px}
+.tarabon-table-wrap th,.tarabon-table-wrap td{padding:13px 16px;border:1px solid var(--border);vertical-align:top;text-align:left;min-width:150px}
+.tarabon-table-wrap th{font-weight:500;color:var(--gold-bright);background:rgba(201,169,97,.08)}
+.tarabon-table-wrap td p,.tarabon-table-wrap th p{font-size:16px;line-height:1.55;margin:0}
+.tarabon-table-wrap th p{color:var(--gold-bright)}
+.tarabon-table-wrap tbody tr:nth-child(even){background:rgba(201,169,97,.025)}
+.tarabon-checklist{margin:14px 0 24px;padding-left:24px}
+.tarabon-checklist li{padding:4px 0 4px 5px}
+.tarabon-checklist li::marker{color:var(--gold)}
+.tarabon-return{display:block;max-width:300px;margin:32px auto 0;text-align:center;padding:14px 20px;border:1px solid var(--border-gold);font-size:17px}
+.tarabon-skip{position:fixed;left:16px;top:-100px;z-index:10000;padding:12px 20px;background:var(--bg-card);color:var(--gold-bright)}
+.tarabon-skip:focus{top:14px}
+@media(max-width:1099px){
+  .tarabon-layout{display:block;max-width:880px;margin:0 auto}
+  .tarabon-sidebar{position:static;margin-bottom:40px}
+  .tarabon-toc nav{max-height:none}
+  .tarabon-toc ol{columns:2;column-gap:30px}
+  .tarabon-toc li{break-inside:avoid}
+  .tarabon-toc summary span{display:inline;margin-left:12px;padding:0}
+}
+@media(max-width:600px){
+  .tarabon-book{padding:0 18px 40px}
+  .tarabon-page .page-header{padding:56px 20px 30px}
+  .tarabon-page .page-header .eyebrow{font-size:10px;letter-spacing:.12em}
+  .tarabon-toc ol{columns:1}
+  .tarabon-book h3{font-size:23px}
+  .tarabon-quick{gap:8px;margin-bottom:24px}
+  .tarabon-quick a{font-size:15px;padding:9px 12px}
+  .tarabon-guide{padding:22px 20px 8px}
+  .tarabon-section{margin-bottom:44px}
+  .tarabon-table-wrap th,.tarabon-table-wrap td{padding:10px 12px;min-width:135px}
+  .tarabon-intro{margin-bottom:32px}
+}
+@media(prefers-reduced-motion:reduce){.tarabon-page{scroll-behavior:auto}.tarabon-page *{animation:none!important;transition:none!important}}
