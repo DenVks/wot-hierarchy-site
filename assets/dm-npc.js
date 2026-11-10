@@ -657,6 +657,7 @@ function renderAngrialSelector(c){
 // ── HP System ────────────────────────────────────────────────────────────
 let hpModalNpcId = null;
 function openHpModal(id) {
+  rememberCombatModalFocus();
   hpModalNpcId = id;
   const c = getNpcById(id);
   document.getElementById('hp-modal-title').textContent = (c?c.sh:'NPC') + ' — HP';
@@ -664,7 +665,7 @@ function openHpModal(id) {
   document.getElementById('hp-modal').style.display = 'flex';
   document.getElementById('hp-modal-val').focus();
 }
-function closeHpModal() { document.getElementById('hp-modal').style.display='none'; }
+function closeHpModal() { const modal=document.getElementById('hp-modal'),wasOpen=modal.style.display!=='none';modal.style.display='none';if(wasOpen)restoreCombatModalFocus(); }
 function applyHp(sign) {
   const id = hpModalNpcId;
   const val = parseInt(document.getElementById('hp-modal-val').value) || 0;
@@ -787,6 +788,7 @@ function refreshSlotsPanel(id) {
     const spellBox = document.getElementById('slot-box-sp-'+id+'-'+slot.lv);
     if (spellBox) spellBox.classList.toggle('used', st.used >= st.total);
   });
+  enhanceCombatControls();
 }
 
 function refreshSDPanel(id) {
@@ -796,6 +798,7 @@ function refreshSDPanel(id) {
   container.innerHTML = Array.from({length:s.sdTotal},(_,i)=>
     `<div class="sd-pip${i<s.sdUsed?' used':''}" onclick="useSD(${id})">${i<s.sdUsed?'':'к8'}</div>`
   ).join('');
+  enhanceCombatControls();
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────
@@ -833,6 +836,7 @@ function renderSidebarNpcButton(c, mode){
       '<div class="npc-btn-hp"><div class="npc-btn-hp-fill '+hpColor(s.curHp,maxHp)+'" style="width:'+pct+'%"></div></div>'+
       '<div class="cond-badges">'+s.conditions.map(k=>'<span class="cond-badge cb-'+k+'">'+(COND_LABELS[k]||k)+'</span>').join('')+'</div>'+
     '</span>'+hiHtml+actionHtml+'<span class="npc-btn-lv">'+c.lv+'</span>';
+  btn.tabIndex=0;btn.setAttribute('role','button');btn.onkeydown=event=>{if(event.target===btn&&['Enter',' '].includes(event.key)){event.preventDefault();showNPC(c.id);}};
   btn.onclick = () => showNPC(c.id);
   return btn;
 }
@@ -2008,6 +2012,13 @@ function calculateNpcBaseHp(c){
   const calc=db.calculateHitPoints(classes,c.st.con,coefficient,[{name:'Иерархия',value:hierarchyFlat},...flatModifiers]);
   return {method:'average',classes,coefficient,hierarchyId,rank,hierarchyFlat,flatModifiers,hitDicePart:calc.hitDicePart,contribution:calc.contribution,expected:calc.total,status:'verified',source:'Средние D&D 5e; текущий профиль Иерархии'};
 }
+// Descriptions contain identity and role; calculated HP comes from the current display profile.
+function getNpcSubtitle(c,maxHp){
+  const description=String(c&&c.su||'').split(/\s*·\s*/)
+    .filter(part=>!/^(?:ОЗ\s+\d+|\d+\s+ОЗ)$/i.test(part.trim()))
+    .map(part=>part.trim()).filter(Boolean).join(' · ');
+  return [description,'Макс. ОЗ '+maxHp].filter(Boolean).join(' · ');
+}
 function renderNpcHpCalculation(c){
   const saved=c.hpCalculation;
   const input=c.generator&&c.generator.inputs;
@@ -2145,11 +2156,11 @@ function renderElixirQuickResources(id){
   const catalog=elixirCatalog(), slots=getElixirSlots(id);
   const selected=slots.filter(slot=>getElixirItem(slot.itemId));
   const ready=selected.filter(slot=>!slot.used).length;
-  return `<section class="combat-quick-resources" id="combat-elixirs-${id}">
+  return `<details class="combat-quick-resources combat-aux" id="combat-elixirs-${id}" ${selected.length?'open':''}><summary>Эликсиры · ${ready}/${selected.length} готово</summary>
     <div class="combat-quick-resources-head"><div><strong>🧪 Эликсиры</strong><span>5 независимых расходников этой копии NPC</span></div><b>${ready}/${selected.length||0} готово</b></div>
     ${catalog.length?`<div class="combat-elixir-strip">${slots.map((slot,index)=>renderElixirCell(id,slot,index,catalog)).join('')}</div>`:'<div class="combat-elixir-empty">Каталог орденских составов не загружен.</div>'}
     <div class="combat-elixir-note">Применение отмечает расход и записывает событие боя. Временные эффекты и лечение пока не меняют параметры автоматически.</div>
-  </section>`;
+  </details>`;
 }
 function refreshElixirPanel(id){
   const panel=document.getElementById('combat-elixirs-'+id);
@@ -2433,26 +2444,7 @@ function uniqueBriefItems(items){
     return true;
   });
 }
-function combatBrief(c){
-  const records = npcTextRecords(c);
-  const cats = [
-    {key:'turn', title:'Начало / конец хода', icon:'⟳', cls:'turn', patterns:[/\bрегенерац|регенер/i,/в начале[^.]{0,180}ход/i,/в конце[^.]{0,180}ход/i,/кажд(?:ый|ого) раунд/i,/восстанавливает[^.]{0,120}(?:хит|ОЗ)/i]},
-    {key:'defense', title:'Защита / стойкость', icon:'🛡', cls:'defense', patterns:[/сопротивлен/i,/иммун/i,/уязв/i,/преим[^.]{0,90}спас/i,/снижает? урон|уменьшает? урон|поглотить|половин/i,/немагич[^.]{0,80}урон/i]},
-    {key:'reaction', title:'Реакции', icon:'↩', cls:'reaction', patterns:[/реакц/i]},
-    {key:'bonus', title:'Бонусные действия', icon:'⚡', cls:'bonus', patterns:[/бон\.д|бонусн/i]},
-    {key:'aura', title:'Ауры / союзники', icon:'◎', cls:'aura', patterns:[/\bаура/i,/союзник/i,/союзн/i,/в пределах \d+\s?фт/i,/энергетическая связь/i]},
-    {key:'resource', title:'Ограниченные ресурсы', icon:'◆', cls:'resource', patterns:[/1\/день|1\/долг|1\/корот|1\/отдых|раз за|число раз|бонусу мастерства|восстанавливается/i,/коротк(?:им|ого)|продолжительн(?:ым|ого)|долг(?:им|ого) отдых/i]}
-  ];
-  const out = {};
-  cats.forEach(cat=>{
-    const found = records
-      .filter(r=>(r.tags||[]).includes(cat.key)||briefMatches(r.name+' '+r.text, cat.patterns))
-      .sort((a,b)=>(b.rank||0)-(a.rank||0));
-    out[cat.key] = uniqueBriefItems(found).slice(0,4).map(r=>({source:r.source, name:r.name, text:clipNpcText(r.text, 210)}));
-    out[cat.key].meta = cat;
-  });
-  return {records, cats, out};
-}
+function combatBrief(c){return window.WOT_COMBAT_VIEW.entries(c,window.WOT_HIERARCHY_DB,splitScreamAbilities);}
 function getSpellLine(c){
   const cr = String(c && c.co && c.co.cr || '');
   const parts = [];
@@ -2469,41 +2461,22 @@ function renderBriefGroup(meta, items){
     <div class="battle-brief-list">${items.map(it=>`<div class="battle-brief-item"><b>${escHtml(it.name)}</b><em>${escHtml(it.source)}</em><span>${escHtml(it.text)}</span></div>`).join('')}</div>
   </div>`;
 }
-function renderCombatDashboard(id, c, s){
-  const brief = combatBrief(c);
-  const displaySummary=getDisplayCombatSummary(c);
-  const coreCr = displaySummary ? clipNpcText(displaySummary, 115) : '—';
-  const spellLine = getSpellLine(c);
-  const slotLine = c.slots && c.slots.length ? c.slots.map(sl=>`${escHtml(sl.lv)}:${sl.n}`).join(' · ') : '';
-  const activeAngrial = (c.spells || c.slots) ? getSelectedAngrial(c) : ANGRIAL_CATALOG[0];
-  const itemResistances = getDisplayResistances(c);
-  const hp=getDisplayHpProfile(c,s);
-  const criticalGroups = ['turn','defense','reaction','bonus','aura','resource']
-    .map(k=>renderBriefGroup(brief.out[k].meta, brief.out[k]))
-    .join('');
-  const emptyLine = criticalGroups ? '' : '<div class="battle-brief-empty">Автоматических напоминаний не найдено. Проверьте вкладки «Черты» и «Иерархия» перед боем.</div>';
-  return `<section class="battle-dashboard" id="battle-dashboard-${id}">
-    <div class="battle-dashboard-head">
-      <div>
-        <div class="bd-kicker">Боевой пульт</div>
-        <div class="bd-title">Что нужно видеть во время сцены</div>
-      </div>
-      <div class="bd-status-line">${escHtml(coreCr)}</div>
-    </div>
-    <div class="bd-metrics">
-      <div class="bd-metric ac"><span>КД</span><b>${getDisplayAC(c)}</b></div>
-      <div class="bd-metric hp"><span>ОЗ</span><b>${hp.current}/${hp.max}</b></div>
-      <div class="bd-metric"><span>Иниц.</span><b>${escHtml(getDisplayInitiative(c))}</b></div>
-      <div class="bd-metric"><span>Скор.</span><b>${escHtml(c.co.sp)} фт</b></div>
-      <div class="bd-metric"><span>Пасс. ВСПР</span><b>${escHtml(getPassivePerception(c))}</b></div>
-      <div class="bd-metric"><span>Плетения</span><b>${escHtml(spellLine)}</b></div>
-    </div>
-    ${slotLine || activeAngrial.id!=='none' || itemResistances.length ? `<div class="bd-resource-line">${slotLine ? `<span><b>Ячейки:</b> ${slotLine}</span>` : ''}${activeAngrial.id!=='none' ? `<span><b>${activeAngrial.kind==='saangrial'?'Са’ангриал':'Ангриал'}:</b> сила ${activeAngrial.lv} · атака +${activeAngrial.attack} · +${activeAngrial.dice} куб. · ×${activeAngrial.range}</span>` : ''}${itemResistances.length?`<span><b>Сопр. от предметов:</b> ${escHtml(itemResistances.join(', '))}</span>`:''}</div>` : ''}
-    <div class="battle-brief-grid">${criticalGroups}${emptyLine}</div>
-  </section>`;
+function renderCombatDashboard(id,c,s){
+  const entries=combatBrief(c),groups=window.WOT_COMBAT_VIEW.GROUPS;
+  const order=['reaction','bonus','action','trigger','special','passive','preparation','reference'];
+  return `<section class="battle-dashboard" id="battle-dashboard-${id}" aria-label="Способности текущего NPC"><div class="battle-dashboard-head"><div class="bd-title">Способности и условия</div></div>${order.map(kind=>{
+    const rows=entries.filter(e=>e.kind===kind);if(!rows.length)return '';
+    return `<details class="combat-rule-group" ${['reaction','bonus','action','trigger'].includes(kind)?'open':''}><summary>${groups[kind]} · ${rows.length}</summary>${rows.map(e=>`<details class="combat-rule" data-rule-id="${escHtml(e.id)}"><summary><strong>${escHtml(e.name)}</strong><small>${escHtml(groups[kind])} · ${escHtml(e.source)}</small></summary><div class="combat-rule-body">${escHtml(e.text)}${e.specific?'<p><b>Параметры карточки:</b> '+escHtml(e.specific)+'</p>':''}</div>${e.href&&/^[a-z0-9-]+\.html(?:#[a-z0-9-]+)?$/.test(e.href)?`<a href="${escHtml(e.href)}" target="_blank" rel="noopener">Открыть полное правило Иерархии</a>`:''}</details>`).join('')}</details>`;
+  }).join('')}</section>`;
+}
+function renderNpcHierarchy(c,id){
+  if(!c.hi)return '';
+  const items=c.hi.items.map(item=>{const rule=window.WOT_COMBAT_VIEW.canonicalRule(c,item,window.WOT_HIERARCHY_DB);return {...item,d:rule.text+(rule.specific?'\nПараметры карточки: '+rule.specific:'')};});
+  return renderHi({...c.hi,items},id);
 }
 
 function showNPC(id) {
+  closeCombatCatalog(false);
   loadCustomNpcsFromStorage();
   const c = getNpcById(id);
   const main = document.getElementById('mn');
@@ -2527,8 +2500,8 @@ function showNPC(id) {
   const hasTalents = !!(c.excTalents && c.excTalents.length);
   const hasSD = c.co.cr && /\d+к8.*Превосх/.test(c.co.cr);
 
-  const tabs = ['battle','overview','abilities','equipment'].concat(hasForms?['forms']:[]).concat(hasSpells?['spells']:[]).concat(hasTalents?['talents']:[]);
-  const tabLabels = {'battle':'⚔ Бой','overview':'📊 Обзор','abilities':'✨ Черты','equipment':'🎒 Снар.','forms':'🗡 Формы','spells':'🌀 Плетения','talents':'🌟 Таланты'};
+  const tabs = ['battle'].concat(hasSpells?['spells']:[]).concat(['equipment','overview','abilities']).concat(hasForms?['forms']:[]).concat(hasTalents?['talents']:[]);
+  const tabLabels = {'battle':'⚔ Бой','overview':'📊 Описание','abilities':'✨ Черты','equipment':'🎒 Снаряжение','forms':'🗡 Формы','spells':'🌀 Плетения','talents':'🌟 Таланты'};
 
   let html = `
 <div class="combat-panel" id="combat-panel-${c.id}">
@@ -2569,17 +2542,16 @@ function showNPC(id) {
 <div class="sheet-header ty-${c.ty}">
   <div class="sh-row1"><span class="sh-icon">${c.ic}</span><div>
     <div class="sh-title">${c.ti}</div>
-    <div class="sh-sub">${c.su}</div>
+    <div class="sh-sub">${escHtml(getNpcSubtitle(c,maxHp))}</div>
   </div></div>
   <div class="sh-tags">${c.tags.map(t=>`<span class="tag tag-${c.ty}">${t}</span>`).join('')}</div>
 </div>
-${renderCombatDashboard(id, c, s)}
-<div class="tabs" id="tabs_${id}">
-  ${tabs.map((t,ti)=>`<button class="tab-btn${ti===0?' active':''}" onclick="switchTab(${id},'${t}')">${tabLabels[t]}</button>`).join('')}
+<div class="tabs" id="tabs_${id}" role="tablist" aria-label="Разделы карточки NPC">
+  ${tabs.map((t,ti)=>`<button class="tab-btn${ti===0?' active':''}" id="npc-tab-${id}-${t}" role="tab" aria-controls="tab_${id}_${t}" aria-selected="${ti===0}" onkeydown="combatTabKey(event)" onclick="switchTab(${id},'${t}')">${tabLabels[t]}</button>`).join('')}
 </div>`;
 
   // ── TAB: BATTLE ──────────────────────────────────────────────────────
-  html += `<div class="tab-content active" id="tab_${id}_battle">`;
+  html += `<div class="tab-content active" id="tab_${id}_battle"><div class="npc-battle-layout"><div class="npc-primary-actions">`;
 
   // Rest + round buttons
   html += `<div class="rest-row">
@@ -2591,14 +2563,15 @@ ${renderCombatDashboard(id, c, s)}
   html += renderCombatJournalTools(c);
 
   // Compact, per-NPC consumables. Kept separate from equipment calculations.
-  html += renderElixirQuickResources(id);
+  // Consumables remain accessible below the primary attacks.
+
 
   // Dice buttons
-  html += `<div class="sec"><div class="sec-h">Кубики</div>
+  html += `<details class="combat-aux"><summary>Кубики</summary><div class="sec">
 <div class="dice-btns">
   ${['1к4','1к6','1к8','1к10','1к12','1к20','2к6','1к20+0'].map(d=>`<button class="dice-btn" onclick="rollDice('${d}','${d}')">${d}</button>`).join('')}
   <span class="dice-output" id="dice-out">—</span>
-</div></div>`;
+</div></div></details>`;
 
   // Quick skill / precision damage tools
   const saExpr = getSneakAttackExpr(c);
@@ -2703,7 +2676,8 @@ ${Array.from({length:sdN},(_,i)=>`<div class="sd-pip${i<s.sdUsed?' used':''}" on
 </div></div>`;
   }
 
-  html += `</div>`; // end battle tab
+  html += renderElixirQuickResources(id);
+  html += `</div><aside class="npc-ability-rail">${renderCombatDashboard(id,c,s)}</aside></div></div>`; // end battle tab
 
   // ── TAB: OVERVIEW ────────────────────────────────────────────────────
   html += `<div class="tab-content" id="tab_${id}_overview">
@@ -2723,7 +2697,7 @@ ${['СИЛ','ТЕЛ','ЛОВ','ИНТ','МДР','ХАР'].map((name,si)=>{
   <div class="core-box core-wide"><span style="font-size:10px;color:var(--text3)">Особенности</span><span class="core-val" style="font-size:10px;color:var(--gold2)">${displaySummary}</span></div>
 </div>
 ${renderNpcHpCalculation(c)}
-${c.hi ? renderHi(c.hi, id) : ''}
+${renderNpcHierarchy(c,id)}
 ${getSelectedAngrial(c).id!=='none' ? renderAngrial(getSelectedAngrial(c)) : ''}
 <div class="sec"><div class="sec-h">Навыки</div>
 <div class="sk-grid">${c.sk.map(sk=>`<div class="sk-item${sk.e?' expert':''}"><span class="sk-name">${sk.e?'<span class="sk-star">★</span>':''}${sk.n}<span style="font-size:9px;color:var(--text3);margin-left:3px">${sk.note||''}</span></span><span class="sk-val">${getDisplaySkillValue(c,sk)}</span></div>`).join('')}</div></div>
@@ -2736,7 +2710,7 @@ ${c.tactics.map(t=>`<div class="tact-phase"><div class="tact-phase-name">${t.ph}
   // ── TAB: ABILITIES ────────────────────────────────────────────────────
   html += `<div class="tab-content" id="tab_${id}_abilities">
 <div class="sec"><div class="sec-h">Черты класса и архетипа</div>
-<div class="ab-grid">${c.ab.map(a=>`<div class="ab-card${a.hi?' highlight':''}"><div class="ab-name">${a.n} ${classFeatureInfoButton(id, a.n)}</div><div class="ab-desc">${a.d}</div></div>`).join('')}</div>
+<div class="ab-grid">${c.ab.filter(a=>!window.WOT_COMBAT_VIEW.hierarchyOwns(c,a)).map(a=>`<div class="ab-card${a.hi?' highlight':''}"><div class="ab-name">${a.n} ${classFeatureInfoButton(id, a.n)}</div><div class="ab-desc">${a.d}</div></div>`).join('')}</div>
 </div></div>`;
 
   // ── TAB: EQUIPMENT ────────────────────────────────────────────────────
@@ -2797,7 +2771,10 @@ ${resolvedSpells.map((sp,spi)=>`<tr>
   html += `</div></div>`; // sheet + app
 
   main.innerHTML = html;
+  enhanceCombatControls();
+  setCombatMobileTitle(c.sh+(combatActive?' · раунд '+combatRound:''));
   refreshIniTracker();
+  document.querySelectorAll('.tab-content[id^="tab_"]').forEach(panel=>{panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby','npc-tab-'+panel.id.slice(4).replace('_','-'));});
   }catch(err){
     console.error('Cannot render NPC', c, err);
     if(main) main.innerHTML = '<div class="placeholder" id="placeholder">Ошибка открытия NPC: '+(err && err.message ? err.message : err)+'</div>';
@@ -3123,11 +3100,11 @@ function renderTalentsTab(i, c) {
 // ── Tab switching ─────────────────────────────────────────────────────────
 function switchTab(i, tabId) {
   document.querySelectorAll(`#tab_${i}_battle, #tab_${i}_overview, #tab_${i}_abilities, #tab_${i}_equipment, #tab_${i}_forms, #tab_${i}_spells, #tab_${i}_talents`).forEach(el => el && el.classList.remove('active'));
-  document.querySelectorAll(`#tabs_${i} .tab-btn`).forEach(b => b.classList.remove('active'));
+  document.querySelectorAll(`#tabs_${i} .tab-btn`).forEach(b => {b.classList.remove('active');b.setAttribute('aria-selected','false');});
   const tc = document.getElementById(`tab_${i}_${tabId}`);
   if (tc) tc.classList.add('active');
   document.querySelectorAll(`#tabs_${i} .tab-btn`).forEach(b => {
-    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${tabId}'`)) b.classList.add('active');
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${tabId}'`)){b.classList.add('active');b.setAttribute('aria-selected','true');}
   });
 }
 

@@ -7,11 +7,14 @@
 <script src="assets/auth.js?v=117"></script>
 <link rel="stylesheet" href="assets/dm-npc.css?v=175">
 <link rel="stylesheet" href="assets/hp-formula.css?v=176">
+<link rel="stylesheet" href="assets/combat-layout.css?v=182">
+<script src="assets/combat-layout.js?v=182"></script>
+<link rel="stylesheet" href="assets/site-navigation.css?v=183">
 </head>
-<body>
+<body class="combat-workspace"><div class="mobile-catalog-trigger"><span>NPC · Бой</span><button id="catalog-toggle" aria-expanded="false" aria-controls="catalog-panel" aria-label="Выбрать NPC" onclick="toggleCombatCatalog()">Каталог</button><button onclick="jumpCombatActions()">К действиям</button></div><button class="catalog-scrim" tabindex="-1" aria-label="Закрыть каталог" onclick="closeCombatCatalog()"></button>
 <div class="dm-tool-badge">DM Toolkit · NPC / Бой</div>
 <div class="app">
-<aside class="sidebar">
+<aside class="sidebar" id="catalog-panel" aria-label="Каталог NPC"><button class="catalog-close" onclick="closeCombatCatalog()">Закрыть каталог</button>
   <div class="sidebar-header">
     <div class="sidebar-title">WoT 5e · NPC</div>
     <div class="sidebar-sub"><a href="index.html">← на сайт</a> · <a href="classes.html#class-nositel-dogovora">Носитель Договора</a> · <span id="sb-count">— персонажей</span></div>
@@ -31,10 +34,10 @@
 </div>
 
 <!-- HP Modal -->
-<div class="hp-modal" id="hp-modal" style="display:none">
+<div class="hp-modal" id="hp-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="hp-modal-title">
   <div class="hp-modal-box">
     <div class="hp-modal-title" id="hp-modal-title">Урон / Лечение</div>
-    <input class="hp-modal-input" id="hp-modal-val" type="number" min="0" placeholder="0">
+    <input class="hp-modal-input" id="hp-modal-val" aria-label="Количество хитов" type="number" min="0" placeholder="0">
     <div class="hp-modal-btns">
       <button class="hp-modal-cancel" onclick="closeHpModal()">Отмена</button>
       <button class="hp-modal-heal" onclick="applyHp(1)">+ Лечение</button>
@@ -59,11 +62,13 @@
 <script src="assets/npc-misc-items.js?v=4"></script>
 <script src="assets/npc-elixirs.js?v=1"></script>
 <script src="assets/npc-tactics.js?v=1"></script>
-<script src="assets/npc-data.js?v=176"></script>
+<script src="assets/npc-data.js?v=180"></script>
 <script src="assets/hierarchy-data.js?v=137"></script>
 <script src="assets/hierarchy-wall-data.js?v=1"></script>
 <script src="assets/hierarchy-mechanics.js?v=176"></script>
-<script src="assets/dm-npc.js?v=176"></script>
+<script src="assets/npc-combat-view.js?v=182"></script>
+<script src="assets/dm-npc.js?v=182"></script>
 <script src="assets/hierarchy-wall-dm-patch.js?v=1"></script>
+<script src="assets/site-navigation.js?v=183"></script>
 </body>
 </html>

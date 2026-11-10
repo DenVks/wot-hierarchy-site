@@ -1,0 +1,28 @@
+/* Common combat workspaces: visible focus and a catalogue that does not precede the card on mobile. */
+.combat-workspace :focus-visible{outline:2px solid var(--gold2,#f0cd7a);outline-offset:3px}
+.combat-workspace .main{min-width:0}.combat-workspace .combat-panel{position:static}
+.mobile-catalog-trigger,.catalog-close,.catalog-scrim{display:none}
+.combat-workspace .tabs{margin:0 0 10px}.combat-workspace .tab-btn{min-height:34px;font-size:11px}
+.combat-workspace .sheet-header{padding:8px 12px;margin-bottom:8px}.combat-workspace .sh-title{font-size:19px}.combat-workspace .sh-sub{font-size:12px;line-height:1.4}
+.npc-battle-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(260px,1fr);gap:12px;align-items:start}.npc-primary-actions{min-width:0}.npc-ability-rail{min-width:0}
+.combat-workspace .battle-dashboard{margin:0;padding:10px}.combat-workspace .battle-dashboard-head{margin-bottom:6px}.combat-workspace .bd-title{font-size:13px}
+.combat-rule-group{border-top:1px solid var(--border);padding:6px 0}.combat-rule-group>summary{cursor:pointer;font-size:13px;color:var(--gold2)}.combat-rule{margin:5px 0;border:1px solid var(--border);border-radius:6px;padding:7px}.combat-rule>summary{cursor:pointer;line-height:1.4;font-size:13px}.combat-rule small{display:block;color:var(--text2);font-size:11px}.combat-rule-body{padding-top:7px;font-size:13px;line-height:1.5;white-space:pre-line;overflow-wrap:anywhere}.combat-rule a{display:block;margin-top:7px;color:var(--gold2);font-size:12px}
+.combat-workspace .combat-turn-tools{padding:6px 8px}.combat-workspace .combat-action-buttons button{font-size:10px;min-height:28px}.combat-workspace .combat-journal{margin-top:4px}.combat-workspace .rest-row{margin-bottom:8px}
+.combat-aux{border:1px solid var(--border);border-radius:6px;padding:7px;margin:7px 0}.combat-aux>summary{cursor:pointer;font-size:12px;color:var(--text2)}
+.combat-workspace .combat-quick-resources-head span{font-size:10px}.combat-workspace .combat-elixir-cell{font-size:12px}.combat-workspace .combat-elixir-effect{font-size:12px}
+.combat-workspace .npc-btn[role=button]:focus-visible{outline-offset:-2px}
+@media(max-width:1050px){.npc-battle-layout{grid-template-columns:minmax(0,1fr)}.npc-ability-rail{border-top:1px solid var(--border);padding-top:8px}}
+@media(max-width:760px){
+ .combat-workspace{padding-top:46px}.combat-workspace .app{height:auto;min-height:calc(100vh - 46px);overflow:visible;display:block}.combat-workspace .main{width:100%;overflow:visible}
+ .mobile-catalog-trigger{display:flex;position:fixed;z-index:100;top:0;left:0;right:0;height:46px;align-items:center;justify-content:space-between;background:var(--bg2);padding:5px 10px;border-bottom:1px solid var(--border)}.mobile-catalog-trigger button,.catalog-close{min-height:36px;background:var(--bg3);color:var(--gold2);border:1px solid var(--border2);border-radius:5px;padding:5px 10px;font:inherit}
+ .combat-workspace .sidebar{display:none}.combat-workspace.catalog-open .sidebar{display:flex;position:fixed;inset:50px 8px auto;z-index:140;width:auto;max-height:calc(100dvh - 64px);border:1px solid var(--gold);border-radius:8px;box-shadow:0 12px 40px #000}.combat-workspace.catalog-open{overflow:hidden}.catalog-open .catalog-close{display:block;align-self:flex-end;margin:5px}.catalog-open .catalog-scrim{display:block;position:fixed;inset:46px 0 0;background:#000a;border:0;z-index:130;width:100%;height:100%}
+ .combat-workspace .sidebar-list{max-height:65vh}.combat-workspace .search-input{min-height:36px;font-size:14px;min-width:0}.combat-workspace .combat-panel{padding:8px;gap:7px}.combat-workspace .cp-name{width:100%;flex-basis:100%}.combat-workspace .sheet{padding:8px}.combat-workspace .tabs{gap:4px}.combat-workspace .tab-btn{min-height:40px;flex:1 0 auto;font-size:12px}.combat-workspace .sheet-header .sh-tags{display:none}
+ .combat-workspace .cp-dmg-btn,.combat-workspace .cp-heal-btn,.combat-workspace .cp-reset-btn,.combat-workspace .atk-btn-row button,.combat-workspace .cond-toggle{min-height:36px}.combat-workspace .hp-modal-box{max-width:calc(100vw - 24px)}.combat-workspace .dm-tool-badge{display:none}
+}
+
+.combat-workspace .sheet-header .sh-tags{display:none}.scene-transfer{border:1px solid var(--border);border-radius:5px;padding:4px 7px}.scene-transfer>summary,.combat-dice>summary{cursor:pointer;font-size:12px;color:var(--text2)}.scene-transfer[open]{flex-basis:100%;max-height:none!important}.scene-transfer .scene-controls{padding-top:7px}.combat-dice[open]{flex-basis:100%}
+
+.combat-workspace .cp-name{scroll-margin-top:58px}.mobile-catalog-trigger>span{max-width:62%;font-size:13px;line-height:1.2}
+
+.combat-workspace .atk-card{scroll-margin-top:58px}
+@media(max-width:760px){.mobile-catalog-trigger{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px}.mobile-catalog-trigger>span{max-width:none;font-size:12px}.mobile-catalog-trigger button{font-size:12px;padding:4px 7px}}

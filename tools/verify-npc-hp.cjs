@@ -37,3 +37,21 @@ for(const page of ['unity.html','throne.html','madding.html','hierarchy-wall.htm
 }
 assert.ok(fs.readFileSync(path.join(root,'shara-will.html'),'utf8').includes('Формула максимума хитов'));
 console.log(`PASS: ${rows.length} NPCs, ${ranks} rank profiles, 7 hierarchy pages; multiclass, rounding, Constitution and flat bonuses.`);
+
+// The subtitle uses the same supplied display maximum as the HP counter, including item bonuses.
+const npcUi=fs.readFileSync(path.join(root,'assets/dm-npc.js'),'utf8');
+const subtitleSource=npcUi.slice(npcUi.indexOf('function getNpcSubtitle('),npcUi.indexOf('function renderNpcHpCalculation('));
+assert.ok(subtitleSource.startsWith('function getNpcSubtitle('));
+vm.runInContext(subtitleSource,ctx);
+for(const c of rows){
+  assert.ok(!c.su.split(/\s*·\s*/).some(part=>/^(?:ОЗ\s+\d+|\d+\s+ОЗ)$/i.test(part)),c.id+': manual HP in description');
+  for(const maximum of [c.co.hp,c.co.hp+10]){
+    const text=ctx.getNpcSubtitle(c,maximum);
+    assert.equal((text.match(/Макс\. ОЗ /g)||[]).length,1,c.id+': repeated display maximum');
+    assert.ok(text.endsWith('Макс. ОЗ '+maximum),c.id+': display HP');
+  }
+}
+assert.equal(ctx.getNpcSubtitle({su:'Копия · ОЗ 313 · Роль'},257),'Копия · Роль · Макс. ОЗ 257');
+assert.equal(ctx.getNpcSubtitle({su:'Пользовательский · 216 ОЗ'},220),'Пользовательский · Макс. ОЗ 220');
+assert.ok(npcUi.includes('escHtml(getNpcSubtitle(c,maxHp))'),'Card must use the display maximum');
+console.log('PASS: 50 derived HP subtitles; changed maxima, legacy copies and custom NPC descriptions.');

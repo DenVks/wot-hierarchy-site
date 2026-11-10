@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DM Toolkit · Monsters / Бой</title>
+<title>DM Toolkit · Монстры / Бой</title>
 <script src="assets/auth.js?v=58"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -80,6 +80,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .cp-reset-btn,.cp-util-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text2);padding:3px 8px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;transition:all .12s}
 .cp-reset-btn:hover,.cp-util-btn:hover{border-color:var(--gold);color:var(--gold2);background:var(--bg4)}
 .cp-util-btn.danger,.cp-reset-btn.danger{background:var(--danger-bg);border-color:var(--red);color:var(--red2)}
+.clone-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;flex-basis:100%}.clone-tools label{font-size:12px;color:var(--text2)}.clone-tools input{width:4em;padding:5px;border:1px solid var(--border);border-radius:5px;background:var(--bg2);color:var(--text)}.clone-tools span{font-size:12px;color:var(--text2)}
 .cp-clone-add{border-color:var(--gold);color:var(--gold2)}
 .cp-clone-remove{border-color:var(--danger-border);color:var(--red2);background:var(--danger-bg)}
 .cp-ini-box{cursor:pointer;transition:all .12s}.cp-ini-box:hover{border-color:var(--gold);background:var(--bg4)}
@@ -352,6 +353,8 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 .bleach-warning{margin-top:6px;color:#f1d8a6;font-size:12px}
 @media(max-width:900px){.anomaly-bg-controls{grid-template-columns:1fr 1fr}.anomaly-bg-select{grid-column:1/-1}}
 
+.scene-panel{margin:8px 10px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2)}
+.scene-controls{display:flex;flex-wrap:wrap;gap:7px;align-items:center}.scene-panel button,.scene-panel input{font:inherit;font-size:12px;color:var(--text);background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:5px}.scene-panel button{cursor:pointer}.scene-panel button:disabled{opacity:.45;cursor:default}.scene-controls label{max-width:100%;min-width:0}.scene-controls input{max-width:100%;box-sizing:border-box}.scene-file input{max-width:210px}.scene-panel p{margin:6px 0;font-size:12px}.scene-panel details{font-size:12px;max-height:180px;overflow:auto}.scene-import-preview{border:1px solid var(--gold);padding:8px;margin-top:7px}
 @media(max-width:700px){
   .app{flex-direction:column;height:auto}
   .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border)}
@@ -360,11 +363,14 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
   .highlight-grid{grid-template-columns:repeat(2,1fr)}
 }
 </style>
+<link rel="stylesheet" href="assets/combat-layout.css?v=182">
+<script src="assets/combat-layout.js?v=182"></script>
+<link rel="stylesheet" href="assets/site-navigation.css?v=183">
 </head>
-<body><div id="monster-image-lightbox" class="monster-image-lightbox" onclick="if(event.target.id==='monster-image-lightbox') closeMonsterImage()"><button class="monster-image-lightbox-close" onclick="closeMonsterImage()">×</button><img id="monster-image-lightbox-img" alt=""><div id="monster-image-lightbox-title" class="monster-image-lightbox-title"></div></div>
-<div class="dm-tool-badge">DM Toolkit · Monsters / Бой</div>
+<body class="combat-workspace"><div class="mobile-catalog-trigger"><span>монстра · Бой</span><button id="catalog-toggle" aria-expanded="false" aria-controls="catalog-panel" aria-label="Выбрать монстра" onclick="toggleCombatCatalog()">Каталог</button><button onclick="jumpCombatActions()">К действиям</button></div><button class="catalog-scrim" tabindex="-1" aria-label="Закрыть каталог" onclick="closeCombatCatalog()"></button><div id="monster-image-lightbox" class="monster-image-lightbox" onclick="if(event.target.id==='monster-image-lightbox') closeMonsterImage()"><button class="monster-image-lightbox-close" onclick="closeMonsterImage()">×</button><img id="monster-image-lightbox-img" alt=""><div id="monster-image-lightbox-title" class="monster-image-lightbox-title"></div></div>
+<div class="dm-tool-badge">DM Toolkit · Монстры / Бой</div>
 <div class="app">
-<aside class="sidebar">
+<aside class="sidebar" id="catalog-panel" aria-label="Каталог монстра"><button class="catalog-close" onclick="closeCombatCatalog()">Закрыть каталог</button>
   <div class="sidebar-header">
     <div class="sidebar-title">WoT 5e · Монстры Стены</div>
     <div class="sidebar-sub"><a href="index.html">← на сайт</a> · CR 5–18 · Аномальная Стена</div>
@@ -379,10 +385,10 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 </main>
 </div>
 
-<div class="hp-modal" id="hp-modal" style="display:none">
+<div class="hp-modal" id="hp-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="hp-modal-title">
   <div class="hp-modal-box">
     <div class="hp-modal-title" id="hp-modal-title">Урон / Лечение</div>
-    <input class="hp-modal-input" id="hp-modal-val" type="number" min="0" placeholder="0">
+    <input class="hp-modal-input" id="hp-modal-val" aria-label="Количество хитов" type="number" min="0" placeholder="0">
     <div class="hp-modal-btns">
       <button class="hp-modal-cancel" onclick="closeHpModal()">Отмена</button>
       <button class="hp-modal-heal" onclick="applyHp(1)">+ Лечение</button>
@@ -399,6 +405,8 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
 </div>
 
 <script src="assets/monster-packs-data.js?v=88"></script><script src="assets/anomaly-backgrounds-data.js?v=87"></script><script src="assets/mm-monsters-data.js?v=80"></script><script src="assets/mm-bestiary-adapter.js?v=80"></script>
+<script src="assets/monster-scene.js?v=181"></script>
+<script src="assets/monster-scene-ui.js?v=181"></script>
 <script>
 const MS=[
 {id:1,z:'oreol',cr:'7',crN:7,xp:'2 900',nm:'Картограф',en:'Cartographer',ly:'Внешняя Тень',sz:'Среднее, аберрация',
@@ -795,6 +803,7 @@ function ensureMmMonsterLoaded(monsterId){
   const found=mmList[idx];
   if(!found)return null;
   MS.push(found);
+  registerSceneTemplate(found);
   STATE[String(found.id)]=makeState(found);
   return found;
 }
@@ -804,6 +813,7 @@ const STATE={};
 const CLONES=[];
 const INITIATIVE=[];
 let cloneSeq=1;
+let cloneNotice='';
 let turnIndex=0;
 let activeAnomalyBackgroundId='';
 let anomalyBgExpanded=false;
@@ -813,7 +823,7 @@ let cur=null,tab='combat';
 function keyOf(m){return String(m&&m.id)}
 function allMonsters(){return [...CLONES,...MS]}
 function getMon(id){const sid=String(id);return allMonsters().find(m=>String(m.id)===sid)}
-function baseOf(m){return m&&m.isClone?MS.find(x=>x.id===m.baseId):m}
+function baseOf(m){return m&&m.isClone?MS.find(x=>String(x.id)===String(m.baseId)):m}
 function cleanName(n){return String(n||'').replace(/\s+#\d+$/,'')}
 
 /* ── Dice ── */
@@ -873,18 +883,20 @@ function rollDamage(diceStr,bonus,isCrit){
 
 /* ── HP ── */
 function openHpModal(){
+  rememberCombatModalFocus();
   if(!cur)return;
   document.getElementById('hp-modal-title').textContent=`ОЗ: ${cur.nm} (${STATE[keyOf(cur)].hp}/${cur.hp})`;
   document.getElementById('hp-modal-val').value='';
   document.getElementById('hp-modal').style.display='flex';
   setTimeout(()=>document.getElementById('hp-modal-val').focus(),50);
 }
-function closeHpModal(){document.getElementById('hp-modal').style.display='none'}
+function closeHpModal(){const modal=document.getElementById('hp-modal'),wasOpen=modal.style.display!=='none';modal.style.display='none';if(wasOpen)restoreCombatModalFocus()}
 function applyHp(sign){
   const v=parseInt(document.getElementById('hp-modal-val').value)||0;
   if(!cur||v===0){closeHpModal();return;}
   const s=STATE[keyOf(cur)];
-  s.hp=Math.max(0,Math.min(cur.hp,s.hp+sign*v));
+  const previousHp=s.hp;s.hp=Math.max(0,Math.min(cur.hp,s.hp+sign*v));
+  sceneEvent(cur.nm+': ОЗ '+previousHp+' → '+s.hp+(s.hp===0?' (0 ОЗ; очередь меняется вручную)':''));
   closeHpModal();
   buildSidebar();
   render();
@@ -900,7 +912,7 @@ function newRound(){
   if(!cur)return;
   const s=STATE[keyOf(cur)];
   s.roll={};
-  showDiceModal('Новый раунд','↻','Сброшены видимые результаты бросков выбранного существа',false);
+  showDiceModal('Сброс бросков','↻','Сброшены видимые результаты бросков выбранного существа',false);
   renderFull();
 }
 function shortRest(){
@@ -1002,6 +1014,8 @@ function handlePackQuery(){
 }
 
 function selectMon(id){
+  closeCombatCatalog(false);
+  cloneNotice='';
   cur=getMon(id);
   if(!cur)return;
   tab='combat';
@@ -1009,23 +1023,33 @@ function selectMon(id){
   renderFull();
 }
 
-function createClone(source){
-  const base=baseOf(source||cur);
-  if(!base)return;
-  const sameExisting=CLONES.filter(c=>c.baseId===base.id).length;
-  const cid='clone-'+(cloneSeq++);
-  const clone={...base,id:cid,baseId:base.id,isClone:true,nm:`${base.nm} #${sameExisting+1}`,en:base.en,ly:base.ly};
-  CLONES.push(clone);
-  STATE[keyOf(clone)]=makeState(clone);
-  cur=clone;
-  tab='combat';
-  buildSidebar();
-  renderFull();
+function createClones(source,count){
+  const base=baseOf(source||cur), amount=Number(count);
+  if(!base)return [];
+  if(!Number.isInteger(amount)||amount<1||amount>20||allMonsters().length+amount>1000){
+    cloneNotice=allMonsters().length+amount>1000?'Достигнут лимит сцены: 1000 записей существ.':'Укажите целое количество копий от 1 до 20.';
+    const status=document.getElementById('clone-status');if(status)status.textContent=cloneNotice;
+    return [];
+  }
+  const used=new Set(CLONES.filter(c=>String(c.baseId)===String(base.id)).map(c=>c.cloneNo||Number((c.nm.match(/#(\d+)$/)||[])[1])));
+  const added=[];
+  for(let i=0;i<amount;i++){
+    let cloneNo=1;while(used.has(cloneNo))cloneNo++;used.add(cloneNo);
+    const cid='clone-'+(cloneSeq++);
+    // Each instance owns mutable statblock additions as well as combat state.
+    const clone={...JSON.parse(JSON.stringify(base)),id:cid,baseId:base.id,isClone:true,cloneNo,nm:`${base.nm} #${cloneNo}`};
+    CLONES.push(clone);STATE[keyOf(clone)]=makeState(clone);added.push(clone);
+  }
+  cur=added[0];tab='combat';
+  cloneNotice=`Добавлено копий: ${amount} · ${base.nm}`;sceneEvent(cloneNotice);
+  buildSidebar();renderFull();return added;
 }
+function createClone(source){return createClones(source,1);}
 function removeClone(id){
   const sid=String(id);
   const idx=CLONES.findIndex(c=>String(c.id)===sid);
   if(idx<0)return;
+  sceneEvent('Удалён экземпляр: '+CLONES[idx].nm);
   CLONES.splice(idx,1);
   delete STATE[sid];
   removeFromInitiative(sid,false);
@@ -1041,15 +1065,7 @@ function clearClones(){
   buildSidebar();
   renderFull();
 }
-function resetCombat(){
-  MS.forEach(m=>{STATE[String(m.id)]=makeState(m)});
-  CLONES.splice(0,CLONES.length);
-  Object.keys(STATE).filter(k=>k.startsWith('clone-')).forEach(k=>delete STATE[k]);
-  INITIATIVE.splice(0,INITIATIVE.length);
-  turnIndex=0;
-  cur=null;tab='combat';
-  buildSidebar();renderFull();
-}
+function resetCombat(){requestNewMonsterScene();}
 
 
 /* ── HP color ── */
@@ -1082,13 +1098,16 @@ function parseBonus(str){
   return m?parseInt(m[0],10):0;
 }
 function hasAdvantageText(str){return /преим/i.test(String(str||''));}
+function sortInitiativePreservingActor(){
+  const current=sceneRound>0&&INITIATIVE[turnIndex]?.id;
+  INITIATIVE.sort((a,b)=>b.val-a.val||String(a.name).localeCompare(String(b.name),'ru'));
+  turnIndex=current?Math.max(0,INITIATIVE.findIndex(x=>x.id===current)):0;
+}
 function upsertInitiative(mon,val){
-  const id=keyOf(mon);
-  const old=INITIATIVE.find(x=>x.id===id);
+  const id=keyOf(mon),old=INITIATIVE.find(x=>x.id===id);
   if(old){old.val=val;old.name=mon.nm;old.z=mon.z;old.manual=false;}
   else INITIATIVE.push({id,val,name:mon.nm,z:mon.z,manual:false});
-  INITIATIVE.sort((a,b)=>b.val-a.val || String(a.name).localeCompare(String(b.name),'ru'));
-  turnIndex=Math.max(0,Math.min(turnIndex,INITIATIVE.length-1));
+  sortInitiativePreservingActor();sceneEvent(mon.nm+': инициатива '+val);
 }
 function rollInitiativeCurrent(){
   if(!cur)return;
@@ -1107,44 +1126,42 @@ function addManualInitiative(){
   const name=(nameEl&&nameEl.value.trim())||'Игрок';
   const val=parseInt(valEl&&valEl.value,10);
   if(!Number.isFinite(val))return;
-  const id='manual-'+Date.now();
+  const id='manual-'+Date.now()+'-'+Math.random().toString(36).slice(2);
   INITIATIVE.push({id,val,name,z:'manual',manual:true});
-  INITIATIVE.sort((a,b)=>b.val-a.val || String(a.name).localeCompare(String(b.name),'ru'));
+  sortInitiativePreservingActor();sceneEvent('Добавлен участник: '+name+', инициатива '+val);
   if(nameEl)nameEl.value='';
   if(valEl)valEl.value='';
   renderFull();
 }
 function removeFromInitiative(id,rerender=true){
-  const sid=String(id);
-  const idx=INITIATIVE.findIndex(x=>x.id===sid);
-  if(idx>=0)INITIATIVE.splice(idx,1);
-  turnIndex=Math.max(0,Math.min(turnIndex,INITIATIVE.length-1));
-  if(rerender)renderFull();
+  const sid=String(id),idx=INITIATIVE.findIndex(x=>x.id===sid);
+  if(idx<0)return;
+  const wasCurrent=idx===turnIndex,removed=INITIATIVE[idx];INITIATIVE.splice(idx,1);
+  if(!INITIATIVE.length){turnIndex=0;sceneRunning=false;sceneRound=0;}
+  else if(idx<turnIndex)turnIndex--;
+  else if(wasCurrent){if(turnIndex>=INITIATIVE.length){turnIndex=0;if(sceneRunning)sceneRound++;}sceneTurnSerial++;selectSceneActor();}
+  sceneEvent('Из очереди удалён '+removed.name+(wasCurrent&&INITIATIVE.length?'. Следующий: '+activeSceneActor().name:''));
+  if(rerender){buildSidebar();renderFull();}
 }
 function iniJump(i){
   if(i<0||i>=INITIATIVE.length)return;
-  turnIndex=i;
-  const item=INITIATIVE[turnIndex];
-  const mon=item&&!item.manual?getMon(item.id):null;
-  if(mon)cur=mon;
-  buildSidebar();
-  renderFull();
+  turnIndex=i;sceneTurnSerial++;selectSceneActor();
+  sceneEvent('Мастер выбрал текущий ход: '+activeSceneActor().name+'. Раунд не изменён.');buildSidebar();renderFull();
 }
 function nextTurn(){
-  if(!INITIATIVE.length)return;
-  turnIndex=(turnIndex+1)%INITIATIVE.length;
-  const item=INITIATIVE[turnIndex];
-  const mon=item&&!item.manual?getMon(item.id):null;
-  if(mon)cur=mon;
-  buildSidebar();
-  renderFull();
+  if(!sceneRunning||!INITIATIVE.length)return;
+  const previous=activeSceneActor().name;turnIndex++;
+  if(turnIndex>=INITIATIVE.length){turnIndex=0;sceneRound++;}
+  sceneTurnSerial++;selectSceneActor();
+  sceneEvent('Конец хода: '+previous+'. Начало хода: '+activeSceneActor().name+'. Разрешите соответствующие эффекты.');
+  buildSidebar();renderFull();
 }
-function clearInitiative(){INITIATIVE.splice(0,INITIATIVE.length);turnIndex=0;renderFull();}
+function clearInitiative(){INITIATIVE.splice(0,INITIATIVE.length);turnIndex=0;sceneRunning=false;sceneRound=0;sceneEvent('Очередь очищена.');renderFull();}
 function renderInitiativeTracker(){
   let html=`<div class="ini-tracker"><span class="ini-tracker-label">Инициатива:</span>`;
   if(INITIATIVE.length){
-    html+=INITIATIVE.map((it,i)=>`<div class="ini-slot ${i===turnIndex?'current':''}" onclick="iniJump(${i})"><span class="ini-slot-name">${it.manual?'👤 ':''}${it.name}</span><span class="ini-slot-val">${it.val}</span><button class="ini-remove-btn" onclick="event.stopPropagation();removeFromInitiative('${it.id}')">×</button></div>`).join('');
-    html+=`<button class="ini-next-btn" onclick="nextTurn()">→ След.</button><button class="ini-clear-btn" onclick="clearInitiative()">✕</button>`;
+    html+=INITIATIVE.map((it,i)=>`<div class="ini-slot ${i===turnIndex?'current':''}" onclick="iniJump(${i})"><span class="ini-slot-name">${it.manual?'👤 ':''}${escHtml(it.name)}</span><span class="ini-slot-val">${it.val}</span><button class="ini-remove-btn" onclick="event.stopPropagation();removeFromInitiative('${it.id}')">×</button></div>`).join('');
+    html+=`<button class="ini-next-btn" onclick="nextTurn()" ${sceneRunning?'':'disabled'}>→ След.</button><button class="ini-clear-btn" onclick="clearInitiative()">✕</button>`;
   }else{
     html+=`<span style="color:var(--text3);font-size:10px">Нажмите на блок «Иниц.» у монстра или добавьте значение вручную</span>`;
   }
@@ -1423,9 +1440,10 @@ function closeMonsterImage(){const lb=document.getElementById('monster-image-lig
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMonsterImage();});
 function renderMonsterArt(m){if(!m||!m.img)return'';return `<div class="monster-art-card"><button class="monster-art-btn" onclick="openMonsterImage('${escAttr(m.img)}','${escAttr(m.nm)}')" title="Увеличить изображение"><img src="${escAttr(m.img)}" alt="${escAttr(m.nm)}" loading="lazy"></button></div>`;}
 function renderFull(){
-  const mn=document.getElementById('mn');
-  if(!cur){mn.innerHTML=renderAnomalyBackgroundPanel()+'<div class="placeholder">← Выбери существо слева</div>';return;}
+  const mn=document.getElementById('mn');saveMonsterScene();const scenePanel=renderMonsterScenePanel();
+  if(!cur){mn.innerHTML=scenePanel+renderInitiativeTracker()+renderAnomalyBackgroundPanel()+'<div class="placeholder">← Выбери существо слева</div>';return;}
   const m=cur,s=STATE[keyOf(m)],zc=ZC[m.z]||ZC.yadro;
+  setCombatMobileTitle((sceneRound?'Раунд '+sceneRound+' · ':'')+m.nm);
   const modStr=v=>{const r=Math.floor((v-10)/2);return(r>=0?'+':'')+r};
   const STATS=[['СИЛ','str'],['ЛОВ','dex'],['ТЕЛ','con'],['ИНТ','int'],['МДР','wis'],['ХАР','cha']];
   const pct=Math.max(0,s.hp/m.hp);
@@ -1445,7 +1463,7 @@ function renderFull(){
 
   const combatHTML=()=>{
     let h=`<div class="rest-row">
-      <button class="new-round-btn" onclick="newRound()">🔄 Новый раунд</button>
+      <button class="new-round-btn" onclick="newRound()">🔄 Сброс бросков</button>
       <button class="short-rest-btn" onclick="shortRest()">☕ Кор. отдых</button>
       <button class="long-rest-btn" onclick="longRest()">🌙 Долг. отдых</button>
     </div>`;
@@ -1472,7 +1490,7 @@ function renderFull(){
             <button class="atk-dmg-btn" style="font-size:11px;padding:4px 5px" onclick="doDmgRoll(${i},true)">💥</button>`:''}
             ${hasSv&&!hasRoll?`<button class="atk-dmg-btn" onclick="doSvRoll(${i})" style="flex:1">🎲 Кидаю</button>`:''}
           </div>
-          <div class="atk-inline-result" id="roll-r-${i}"></div>`:''}
+          <div class="atk-inline-result${s.roll[i]?' show':''}" id="roll-r-${i}">${renderMonsterRoll(s.roll[i])}</div>`:''}
         </div>`;
       }
     });
@@ -1531,7 +1549,7 @@ function renderFull(){
 
   const tabContent=tab==='combat'?combatHTML():tab==='traits'?traitsHTML():tab==='km'?kmHTML():defenseHTML();
 
-  mn.innerHTML=renderAnomalyBackgroundPanel()+renderBleachPanel(m)+`
+  mn.innerHTML=scenePanel+`<details class="combat-aux" ${activeAnomalyBackgroundId?'open':''}><summary>Среда аномалии${activeAnomalyBackgroundId?' · активна':''}</summary>${renderAnomalyBackgroundPanel()}${renderBleachPanel(m)}</details>`+`
   <div class="combat-panel" id="cp">
     <div class="cp-name">${m.nm}${m.isClone?' · копия':''}</div>
     <div class="cp-hp-block" onclick="openHpModal()">
@@ -1544,7 +1562,9 @@ function renderFull(){
     <button class="cp-dmg-btn" onclick="openHpModal()">−ОЗ</button>
     <button class="cp-heal-btn" onclick="openHpModal()">+ОЗ</button>
     <button class="cp-reset-btn" onclick="resetHP()" title="Восстановить полные ОЗ выбранного монстра">↺</button>
-    ${m.isClone?`<button class="cp-reset-btn cp-clone-remove" onclick="removeClone('${m.id}')" title="Удалить эту копию из сцены">× копия</button>`:`<button class="cp-reset-btn cp-clone-add" onclick="createClone(cur)" title="Создать ещё одну копию этого монстра">＋ копия</button>`}
+    <button class="cp-reset-btn cp-clone-add" onclick="createClone(cur)" title="Создать ещё одну копию исходного монстра">＋ копия</button>
+    ${m.isClone?`<button class="cp-reset-btn cp-clone-remove" onclick="removeClone('${m.id}')" title="Удалить эту копию из сцены">× копия</button>`:''}
+    <div class="clone-tools"><label for="clone-count">Копий в сцену <input id="clone-count" type="number" min="1" max="20" step="1" value="3"/></label><button class="cp-reset-btn cp-clone-add" onclick="createClones(cur,document.getElementById('clone-count').value)">Добавить в сцену</button><span id="clone-status" role="status">${escHtml(cloneNotice)}</span></div>
     <button class="cp-reset-btn danger" onclick="resetCombat()" title="Сбросить ОЗ, состояния, инициативу и копии монстров">↺ бой</button>
     <div class="cp-ac-box"><div class="cp-ac-val" style="color:${zc.light}">${m.ac}</div><div class="cp-ac-lbl">КД</div></div>
     <div class="cp-ini-box" onclick="rollInitiativeCurrent()" title="Бросить инициативу и добавить в трекер"><div class="cp-ini-val">${m.ini}</div><div class="cp-ini-lbl">Иниц.</div></div>
@@ -1554,10 +1574,10 @@ function renderFull(){
     <div class="cond-panel">
       ${Object.entries(condNames).map(([k,v])=>`<button class="cond-toggle${s.conds[k]?' on-'+k:''}" onclick="toggleCond('${k}')">${v}</button>`).join('')}
     </div>
-    <div class="dice-section">
+    <details class="combat-dice"><summary>Кубики</summary><div class="dice-section">
       ${['4','6','8','10','12','20'].map(d=>`<button class="dice-btn" onclick="quickDice(${d})">к${d}</button>`).join('')}
-      <span class="dice-output" id="quick-out">—</span>
-    </div>
+      <span class="dice-output" id="quick-out">${escHtml(s.roll.quick?.text||'—')}</span>
+    </div></details>
   </div>
   ${renderInitiativeTracker()}
   ${renderMonsterArt(m)}
@@ -1577,7 +1597,11 @@ function renderFull(){
       </div>
     </div>
 
-    <div class="highlight-grid">
+    <div class="tabs" role="tablist" aria-label="Разделы карточки монстра">
+      ${TABS.map(t=>`<button class="tab-btn${tab===t.id?' active':''}" id="monster-tab-${t.id}" role="tab" aria-controls="tc" aria-selected="${tab===t.id}" onkeydown="combatTabKey(event)" onclick="switchTab('${t.id}')">${t.lb}</button>`).join('')}
+    </div>
+    <div class="tab-content active" id="tc" role="tabpanel" aria-labelledby="monster-tab-${tab}">${tabContent}</div>
+    <details class="combat-aux"><summary>Характеристики и полный профиль</summary>    <div class="highlight-grid">
       <div class="hl-box z-${m.z}"><div class="hl-label">ОЗ</div><div class="hl-val">${s.hp}</div><div class="hl-sub">${m.hpF}</div></div>
       <div class="hl-box z-${m.z}"><div class="hl-label">КД</div><div class="hl-val">${m.ac}</div><div class="hl-sub">${m.acN||'—'}</div></div>
       <div class="hl-box z-${m.z}"><div class="hl-label">Инициатива</div><div class="hl-val">${m.ini}</div><div class="hl-sub">от ЛОВ ${modStr(m.st.dex)}</div></div>
@@ -1596,12 +1620,10 @@ function renderFull(){
       <div class="core-box"><span class="core-label">Скорость</span><span class="core-val">${m.spd}</span></div>
     </div>
 
-    <div class="tabs">
-      ${TABS.map(t=>`<button class="tab-btn${tab===t.id?' active':''}" onclick="switchTab('${t.id}')">${t.lb}</button>`).join('')}
-    </div>
-    <div class="tab-content active" id="tc">${tabContent}</div>
+</details>
   </div>
   `;
+  enhanceCombatControls();
 }
 
 function render(){renderFull();}
@@ -1611,7 +1633,7 @@ function switchTab(t){tab=t;renderFull();}
 function toggleCond(k){
   if(!cur)return;
   const s=STATE[keyOf(cur)];
-  s.conds[k]=!s.conds[k];
+  s.conds[k]=!s.conds[k];sceneEvent(cur.nm+': состояние '+k+' '+(s.conds[k]?'включено':'снято'));
   renderFull();
 }
 function togglePhase(){
@@ -1632,6 +1654,7 @@ function doAtkRoll(idx){
   let cls=r.isCrit?'r-crit':r.isFumble?'r-miss':'r-hit';
   let label=r.isCrit?'КРИТ!':(r.isFumble?'ПРОВАЛ':r.total>=12?'Попадание':'Промах?');
   el.innerHTML=`<span class="${cls} r-d20">${r.d20}</span> <span class="r-label">d20</span> <span style="color:var(--text3)">+${bonus}</span> = <span class="${cls}" style="font-size:14px;font-weight:700">${r.total}</span> <span class="r-label">${label}</span>`;
+  saveMonsterRoll(idx,`Атака ${a.n}: d20 ${r.d20} + ${bonus} = ${r.total}${r.isCrit?' · критическое попадание':''}`);
   showDiceModal(`Атака: ${a.n}`,r.total,`d20(${r.d20}) + ${bonus}${r.isCrit?' ⚡КРИТ':''}`,r.isCrit);
 }
 function doDmgRoll(idx,isCrit){
@@ -1642,6 +1665,7 @@ function doDmgRoll(idx,isCrit){
   if(!el)return;
   el.className='atk-inline-result show';
   el.innerHTML=`${isCrit?'<span class="r-crit">💥КРИТ </span>':''}<span class="r-label">Урон: </span><span class="r-dmg">${r.total}</span> <span class="r-label">${r.text}</span>`;
+  saveMonsterRoll(idx,`${isCrit?'Критический урон':'Урон'} ${a.n}: ${r.total} · ${r.text}`);
   showDiceModal(isCrit?`КРИТ: ${a.n}`:`Урон: ${a.n}`,r.total,r.text,isCrit);
 }
 function doSvRoll(idx){
@@ -1650,11 +1674,12 @@ function doSvRoll(idx){
   if(!el)return;
   el.className='atk-inline-result show';
   el.innerHTML=`<span class="r-label">к20: </span><span class="${d===20?'r-crit':d===1?'r-miss':'r-hit'} r-d20">${d}</span> <span class="r-label">(СБ цели)</span>`;
+  saveMonsterRoll(idx,'Спасбросок: к20 '+d+' (добавьте бонус цели)');
   showDiceModal('Бросок кубика',d,'к20 (ГМ добавляет бонус цели)',d===20);
 }
 function quickDice(sides){
   const r=rollDie(sides);
-  document.getElementById('quick-out').textContent=r;
+  document.getElementById('quick-out').textContent=r;saveMonsterRoll('quick',String(r));
   showDiceModal(`к${sides}`,r,`Результат к${sides}`,r===sides);
 }
 
@@ -1662,9 +1687,12 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape')closeHpModal();
 });
 
+// Initialize scene
+const hadSavedScene=initializeMonsterScene();
 buildSidebar();
-handlePackQuery();
-if(!cur) selectMon(1);
+if(!hadSavedScene)handlePackQuery();
+if(!cur&&!hadSavedScene)selectMon(1);else renderFull();
 </script>
+<script src="assets/site-navigation.js?v=183"></script>
 </body>
 </html>

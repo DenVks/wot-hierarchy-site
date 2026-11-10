@@ -13,6 +13,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .auth-lock body{overflow:hidden}.auth-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(10,8,14,.88);backdrop-filter:blur(10px);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}.auth-modal{width:min(420px,calc(100vw - 32px));border:1px solid rgba(201,169,97,.35);border-radius:18px;background:#18131d;color:#f7efd8;padding:26px;box-shadow:0 24px 80px rgba(0,0,0,.55)}.auth-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#c9a961;margin-bottom:8px}.auth-modal h1{font-size:24px;margin:0 0 10px;text-align:left}.auth-text{font-size:13px;color:rgba(255,255,255,.72);margin-bottom:14px}.auth-form label{display:block;font-size:12px;margin:10px 0 6px;color:#e8d8aa}.auth-form input{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rgba(201,169,97,.35);background:#0f0d16;color:#fff}.auth-form button{margin-top:12px;width:100%;border:0;border-radius:10px;padding:11px 12px;background:#ba7517;color:#fff;font-weight:600;cursor:pointer}.auth-error{min-height:18px;color:#ffb4b4;font-size:12px;margin:8px 0 0}.auth-sigil{display:none}
 </style>
 <script src="assets/auth.js?v=117"></script>
+<link rel="stylesheet" href="assets/site-navigation.css?v=183">
 </head>
 <body><div class="wrap">
 <h1>Гильдия Хранителей · Каталог PoI R7–R10 и археонаходок</h1>
@@ -1383,4 +1384,5 @@ function renderPois(){let list=POIS.filter(p=>currentRing==='Все'||p.ring===c
 function renderIndexes(){const by=(fn,clsfn)=>{const m={};POIS.forEach(p=>{const k=fn(p);(m[k]=m[k]||[]).push(p.code)});return Object.entries(m).sort((a,b)=>a[0].localeCompare(b[0],'ru')).map(([k,v])=>tag(k+': '+v.join(', '), clsfn?clsfn(k):'gold')).join('');};document.getElementById('classIndex').innerHTML=by(p=>p.siteClassLabel,k=>k.startsWith('AR')?'gold':k.startsWith('HY')?'info':k.startsWith('OP')?'danger':'purple');document.getElementById('difficultyIndex').innerHTML=by(p=>difficultyKey(p),k=>k.startsWith('АРХ')?'gold':k.includes('R10')?'danger':k.includes('R9')?'purple':k.includes('R8')?'info':'good');document.getElementById('curatorIndex').innerHTML=by(p=>p.curator.split('/')[0].trim());document.getElementById('typeIndex').innerHTML=by(p=>p.type.split('·')[0].trim()+' · '+(p.type.split('·')[1]||'').trim(),k=>k.startsWith('A')?'info':k.startsWith('B')?'good':k.startsWith('C')?'purple':'gold');document.getElementById('statusIndex').innerHTML=by(p=>p.status.split('/')[0].trim(),statusClass);document.getElementById('ringIndex').innerHTML=by(p=>p.ring);}
 renderFilters();renderPois();renderIndexes();
 </script>
+<script src="assets/site-navigation.js?v=183"></script>
 </body></html>
