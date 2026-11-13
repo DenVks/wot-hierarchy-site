@@ -4,10 +4,10 @@
   "records": [
     {
       "libraryId": "npc-e00c10e6-abfb-4eb3-b273-083ef6e543c7",
-      "revision": "a8ad2951-17a0-43f8-b054-8d9dff345972",
+      "revision": "608b9740-08a5-4d38-96b2-bd5a841190c4",
       "createdAt": "2026-11-13T09:42:55.574Z",
-      "updatedAt": "2026-11-13T09:43:01.922Z",
-      "archived": false,
+      "updatedAt": "2026-11-13T09:43:07.033Z",
+      "archived": true,
       "npc": {
         "id": 9292795195,
         "sh": "QA · NPC A edited",
