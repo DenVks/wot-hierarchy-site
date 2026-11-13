@@ -19,6 +19,8 @@ const hierarchyDb=window.WOT_HIERARCHY_DB||{hierarchies:[]};
 let currentNpc=null;
 let reviewReady=false;
 let loadedCustomId=null;
+let draftNpcId=freshNpcId(),libraryId=null,libraryRevision=null,initialSnapshot=null,savingNpc=false,draftPersistenceReady=false;
+function freshNpcId(){const value=new Uint32Array(1);crypto.getRandomValues(value);return 9000000000+value[0];}
 const hierarchyChoiceMemory={};
 const $=id=>document.getElementById(id);
 const statKeys=['str','dex','con','int','wis','cha'];
@@ -675,7 +677,7 @@ function findWeavesInput(){
 function buildGeneratorSnapshot(){
   const value=id=>$(id)?.value??'', checked=id=>!!$(id)?.checked;
   return {schemaVersion:6,hierarchyDbVersion:hierarchyDb.updated||'',inputs:{
-    name:value('npc-name'),nation:value('npc-nation'),level:value('npc-level'),cls:value('npc-class'),arch:value('npc-arch'),role:value('npc-role'),threat:value('npc-threat'),
+    notes:value('npc-notes'),name:value('npc-name'),nation:value('npc-nation'),level:value('npc-level'),cls:value('npc-class'),arch:value('npc-arch'),role:value('npc-role'),threat:value('npc-threat'),
     faction:value('npc-faction'),rank:value('npc-rank'),branch:value('npc-hierarchy-branch'),sharaVessel:value('npc-shara-vessel'),profileKind:value('npc-hierarchy-profile-kind'),
     screamInitiative:value('npc-scream-initiative'),screamInitiativeStat:value('npc-scream-initiative-stat'),screamCharge:checked('npc-scream-charge'),
     stats:getBaseStats(),hierarchyChoices:readHierarchyStatChoices(),fightingStyle:value('npc-fighting-style'),feats:selectedFeats(),featCostConfirmed:isFeatCostConfirmed(),ajah:value('npc-ajah'),pactAnchor:value('npc-pact-anchor'),secretMatrices:getSelectedSecretMatrices().map(x=>x.name),forbiddenMatrices:getSelectedForbiddenMatrices().map(x=>x.name),talents:getSelectedTalents(),affinities:getSelectedAffinities(),weaves:getSelectedWeaveTitles(),manualWeaves:value('npc-weaves'),
@@ -688,7 +690,7 @@ function restoreGeneratorSnapshot(snapshot){
   const wilderTraditionMigrated=i.cls==='Дичок'&&!WILDER_TRADITIONS.includes(i.arch);
   const restoredArch=wilderTraditionMigrated?WILDER_TRADITIONS[0]:i.arch;
   const set=(id,value)=>{const el=$(id);if(el&&value!==undefined&&value!==null)el.value=String(value);};
-  set('npc-name',i.name);set('npc-nation',i.nation);set('npc-level',i.level);set('npc-class',i.cls);updateArchSelect();set('npc-arch',restoredArch);set('npc-role',i.role);set('npc-threat',i.threat);set('npc-ajah',i.ajah||'');set('npc-pact-anchor',i.pactAnchor||'');updateAjahControl();updatePactControls();renderPactMatrixControls({secret:i.secretMatrices||[],forbidden:i.forbiddenMatrices||[]});
+  set('npc-notes',i.notes||'');set('npc-name',i.name);set('npc-nation',i.nation);set('npc-level',i.level);set('npc-class',i.cls);updateArchSelect();set('npc-arch',restoredArch);set('npc-role',i.role);set('npc-threat',i.threat);set('npc-ajah',i.ajah||'');set('npc-pact-anchor',i.pactAnchor||'');updateAjahControl();updatePactControls();renderPactMatrixControls({secret:i.secretMatrices||[],forbidden:i.forbiddenMatrices||[]});
   statKeys.forEach(k=>set(k,i.stats&&i.stats[k]));
   set('weapon-select',i.weapon);set('weapon-bonus',i.weaponBonus);set('armor-select',i.armor);set('armor-bonus',i.armorBonus);set('shield-select',i.shield);set('shield-bonus',i.shieldBonus);
   set('npc-faction',i.faction||'none');updateHierarchyControls(true);set('npc-rank',i.rank);updateHierarchyControls(false);set('npc-hierarchy-branch',i.branch);set('npc-shara-vessel',i.sharaVessel);set('npc-hierarchy-profile-kind',i.profileKind);set('npc-scream-initiative',i.screamInitiative);set('npc-scream-initiative-stat',i.screamInitiativeStat);if($('npc-scream-charge'))$('npc-scream-charge').checked=i.screamCharge!==false;
@@ -718,7 +720,7 @@ function buildNpc(){
   if(style) ab.push({n:style.n,d:style.d,hi:true,source:'fighting-style'});
   featsSel.forEach(fn=>{const f=feats.find(x=>x.name===fn); ab.push({n:fn,d:f?f.desc.join(' '):'Дополнительная черта.',hi:false,source:'feat'});});
   h.traits.forEach(t=>ab.push({n:t.n,d:t.d,hi:true,source:'hierarchy',color:t.color}));
-  const id=loadedCustomId||200000+Date.now()%100000000;
+  const id=loadedCustomId||draftNpcId;
   const ajah=getAjah();
   const openFormulaNames=/Носитель Договора/i.test(cls)&&pactAnchor==='book'&&lv>=12?spells.filter(sp=>{const weave=weaves.find(w=>normText(w.title)===normText(sp.n));return weave&&!isPactWeaveAvailable(weave,cls,arch);}).map(sp=>sp.n):[];
   const pact=/Носитель Договора/i.test(cls)?{patron:arch,anchor:pactAnchor||null,anchorLabel:getPactAnchorLabel(pactAnchor)||null,primary:'Харизма',supporting:'Телосложение',spellAttack:sign(mod(stats.cha)+p+(h.weaveAttack||0)),spellDc:8+p+mod(stats.cha)+(h.dcBonus||0),openFormula:openFormulaNames[0]||null,secretMatrices:selectedSecretMatrices.map(x=>({n:x.name,group:x.group,req:x.requirement,minLevel:x.minLevel,anchor:x.anchor||null,d:x.description})),forbiddenMatrices:selectedForbiddenMatrices.map(x=>({n:x.name,lv:x.level,uses:x.uses,defaultPatron:(x.defaultPatrons||[]).includes(arch),d:x.description})),note:'Тайные матрицы — постоянные улучшения Договора, а не Плетения. Запретные матрицы применяются отдельно от ячеек Договора.'}:null;
@@ -732,7 +734,7 @@ function buildNpc(){
   npc.hpCalculation=hpCalculation(cls,lv,stats.con,h,nation);
   if(spells.length) npc.spells=spells;
   npc.verify=validateNpc({cls,arch,pactAnchor,pact,lv,nation,features,featsSel,featCostState,spells,h,stats,hp,ac:acCalc.ac,applied,eq,attack,weaponAttacks,selectedTalents,selectedAffinities,selectedSecretMatrices,selectedForbiddenMatrices,hierarchyCtx});
-  currentNpc=npc; reviewReady=true; renderReview(npc,{applied,acCalc,attack,eq,baseline:{stats:baseline.stats,hp:baselineHp,ac:baselineAc.ac,speed:30,initiative:baselineIni,attack:baselineAttack.a}}); return npc;
+  currentNpc=npc; reviewReady=true; updateLibraryIdentity(); if(draftPersistenceReady&&window.WOT_LIBRARY)window.WOT_LIBRARY.saveDraft({snapshot:npc.generator,identity:{runtimeId:id,libraryId,libraryRevision}}); renderReview(npc,{applied,acCalc,attack,eq,baseline:{stats:baseline.stats,hp:baselineHp,ac:baselineAc.ac,speed:30,initiative:baselineIni,attack:baselineAttack.a}}); return npc;
 }
 function validateNpc(ctx){
   const out=[]; out.push({s:'ok',t:`Бонус мастерства: ${sign(prof(ctx.lv))}.`});
@@ -826,17 +828,34 @@ function renderReview(npc,ctx){
   renderCustomManager();
 }
 function showFeatureModal(idx){ if(!currentNpc) return; const a=currentNpc.ab[idx]; if(!a) return; const box=$('feature-modal'); box.innerHTML=`<div class="fm-box"><button class="fm-close" type="button">×</button><h3>${safe(a.n)}</h3><p>${safe(a.d)}</p><small>${safe(a.source||'')}</small></div>`; box.style.display='flex'; box.querySelector('.fm-close').onclick=()=>box.style.display='none'; }
-function getCustom(){try{return JSON.parse(localStorage.getItem(CUSTOM_KEY)||'[]')||[]}catch(e){return[]}}
-function setCustom(arr){localStorage.setItem(CUSTOM_KEY,JSON.stringify(arr||[]));}
-function saveLocal(){ const npc=currentNpc||buildNpc(); if(!reviewReady){alert('Сначала выполните проверку карточки.');return;} if(/Носитель Договора/i.test(getClass())&&getLevel()>=3&&!getPactAnchor()){alert('С 3-го уровня выберите Якорь Договора перед сохранением карточки.');return;} if(getPactAnchor()==='blade'&&/^Без оружия$/i.test(String(getEquipment().weapon.name||''))){alert('Для Якоря Клинка выберите связанное оружие в разделе «Экипировка».');return;} if(selectedFeats().length&&!isFeatCostConfirmed()){alert('Сначала подтвердите оплату дополнительных черт в разделе 3. Если пунктов уровневого роста недостаточно, повысьте уровень NPC или снимите часть черт.');return;} const arr=getCustom().filter(x=>Number(x.id)!==Number(npc.id)); arr.push(npc); setCustom(arr); renderCustomManager(); alert('NPC сохранён в постоянном пользовательском списке этого браузера. Нажмите «Открыть NPC / Бой»: карточка будет в группе «Пользовательские NPC».'); }
-function deleteCustomNpc(id){ const arr=getCustom().filter(x=>Number(x.id)!==Number(id)); setCustom(arr); if(Number(loadedCustomId)===Number(id))loadedCustomId=null; renderCustomManager(); }
-function loadCustomNpc(id){const npc=getCustom().find(x=>Number(x.id)===Number(id));if(npc){loadedCustomId=Number(npc.id);restoreGeneratorSnapshot(npc.generator);}}
-function renderCustomManager(){ const box=$('custom-list'); if(!box) return; const arr=getCustom(); box.innerHTML=arr.length?arr.map(x=>`<div class="custom-row"><span>${safe(x.ti||x.sh||'NPC')}<small class="muted">${x.generator?` · база ${safe(x.generator.hierarchyDbVersion||'—')}`:' · без исходных настроек'}</small></span><div class="custom-actions">${x.generator?`<button type="button" class="load" data-load-custom="${x.id}">Загрузить / пересчитать</button>`:''}<button type="button" data-del-custom="${x.id}">Удалить</button></div></div>`).join(''):'<div class="mono muted">Пользовательских NPC пока нет.</div>'; }
-function clearCustom(){ if(confirm('Удалить всех пользовательских NPC из этого браузера?')){localStorage.removeItem(CUSTOM_KEY); renderCustomManager(); alert('Пользовательские NPC удалены.');}}
+function getCustom(){return window.WOT_LIBRARY?window.WOT_LIBRARY.records().map(row=>row.npc):[];}
+function updateLibraryIdentity(){const el=$('library-identity-text');if(el)el.textContent=(libraryId?'Редактирование: ':'Новый NPC: ')+(currentNpc?.sh||'Новый NPC');}
+let saveLocks=[];
+function setSaving(value){savingNpc=value;if(value){saveLocks=Array.from(document.querySelectorAll('.layout input,.layout select,.layout textarea,#new-npc,.custom-actions button')).map(el=>[el,el.disabled]);saveLocks.forEach(([el])=>el.disabled=true);}else{saveLocks.forEach(([el,disabled])=>el.disabled=disabled);saveLocks=[];}document.querySelectorAll('[data-npc-save]').forEach(button=>button.disabled=value);renderCustomManager();}
+async function saveLocal({openBattle=false}={}){
+ if(savingNpc)return;const npc=buildNpc();if(!reviewReady){alert('Сначала выполните проверку карточки.');return;}
+ if(/Носитель Договора/i.test(getClass())&&getLevel()>=3&&!getPactAnchor()){alert('С 3-го уровня выберите Якорь Договора перед сохранением карточки.');return;}
+ if(getPactAnchor()==='blade'&&/^Без оружия$/i.test(String(getEquipment().weapon.name||''))){alert('Для Якоря Клинка выберите связанное оружие в разделе «Экипировка».');return;}
+ if(selectedFeats().length&&!isFeatCostConfirmed()){alert('Сначала подтвердите оплату дополнительных черт в разделе 3.');return;}
+ if(!window.WOT_LIBRARY)return;setSaving(true);
+ try{const row=await window.WOT_LIBRARY.saveNpc(npc,{libraryId,revision:libraryRevision});libraryId=row.libraryId;libraryRevision=row.revision;loadedCustomId=row.npc.id;updateLibraryIdentity();window.WOT_LIBRARY.saveDraft({snapshot:row.npc.generator,identity:{runtimeId:row.npc.id,libraryId,libraryRevision}});renderCustomManager();if(openBattle)window.location.href='dm-npc.html?npc='+encodeURIComponent(row.npc.id)+'&libraryNpc='+encodeURIComponent(row.libraryId);}
+ catch(error){window.WOT_LIBRARY.status(error.message,'error');}finally{setSaving(false);}
+}
+function createNewNpc(){if(savingNpc)return;if(!confirm('Начать нового NPC? Текущий черновик будет сохранён как резервная копия в этом браузере.'))return;try{window.WOT_LIBRARY?.resetDraft();}catch(error){window.WOT_LIBRARY?.status(error.message,'error');return;}loadedCustomId=null;libraryId=null;libraryRevision=null;draftNpcId=freshNpcId();if(initialSnapshot)restoreGeneratorSnapshot(initialSnapshot);else buildNpc();}
+async function saveAsNewNpc(){if(savingNpc)return;loadedCustomId=null;libraryId=null;libraryRevision=null;draftNpcId=freshNpcId();buildNpc();await saveLocal();}
+function deleteCustomNpc(id){return window.WOT_LIBRARY?.archive(String(id));}
+function loadCustomNpc(id){if(savingNpc)return;const row=window.WOT_LIBRARY?.records().find(x=>x.libraryId===String(id));if(!row)return;try{window.WOT_GITHUB_STORE.validateGeneratorSnapshot(row.npc.generator);}catch(error){alert(error.message+' Карточку можно использовать в бою; текущая форма сохранена.');return;}loadedCustomId=row.npc.id;draftNpcId=row.npc.id;libraryId=row.libraryId;libraryRevision=row.revision;restoreGeneratorSnapshot(row.npc.generator);}
+function renderCustomManager(){
+ const box=$('custom-list');if(!box)return;box.replaceChildren();const rows=window.WOT_LIBRARY?.records()||[];
+ if(!rows.length){const empty=document.createElement('p');empty.textContent='В библиотеке пока нет активных NPC. Подключите GitHub, создайте хранилище или перенесите старые записи.';box.append(empty);return;}
+ for(const row of rows){const item=document.createElement('div');item.className='custom-row';const text=document.createElement('span');text.textContent=row.npc.ti||row.npc.sh;const time=document.createElement('small');time.className='library-record-time';time.textContent=' · '+(Number.isFinite(Date.parse(row.updatedAt))?new Date(row.updatedAt).toLocaleString('ru-RU'):'дата не указана'); text.append(time);const actions=document.createElement('div');actions.className='custom-actions';
+ for(const[label,action]of [['Редактировать',()=>loadCustomNpc(row.libraryId)],['В бой',()=>{window.location.href='dm-npc.html?npc='+row.npc.id+'&libraryNpc='+encodeURIComponent(row.libraryId);}],['Архивировать',()=>deleteCustomNpc(row.libraryId)]]){const button=document.createElement('button');button.type='button';button.textContent=label;button.disabled=savingNpc;button.addEventListener('click',action);actions.append(button);}item.append(text,actions);box.append(item);}
+}
+function clearCustom(){window.WOT_LIBRARY?.migrate();}
 function copyExport(){navigator.clipboard&&navigator.clipboard.writeText($('export-box').textContent).then(()=>alert('JS/JSON скопирован.'));}
 function downloadExport(){ const npc=currentNpc||buildNpc(), blob=new Blob([JSON.stringify(npc,null,2)],{type:'application/json;charset=utf-8'}), url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url;a.download=(slug(npc.sh||'npc')||'npc')+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000); }
 function bind(){
-  initClassSelect(); initNationSelect(); initEquipment(); initFeats(); initHierarchyControls(); updatePactControls(); updateFightingStyleSelect(); renderWeavePicker(); buildNpc(); renderCustomManager();
+  initClassSelect(); initNationSelect(); initEquipment(); initFeats(); initHierarchyControls(); updatePactControls(); updateFightingStyleSelect(); renderWeavePicker(); buildNpc(); initialSnapshot=buildGeneratorSnapshot(); const draft=window.WOT_LIBRARY?.loadDraft(); if(draft){loadedCustomId=draft.identity.runtimeId;draftNpcId=loadedCustomId;libraryId=draft.identity.libraryId||null;libraryRevision=draft.identity.libraryRevision||null;restoreGeneratorSnapshot(draft.snapshot);} draftPersistenceReady=true; renderCustomManager();window.WOT_LIBRARY?.subscribe(renderCustomManager); $('new-npc')?.addEventListener('click',createNewNpc);$('save-as-new')?.addEventListener('click',saveAsNewNpc);$('save-open-battle')?.addEventListener('click',()=>saveLocal({openBattle:true}));
   $('npc-class').addEventListener('change',()=>{updateArchSelect(); updatePactControls(); updateFightingStyleSelect(); renderWeavePicker(); renderHierarchyStatChoices(); buildNpc();}); $('npc-arch').addEventListener('change',()=>{updatePactControls();updateFightingStyleSelect(); renderWeavePicker(); buildNpc();}); $('npc-ajah')?.addEventListener('change',()=>{renderWeavePicker();buildNpc();}); $('npc-fighting-style')?.addEventListener('change',buildNpc); $('feat-search').addEventListener('input',initFeats); $('weave-search')?.addEventListener('input',()=>{renderWeavePicker(); buildNpc();}); $('clear-weaves')?.addEventListener('click',()=>{document.querySelectorAll('[data-weave-title]').forEach(x=>x.checked=false); $('npc-weaves').value=''; buildNpc();});
   $('npc-faction').addEventListener('change',()=>{updateHierarchyControls(true);buildNpc();}); $('npc-rank').addEventListener('change',()=>{updateHierarchyControls(false);buildNpc();}); $('npc-hierarchy-branch').addEventListener('change',buildNpc);
   $('npc-shara-vessel')?.addEventListener('change',()=>{const v=$('npc-shara-vessel').value;if($('npc-hierarchy-branch'))$('npc-hierarchy-branch').value=v==='shbotai-warrior'?'warrior':'aiyad';buildNpc();});

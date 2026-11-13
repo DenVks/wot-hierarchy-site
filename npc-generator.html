@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="assets/npc-generator.css?v=163">
 <script src="assets/auth.js?v=65"></script>
 <link rel="stylesheet" href="assets/site-navigation.css?v=183">
+<link rel="stylesheet" href="assets/shared-library.css?v=184">
 </head>
 <body>
 <div class="dm-tool-badge">DM Toolkit · Генератор NPC</div>
@@ -22,6 +23,8 @@
     </div>
     <a class="back" href="dm-toolkit.html">← DM Toolkit</a>
   </div>
+  <section data-library-tools aria-label="Библиотека GitHub"></section>
+  <div class="library-identity"><strong id="library-identity-text">Новый NPC</strong><div class="library-buttons"><button id="new-npc" type="button">Создать нового</button><button id="save-as-new" type="button" data-npc-save>Сохранить как нового</button></div></div>
   <div class="layout">
     <section class="panel">
       <h2>1. Концепция</h2>
@@ -152,9 +155,9 @@
         <div class="field"><label>Магический бонус доспеха</label><input id="armor-bonus" type="number" min="0" max="5" value="0"></div>
       </div>
       <div class="field"><label>Магический бонус щита</label><input id="shield-bonus" type="number" min="0" max="5" value="0"></div>
-      <div class="actions"><button type="button" class="secondary" id="copy-export">Копировать JS</button><button type="button" class="secondary" id="download-export">Скачать JSON для общей базы</button><button type="button" id="save-local">Сохранить в список NPC</button><a class="button-link" href="dm-npc.html">Открыть NPC / Бой</a><button type="button" class="danger" id="clear-custom">Очистить пользовательских NPC</button></div>
-      <p class="hint save-hint">«Сохранить в список NPC» добавляет карточку в постоянный пользовательский список этого браузера и показывает её в разделе «NPC / Бой». Для другого компьютера или общей базы сайта скачайте JSON.</p>
-      <h2>Постоянный пользовательский список этого браузера</h2>
+      <div class="actions"><button type="button" class="secondary" id="copy-export">Копировать JS</button><button type="button" class="secondary" id="download-export">Скачать JSON для общей базы</button><button type="button" id="save-local" data-npc-save>Сохранить в библиотеку GitHub</button><button type="button" id="save-open-battle" data-npc-save>Сохранить и открыть в бою</button><button type="button" class="secondary" id="clear-custom">Перенести старые NPC</button></div>
+      <p class="hint save-hint">Библиотека хранится в GitHub и доступна с другого компьютера. Запись требует подключения GitHub. JSON нужен для отдельной резервной копии; старая библиотека этого браузера переносится отдельной командой.</p>
+      <h2>Библиотека NPC · GitHub</h2>
       <div id="custom-list" class="custom-list"></div>
     </section>
     <section class="panel">
@@ -178,7 +181,9 @@
 <script src="assets/hierarchy-wall-data.js?v=153"></script>
 <script src="assets/hierarchy-mechanics.js?v=176"></script>
 <script src="assets/npc-data.js?v=176"></script>
-<script src="assets/npc-generator.js?v=176"></script>
+<script src="assets/github-store.js?v=184"></script>
+<script src="assets/shared-library-ui.js?v=184"></script>
+<script src="assets/npc-generator.js?v=184"></script>
 <script src="assets/site-navigation.js?v=183"></script><script src="assets/shared.js?v=183"></script>
 </body>
 </html>

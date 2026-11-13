@@ -93,7 +93,7 @@ function normalizeCustomNpc(raw, index){
 function npcIdEquals(a,b){ return String(a) === String(b); }
 function loadCustomNpcsFromStorage(){
   try{
-    const arr = JSON.parse(localStorage.getItem(CUSTOM_NPC_STORAGE_KEY) || '[]');
+    const arr = window.WOT_LIBRARY ? window.WOT_LIBRARY.records().map(row => Object.assign({},row.npc,{libraryId:row.libraryId,libraryRevision:row.revision})) : JSON.parse(localStorage.getItem(CUSTOM_NPC_STORAGE_KEY) || '[]');
     if(!Array.isArray(arr)) return;
     for(let i=CS.length-1;i>=0;i--){
       if(CS[i] && CS[i].custom && !CS[i].isClone) CS.splice(i,1);
@@ -841,6 +841,10 @@ function renderSidebarNpcButton(c, mode){
   return btn;
 }
 
+function npcMatchesCatalogSearch(c,search){
+ if(!search)return true;
+ return [c.sh,c.na,c.ti,...(c.tags||[])].some(value=>String(value||'').toLowerCase().includes(search));
+}
 function buildSidebar() {
   loadCustomNpcsFromStorage();
   const sb = document.getElementById('sb');
@@ -852,15 +856,10 @@ function buildSidebar() {
     return;
   }
   const searchEl = document.getElementById('sb-search');
-  const search = (searchEl ? searchEl.value : '').toLowerCase();
+  const search = (searchEl ? searchEl.value : '').trim().toLowerCase();
   const baseList = CS.filter(c => !c.isClone);
-  const customList = baseList.filter(c => c.custom);
-  const normalBaseList = baseList.filter(c => !c.custom);
-  const filtered = normalBaseList.filter(c => {
-    if (!search) return true;
-    return String(c.sh||'').toLowerCase().includes(search) || String(c.na||'').toLowerCase().includes(search) ||
-      String(c.ti||'').toLowerCase().includes(search) || (c.tags||[]).some(t=>String(t).toLowerCase().includes(search));
-  });
+  const customList = baseList.filter(c => c.custom && npcMatchesCatalogSearch(c,search));
+  const filtered = baseList.filter(c => !c.custom && npcMatchesCatalogSearch(c,search));
 
   document.getElementById('sb-count').textContent = (filtered.length + customList.length) + ' / ' + baseList.length + ' базовых · копий: ' + ENCOUNTER_CLONES.length;
   sb.innerHTML = '';
@@ -2517,7 +2516,7 @@ function showNPC(id) {
   <button class="cp-heal-btn" onclick="openHpModal(${c.id})">+ОЗ</button>
   <button class="cp-reset-btn" onclick="resetHP(${c.id})" title="Восстановить полные ОЗ">↺</button>
   ${c.isClone ? `<button class="cp-reset-btn cp-clone-remove" onclick="removeEncounterClone(${c.id})" title="Удалить эту копию из сцены">× копия</button>` : `<button class="cp-reset-btn cp-clone-add" onclick="addEncounterClone(${c.id})" title="Создать ещё одну копию этого NPC">＋ копия</button>`}
-  ${c.custom && !c.isClone ? `<button class="cp-reset-btn cp-custom-remove" onclick="deleteCustomNpcFromBrowser(${c.id})" title="Удалить пользовательского NPC из этого браузера">× удалить NPC</button>` : ``}
+  ${c.custom && !c.isClone ? `<button class="cp-reset-btn cp-custom-remove" onclick="deleteCustomNpcFromBrowser(${c.id})" title="${window.WOT_LIBRARY?'Архивировать NPC в библиотеке GitHub':'Удалить пользовательского NPC из этого браузера'}">${window.WOT_LIBRARY?'В архив':'× удалить NPC'}</button>` : ``}
   <div class="cp-ac-box"><div class="cp-ac-val" id="cp-ac-val">${getDisplayAC(c)}</div><div class="cp-ac-lbl">КД</div></div>
   <div class="cp-ini-box" onclick="addToIni(${c.id})" title="Добавить в трекер инициативы"><div class="cp-ini-val">${getDisplayInitiative(c)}</div><div class="cp-ini-lbl">Иниц.</div></div>
   <div class="cp-sp-box"><div class="cp-sp-val">${c.co.sp} фт</div><div class="cp-sp-lbl">Скор.</div></div>
@@ -3261,6 +3260,9 @@ buildSidebar();
 
 // ── Custom NPC deletion helper (v61) ──────────────────────────────────────
 function deleteCustomNpcFromBrowser(id){
+  const selected=getNpcById(id);if(!selected||selected.isClone)return;const linked=selected.libraryId;
+  const shared=window.WOT_LIBRARY?.records().find(row=>linked?row.libraryId===linked:npcIdEquals(row.npc.id,id));
+  if(shared)return window.WOT_LIBRARY.archive(shared.libraryId);
   const npc = getNpcById(id);
   if(!npc || !npc.custom || npc.isClone) return;
   if(!confirm('Удалить пользовательского NPC «' + (npc.sh||npc.ti||id) + '» из этого браузера?')) return;
@@ -3274,4 +3276,18 @@ function deleteCustomNpcFromBrowser(id){
   if(npcIdEquals(curNPC, id)) curNPC = null;
   savePersistedState(); buildSidebar();
   const main = document.getElementById('mn'); if(main) main.innerHTML = '<div class="placeholder" id="placeholder">← Выбери персонажа слева</div>';
+}
+
+// Refresh the catalogue after remote library loading; direct links select the saved record.
+if(window.WOT_LIBRARY){
+ let libraryTargetOpened=false,lastLibraryView='';
+ function refreshSharedNpcCatalog(){
+  const rows=window.WOT_LIBRARY.records(),stamp=rows.map(x=>x.libraryId+':'+x.revision).join('|');if(stamp===lastLibraryView)return;lastLibraryView=stamp;
+  const previous=CS.find(x=>npcIdEquals(x.id,curNPC)),previousLibraryId=previous&&!previous.isClone?previous.libraryId:null;
+  buildSidebar();
+  if(previousLibraryId){const selected=CS.find(x=>x.libraryId===previousLibraryId&&!x.isClone);if(selected)showNPC(selected.id);else{curNPC=-1;const main=document.getElementById('mn');if(main)main.innerHTML='<div class="placeholder">NPC архивирован. Выберите другого персонажа.</div>';}}
+  const params=new URLSearchParams(window.location.search||''),libraryId=params.get('libraryNpc');
+  if(libraryId&&!libraryTargetOpened){const row=window.WOT_LIBRARY.records().find(x=>x.libraryId===libraryId);if(row){const target=CS.find(x=>x.libraryId===row.libraryId&&!x.isClone);if(target){libraryTargetOpened=true;showNPC(target.id);}}}
+ }
+ document.addEventListener('wot-library-change',refreshSharedNpcCatalog);
 }
