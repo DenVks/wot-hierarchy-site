@@ -4,13 +4,13 @@
   "records": [
     {
       "libraryId": "npc-7baafa16-3140-4c04-a712-cca17cb256a9",
-      "revision": "46630667-c455-4261-9853-e7783eda3950",
+      "revision": "8d04f618-5057-4bf2-be61-7243df20d9f5",
       "createdAt": "2026-11-13T11:01:43.645Z",
-      "updatedAt": "2026-11-13T11:01:43.645Z",
+      "updatedAt": "2026-11-13T11:01:49.950Z",
       "archived": false,
       "npc": {
         "id": 9920094074,
-        "sh": "QA · NPC A · 13.11.2026",
+        "sh": "QA · NPC A edited",
         "ti": "QA · NPC A · 13.11.2026",
         "co": {
           "hp": 40,
