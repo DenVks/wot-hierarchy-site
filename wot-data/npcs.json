@@ -33,10 +33,10 @@
     },
     {
       "libraryId": "npc-1dfe16a4-28cb-400c-93ab-a22c8dea7c97",
-      "revision": "9e739cfd-2c67-4916-b5d2-b41cd90e38bc",
+      "revision": "a502ca4f-8028-4442-8e5f-5b2d28f386df",
       "createdAt": "2026-11-13T11:01:46.255Z",
-      "updatedAt": "2026-11-13T11:01:46.255Z",
-      "archived": false,
+      "updatedAt": "2026-11-13T11:01:57.185Z",
+      "archived": true,
       "npc": {
         "id": 9920094075,
         "sh": "QA · NPC B · 13.11.2026",
