@@ -4,7 +4,7 @@
   "records": [
     {
       "sceneId": "encounter-f94dfbaa-05ec-4a81-80f5-8ff9ba0aef3d",
-      "revision": "31d57d73-4040-4cd8-aef1-842731873df2",
+      "revision": "13ea4394-3e4d-41cc-a329-5e2c127da996",
       "archived": false,
       "scene": {
         "format": "wot-encounter",
@@ -12,7 +12,7 @@
         "sceneId": "encounter-f94dfbaa-05ec-4a81-80f5-8ff9ba0aef3d",
         "name": "Synthetic mixed encounter QA",
         "createdAt": "2026-11-13T12:47:44.054Z",
-        "updatedAt": "2026-11-13T12:47:44.059Z",
+        "updatedAt": "2026-11-13T12:47:47.643Z",
         "actors": [
           {
             "id": "actor-9a73c187-1072-43d0-82ac-cf0b0649386f",
@@ -81,7 +81,7 @@
               "ac": 15
             },
             "state": {
-              "hp": 60,
+              "hp": 55,
               "conds": {},
               "phase": 1,
               "roll": {},
@@ -130,6 +130,11 @@
         "running": true,
         "turnSerial": 1,
         "log": [
+          {
+            "text": "Synthetic QA monster #1: хиты 55/60.",
+            "round": 1,
+            "turn": 1
+          },
           {
             "text": "Synthetic QA NPC: хиты 33/40.",
             "round": 1,
