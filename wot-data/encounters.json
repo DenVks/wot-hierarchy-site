@@ -166,8 +166,8 @@
     },
     {
       "sceneId": "encounter-4d51c65d-26b5-4ec3-b422-46dc64676487",
-      "revision": "17800dd3-dc34-4737-a908-156735f80ed0",
-      "archived": false,
+      "revision": "25705641-741f-4f24-b209-221f17bd7dac",
+      "archived": true,
       "scene": {
         "format": "wot-encounter",
         "version": 1,
