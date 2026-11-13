@@ -1384,5 +1384,5 @@ function renderPois(){let list=POIS.filter(p=>currentRing==='Все'||p.ring===c
 function renderIndexes(){const by=(fn,clsfn)=>{const m={};POIS.forEach(p=>{const k=fn(p);(m[k]=m[k]||[]).push(p.code)});return Object.entries(m).sort((a,b)=>a[0].localeCompare(b[0],'ru')).map(([k,v])=>tag(k+': '+v.join(', '), clsfn?clsfn(k):'gold')).join('');};document.getElementById('classIndex').innerHTML=by(p=>p.siteClassLabel,k=>k.startsWith('AR')?'gold':k.startsWith('HY')?'info':k.startsWith('OP')?'danger':'purple');document.getElementById('difficultyIndex').innerHTML=by(p=>difficultyKey(p),k=>k.startsWith('АРХ')?'gold':k.includes('R10')?'danger':k.includes('R9')?'purple':k.includes('R8')?'info':'good');document.getElementById('curatorIndex').innerHTML=by(p=>p.curator.split('/')[0].trim());document.getElementById('typeIndex').innerHTML=by(p=>p.type.split('·')[0].trim()+' · '+(p.type.split('·')[1]||'').trim(),k=>k.startsWith('A')?'info':k.startsWith('B')?'good':k.startsWith('C')?'purple':'gold');document.getElementById('statusIndex').innerHTML=by(p=>p.status.split('/')[0].trim(),statusClass);document.getElementById('ringIndex').innerHTML=by(p=>p.ring);}
 renderFilters();renderPois();renderIndexes();
 </script>
-<script src="assets/site-navigation.js?v=183"></script>
+<script src="assets/site-navigation.js?v=185"></script>
 </body></html>

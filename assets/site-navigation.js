@@ -3,6 +3,7 @@
 'use strict';
 const toolGroups=[
  {id:'run',label:'Проведение',items:[
+  {href:'encounter.html',label:'Общая сцена боя',description:'NPC и монстры в одной очереди. Сохранить бой в GitHub и открыть с другого компьютера.',protected:true},
   {href:'dm-npc.html',label:'NPC / Бой',description:'Хиты, состояния, ресурсы и очередь NPC. Продолжить бой, сохранённый в этом браузере.',protected:true},
   {href:'monsters-battle.html',label:'Монстры / Бой',description:'Участники, ход и раунд боя монстров. Восстановить сцену из браузера или импортировать файл.',protected:true}]},
  {id:'prepare',label:'Подготовка',items:[

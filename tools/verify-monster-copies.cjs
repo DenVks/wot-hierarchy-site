@@ -6,6 +6,7 @@ const source=blocks.find(s=>s.includes('function createClones('));assert.ok(sour
 const elements=new Map();function el(id){if(!elements.has(id))elements.set(id,{value:'',style:{},textContent:'',addEventListener(){},focus(){},classList:{add(){},remove(){}}});return elements.get(id);}
 const context={window:{},enhanceCombatControls(){},setCombatMobileTitle(){},closeCombatCatalog(){},rememberCombatModalFocus(){},restoreCombatModalFocus(){},console,URLSearchParams,setTimeout:()=>1,clearTimeout(){},document:{getElementById:el,addEventListener(){},querySelectorAll:()=>[]}};vm.createContext(context);
 vm.runInContext(fs.readFileSync(path.join(root,'assets/monster-packs-data.js'),'utf8'),context);
+vm.runInContext(fs.readFileSync(path.join(root,'assets/bestiary-data.js'),'utf8'),context);
 vm.runInContext(fs.readFileSync(path.join(root,'assets/monster-scene.js'),'utf8'),context);
 vm.runInContext(fs.readFileSync(path.join(root,'assets/monster-scene-ui.js'),'utf8'),context);
 vm.runInContext(source.split('// Initialize scene')[0]+`buildSidebar=()=>{};renderFull=()=>{};render=()=>{};window.test={MS,CLONES,STATE,createClones,createClone,removeClone,getMon,select:id=>cur=getMon(id),current:()=>cur,applyHp,toggleCond};`,context);

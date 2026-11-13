@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DM Toolkit · Общая сцена боя</title>
+<script src="assets/auth.js?v=117"></script>
+<link rel="stylesheet" href="assets/styles.css?v=157">
+<link rel="stylesheet" href="assets/shared-library.css?v=185">
+<link rel="stylesheet" href="assets/encounter.css?v=185">
+<link rel="stylesheet" href="assets/site-navigation.css?v=183">
+</head>
+<body class="encounter-workspace">
+<div class="encounter-wrap">
+  <header><div><h1>Общая сцена боя</h1><p>NPC и монстры в одной очереди. У каждого участника свои хиты, состояния и ресурсы.</p></div><a href="dm-toolkit.html">← DM Toolkit</a></header>
+  <section data-library-tools data-library-compact aria-label="Подключение GitHub"></section>
+  <section class="encounter-controls" aria-label="Сцена и сохранение">
+    <label class="scene-name">Название боя<input id="scene-name" maxlength="120" value="Общий бой"></label>
+    <div class="turn-status" id="turn-status" role="status"></div>
+    <div class="encounter-buttons"><button id="combat-start">Начать бой</button><button id="combat-next">Следующий ход</button><button id="scene-copy">Создать копию боя</button><button id="scene-new">Новая сцена</button></div>
+    <details class="scene-storage"><summary>Сохранение и открытие боёв</summary>
+      <div class="encounter-buttons"><button id="scene-save">Сохранить бой в GitHub</button><button id="scenes-refresh">Загрузить список боёв</button><button id="scene-export">Скачать JSON боя</button><button id="scene-import">Открыть JSON боя</button><button id="legacy-npc">Перенести прежний бой NPC</button><button id="legacy-monster">Перенести прежний бой монстров</button><button id="scene-backup">Открыть резервную копию</button></div>
+      <label>Сохранённые бои<select id="cloud-scenes"><option value="">Список ещё не загружен</option></select></label><button id="scene-open">Открыть выбранный бой</button>
+      <p>Сохранённый в GitHub бой можно открыть с другого компьютера. Текущий черновик автоматически сохраняется в этом браузере.</p>
+    </details>
+    <p id="scene-status" role="status"></p><input id="scene-file" type="file" accept=".json,application/json" hidden>
+  </section>
+  <div class="encounter-columns">
+    <aside>
+      <details id="encounter-catalog"><summary>Добавить участников</summary>
+        <label>Поиск по каталогу<input id="catalog-search" type="search" placeholder="Имя, класс или вид существа"></label>
+        <div class="catalog-options"><label>Каталог<select id="catalog-kind"><option value="all">NPC и монстры</option><option value="npc">Только NPC</option><option value="monster">Только монстры</option></select></label><label>Копий<input id="add-count" type="number" min="1" max="20" value="1"></label></div>
+        <p id="catalog-count"></p><div id="catalog-results"></div><button id="catalog-more">Показать ещё</button>
+        <details><summary>Участник с инициативой вручную</summary><label>Имя<input id="manual-name" maxlength="180" placeholder="Имя персонажа игрока"></label><label>Инициатива<input id="manual-initiative" type="number" min="-100" max="200" value="10"></label><button id="manual-add">Добавить в очередь</button></details>
+      </details>
+    </aside>
+    <main>
+      <section class="participants-panel" aria-label="Участники боя"><h2>Участники и очередь ходов</h2><p id="queue-help">Задайте инициативу участникам. Выбор карточки не меняет текущий ход.</p><div id="participants"></div></section>
+      <section id="actor-card" aria-label="Карточка участника"></section>
+    </main>
+  </div>
+</div>
+<dialog id="scene-confirm" class="library-connect"><h2 id="confirm-title"></h2><p id="confirm-text"></p><div class="encounter-buttons"><button id="confirm-cancel">Отмена</button><button id="confirm-apply">Подтвердить</button></div></dialog>
+<script src="assets/hierarchy-data.js?v=178"></script>
+<script src="assets/hierarchy-wall-data.js?v=178"></script>
+<script src="assets/hierarchy-mechanics.js?v=178"></script>
+<script src="assets/npc-data.js?v=178"></script>
+<script src="assets/monster-packs-data.js?v=88"></script>
+<script src="assets/anomaly-backgrounds-data.js?v=87"></script>
+<script src="assets/bestiary-data.js?v=185"></script>
+<script src="assets/mm-monsters-data.js?v=80"></script>
+<script src="assets/mm-bestiary-adapter.js?v=80"></script>
+<script src="assets/github-store.js?v=185"></script>
+<script src="assets/shared-library-ui.js?v=185"></script>
+<script src="assets/encounter-scene.js?v=185"></script>
+<script src="assets/monster-scene.js?v=185"></script>
+<script src="assets/encounter-migrate.js?v=185"></script>
+<script src="assets/encounter-draft.js?v=185"></script>
+<script src="assets/encounter-ui.js?v=185"></script>
+<script src="assets/site-navigation.js?v=185"></script>
+</body>
+</html>
