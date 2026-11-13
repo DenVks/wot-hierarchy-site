@@ -30,6 +30,35 @@
         "qaRun": "wot-qa-68fe65c3-8e52-4a59-9618-93f6f794be08",
         "dm": "Synthetic QA record; no campaign data."
       }
+    },
+    {
+      "libraryId": "npc-789b6067-e718-45d3-bc6f-ac754ceeb03f",
+      "revision": "56176e2c-ba31-44e1-8589-83902e117ffe",
+      "createdAt": "2026-11-13T09:42:58.371Z",
+      "updatedAt": "2026-11-13T09:42:58.371Z",
+      "archived": false,
+      "npc": {
+        "id": 9292795196,
+        "sh": "QA · NPC B · 13.11.2026",
+        "ti": "QA · NPC B · 13.11.2026",
+        "co": {
+          "hp": 40,
+          "ac": 16
+        },
+        "st": {
+          "con": 14
+        },
+        "generator": {
+          "schemaVersion": 6,
+          "inputs": {
+            "name": "QA · NPC B · 13.11.2026",
+            "cls": "Мастер по оружию",
+            "level": "7"
+          }
+        },
+        "qaRun": "wot-qa-68fe65c3-8e52-4a59-9618-93f6f794be08",
+        "dm": "Synthetic QA record; no campaign data."
+      }
     }
   ]
 }
