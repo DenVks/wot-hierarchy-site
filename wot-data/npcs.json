@@ -688,19 +688,19 @@
     },
     {
       "libraryId": "npc-56117e72-58d4-4959-b6be-102e6f9ecf25",
-      "revision": "5938e7d8-7be1-4a0e-84a1-9c7d96375737",
+      "revision": "eb98a2bd-58c9-4588-9175-7511a8ad93ed",
       "createdAt": "2026-11-14T18:15:42.659Z",
-      "updatedAt": "2026-11-14T18:15:42.659Z",
+      "updatedAt": "2026-11-14T18:16:46.028Z",
       "archived": false,
       "npc": {
         "id": 10136690779,
-        "sh": "Новый NPC",
+        "sh": "Вен Чу",
         "na": "Шара",
         "lv": 7,
         "ic": "◇",
         "ty": "purple",
         "custom": true,
-        "ti": "Новый NPC — Скиталец / Ассасин (Assassin) 7-го уровня",
+        "ti": "Вен Чу — Скиталец / Ассасин (Assassin) 7-го уровня",
         "su": "Черновик NPC · Скиталец · Элитный",
         "tags": [
           "Скиталец",
@@ -979,7 +979,7 @@
           "hierarchyDbVersion": "2026-09-06",
           "inputs": {
             "notes": "",
-            "name": "",
+            "name": "Вен Чу",
             "nation": "Шара",
             "level": "7",
             "cls": "Скиталец",
