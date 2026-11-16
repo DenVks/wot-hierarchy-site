@@ -9,83 +9,7 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Marcellus&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
 <link href="assets/styles.css?v=157" rel="stylesheet"/>
-<style>
-.wall-hierarchy-full{--wall-accent:var(--c-wall);padding-bottom:1px}
-.wall-hierarchy-full .page-header{padding-bottom:54px}
-.wall-hierarchy-full .page-header h1{font-size:clamp(42px,6.2vw,78px)}
-.wall-hierarchy-full .hero-art{max-width:1180px;margin:0 auto 70px;padding:0 40px}
-.wall-hierarchy-full .hero-art img{display:block;width:100%;height:auto;max-height:900px;object-fit:contain;border:1px solid rgba(251,146,60,.28);background:#0c0b10;box-shadow:0 24px 70px rgba(0,0,0,.55)}
-.wall-hierarchy-full .hero-art figcaption{max-width:900px;margin:12px auto 0;text-align:center;color:var(--ink-muted);font-style:italic}
-.wall-hierarchy-full .frontmatter,.wall-hierarchy-full .book{width:auto;max-width:1180px;min-height:0;margin:0 auto;padding:0 40px;background:none;columns:1;column-gap:0;column-rule:0}
-.wall-hierarchy-full .frontmatter{margin-bottom:32px}
-.wall-hierarchy-full .kicker{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.45em;text-transform:uppercase;color:var(--wall-accent);margin-bottom:12px}
-.wall-hierarchy-full .frontmatter h2,.wall-hierarchy-full .book h2{scroll-margin-top:94px;font-family:'Marcellus',serif;font-size:clamp(31px,4.5vw,52px);font-variant:normal;letter-spacing:.01em;font-weight:400;line-height:1.14;color:var(--ink-bright);border:0;border-bottom:1px solid rgba(251,146,60,.25);padding:0 0 19px;margin:76px 0 28px;position:relative}
-.wall-hierarchy-full .frontmatter h2::after,.wall-hierarchy-full .book h2::after{content:'';display:block;position:absolute;left:0;bottom:-1px;width:150px;border-bottom:2px solid var(--wall-accent)}
-.wall-hierarchy-full .frontmatter p,.wall-hierarchy-full .book p{margin:0 0 18px;color:var(--ink-soft);font-size:17.5px;line-height:1.78;text-align:left;hyphens:auto}
-.wall-hierarchy-full .book p.drop:first-letter{float:left;font-family:'Marcellus',serif;font-size:4.2em;line-height:.82;padding:9px 13px 0 0;color:var(--gold)}
-.wall-hierarchy-full .book h3{scroll-margin-top:94px;font-family:'Marcellus',serif;color:var(--gold-pale);font-size:clamp(23px,3vw,32px);font-weight:400;line-height:1.25;border:0;margin:38px 0 15px}
-.wall-hierarchy-full .book h4{font-family:'Cinzel',serif;text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--wall-accent);margin:24px 0 10px}
-.wall-hierarchy-full .frontmatter a,.wall-hierarchy-full .book a{color:var(--gold);text-decoration:none}
-.wall-hierarchy-full .reader-note,.wall-hierarchy-full .sidebar{border:1px solid rgba(201,169,97,.22);border-left:3px solid var(--gold);background:linear-gradient(135deg,rgba(201,169,97,.075),rgba(251,146,60,.035));padding:18px 20px;margin:24px 0;color:var(--ink-soft);break-inside:avoid}
-.wall-hierarchy-full .reader-note strong,.wall-hierarchy-full .sidebar strong{color:var(--gold-pale)}
-.wall-hierarchy-full .toc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;margin:20px 0 34px}
-.wall-hierarchy-full .toc a{display:flex;align-items:flex-end;gap:10px;padding:13px 15px;border:1px solid var(--border);background:rgba(255,255,255,.018);color:var(--ink-soft);transition:border-color .25s ease,color .25s ease,background .25s ease}
-.wall-hierarchy-full .toc a:hover{border-color:var(--gold-deep);color:var(--gold-bright);background:rgba(201,169,97,.055)}
-.wall-hierarchy-full .toc .dots{flex:1;border-bottom:1px dotted rgba(201,169,97,.28);transform:translateY(-5px)}
-.wall-hierarchy-full .part-banner{margin:92px 0 18px;padding:16px 19px;border:1px solid rgba(251,146,60,.28);background:linear-gradient(90deg,rgba(251,146,60,.11),rgba(201,169,97,.055),transparent);font-family:'Cinzel',serif;text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:var(--wall-accent)}
-.wall-hierarchy-full .part-banner.first{margin-top:62px}
-.wall-hierarchy-full .table-wrap{margin:24px 0 34px;overflow-x:auto;border:1px solid rgba(201,169,97,.16);background:rgba(255,255,255,.018)}
-.wall-hierarchy-full table{width:100%;min-width:700px;border-collapse:collapse;font-size:15px;line-height:1.45;background:none}
-.wall-hierarchy-full th{padding:12px 11px;border:1px solid rgba(201,169,97,.18);background:rgba(201,169,97,.09);color:var(--gold-pale);font-family:'Cinzel',serif;font-size:11px;letter-spacing:.08em;font-weight:500;text-align:left}
-.wall-hierarchy-full td{padding:11px;border:1px solid rgba(255,255,255,.075);vertical-align:top;color:var(--ink-soft)}
-.wall-hierarchy-full tbody tr:nth-child(even){background:rgba(255,255,255,.016)}
-.wall-hierarchy-full .compact td,.wall-hierarchy-full .compact th{padding:9px;font-size:13px}
-.wall-hierarchy-full .rank-card{margin:20px 0 28px;padding:18px 20px 14px;border:1px solid rgba(251,146,60,.18);border-left:3px solid var(--wall-accent);background:linear-gradient(100deg,rgba(251,146,60,.07),rgba(255,255,255,.015) 58%,transparent);break-inside:avoid}
-.wall-hierarchy-full .rank-card h3{margin:0 0 7px}
-.wall-hierarchy-full .rank-meta{font-family:'Cinzel',serif;font-size:10px;color:var(--ink-muted);letter-spacing:.18em;text-transform:uppercase;margin-bottom:17px}
-.wall-hierarchy-full .ability{margin:0 0 15px}
-.wall-hierarchy-full .ability b{color:var(--ink-bright)}
-.wall-hierarchy-full .tag{display:inline-block;margin:0 5px 3px 0;padding:2px 7px;border:1px solid rgba(251,146,60,.42);border-radius:999px;color:#fdba74;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.06em;white-space:nowrap}
-.wall-hierarchy-full .tag.anom{color:#7dd3fc;border-color:rgba(125,211,252,.38)}
-.wall-hierarchy-full .rulebox{margin:22px 0;padding:18px 20px;border-top:2px solid var(--gold);border-bottom:1px solid rgba(201,169,97,.3);background:rgba(201,169,97,.055);break-inside:avoid}
-.wall-hierarchy-full .rulebox .title{font-family:'Marcellus',serif;color:var(--gold-pale);font-size:21px;margin-bottom:8px}
-.wall-hierarchy-full .warning{border-color:#ef4444;background:rgba(239,68,68,.06)}
-.wall-hierarchy-full .small{font-size:14px;color:var(--ink-muted)}
-.wall-hierarchy-full .quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:26px 0}
-.wall-hierarchy-full .quick>div{border:1px solid rgba(201,169,97,.2);padding:17px;background:rgba(201,169,97,.035)}
-.wall-hierarchy-full .quick strong{display:block;color:var(--gold-pale);margin-bottom:5px}
-.wall-hierarchy-full .art{display:block;margin:30px auto 38px;padding:0;break-inside:avoid}
-.wall-hierarchy-full .art img{display:block;width:100%;height:auto;max-height:900px;object-fit:contain;border:1px solid rgba(251,146,60,.25);background:#0b0b11;box-shadow:0 18px 46px rgba(0,0,0,.42)}
-.wall-hierarchy-full .art figcaption{max-width:900px;margin:10px auto 0;text-align:center;color:var(--ink-muted);font-style:italic;font-size:15px;line-height:1.45}
-.wall-hierarchy-full .art-portrait img{width:auto;max-width:min(100%,760px);margin:0 auto}
-.wall-hierarchy-full .footer-note{margin:70px 0 0;padding:22px 0;border-top:1px solid var(--border);font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;text-align:center;color:var(--ink-muted)}
-@media(max-width:760px){
-  .wall-hierarchy-full{max-width:100%;overflow:hidden}
-  .wall-hierarchy-full .page-header{width:100%;max-width:100%;box-sizing:border-box;padding-left:20px;padding-right:20px}
-  .wall-hierarchy-full .page-header>*{width:100%;max-width:100%;box-sizing:border-box}
-  .wall-hierarchy-full .page-header .eyebrow{font-size:9px;letter-spacing:.28em;line-height:1.8;overflow-wrap:anywhere}
-  .wall-hierarchy-full .page-header .eyebrow::before,.wall-hierarchy-full .page-header .eyebrow::after{display:none}
-  .wall-hierarchy-full .page-header h1{font-size:clamp(28px,8vw,34px);line-height:1.12;white-space:normal;overflow-wrap:anywhere}
-  .wall-hierarchy-full .page-header h1 span{display:block}
-  .wall-hierarchy-full .page-header .lead{font-size:18px;white-space:normal;overflow-wrap:anywhere}
-  .wall-hierarchy-full .hero-art,.wall-hierarchy-full .frontmatter,.wall-hierarchy-full .book{padding-left:20px;padding-right:20px}
-  .wall-hierarchy-full .toc,.wall-hierarchy-full .quick{grid-template-columns:1fr}
-  .wall-hierarchy-full .toc a{font-size:14px}
-  .wall-hierarchy-full .frontmatter h2,.wall-hierarchy-full .book h2{margin-top:58px}
-  .wall-hierarchy-full table{font-size:13px}
-}
-@media print{
-  nav.sitenav,.pattern-bg,.thread-layer,footer{display:none!important}
-  body{background:#fff;color:#222}
-  .page-body{padding-top:0}
-  .wall-hierarchy-full .page-header{padding:28px 20px}
-  .wall-hierarchy-full .page-header h1{-webkit-text-fill-color:#34271d;color:#34271d;background:none;text-shadow:none}
-  .wall-hierarchy-full .frontmatter,.wall-hierarchy-full .book{max-width:none;padding:0}
-  .wall-hierarchy-full .frontmatter p,.wall-hierarchy-full .book p,.wall-hierarchy-full td{color:#2b241e}
-  .wall-hierarchy-full .frontmatter h2,.wall-hierarchy-full .book h2,.wall-hierarchy-full .book h3{color:#3a2c22}
-  .wall-hierarchy-full .rank-card,.wall-hierarchy-full .reader-note,.wall-hierarchy-full .sidebar,.wall-hierarchy-full .rulebox{break-inside:avoid;background:#faf6ec}
-}
-</style>
+<link rel="stylesheet" href="assets/wall-reader.css?v=187">
 <link rel="stylesheet" href="assets/hp-formula.css?v=176">
 <link rel="stylesheet" href="assets/site-navigation.css?v=183">
 </head>
@@ -95,16 +19,16 @@
 <nav class="sitenav"><div class="inner"><a class="nav-brand" href="index.html"><svg class="mini-wheel" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient cx="50%" cy="50%" id="wg"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"></stop><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"></stop></radialGradient></defs><g fill="none" stroke="url(#wg)" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"></circle><circle cx="40" cy="40" opacity=".75" r="28" stroke-width=".7"></circle><circle cx="40" cy="40" opacity=".55" r="18" stroke-width=".5"></circle><circle cx="40" cy="40" opacity=".85" r="8" stroke-width=".6"></circle><g opacity=".7" stroke-width=".55"><line x1="40" x2="40" y1="4" y2="76"></line><line x1="4" x2="76" y1="40" y2="40"></line><line x1="14.8" x2="65.2" y1="14.8" y2="65.2"></line><line x1="65.2" x2="14.8" y1="14.8" y2="65.2"></line><line x1="40" x2="52" y1="4" y2="76"></line><line x1="40" x2="28" y1="4" y2="76"></line><line x1="4" x2="76" y1="40" y2="52"></line></g><circle cx="40" cy="40" fill="#e8c878" r="3" stroke="none"></circle></g></svg><span>Колесо&nbsp;·&nbsp;270&nbsp;ПБ</span></a><div class="nav-links"><a href="index.html">Главная</a><a href="dm-toolkit.html" data-protected-href="dm-toolkit.html">Мастеру</a></div></div></nav>
 <div class="page-body wall-hierarchy-full">
 <header class="page-header">
-<div class="eyebrow">Игроковая иллюстрированная редакция · v1.0</div>
+<div class="eyebrow">Материал для игроков · иллюстрированная редакция · v1.0</div>
 <h1><span>Иерархия</span> <span>Аномальной Стены</span></h1>
 <p class="lead">Стражи Проходов, восемь рангов допуска, Ореол, Ядро и искусство провести людей там, где сама дорога перестаёт соглашаться с реальностью.</p>
 </header>
-<div class="chapter-nav" aria-label="Разделы Аномальной Стены"><a class="active" href="hierarchy-wall.html">Правила игрока</a><a href="wall-dm.html">DM Toolkit мастера</a></div>
+<div class="chapter-nav" aria-label="Разделы Аномальной Стены"><a href="wall.html">Стена и мир</a><a class="active" href="hierarchy-wall.html">Иерархия и правила</a><a href="wall-dm.html">Мастеру</a></div>
 <figure class="hero-art"><img alt="Стражи Проходов у фронта Аномальной Стены." decoding="async" fetchpriority="high" src="assets/wall-hierarchy/ASW-01_Passage_Wardens_at_the_Frontier.png"/><figcaption>Стражи Проходов у фронта Аномальной Стены.</figcaption></figure>
 <section class="frontmatter">
 <div class="kicker">О документе</div>
 <h2>Как пользоваться этой книгой</h2>
-<p>Этот документ объединяет игроковые сведения об Аномальной Стене и полные правила Иерархии, выросшей вокруг службы на её фронте. Он объясняет, что такое Ореол и Ядро, как работает Стабильность группы (STAB), каким образом пересекают Стену и что получает персонаж на каждом из восьми рангов.</p>
+<p>Этот справочник содержит полные правила Иерархии, выросшей вокруг службы на фронте Аномальной Стены. Общее описание Стены вынесено в раздел «Мир». Он объясняет, что такое Ореол и Ядро, как работает Стабильность группы (STAB), каким образом пересекают Стену и что получает персонаж на каждом из восьми рангов.</p>
 <div class="reader-note"><strong>Сведения для игрока.</strong> Здесь приведены только открытый лор и игровые правила. Скрытые причины работы Стены, текущие действия ключевых NPC и кампанийные тайны в эту редакцию не включены.</div>
 <h2>Оглавление</h2>
 <nav class="toc">
@@ -123,26 +47,9 @@
 </section>
 <main class="book">
 <div class="part-banner first">Часть I · Стена и её законы</div>
-<h2 id="p1">I. Аномальная Стена</h2>
-<p class="drop"><strong>Аномальная Стена</strong> — Великая перманентная аномалия континентального масштаба. Она возникла из временной аномалии 10-го рейтинга во время Великого выброса у Кинжала Убийцы Родни примерно в 20–30 ПБ. Выброс не разошёлся обычным пятном: он зацепился за напряжённый географический шов Хребта Мира и превратился в протяжённый фронт несогласованной реальности.</p>
-<p>Сегодня Стена тянется от северного предела у Шайол Гул вдоль Хребта Мира и далее к южным широтам. Её исследованная линия дрейфует: отдельные участки могут смещаться на десятки миль, образовывать локальные «языки» и открывать редкие окна перехода. Южное продолжение теряется в плохо картографированных широтах; глобальная форма фронта достоверно не установлена.</p>
-<h3>Почему фронт движется</h3>
-<p>Известно, что крупные аномальные события, масштабное направление Единой Силы, войны и операции стабилизации нередко совпадают с последующими сдвигами фронта. Стражи и исследователи называют это перераспределением натяжения Узора, однако это остаётся рабочей теорией, а не доказанной физикой Стены.</p>
-<h3>Две области, три подзоны</h3>
-<div class="table-wrap"><table><caption class="sr-only">Две области и три подзоны Аномальной Стены</caption><thead><tr><th scope="col">Область</th><th scope="col">Подзона</th><th scope="col">Смысл</th></tr></thead><tbody>
-<tr><td rowspan="2"><b>Ореол (Тень)</b></td><td>Внешняя Тень</td><td>Реальность шумит, но подготовленная группа способна работать и двигаться.</td></tr>
-<tr><td>Внутренняя Тень</td><td>Искажения сильнее, маршруты нестабильны, безопасное движение требует подготовки.</td></tr>
-<tr><td><b>Ядро (Гребень)</b></td><td>Гребень</td><td>Центральная область прямого слома реальности. Обычный пеший проход практически невозможен.</td></tr>
-</tbody></table></div>
-<div class="sidebar"><strong>Важно.</strong> Современная Стена <b>не имеет обычного рейтинга R</b> и не считается аномалией R10. Десятый рейтинг относится к исходному Великому выбросу. Если внутри Ореола возникает отдельная временная аномалия, все формулы с R используют рейтинг именно этой временной аномалии.</div>
-<h3>Айил и Стражи Проходов</h3>
-<p>В течение первого столетия после появления Стены айил переопределили часть своей старой миссии. Одним из новых направлений стали <strong>Стражи Проходов</strong>: хранители перевалов, окон дрейфа и караванных коридоров. Их обычная подготовка — дисциплина, навигация, выживание и многолетнее знание фронта — сама по себе не является сверхъестественной Иерархией.</p><div class="sidebar">Не путайте термины. <strong>Стражи Проходов</strong> — профессионально-общественное направление айил. <strong>Стражи Дрейфа</strong> — политическое течение внутри айил. <strong>Страж Дрейфа</strong> — титул V ранга Иерархии. Слово <strong>Проводник</strong> с прописной буквы обозначает VIII ранг; обычный ведущий пути называется лидером маршрута или проводником маршрута.</div>
-<p><strong>Иерархия Аномальной Стены</strong> — отдельная связь с самой Стеной, доступная лишь части Стражей Проходов и другим допущенным людям. Она возникла в айильской среде, но не является расово закрытой.</p><figure class="art art-banner" data-asw="ASW-13"><img alt="Фронтир Стены: караваны, Стражи Проходов и временные стоянки существуют в ритме следующего безопасного окна." decoding="async" src="assets/wall-hierarchy/ASW-13_Wall_Frontier_Caravan.png"/><figcaption>Фронтир Стены: караваны, Стражи Проходов и временные стоянки существуют в ритме следующего безопасного окна.</figcaption></figure>
-<h3>Авиенда и Узел Ядра</h3>
-<p>В первые десятилетия после рождения Стены Авиенда первой из известных людей достигла Ядра и установила связь с центральным источником феномена — <strong>Узлом Ядра</strong>, который исследователи также называют <strong>Реактором Стены</strong>. Ядро признало её первым Проводником, вершиной новой системы допуска.</p>
-<p>Иерархия не собирает энергию с нижестоящих. Узел выдаёт её непосредственно по допуску: ранг определяет, какой объём воздействия носитель способен безопасно выдерживать и использовать.</p>
-<h3>Якоря</h3>
-<p>Примерно к 50 ПБ вдоль отдельных участков фронта была развёрнута сеть стационарных Арк — <strong>Якорей</strong>. Их официально известная функция — слушать ритм Стены и локально замедлять дрейф, не превращаясь при этом в щит или барьер. Сеть нескольких работающих Якорей помогает прогнозировать поведение фронта и окна прохода.</p><figure class="art art-wide" data-asw="ASW-12"><img alt="Якорь-Арка локально замедляет дрейф и помогает читать ритм фронта." decoding="async" src="assets/wall-hierarchy/ASW-12_Anchor_Arch.png"/><figcaption>Якорь-Арка локально замедляет дрейф и помогает читать ритм фронта.</figcaption></figure>
+<h2 id="p1">I. Стена и её Иерархия</h2>
+<p>Общее описание Аномальной Стены — её происхождение, география, области и связь с айил — находится в разделе «Мир». Этот справочник содержит правила Ореола и Ядра, пересечения Стены и ранговые способности Иерархии.</p>
+<p><a href="wall.html">Аномальная Стена: описание мира →</a></p>
 <h2 id="p2">II. Законы Ореола</h2>
 <h3>Шум Узора</h3>
 <p>Внутри Стены сбиваются ориентиры, чувство времени и причинность. Без проводника или надёжных меток персонаж совершает проверки Мудрости (Выживание) для навигации с помехой. Продолжительный отдых возможен по обычным правилам, если обстановка действительно позволяет отдыхать, но сам по себе не восстанавливает STAB внутри Ореола.</p>
@@ -317,6 +224,6 @@
 </main>
 </div>
 <footer><svg class="mini-wheel-ft" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient cx="50%" cy="50%" id="wg-ft"><stop offset="0%" stop-color="#e8c878" stop-opacity="0.9"></stop><stop offset="100%" stop-color="#c9a961" stop-opacity="0.5"></stop></radialGradient></defs><g fill="none" stroke="url(#wg-ft)" stroke-linecap="round"><circle cx="40" cy="40" r="36" stroke-width="1"></circle><circle cx="40" cy="40" opacity=".75" r="28" stroke-width=".7"></circle><circle cx="40" cy="40" opacity=".55" r="18" stroke-width=".5"></circle><circle cx="40" cy="40" opacity=".85" r="8" stroke-width=".6"></circle><g opacity=".7" stroke-width=".55"><line x1="40" x2="40" y1="4" y2="76"></line><line x1="4" x2="76" y1="40" y2="40"></line><line x1="14.8" x2="65.2" y1="14.8" y2="65.2"></line><line x1="65.2" x2="14.8" y1="14.8" y2="65.2"></line></g><circle cx="40" cy="40" fill="#e8c878" r="3" stroke="none"></circle></g></svg><div class="ft-quote">❖&nbsp;&nbsp;И нет ни начала, ни конца вращению Колеса Времени&nbsp;&nbsp;❖</div><p>Четвёртая Эпоха · 270 лет после Последней Битвы</p></footer>
-<script src="assets/site-navigation.js?v=185"></script><script src="assets/shared.js?v=183"></script>
+<script src="assets/site-navigation.js?v=187"></script><script src="assets/shared.js?v=183"></script>
 </body>
 </html>

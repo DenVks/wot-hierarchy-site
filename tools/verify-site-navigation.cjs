@@ -11,7 +11,7 @@ for(const item of all){assert(fs.existsSync(path.join(root,item.href)),item.href
 const pages=fs.readdirSync('.').filter(f=>f.endsWith('.html'));let active=0,nav=0,compact=0;
 for(const page of pages){
  const text=normalize(fs.readFileSync(page,'utf8'));
- if(/http-equiv=["']refresh/i.test(text)){assert(text===baseFile(page),'Redirect changed: '+page);continue;}
+ if(/http-equiv=["']refresh/i.test(text)){if(page==='tsitadel.html'){assert(text.includes('url=order.html#section-6'));assert(text.includes('location.replace("order.html"+target)'));}else assert(text===baseFile(page),'Redirect changed: '+page);continue;}
  active++;
  assert.equal((text.match(/src="assets\/site-navigation\.js/g)||[]).length,1,page+' navigation dependency');
  assert.equal((text.match(/href="assets\/site-navigation\.css/g)||[]).length,1,page+' navigation style');

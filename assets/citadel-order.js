@@ -1,0 +1,2 @@
+/* Open the room addressed by an old or current Citadel link. */
+(function(){function reveal(){let id;try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}const room=document.getElementById(id);if(room?.matches('details.citadel-location')){room.open=true;requestAnimationFrame(()=>room.scrollIntoView({block:'start'}));}}document.addEventListener('DOMContentLoaded',reveal);window.addEventListener('hashchange',reveal);})();

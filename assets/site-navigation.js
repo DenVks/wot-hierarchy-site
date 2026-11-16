@@ -22,9 +22,9 @@ const groups=[
  {id:'world',label:'Мир',items:[
   {href:'epoch.html',label:'Эпоха · 270 ПБ'},{href:'chronicles.html',label:'Хронология'},
   ...[['aiel','Айил'],['tuataan','Туата’ан'],['sea-folk','Морской народ'],['tremalkin','Тремалкин'],['daaltian',"Дааль’тиан"],['land-madmen','Земля Безумцев'],['arafel','Арафел'],['kandor','Кандор'],['shienar','Шайнар'],['tar-valon','Тар Валон'],['shara','Шара'],['freefolk','Вольные земли'],['altara','Алтара · 285 ПБ'],['tarabon','Тарабон · 285 ПБ']].map(([p,label])=>({href:p+'.html',label})),
-  {href:'tsitadel.html',label:'Цитадель'}]},
+  {href:'wall.html',label:'Аномальная Стена'}]},
  {id:'rules',label:'Правила',items:[{href:'player-rules.html',label:'Книга правил'},{href:'classes.html',label:'Классы'},{href:'feats.html',label:'Черты'},{href:'weaves.html',label:'Плетения'},{href:'alchemy.html',label:'Необычная алхимия'},{href:'ingredients.html',label:'Ингредиенты'},{href:'rituals.html',label:'Ритуалы'}]},
- {id:'hierarchies',label:'Иерархии',items:[{href:'hierarchies.html',label:'Обзор и сравнение'},...['unity|Иерархия Единства','throne|Хрустальный Трон','madding|Гильдия Хранителей','shara-will|Единая Воля Шары','hierarchy-wall|Иерархия Аномальной Стены','scream|Крик и Держащие Равновесие','order|Орден Стражей Узора','guild-keepers-expanded|Гильдия · полное описание для Мастера','guild-keepers-poi-catalog|Гильдия · объекты для Мастера'].map(s=>{const[p,label]=s.split('|');return{href:p+'.html',label,protected:p.startsWith('guild-')};})]},
+ {id:'hierarchies',label:'Иерархии',items:[{href:'hierarchies.html',label:'Обзор и сравнение'},...['unity|Иерархия Единства','throne|Хрустальный Трон','madding|Гильдия Хранителей','shara-will|Единая Воля Шары','hierarchy-wall|Иерархия Аномальной Стены','scream|Крик и Держащие Равновесие','order|Орден Стражей Узора'].map(s=>{const[p,label]=s.split('|');return{href:p+'.html',label,protected:p.startsWith('guild-')};})]},
  {id:'dm',label:'Мастеру',items:[{href:'dm-toolkit.html',label:'Обзор DM Toolkit',protected:true},...toolGroups.flatMap(g=>g.items)]}
 ];
 window.WOT_SITE_NAV={groups,toolGroups};
