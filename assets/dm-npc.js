@@ -1672,13 +1672,16 @@ function weaponRules(){
 function cleanAttackWeaponName(name){
   return String(name||'').replace(/\s*·\s*(?:атака\s*\d+\/\d+|древко|дополнительный выстрел).*$/i,'').trim();
 }
-function findWeaponByName(name){
-  const list=weaponRules(), clean=cleanAttackWeaponName(name);
-  return list.find(w=>w.name===clean) || list.find(w=>clean.startsWith(w.name)||w.name.startsWith(clean)) || list[0];
+function findWeaponByName(name,fallback=true){
+  const normalize=value=>cleanAttackWeaponName(value).replace(/\s*\(\d+[-‑]?[аяй]?\s+атака\)\s*$/i,'').replace(/\s*[×x]\s*\d+\s*$/i,'').replace(/\s*\+\s*\d+\s*$/,'').trim().toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ');
+  const list=weaponRules(),clean=normalize(name);
+  const aliases=list.flatMap(weapon=>[weapon.name,...weapon.name.split(/\s*\/\s*/)].map(alias=>({weapon,alias:normalize(alias)})));
+  return aliases.find(row=>row.alias===clean)?.weapon || aliases.filter(row=>row.alias&&clean.startsWith(row.alias+' ')).sort((a,b)=>b.alias.length-a.alias.length)[0]?.weapon || (fallback?list[0]:null);
 }
 function defaultNpcWeaponState(c){
-  const parts=equipmentSegments(c), fromAttack=c&&c.at&&c.at[0]&&c.at[0].n, weapon=findWeaponByName(parts[0]||fromAttack);
-  return {active:false,seeded:true,weaponName:weapon&&weapon.name||'Без оружия',magicBonus:equipmentMagicBonus(parts[0],weapon&&weapon.name)};
+  const parts=equipmentSegments(c), fromAttack=c&&c.at&&c.at[0]&&c.at[0].n, weapon=findWeaponByName(parts[0],false)||findWeaponByName(fromAttack);
+  const raw=parts[0]||fromAttack||'', magicName=weapon&&[weapon.name,...weapon.name.split(/\s*\/\s*/)].find(alias=>String(raw).toLowerCase().startsWith(alias.toLowerCase()))||weapon&&weapon.name;
+  return {active:false,seeded:true,weaponName:weapon&&weapon.name||'Без оружия',magicBonus:equipmentMagicBonus(raw,magicName)};
 }
 function getStoredWeaponState(cOrId){
   const c=typeof cOrId==='object'?cOrId:getNpcById(cOrId), npcId=c?c.id:cOrId;
@@ -1718,11 +1721,11 @@ function isWeaponProficient(c,w){
   const prof=getNpcWeaponProficiencies(c);
   return !!(prof.all||(prof.simple&&weaponCategory(w)==='simple')||prof.names.includes(w&&w.name));
 }
-function weaponAbilityKey(c,w){
+function weaponAbilityKey(c,w,{base=false}={}){
   if(npcHasFeature(c,/Договорный клинок/i))return 'cha';
   const props=String(w&&w.properties||'');
   if(w&&w.type==='ranged')return 'dex';
-  if(/finesse|фехтовальн/i.test(props))return statModNum(getDisplayStat(c,'dex'))>=statModNum(getDisplayStat(c,'str'))?'dex':'str';
+  if(/finesse|фехтовальн/i.test(props))return statModNum(base?c&&c.st&&c.st.dex:getDisplayStat(c,'dex'))>=statModNum(base?c&&c.st&&c.st.str:getDisplayStat(c,'str'))?'dex':'str';
   return String(w&&w.stat||'str');
 }
 function weaponDamageType(w){
@@ -1746,13 +1749,19 @@ function signedFlat(n){return Number(n)>=0?`+${Number(n)||0}`:String(Number(n)||
 function weaponPrimaryAttackCount(c){
   const first=c&&c.at&&c.at[0];
   if(first&&Number(first.attacks)>0)return Number(first.attacks);
+  const stated=String(first&&first.no||'').match(/(?:^|[.·]\s*)([1-4])\s+атак[аи]?(?=\s|[.(,;:]|$)/i);
+  if(stated)return Number(stated[1]);
   const rows=(c&&c.at||[]).filter(a=>!/Бонусное действие/i.test(String(a.no||'')));
   return Math.max(1,rows.filter(a=>/атака\s*\d+\/\d+/i.test(String(a.n||''))).length||rows.length||1);
 }
 function originalWeaponMagic(c){return defaultNpcWeaponState(c).magicBonus||0;}
-function attackSpecialBonus(c,base){
-  const stat=String(base&&base.stat||findWeaponByName(base&&base.n)&&findWeaponByName(base.n).stat||'str');
-  return parseSignedBonus(base&&base.a)-statModNum(c&&c.st&&c.st[stat])-Math.abs(parseSignedBonus(c&&c.co&&c.co.prof))-originalWeaponMagic(c);
+function attackSpecialBonus(c,base,targetWeapon){
+  const sourceWeapon=findWeaponByName(base&&base.n,false);
+  const stat=String(base&&base.stat||(sourceWeapon?weaponAbilityKey(c,sourceWeapon,{base:true}):attackAbilityProfile(c,base)?.key)||'str');
+  const sourceRanged=sourceWeapon?sourceWeapon.type==='ranged':/лук|арбалет|пращ|выстрел|дальн/i.test([base&&base.n,base&&base.r].join(' '));
+  const archery=npcHasFeature(c,/Стиль.*Стрельба/i)?2:0;
+  // Remove the original ability and ranged-only style before applying the selected weapon.
+  return parseSignedBonus(base&&base.a)-statModNum(c&&c.st&&c.st[stat])-Math.abs(parseSignedBonus(c&&c.co&&c.co.prof))-originalWeaponMagic(c)-(sourceRanged?archery:0)+(targetWeapon&&targetWeapon.type==='ranged'?archery:0);
 }
 function compatibleWeaponNotes(c,w,magic){
   const props=String(w&&w.properties||''), melee=w&&w.type!=='ranged', heavy=/heavy|тяж[её]л/i.test(props), twoHanded=/two-handed|двуруч/i.test(props), versatile=/versatile|универсальн/i.test(props);
@@ -1779,7 +1788,7 @@ function canFrenzyBonus(c,w){
 function buildWeaponOverrideAttacks(c,weaponState){
   const w=findWeaponByName(weaponState&&weaponState.weaponName), base=c&&c.at&&c.at[0]||{}, count=weaponPrimaryAttackCount(c), magic=Number(weaponState&&weaponState.magicBonus)||0;
   if(!w)return c&&c.at||[];
-  const stat=weaponAbilityKey(c,w), ability=statModNum(getDisplayStat(c,stat)), proficient=isWeaponProficient(c,w), prof=proficient?Math.abs(parseSignedBonus(c&&c.co&&c.co.prof)):0, special=attackSpecialBonus(c,base), attack=ability+prof+special+magic;
+  const stat=weaponAbilityKey(c,w), ability=statModNum(getDisplayStat(c,stat)), proficient=isWeaponProficient(c,w), prof=proficient?Math.abs(parseSignedBonus(c&&c.co&&c.co.prof)):0, special=attackSpecialBonus(c,base,w), attack=ability+prof+special+magic;
   const tail=damageTail(base.baseDamage||base.d), damage=w.damage==='—'?'—':`${w.damage}${signedFlat(ability+magic)}${tail}`;
   const once=base.onceDamage||'', props=String(w.properties||'—'), notes=compatibleWeaponNotes(c,w,magic), rows=[];
   const common={a:signedFlat(attack),baseDamage:damage,t:weaponDamageType(w),r:weaponRangeLabel(w),stat,attacks:count};
