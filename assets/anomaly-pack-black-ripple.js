@@ -119,7 +119,7 @@
         "immunities": [],
         "conditionImmunities": []
       },
-      "img": ""
+      "img": "assets/monsters/anomaly/r1-type-a-black-ripple/r1-type-a-black-ripple-skobnik.png"
     },
     {
       "id": "r1-type-a-black-ripple-gasitel",
@@ -195,7 +195,7 @@
         "immunities": [],
         "conditionImmunities": []
       },
-      "img": ""
+      "img": "assets/monsters/anomaly/r1-type-a-black-ripple/r1-type-a-black-ripple-gasitel.png"
     },
     {
       "id": "r1-type-a-black-ripple-pantsirnik",
@@ -295,7 +295,7 @@
         "immunities": [],
         "conditionImmunities": []
       },
-      "img": ""
+      "img": "assets/monsters/anomaly/r1-type-a-black-ripple/r1-type-a-black-ripple-pantsirnik.png"
     }
   ]
 };
