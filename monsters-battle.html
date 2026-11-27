@@ -404,7 +404,8 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font
   <div class="dice-modal-detail" id="dice-modal-detail"></div>
 </div>
 
-<script src="assets/monster-packs-data.js?v=88"></script><script src="assets/anomaly-backgrounds-data.js?v=87"></script><script src="assets/mm-monsters-data.js?v=80"></script><script src="assets/mm-bestiary-adapter.js?v=80"></script>
+<script src="assets/monster-packs-data.js?v=88"></script>
+<script src="assets/anomaly-pack-black-ripple.js?v=1"></script><script src="assets/anomaly-backgrounds-data.js?v=87"></script><script src="assets/mm-monsters-data.js?v=80"></script><script src="assets/mm-bestiary-adapter.js?v=80"></script>
 <script src="assets/bestiary-data.js?v=185"></script>
 <script src="assets/monster-scene.js?v=181"></script>
 <script src="assets/monster-scene-ui.js?v=181"></script>
@@ -557,7 +558,7 @@ function longRest(){
 }
 
 /* ── Sidebar ── */
-const ZONES=[{id:'oreol',lb:'Ореол',dot:'#c9a84c'},{id:'greb',lb:'Гребень',dot:'#4c7ac9'},{id:'yadro',lb:'Ядро',dot:'#c94c4c'},{id:'r7',lb:'R7 · Ложные цели',dot:'#b07ae8'},{id:'r5a',lb:'R5 · Type A · Тёплый',dot:'#d99a3d'},{id:'r5b',lb:'R5 · Type B · Тёплый',dot:'#79d0a3'},{id:'r5c',lb:'R5 · Type C · Холодный',dot:'#9fb6d9'},{id:'r6a',lb:'R6 · Type A · Тёплый',dot:'#dda14a'},{id:'r6b',lb:'R6 · Type B · Холодный',dot:'#79b8c8'},{id:'r6c',lb:'R6 · Type C · Холодный',dot:'#8da7e6'},{id:'r7cw',lb:'R7 · Type C · Тёплый',dot:'#d79a48'},{id:'r7ad',lb:'R7 · Type A · Обесцвеченный',dot:'#c9c2b6'},{id:'r7bd',lb:'R7 · Type B · Обесцвеченный',dot:'#b8b1a6'},{id:'mm5e',lb:'Monster Manual 5e',dot:'#8fd0b0'}];
+const ZONES=[{id:'oreol',lb:'Ореол',dot:'#c9a84c'},{id:'greb',lb:'Гребень',dot:'#4c7ac9'},{id:'yadro',lb:'Ядро',dot:'#c94c4c'},{id:'r7',lb:'R7 · Ложные цели',dot:'#b07ae8'},{id:'r1a',lb:'R1 · Type A · Чёрная рябь',dot:'#9fb6d9'},{id:'r5a',lb:'R5 · Type A · Тёплый',dot:'#d99a3d'},{id:'r5b',lb:'R5 · Type B · Тёплый',dot:'#79d0a3'},{id:'r5c',lb:'R5 · Type C · Холодный',dot:'#9fb6d9'},{id:'r6a',lb:'R6 · Type A · Тёплый',dot:'#dda14a'},{id:'r6b',lb:'R6 · Type B · Холодный',dot:'#79b8c8'},{id:'r6c',lb:'R6 · Type C · Холодный',dot:'#8da7e6'},{id:'r7cw',lb:'R7 · Type C · Тёплый',dot:'#d79a48'},{id:'r7ad',lb:'R7 · Type A · Обесцвеченный',dot:'#c9c2b6'},{id:'r7bd',lb:'R7 · Type B · Обесцвеченный',dot:'#b8b1a6'},{id:'mm5e',lb:'Monster Manual 5e',dot:'#8fd0b0'}];
 function filterSidebar(){
   const q=document.getElementById('sb-search').value.toLowerCase();
   document.querySelectorAll('.mon-btn').forEach(b=>{
@@ -614,10 +615,11 @@ function buildSidebar(){
 
 
 function addPackToCombat(packId){
-  const ids=(window.ANOMALY_MONSTER_PACKS||[]).find(p=>p.id===packId)?.monsterIds||[];
-  ids.map(getMon).filter(Boolean).forEach(m=>createClone(m));
-  if(ids.length){
-    const firstClone=CLONES[CLONES.length-ids.length];
+  const pack=(window.ANOMALY_MONSTER_PACKS||[]).find(entry=>entry.id===packId);
+  const ids=pack?.initialMonsterIds??pack?.monsterIds??[];
+  const added=ids.map(getMon).filter(Boolean).flatMap(monster=>createClone(monster));
+  if(added.length){
+    const firstClone=added[0];
     if(firstClone) selectMon(firstClone.id);
   }
 }
